@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Calendario, Turnos, Etiquetas y CumpleaÃ±os</title>
-  <meta name="description" content="Calendario personal con turnos, notas, cumpleaÃ±os y control de medicamentos.">
+  <title>Calendario, Turnos, Etiquetas y Cumpleaños</title>
+  <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
@@ -67,7 +67,7 @@
       <i class="fa-solid fa-circle-info"></i>
     </div>
     <div class="flex-1 min-w-0">
-      <p id="toast-title" class="text-xs font-bold text-slate-200">NotificaciÃ³n</p>
+      <p id="toast-title" class="text-xs font-bold text-slate-200">Notificación</p>
       <p id="toast-body" class="text-[11px] text-slate-400 truncate">Mensaje del sistema</p>
     </div>
   </div>
@@ -90,7 +90,7 @@
         </button>
 
         <!-- Notification Permission Button -->
-        <button id="notif-permission-btn" onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Activar recordatorios de medicamentos y cumpleaÃ±os">
+        <button id="notif-permission-btn" onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Activar recordatorios de medicamentos y cumpleaños">
           <i class="fa-solid fa-bell"></i>
         </button>
 
@@ -109,7 +109,7 @@
           <div id="tab-month-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-teal-400"></div>
         </button>
         <button id="tab-year-btn" onclick="switchView('year')" class="flex-1 py-3.5 px-1 relative text-slate-300 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
-          <span id="tab-year-label">AÃ‘O</span>
+          <span id="tab-year-label">AÑO</span>
           <div id="tab-year-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
         <button id="tab-summary-btn" onclick="switchView('summary')" class="flex-1 py-3.5 px-1 relative text-slate-300 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
@@ -162,10 +162,10 @@
           <div class="py-2 bg-[#C81E1E] text-white font-black">DOM</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">LUN</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">MAR</div>
-          <div class="py-2 bg-[#1e293b] text-slate-300">MIÃ‰</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">MIÉ</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">JUE</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">VIE</div>
-          <div class="py-2 bg-[#C81E1E] text-white font-black">SÃB</div>
+          <div class="py-2 bg-[#C81E1E] text-white font-black">SÁB</div>
         </div>
 
         <!-- CALENDAR GRID -->
@@ -177,11 +177,11 @@
         <div class="mt-4 bg-[#1e293b] p-3 rounded-lg border border-slate-700/60 flex items-center justify-between shadow-lg gap-2">
           <div class="flex items-center space-x-2.5 overflow-hidden">
             <span class="w-3 h-3 rounded-full bg-teal-400 shrink-0 animate-pulse"></span>
-            <span id="selected-date-info" class="text-xs sm:text-sm font-medium text-slate-200 truncate">Selecciona un dÃ­a para abrir detalles</span>
+            <span id="selected-date-info" class="text-xs sm:text-sm font-medium text-slate-200 truncate">Selecciona un día para abrir detalles</span>
           </div>
           <button onclick="openDayDetailModal()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md text-xs font-bold tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 shrink-0">
             <i class="fa-solid fa-pen-to-square"></i>
-            <span>Gestionar DÃ­a</span>
+            <span>Gestionar Día</span>
           </button>
         </div>
 
@@ -208,14 +208,14 @@
         </div>
       </div>
 
-      <!-- VISTA 3: RESUMEN Y ESTADÃSTICAS -->
+      <!-- VISTA 3: RESUMEN Y ESTADÍSTICAS -->
       <div id="view-summary" class="hidden flex-1 flex flex-col py-2 space-y-4 view-transition">
         
-        <!-- PANEL 1: ESTADÃSTICAS Y HORAS -->
+        <!-- PANEL 1: ESTADÍSTICAS Y HORAS -->
         <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
           <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
             <i class="fa-solid fa-chart-pie text-teal-400"></i>
-            <span>ESTADÃSTICAS</span>
+            <span>ESTADÍSTICAS</span>
           </h3>
 
           <!-- Segmented Filter Buttons -->
@@ -224,10 +224,10 @@
               Mes
             </button>
             <button id="summary-mode-year" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
-              AÃ±o
+              Año
             </button>
             <button id="summary-mode-all" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
-              HistÃ³rico
+              Histórico
             </button>
           </div>
 
@@ -282,7 +282,7 @@
               Pasadas
             </button>
             <button id="notes-mode-next" onclick="setNotesTab('next')" class="py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow">
-              PrÃ³ximas
+              Próximas
             </button>
           </div>
 
@@ -293,25 +293,25 @@
 
       </div>
 
-      <!-- VISTA 4: CUMPLEAÃ‘OS -->
+      <!-- VISTA 4: CUMPLEAÑOS -->
       <div id="view-birthdays" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
         
-        <!-- HEADER DE CUMPLEAÃ‘OS -->
+        <!-- HEADER DE CUMPLEAÑOS -->
         <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-cake-candles text-amber-400 text-base"></i>
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">GESTIÃ“N DE CUMPLEAÃ‘OS</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">GESTIÓN DE CUMPLEAÑOS</h3>
           </div>
           <button onclick="openDirectBirthdayModal()" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
-            <i class="fa-solid fa-plus"></i> AÃ±adir
+            <i class="fa-solid fa-plus"></i> Añadir
           </button>
         </div>
 
-        <!-- BOTONES DE FILTRO (PRÃ“XIMOS VS TODOS) -->
+        <!-- BOTONES DE FILTRO (PRÓXIMOS VS TODOS) -->
         <div class="grid grid-cols-2 gap-2">
           <button id="bday-tab-upcoming" onclick="setBirthdayFilterTab('upcoming')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-amber-500 text-slate-950">
             <i class="fa-solid fa-star text-xs"></i>
-            <span>PrÃ³ximos CumpleaÃ±os</span>
+            <span>Próximos Cumpleaños</span>
           </button>
           <button id="bday-tab-all" onclick="setBirthdayFilterTab('all')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700">
             <i class="fa-solid fa-list text-xs"></i>
@@ -326,7 +326,7 @@
           </span>
         </div>
 
-        <!-- LISTA DE CUMPLEAÃ‘OS -->
+        <!-- LISTA DE CUMPLEAÑOS -->
         <div id="birthdays-list-container" class="flex-1 space-y-2 overflow-y-auto max-h-[60vh] pr-1">
           <!-- Birthday Cards -->
         </div>
@@ -349,10 +349,10 @@
           <button onclick="exportMedicationCalendar()" class="w-full py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
             <i class="fa-solid fa-calendar-plus"></i> Exportar recordatorios al calendario
           </button>
-          <p class="mt-1.5 text-[10px] text-slate-400 text-center">Descarga un archivo para importar en el calendario del telÃ©fono.</p>
+          <p class="mt-1.5 text-[10px] text-slate-400 text-center">Descarga un archivo para importar en el calendario del teléfono.</p>
         </div>
 
-        <!-- TABS DE NAVEGACIÃ“N DENTRO DE SALUD -->
+        <!-- TABS DE NAVEGACIÓN DENTRO DE SALUD -->
         <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
           <button id="medSubTabHoy" onclick="switchMedSubTab('hoy')" class="flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow">
             Hoy
@@ -365,7 +365,7 @@
           </button>
         </div>
 
-        <!-- SUB-VISTA 1: HOY & PRÃ“XIMAS TOMAS -->
+        <!-- SUB-VISTA 1: HOY & PRÓXIMAS TOMAS -->
         <div id="medSubViewHoy" class="space-y-3">
           <div class="bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-xl p-4 shadow-xl relative overflow-hidden">
             <p class="text-[10px] font-bold opacity-80 uppercase tracking-wider" id="todayMedFullDate">Cargando fecha...</p>
@@ -402,14 +402,14 @@
               <button onclick="changeMedMonth(-1)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
               </button>
-              <h3 id="calMedMonthTitle" class="font-bold text-xs uppercase tracking-wider text-blue-400">Mes AÃ±o</h3>
+              <h3 id="calMedMonthTitle" class="font-bold text-xs uppercase tracking-wider text-blue-400">Mes Año</h3>
               <button onclick="changeMedMonth(1)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
               </button>
             </div>
 
             <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 mb-1">
-              <div>Dom</div><div>Lun</div><div>Mar</div><div>MiÃ©</div><div>Jue</div><div>Vie</div><div>SÃ¡b</div>
+              <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
             </div>
 
             <div id="calendarMedGrid" class="grid grid-cols-7 gap-1 text-center text-xs">
@@ -418,7 +418,7 @@
           </div>
 
           <div class="bg-[#1e2733] rounded-xl p-3 border border-slate-700/60 shadow-lg">
-            <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2" id="selectedMedDateTitle">Tomas para el dÃ­a</h3>
+            <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2" id="selectedMedDateTitle">Tomas para el día</h3>
             <div id="selectedMedDateDosesList" class="space-y-1.5">
               <!-- Dynamic content -->
             </div>
@@ -453,7 +453,7 @@
           <i class="fa-solid fa-cake-candles"></i>
         </span>
         <div class="min-w-0">
-          <h2 id="birthday-detail-title" class="font-extrabold text-base text-amber-300 truncate">Detalle del cumpleaÃ±os</h2>
+          <h2 id="birthday-detail-title" class="font-extrabold text-base text-amber-300 truncate">Detalle del cumpleaños</h2>
           <p id="birthday-detail-birthdate" class="text-xs text-slate-400 mt-0.5"></p>
         </div>
       </div>
@@ -470,7 +470,7 @@
     </section>
   </div>
 
-  <!-- MODAL: DETALLES Y GESTIÃ“N DEL DÃA -->
+  <!-- MODAL: DETALLES Y GESTIÓN DEL DÍA -->
   <div id="day-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-50 transition-opacity overflow-y-auto">
     <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 max-h-[92vh] my-auto">
       
@@ -505,33 +505,33 @@
         </div>
       </div>
 
-      <!-- VISTA 2: FORMULARIO DE CREACIÃ“N/EDICIÃ“N -->
+      <!-- VISTA 2: FORMULARIO DE CREACIÓN/EDICIÓN -->
       <div id="modal-view-form" class="hidden flex-1 flex-col overflow-y-auto pr-1">
         <input type="hidden" id="editing-note-id" value="">
         <div class="bg-slate-800/90 p-3 rounded-lg border border-slate-700/60 my-2 space-y-3">
           
           <div>
-            <label id="new-note-title-label" for="new-note-title" class="text-[11px] text-slate-300 font-semibold mb-1 block">TÃ­tulo de la nota:</label>
+            <label id="new-note-title-label" for="new-note-title" class="text-[11px] text-slate-300 font-semibold mb-1 block">Título de la nota:</label>
             <div class="relative">
-              <input type="text" id="new-note-title" oninput="handleTitleInput(this.value)" onfocus="handleTitleSuggestions()" autocomplete="off" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2.5 py-2 text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400 transition-colors" placeholder="Ej. ReuniÃ³n, Hospital...">
-              <!-- Advertencia de cumpleaÃ±os duplicado -->
+              <input type="text" id="new-note-title" oninput="handleTitleInput(this.value)" onfocus="handleTitleSuggestions()" autocomplete="off" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2.5 py-2 text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400 transition-colors" placeholder="Ej. Reunión, Hospital...">
+              <!-- Advertencia de cumpleaños duplicado -->
               <p id="bday-duplicate-error" class="hidden text-[10px] text-red-400 font-bold mt-1 flex items-center gap-1">
-                <i class="fa-solid fa-circle-xmark"></i> Ya existe un cumpleaÃ±os registrado con este nombre. Elige otro nombre.
+                <i class="fa-solid fa-circle-xmark"></i> Ya existe un cumpleaños registrado con este nombre. Elige otro nombre.
               </p>
-              <!-- Contenedor de Sugerencias de TÃ­tulos Anteriores -->
+              <!-- Contenedor de Sugerencias de Títulos Anteriores -->
               <div id="title-suggestions-container" class="hidden absolute top-full left-0 right-0 z-50 mt-1 max-h-28 overflow-y-auto bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-1 touch-auto">
-                <!-- Sugerencias dinÃ¡micas -->
+                <!-- Sugerencias dinámicas -->
               </div>
             </div>
           </div>
 
           <div>
-            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">DescripciÃ³n:</label>
+            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">Descripción:</label>
             <textarea id="new-note-textarea" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg p-2.5 text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400 resize-none h-14 transition-colors" placeholder="Detalles o notas adicionales..."></textarea>
           </div>
           
           <div>
-            <span id="new-note-abbrev-label" class="text-[11px] text-slate-300 font-semibold block mb-1">Abreviatura (Auto si estÃ¡ vacÃ­a):</span>
+            <span id="new-note-abbrev-label" class="text-[11px] text-slate-300 font-semibold block mb-1">Abreviatura (Auto si está vacía):</span>
             <input type="text" id="new-note-abbrev" maxlength="6" class="bg-slate-900 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-teal-400 w-full uppercase disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Ej. REU">
             <div id="duration-input-container" class="hidden">
               <input type="number" id="new-note-hours" min="0" max="24" value="0" readonly class="hidden">
@@ -546,7 +546,7 @@
             <div>
               <span class="text-[10px] text-slate-300 font-semibold block mb-0.5">Jornada:</span>
               <select id="new-shift-type" onchange="handleShiftTypeChange()" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-[11px] focus:outline-none focus:border-purple-400 font-bold">
-                <option value="MaÃ±ana">MaÃ±ana</option>
+                <option value="Mañana">Mañana</option>
                 <option value="Tarde">Tarde</option>
                 <option value="Noche">Noche</option>
               </select>
@@ -564,15 +564,15 @@
             </div>
           </div>
 
-          <!-- Campos CumpleaÃ±os -->
+          <!-- Campos Cumpleaños -->
           <div id="birthday-date-container" class="hidden bg-slate-900/90 p-2.5 rounded-lg border border-slate-700/60 flex-col gap-2">
             <input type="checkbox" id="is-birthday-checkbox" class="hidden">
             <div class="flex items-center gap-2">
               <label for="new-note-birthdate" class="text-[10px] text-slate-300 font-semibold whitespace-nowrap">Fecha de nacimiento:</label>
-              <input type="text" id="new-note-birthdate" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="DD/MM/AAAA" aria-label="Fecha de nacimiento (dÃ­a, mes y aÃ±o)" oninput="formatBirthdayDateInput(this); updateBirthdayCounterPreview()" onblur="normalizeBirthdayDateInput(this); updateBirthdayCounterPreview()" class="bg-slate-950 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-[11px] focus:outline-none focus:border-teal-400 w-full font-mono">
+              <input type="text" id="new-note-birthdate" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="DD/MM/AAAA" aria-label="Fecha de nacimiento (día, mes y año)" oninput="formatBirthdayDateInput(this); updateBirthdayCounterPreview()" onblur="normalizeBirthdayDateInput(this); updateBirthdayCounterPreview()" class="bg-slate-950 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-[11px] focus:outline-none focus:border-teal-400 w-full font-mono">
             </div>
 
-            <!-- MenÃº Desplegable: Opciones Avanzadas -->
+            <!-- Menú Desplegable: Opciones Avanzadas -->
             <details class="group pt-1 border-t border-slate-800">
               <summary class="flex items-center justify-between text-[10px] font-bold text-amber-300 cursor-pointer py-1 hover:text-amber-200 transition-colors list-none select-none">
                 <span class="flex items-center gap-1.5">
@@ -589,7 +589,7 @@
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 bg-slate-950 p-2 rounded border border-slate-800 text-[10px]">
                     <label class="flex items-center gap-1 cursor-pointer text-slate-300 hover:text-white">
                       <input type="checkbox" id="bday-count-days" class="accent-amber-500 rounded" onchange="updateBirthdayCounterPreview()">
-                      <span>DÃ­as transcurridos</span>
+                      <span>Días transcurridos</span>
                     </label>
                     <label class="flex items-center gap-1 cursor-pointer text-slate-300 hover:text-white">
                       <input type="checkbox" id="bday-count-weeks" class="accent-amber-500 rounded" onchange="updateBirthdayCounterPreview()">
@@ -613,7 +613,7 @@
                       <input type="color" id="bday-color-anniversary" value="#EC4899" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
                     </div>
                     <div class="flex items-center justify-between gap-1">
-                      <span class="text-slate-300 truncate">Cumple DÃ­a:</span>
+                      <span class="text-slate-300 truncate">Cumple Día:</span>
                       <input type="color" id="bday-color-day" value="#F59E0B" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
                     </div>
                     <div class="flex items-center justify-between gap-1">
@@ -634,9 +634,9 @@
                 <i class="fa-solid fa-bell"></i> Recordatorio:
               </span>
               <select id="birthday-reminder-option" class="bg-slate-950 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-[10px] focus:outline-none focus:border-teal-400">
-                <option value="same_day">El mismo dÃ­a</option>
-                <option value="1_day">1 dÃ­a antes</option>
-                <option value="3_days">3 dÃ­as antes</option>
+                <option value="same_day">El mismo día</option>
+                <option value="1_day">1 día antes</option>
+                <option value="3_days">3 días antes</option>
                 <option value="1_week">1 semana antes</option>
               </select>
             </div>
@@ -647,10 +647,10 @@
             <div id="general-color-wrapper" class="flex items-center gap-1.5">
               <span class="text-[11px] text-slate-300 font-semibold">Color:</span>
               <div class="flex items-center gap-1">
-                <button type="button" onclick="selectFormColor('#EC4899')" class="color-btn w-5 h-5 rounded-full bg-pink-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#EC4899" title="CumpleaÃ±os"></button>
-                <button type="button" onclick="selectFormColor('#F59E0B')" class="color-btn w-5 h-5 rounded-full bg-amber-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#F59E0B" title="Alerta/DÃ­a"></button>
-                <button type="button" onclick="selectFormColor('#38BDF8')" class="color-btn w-5 h-5 rounded-full bg-sky-400 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#38BDF8" title="MaÃ±ana/Semana"></button>
-                <button type="button" onclick="selectFormColor('#10B981')" class="color-btn w-5 h-5 rounded-full bg-emerald-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#10B981" title="Ã‰xito/Mes"></button>
+                <button type="button" onclick="selectFormColor('#EC4899')" class="color-btn w-5 h-5 rounded-full bg-pink-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#EC4899" title="Cumpleaños"></button>
+                <button type="button" onclick="selectFormColor('#F59E0B')" class="color-btn w-5 h-5 rounded-full bg-amber-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#F59E0B" title="Alerta/Día"></button>
+                <button type="button" onclick="selectFormColor('#38BDF8')" class="color-btn w-5 h-5 rounded-full bg-sky-400 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#38BDF8" title="Mañana/Semana"></button>
+                <button type="button" onclick="selectFormColor('#10B981')" class="color-btn w-5 h-5 rounded-full bg-emerald-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#10B981" title="Éxito/Mes"></button>
                 <button type="button" onclick="selectFormColor('#14B8A6')" class="color-btn w-5 h-5 rounded-full bg-teal-500 border-2 border-white ring-2 ring-teal-400 transition-all focus:outline-none" data-color="#14B8A6" title="General"></button>
                 <button type="button" onclick="selectFormColor('#8B5CF6')" class="color-btn w-5 h-5 rounded-full bg-purple-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#8B5CF6" title="Noche"></button>
                 <button type="button" onclick="selectFormColor('#EF4444')" class="color-btn w-5 h-5 rounded-full bg-red-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#EF4444" title="Urgente"></button>
@@ -726,7 +726,7 @@
             <option value="Ibuprofeno">
             <option value="Omeprazol">
             <option value="Amoxicilina">
-            <option value="LosartÃ¡n">
+            <option value="Losartán">
             <option value="Enalapril">
             <option value="Metformina">
             <option value="Atorvastatina">
@@ -743,7 +743,7 @@
             <option value="Ciprofloxacino">
             <option value="Tramadol">
             <option value="Buscapina (Escopolamina)">
-            <option value="Ãcido AcetilsalicÃ­lico (Aspirina)">
+            <option value="Ácido Acetilsalicílico (Aspirina)">
             <option value="Levotiroxina">
             <option value="Amlodipino">
             <option value="Furosemida">
@@ -768,16 +768,16 @@
           </div>
 
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Frasco / PresentaciÃ³n</label>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Frasco / Presentación</label>
             <input type="text" id="medFormType" oninput="calculateDoseHelper()" placeholder="Ej. 100mg/1ml o 500mg/comprimido" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
           </div>
         </div>
 
-        <!-- Calculadora dinÃ¡mica visual -->
+        <!-- Calculadora dinámica visual -->
         <div id="doseCalcResult" class="hidden p-2 rounded-lg bg-blue-950/60 border border-blue-800/60 text-[11px] text-blue-300 space-y-0.5">
           <div class="flex items-center gap-1 font-bold text-blue-400">
             <i class="fa-solid fa-calculator"></i>
-            <span>CÃ¡lculo automÃ¡tico:</span>
+            <span>Cálculo automático:</span>
           </div>
           <p id="doseCalcText" class="font-semibold text-xs">--</p>
         </div>
@@ -785,7 +785,7 @@
         <!-- Horario Inicial & Frecuencia -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">1Âª Hora Toma</label>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">1ª Hora Toma</label>
             <input type="time" id="medTime" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono text-slate-100 focus:outline-none focus:border-blue-400">
           </div>
 
@@ -799,13 +799,13 @@
               <option value="9">Cada 9 horas</option>
               <option value="12">Cada 12 horas</option>
               <option value="24" selected>Cada 24h (Diario)</option>
-              <option value="48">Cada 48h (Cada 2 dÃ­as)</option>
-              <option value="168">Cada 7 dÃ­as (Semanal)</option>
+              <option value="48">Cada 48h (Cada 2 días)</option>
+              <option value="168">Cada 7 días (Semanal)</option>
             </select>
           </div>
         </div>
 
-        <!-- Fecha Inicio & DuraciÃ³n -->
+        <!-- Fecha Inicio & Duración -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[11px] font-semibold text-slate-300 mb-1">Fecha de Inicio</label>
@@ -813,14 +813,14 @@
           </div>
 
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">DuraciÃ³n (DÃ­as)</label>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Duración (Días)</label>
             <input type="number" id="medDuration" value="7" min="1" max="365" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
           </div>
         </div>
 
         <!-- Notas / Indicaciones -->
         <div>
-          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Notas / Indicaciones MÃ©dicas</label>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Notas / Indicaciones Médicas</label>
           <textarea id="medNotes" rows="2" placeholder="Ej. Tomar en ayunas..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 resize-none"></textarea>
         </div>
 
@@ -838,7 +838,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE CONFIRMACIÃ“N DE ELIMINACIÃ“N REPETIDA -->
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN REPETIDA -->
   <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-opacity">
     <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-xs w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3">
       <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
@@ -846,14 +846,14 @@
         <span>Eliminar Elemento Repetido</span>
       </div>
       <p class="text-xs text-slate-300 leading-relaxed">
-        Esta etiqueta tiene una configuraciÃ³n de repeticiÃ³n activa. Â¿CÃ³mo deseas proceder?
+        Esta etiqueta tiene una configuración de repetición activa. ¿Cómo deseas proceder?
       </p>
       <div class="flex flex-col gap-2 pt-2">
         <button type="button" onclick="confirmDeleteAction('all')" class="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs tracking-wide transition-all shadow">
           Eliminar todas las repetidas
         </button>
         <button type="button" onclick="confirmDeleteAction('single')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg font-bold text-xs tracking-wide transition-all">
-          Eliminar solo este dÃ­a
+          Eliminar solo este día
         </button>
         <button type="button" onclick="closeDeleteConfirmModal()" class="w-full py-1.5 text-slate-400 hover:text-slate-200 text-xs font-semibold">
           Cancelar
@@ -994,7 +994,7 @@
       saveToLocalStorage();
     }
 
-    // INICIALIZACIÃ“N
+    // INICIALIZACIÓN
     document.addEventListener('DOMContentLoaded', function() {
       initPWAAndServiceWorker();
       setBirthdayDateMax();
@@ -1006,7 +1006,7 @@
       renderAll();
     });
 
-    // Gestos tÃ¡ctiles (Swipe)
+    // Gestos táctiles (Swipe)
     let touchStartX = 0;
     let touchStartY = 0;
     let touchEndX = 0;
@@ -1099,7 +1099,7 @@
         localStorage.setItem('cal_time_format', timeFormat);
       } catch (error) {
         console.error('No se pudo guardar el formato de hora.', error);
-        showToast('No se pudo guardar', 'El formato se aplicarÃ¡ hasta cerrar esta pÃ¡gina.', 'fa-triangle-exclamation', 'text-red-400');
+        showToast('No se pudo guardar', 'El formato se aplicará hasta cerrar esta página.', 'fa-triangle-exclamation', 'text-red-400');
       }
 
       renderAll();
@@ -1145,7 +1145,7 @@
       renderAll();
     }
 
-    // LÃ“GICA MEDICAMENTOS (MiMedicina)
+    // LÓGICA MEDICAMENTOS (MiMedicina)
     function switchMedSubTab(tab) {
       ['medSubViewHoy', 'medSubViewCal', 'medSubViewMeds'].forEach(id => {
         const el = document.getElementById(id);
@@ -1242,7 +1242,7 @@
             const tabletsText = Number(calculatedTablets.toFixed(3)).toString();
             return {
               equivalence: `${tabletsText} comprimidos de ${mgPerTablet.toFixed(2)} mg`,
-              warning: 'Es una equivalencia matemÃ¡tica; no partas ni tritures el comprimido sin confirmarlo con un profesional.'
+              warning: 'Es una equivalencia matemática; no partas ni tritures el comprimido sin confirmarlo con un profesional.'
             };
           };
         }
@@ -1257,7 +1257,7 @@
             const dropsText = Number.isInteger(calculatedDrops) ? calculatedDrops : calculatedDrops.toFixed(2);
             return {
               equivalence: `${calculatedMl.toFixed(2)} ml (${dropsText} gotas, usando 20 gotas/ml)`,
-              warning: 'Es una estimaciÃ³n: confirma el factor de tu gotero y la dosis con el envase o un profesional.'
+              warning: 'Es una estimación: confirma el factor de tu gotero y la dosis con el envase o un profesional.'
             };
           }
         }
@@ -1279,7 +1279,7 @@
         return;
       }
 
-      calcText.innerHTML = `Equivalencia matemÃ¡tica: <strong class="text-white">${calculation.equivalence}</strong>. ${calculation.warning}`;
+      calcText.innerHTML = `Equivalencia matemática: <strong class="text-white">${calculation.equivalence}</strong>. ${calculation.warning}`;
       calcBox.classList.remove('hidden');
     }
 
@@ -1307,10 +1307,10 @@
       const existingIndex = medications.findIndex(m => m.id === id);
       if (existingIndex >= 0) {
         medications[existingIndex] = newMed;
-        showToast('Medicamento Actualizado', 'ModificaciÃ³n guardada exitosamente.', 'fa-circle-check', 'text-teal-400');
+        showToast('Medicamento Actualizado', 'Modificación guardada exitosamente.', 'fa-circle-check', 'text-teal-400');
       } else {
         medications.push(newMed);
-        showToast('Medicamento Registrado', 'Se agregÃ³ correctamente.', 'fa-circle-check', 'text-teal-400');
+        showToast('Medicamento Registrado', 'Se agregó correctamente.', 'fa-circle-check', 'text-teal-400');
       }
 
       persistMedicationData();
@@ -1322,7 +1322,7 @@
     }
 
     function deleteMed(id) {
-      if (confirm('Â¿Deseas eliminar este medicamento de tus tratamientos?')) {
+      if (confirm('¿Deseas eliminar este medicamento de tus tratamientos?')) {
         medications = medications.filter(m => m.id !== id);
         persistMedicationData();
         showToast('Eliminado', 'Medicamento removido.', 'fa-trash-can', 'text-amber-400');
@@ -1449,7 +1449,7 @@
       });
 
       if (events.length === 0) {
-        showToast('No se pudo exportar', 'Revisa la fecha de inicio, duraciÃ³n y frecuencia de tus tratamientos.', 'fa-triangle-exclamation', 'text-amber-400');
+        showToast('No se pudo exportar', 'Revisa la fecha de inicio, duración y frecuencia de tus tratamientos.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
 
@@ -1501,8 +1501,8 @@
       downloadAnchor.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-      const skippedMessage = skippedMedications > 0 ? ` Se omitieron ${skippedMedications} tratamiento(s) con fechas o duraciones no vÃ¡lidas.` : '';
-      showToast('Calendario exportado', `${events.length} recordatorios descargados. ImpÃ³rtalos en el calendario del telÃ©fono.${skippedMessage}`, 'fa-calendar-check', 'text-teal-400');
+      const skippedMessage = skippedMedications > 0 ? ` Se omitieron ${skippedMedications} tratamiento(s) con fechas o duraciones no válidas.` : '';
+      showToast('Calendario exportado', `${events.length} recordatorios descargados. Impórtalos en el calendario del teléfono.${skippedMessage}`, 'fa-calendar-check', 'text-teal-400');
     }
 
     function renderTodayMedView() {
@@ -1624,7 +1624,7 @@
       title.textContent = `Tomas para el ${parts[2]}/${parts[1]}/${parts[0]}`;
 
       if (doses.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 py-1">Sin tomas registradas para este dÃ­a.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 py-1">Sin tomas registradas para este día.</p>`;
         return;
       }
 
@@ -1658,7 +1658,7 @@
         container.innerHTML = `
           <div class="text-center py-6 bg-slate-900/50 rounded-xl border border-slate-800">
             <i class="fa-solid fa-pills text-3xl text-slate-600 mb-1"></i>
-            <p class="text-xs font-medium text-slate-400">AÃºn no has registrado ningÃºn tratamiento o medicamento.</p>
+            <p class="text-xs font-medium text-slate-400">Aún no has registrado ningún tratamiento o medicamento.</p>
           </div>
         `;
         return;
@@ -1685,7 +1685,7 @@
             <div class="text-[11px] text-slate-400 space-y-0.5">
               <p><strong class="text-slate-300">Dosis:</strong> ${escapeHtml(doseDisplay)}</p>
               <p><strong class="text-slate-300">Horarios:</strong> Cada ${med.frequency} horas desde las ${escapeHtml(formatTime(med.time))}</p>
-              <p><strong class="text-slate-300">DuraciÃ³n:</strong> ${med.duration} dÃ­as (Inicio: ${escapeHtml(med.startDate)})</p>
+              <p><strong class="text-slate-300">Duración:</strong> ${med.duration} días (Inicio: ${escapeHtml(med.startDate)})</p>
               ${med.notes ? `<p class="italic text-slate-400 pt-0.5">"${escapeHtml(med.notes)}"</p>` : ''}
             </div>
           </div>
@@ -1810,7 +1810,7 @@
       const birthDate = parseBirthdayDateInput(document.getElementById('new-note-birthdate').value);
       const counters = calculateBirthdayCounters(birthDate && birthDate.iso);
       const selectedUnits = [
-        ['days', 'bday-count-days', 'dÃ­as'],
+        ['days', 'bday-count-days', 'días'],
         ['weeks', 'bday-count-weeks', 'semanas'],
         ['months', 'bday-count-months', 'meses']
       ].filter(([, id]) => document.getElementById(id).checked);
@@ -1822,7 +1822,7 @@
 
       preview.textContent = `Transcurridos: ${selectedUnits
         .map(([unit, , label]) => `${counters[unit]} ${label}`)
-        .join(' Â· ')}`;
+        .join(' · ')}`;
     }
 
     function showToast(title, body, iconClass = 'fa-circle-info', colorClass = 'text-teal-400') {
@@ -1845,7 +1845,7 @@
         return true;
       } catch (error) {
         console.error('No se pudieron guardar los datos del calendario.', error);
-        showToast('No se pudo guardar', 'El almacenamiento estÃ¡ lleno o no estÃ¡ disponible. Exporta una copia de seguridad.', 'fa-triangle-exclamation', 'text-red-400');
+        showToast('No se pudo guardar', 'El almacenamiento está lleno o no está disponible. Exporta una copia de seguridad.', 'fa-triangle-exclamation', 'text-red-400');
         return false;
       }
     }
@@ -1874,7 +1874,7 @@
 
     function generateSmartAbbrev(titleText, defaultFallback = 'NOTA') {
       if (!titleText) return defaultFallback;
-      const clean = titleText.trim().replace(/[^a-zA-Z0-9Ã¡Ã©Ã­Ã³ÃºÃÃ‰ÃÃ“ÃšÃ±Ã‘]/g, '');
+      const clean = titleText.trim().replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '');
       if (clean.length === 0) return defaultFallback;
       return clean.substring(0, 4).toUpperCase();
     }
@@ -2228,7 +2228,7 @@
 
         document.getElementById('birthday-reminder-option').value = editNote.reminder || 'same_day';
         document.getElementById('is-shift-checkbox').checked = !!editNote.isShift;
-        document.getElementById('new-shift-type').value = editNote.shiftType || 'MaÃ±ana';
+        document.getElementById('new-shift-type').value = editNote.shiftType || 'Mañana';
         document.getElementById('new-shift-start').value = editNote.shiftStart || '';
         document.getElementById('new-shift-end').value = editNote.shiftEnd || '';
         document.getElementById('repeat-option').value = editNote.repeat || 'none';
@@ -2259,7 +2259,7 @@
         const bdayMonthEl = document.getElementById('bday-color-month');
         if (bdayMonthEl) bdayMonthEl.value = '#10B981';
         document.getElementById('is-shift-checkbox').checked = false;
-        document.getElementById('new-shift-type').value = 'MaÃ±ana';
+        document.getElementById('new-shift-type').value = 'Mañana';
         document.getElementById('new-shift-start').value = '08:00';
         document.getElementById('new-shift-end').value = '16:00';
         toggleSpecialTypeInput('none');
@@ -2280,8 +2280,8 @@
 
     function showCreateBirthdayFormInModal() {
       showCreateFormInModal();
-      document.getElementById('modal-title-text').textContent = "Nuevo CumpleaÃ±os";
-      document.getElementById('form-submit-label').textContent = "Guardar e Incluir CumpleaÃ±os";
+      document.getElementById('modal-title-text').textContent = "Nuevo Cumpleaños";
+      document.getElementById('form-submit-label').textContent = "Guardar e Incluir Cumpleaños";
       document.getElementById('is-birthday-checkbox').checked = true;
       toggleSpecialTypeInput('birthday');
       document.getElementById('new-note-abbrev').value = 'CUMPL';
@@ -2366,7 +2366,7 @@
       
       if (note.isShift) {
         document.getElementById('is-shift-checkbox').checked = true;
-        document.getElementById('new-shift-type').value = note.shiftType || 'MaÃ±ana';
+        document.getElementById('new-shift-type').value = note.shiftType || 'Mañana';
         document.getElementById('new-shift-start').value = note.shiftStart || '08:00';
         document.getElementById('new-shift-end').value = note.shiftEnd || '16:00';
         toggleSpecialTypeInput('shift');
@@ -2532,8 +2532,8 @@
       const abbrevLabel = document.getElementById('new-note-abbrev-label');
       const abbrevInput = document.getElementById('new-note-abbrev');
 
-      if (titleLabel) titleLabel.textContent = isBirthday ? 'Nombre:' : 'TÃ­tulo de la nota:';
-      if (abbrevLabel) abbrevLabel.textContent = isBirthday ? 'Abreviatura fija:' : 'Abreviatura (Auto si estÃ¡ vacÃ­a):';
+      if (titleLabel) titleLabel.textContent = isBirthday ? 'Nombre:' : 'Título de la nota:';
+      if (abbrevLabel) abbrevLabel.textContent = isBirthday ? 'Abreviatura fija:' : 'Abreviatura (Auto si está vacía):';
       if (abbrevInput) {
         abbrevInput.disabled = isBirthday;
         if (isBirthday) abbrevInput.value = 'CUMPL';
@@ -2603,7 +2603,7 @@
       if (visibleNotes.length === 0) {
         container.innerHTML = `
           <div class="text-center py-6 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
-            No hay notas asignadas para este dÃ­a.
+            No hay notas asignadas para este día.
           </div>
         `;
         return;
@@ -2634,7 +2634,7 @@
                 <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(note.title || note.text)}</span>
                 <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(labelText)}</span>
                 ${typeBadgeHTML}
-                ${note.repeat && note.repeat !== 'none' ? `<i class="fa-solid fa-arrows-rotate text-[10px] text-teal-400" title="RepeticiÃ³n activa"></i>` : ''}
+                ${note.repeat && note.repeat !== 'none' ? `<i class="fa-solid fa-arrows-rotate text-[10px] text-teal-400" title="Repetición activa"></i>` : ''}
               </div>
               ${note.description ? `<p class="text-[11px] text-slate-400 truncate mt-0.5">${escapeHtml(note.description)}</p>` : ''}
               ${note.isShift ? `<span class="text-[10px] text-purple-400 font-semibold mt-0.5"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${escapeHtml(note.shiftType || 'Turno')}: ${escapeHtml(formatTime(note.shiftStart))} - ${escapeHtml(formatTime(note.shiftEnd))}</span>` : ''}
@@ -2663,7 +2663,7 @@
       const isBirthday = document.getElementById('is-birthday-checkbox').checked;
 
       if (!titleInput) {
-        showToast('Campo Requerido', 'Por favor ingresa un tÃ­tulo para la nota.', 'fa-triangle-exclamation', 'text-amber-400');
+        showToast('Campo Requerido', 'Por favor ingresa un título para la nota.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
 
@@ -2676,11 +2676,11 @@
       if (isBirthday) {
         const parsedBirthDate = parseBirthdayDateInput(document.getElementById('new-note-birthdate').value);
         if (!document.getElementById('new-note-birthdate').value.trim()) {
-          showToast('Fecha requerida', 'Ingresa la fecha en formato dÃ­a/mes/aÃ±o (DD/MM/AAAA).', 'fa-triangle-exclamation', 'text-amber-400');
+          showToast('Fecha requerida', 'Ingresa la fecha en formato día/mes/año (DD/MM/AAAA).', 'fa-triangle-exclamation', 'text-amber-400');
           return;
         }
         if (!parsedBirthDate) {
-          showToast('Fecha no vÃ¡lida', 'Usa una fecha vÃ¡lida en formato DD/MM/AAAA.', 'fa-triangle-exclamation', 'text-amber-400');
+          showToast('Fecha no válida', 'Usa una fecha válida en formato DD/MM/AAAA.', 'fa-triangle-exclamation', 'text-amber-400');
           return;
         }
 
@@ -2689,7 +2689,7 @@
         const today = new Date();
         const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
         if (birthDateISO > todayKey) {
-          showToast('Fecha no vÃ¡lida', 'La fecha de nacimiento no puede estar en el futuro.', 'fa-triangle-exclamation', 'text-amber-400');
+          showToast('Fecha no válida', 'La fecha de nacimiento no puede estar en el futuro.', 'fa-triangle-exclamation', 'text-amber-400');
           return;
         }
       }
@@ -2698,7 +2698,7 @@
       const existingNote = editingId ? getNoteById(editingId) : null;
       const baseGroupId = existingNote ? (existingNote.repeatGroupId || 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)) : 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
 
-      // Si se estÃ¡ editando una nota que tenÃ­a repeticiones o grupo de cumpleaÃ±os, limpiar la serie anterior
+      // Si se está editando una nota que tenía repeticiones o grupo de cumpleaños, limpiar la serie anterior
       if (existingNote) {
         if (existingNote.repeatGroupId || existingNote.birthdayOwnerId || existingNote.isBirthday) {
           const groupId = existingNote.repeatGroupId;
@@ -2774,7 +2774,7 @@
       saveToLocalStorage();
       renderAll();
       closeDayDetailModal();
-      showToast('Guardado Exitoso', 'El registro se guardÃ³ correctamente.', 'fa-circle-check', 'text-teal-400');
+      showToast('Guardado Exitoso', 'El registro se guardó correctamente.', 'fa-circle-check', 'text-teal-400');
     }
 
     function getNoteById(id) {
@@ -2868,7 +2868,7 @@
       saveToLocalStorage();
       renderAll();
       closeDayDetailModal();
-      showToast('Cambios Guardados', 'Notas actualizadas para este dÃ­a.', 'fa-circle-check', 'text-teal-400');
+      showToast('Cambios Guardados', 'Notas actualizadas para este día.', 'fa-circle-check', 'text-teal-400');
     }
 
     function deleteNoteFromModal(id) {
@@ -2922,14 +2922,14 @@
       renderModalNotesList();
       renderAll();
       closeDeleteConfirmModal();
-      showToast('Eliminado', mode === 'all' ? 'Se eliminaron todas las repeticiones.' : 'Nota eliminada para este dÃ­a.', 'fa-trash-can', 'text-amber-400');
+      showToast('Eliminado', mode === 'all' ? 'Se eliminaron todas las repeticiones.' : 'Nota eliminada para este día.', 'fa-trash-can', 'text-amber-400');
     }
 
     function handleShiftTypeChange() {
       const type = document.getElementById('new-shift-type').value;
       const titleLower = document.getElementById('new-note-title').value.trim().toLowerCase();
 
-      if (type === 'MaÃ±ana') {
+      if (type === 'Mañana') {
         document.getElementById('new-shift-start').value = '08:00';
         document.getElementById('new-shift-end').value = '16:00';
         selectNoteColor('#38BDF8');
@@ -2981,7 +2981,7 @@
       } else if (summaryMode === 'year') {
         bannerTitle.textContent = `${summaryDate.getFullYear()}`;
       } else {
-        bannerTitle.textContent = `HISTÃ“RICO COMPLETO`;
+        bannerTitle.textContent = `HISTÓRICO COMPLETO`;
       }
 
       breakdownContainer.innerHTML = '';
@@ -3007,7 +3007,7 @@
             const isTurn = !!n.isShift;
 
             if ((summaryCategory === 'turns' && isTurn) || (summaryCategory === 'labels' && !isTurn && isCalendarNote(n))) {
-              const name = n.title || n.text || 'Sin TÃ­tulo';
+              const name = n.title || n.text || 'Sin Título';
               if (!statsMap[name]) {
                 statsMap[name] = {
                   count: 0,
@@ -3166,7 +3166,7 @@
       if (Object.keys(statsMap).length === 0) {
         breakdownContainer.innerHTML = `
           <div class="text-center py-4 text-slate-500 text-xs italic">
-            No hay registros para este perÃ­odo.
+            No hay registros para este período.
           </div>
         `;
       }
@@ -3218,7 +3218,7 @@
       if (items.length === 0) {
         container.innerHTML = `
           <div class="text-center py-3 text-slate-500 text-xs italic">
-            No hay ${isTurnsTab ? 'turnos cercanos' : 'notas cercanas'} en este rango (3 dÃ­as).
+            No hay ${isTurnsTab ? 'turnos cercanos' : 'notas cercanas'} en este rango (3 días).
           </div>
         `;
         return;
@@ -3283,7 +3283,7 @@
       if (bdays.length === 0) {
         container.innerHTML = `
           <div class="text-center py-8 text-slate-500 text-xs italic bg-slate-900/50 rounded-xl border border-slate-800">
-            No hay cumpleaÃ±os registrados aÃºn.
+            No hay cumpleaños registrados aún.
           </div>
         `;
         return;
@@ -3347,17 +3347,17 @@
 
           let daysBadgeText = '';
           if (item.daysLeft === 0) {
-            daysBadgeText = 'Â¡Es Hoy! ðŸŽ‰';
+            daysBadgeText = '¡Es Hoy! 🎉';
           } else if (item.daysLeft === 1) {
-            daysBadgeText = 'Falta 1 dÃ­a';
+            daysBadgeText = 'Falta 1 día';
           } else {
-            daysBadgeText = `Faltan ${item.daysLeft} dÃ­as`;
+            daysBadgeText = `Faltan ${item.daysLeft} días`;
           }
 
           dateAndAgeHTML = `
             <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
-              <span class="text-[10px] text-amber-300 font-semibold">PrÃ³ximo: ${nextBdayStr}</span>
-              ${item.ageToTurn !== null ? `<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">(CumplirÃ¡ ${item.ageToTurn} aÃ±os)</span>` : ''}
+              <span class="text-[10px] text-amber-300 font-semibold">Próximo: ${nextBdayStr}</span>
+              ${item.ageToTurn !== null ? `<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">(Cumplirá ${item.ageToTurn} años)</span>` : ''}
               <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${item.daysLeft === 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse' : 'bg-slate-800 text-teal-400 border border-slate-700'}">${daysBadgeText}</span>
             </div>
           `;
@@ -3369,7 +3369,7 @@
             fullBirthDateStr += `/${item.birthYear}`;
             const currentAge = currentYear - item.birthYear;
             if (currentAge >= 0) {
-              ageText = ` (${currentAge} aÃ±os)`;
+              ageText = ` (${currentAge} años)`;
             }
           }
 
@@ -3408,7 +3408,7 @@
     function showBirthdayDetails(button) {
       const note = getNoteById(button.dataset.noteId);
       if (!note || !note.isBirthday || note.birthdayOwnerId) {
-        showToast('No se pudo abrir', 'No se encontrÃ³ el registro del cumpleaÃ±os.', 'fa-triangle-exclamation', 'text-amber-400');
+        showToast('No se pudo abrir', 'No se encontró el registro del cumpleaños.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
 
@@ -3418,7 +3418,7 @@
       const milestones = getNextBirthdayMilestones(birthDateValue);
       const birthDate = new Date(`${birthDateValue}T00:00:00`);
       if (!counters || !milestones || Number.isNaN(birthDate.getTime())) {
-        showToast('Fecha no vÃ¡lida', 'No se pudieron calcular los contadores de este cumpleaÃ±os.', 'fa-triangle-exclamation', 'text-amber-400');
+        showToast('Fecha no válida', 'No se pudieron calcular los contadores de este cumpleaños.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
 
@@ -3434,7 +3434,7 @@
         ? `<div class="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/80">
             <div class="flex items-center gap-2.5">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:${counterColor('day')}22;color:${counterColor('day')}"><i class="fa-solid fa-calendar-day"></i></span>
-              <span class="text-xs font-semibold text-slate-300">DÃ­as transcurridos</span>
+              <span class="text-xs font-semibold text-slate-300">Días transcurridos</span>
             </div>
             <strong class="text-lg font-black tabular-nums" style="color:${counterColor('day')}">${counters.days.toLocaleString('es-ES')}</strong>
           </div>`
@@ -3450,7 +3450,7 @@
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-700/70 flex items-start gap-2">
               <i class="fa-solid fa-flag-checkered mt-0.5 text-[10px]" style="color:${counterColor('week')}"></i>
-              <p class="text-[11px] leading-relaxed text-slate-400">PrÃ³ximo cumple semana: <strong class="text-slate-200">${milestones.nextWeekNumber.toLocaleString('es-ES')} semanas</strong><br><span class="text-slate-300">${formatMilestoneDate(milestones.nextWeekDate)}</span> Â· ${milestones.daysUntilWeek === 0 ? 'Â¡Es hoy!' : `en ${milestones.daysUntilWeek} ${milestones.daysUntilWeek === 1 ? 'dÃ­a' : 'dÃ­as'}`}</p>
+              <p class="text-[11px] leading-relaxed text-slate-400">Próximo cumple semana: <strong class="text-slate-200">${milestones.nextWeekNumber.toLocaleString('es-ES')} semanas</strong><br><span class="text-slate-300">${formatMilestoneDate(milestones.nextWeekDate)}</span> · ${milestones.daysUntilWeek === 0 ? '¡Es hoy!' : `en ${milestones.daysUntilWeek} ${milestones.daysUntilWeek === 1 ? 'día' : 'días'}`}</p>
             </div>
           </div>`
         : '';
@@ -3465,14 +3465,14 @@
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-700/70 flex items-start gap-2">
               <i class="fa-solid fa-flag-checkered mt-0.5 text-[10px]" style="color:${counterColor('month')}"></i>
-              <p class="text-[11px] leading-relaxed text-slate-400">PrÃ³ximo cumple mes: <strong class="text-slate-200">${milestones.nextMonthNumber.toLocaleString('es-ES')} meses</strong><br><span class="text-slate-300">${formatMilestoneDate(milestones.nextMonthDate)}</span> Â· ${milestones.daysUntilMonth === 0 ? 'Â¡Es hoy!' : `en ${milestones.daysUntilMonth} ${milestones.daysUntilMonth === 1 ? 'dÃ­a' : 'dÃ­as'}`}</p>
+              <p class="text-[11px] leading-relaxed text-slate-400">Próximo cumple mes: <strong class="text-slate-200">${milestones.nextMonthNumber.toLocaleString('es-ES')} meses</strong><br><span class="text-slate-300">${formatMilestoneDate(milestones.nextMonthDate)}</span> · ${milestones.daysUntilMonth === 0 ? '¡Es hoy!' : `en ${milestones.daysUntilMonth} ${milestones.daysUntilMonth === 1 ? 'día' : 'días'}`}</p>
             </div>
           </div>`
         : '';
 
-      document.getElementById('birthday-detail-title').textContent = note.title || note.text || 'CumpleaÃ±os';
+      document.getElementById('birthday-detail-title').textContent = note.title || note.text || 'Cumpleaños';
       document.getElementById('birthday-detail-birthdate').textContent = `Fecha de nacimiento: ${birthDate.toLocaleDateString('es-ES', {day:'numeric', month:'long', year:'numeric'})}`;
-      document.getElementById('birthday-detail-counters').innerHTML = `${daysHTML}${weeksHTML}${monthsHTML}` || '<p class="rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-center text-xs text-slate-400 italic">No seleccionaste contadores para este cumpleaÃ±os.</p>';
+      document.getElementById('birthday-detail-counters').innerHTML = `${daysHTML}${weeksHTML}${monthsHTML}` || '<p class="rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-center text-xs text-slate-400 italic">No seleccionaste contadores para este cumpleaños.</p>';
       document.getElementById('birthday-detail-modal').classList.remove('hidden');
       document.getElementById('birthday-detail-modal').classList.add('flex');
     }
@@ -3487,14 +3487,14 @@
       const note = getNoteById(button.dataset.noteId);
       const parts = button.dataset.dateKey.split('-').map(Number);
       if (!note || parts.length !== 3 || parts.some(part => !Number.isInteger(part))) {
-        showToast('No se pudo abrir', 'No se encontrÃ³ el cumpleaÃ±os para editar.', 'fa-triangle-exclamation', 'text-amber-400');
+        showToast('No se pudo abrir', 'No se encontró el cumpleaños para editar.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
 
       selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
       openDayDetailModal();
       showCreateFormInModal(note);
-      document.getElementById('modal-title-text').textContent = 'Editar CumpleaÃ±os';
+      document.getElementById('modal-title-text').textContent = 'Editar Cumpleaños';
       document.getElementById('form-submit-label').textContent = 'Guardar Cambios';
     }
 
@@ -3533,7 +3533,7 @@
       downloadAnchor.click();
       downloadAnchor.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      showToast('ExportaciÃ³n Exitosa', 'Respaldo completo descargado (calendario y salud).', 'fa-file-export', 'text-teal-400');
+      showToast('Exportación Exitosa', 'Respaldo completo descargado (calendario y salud).', 'fa-file-export', 'text-teal-400');
     }
 
     function isValidCalendarMap(value) {
@@ -3555,19 +3555,19 @@
           const isLegacyBackup = isValidCalendarMap(importedData);
           const calendar = isLegacyBackup ? importedData : importedData && importedData.calendar;
           if (!isValidCalendarMap(calendar)) {
-            throw new Error('La estructura del calendario no es vÃ¡lida.');
+            throw new Error('La estructura del calendario no es válida.');
           }
 
           const hasMeds = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medications');
           const hasLogs = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medicationLogs');
           if (hasMeds && !Array.isArray(importedData.medications)) {
-            throw new Error('La lista de medicamentos no es vÃ¡lida.');
+            throw new Error('La lista de medicamentos no es válida.');
           }
           if (hasLogs && (!importedData.medicationLogs || typeof importedData.medicationLogs !== 'object' || Array.isArray(importedData.medicationLogs))) {
-            throw new Error('Los registros de tomas no son vÃ¡lidos.');
+            throw new Error('Los registros de tomas no son válidos.');
           }
 
-          // Solo sustituye datos despuÃ©s de validar el archivo completo.
+          // Solo sustituye datos después de validar el archivo completo.
           dayDataMap = calendar;
           syncBirthdayCalendarEvents();
           if (hasMeds) medications = importedData.medications;
@@ -3575,15 +3575,15 @@
           const savedCalendar = saveToLocalStorage();
           const savedHealth = persistMedicationData();
           if (!savedCalendar || !savedHealth) {
-            showToast('Revisa el almacenamiento', 'La importaciÃ³n se leyÃ³, pero el navegador no pudo guardar todos los datos.', 'fa-triangle-exclamation', 'text-amber-400');
+            showToast('Revisa el almacenamiento', 'La importación se leyó, pero el navegador no pudo guardar todos los datos.', 'fa-triangle-exclamation', 'text-amber-400');
           } else {
             renderAll();
             closeSettingsModal();
-            showToast('ImportaciÃ³n Exitosa', isLegacyBackup ? 'Calendario restaurado. Los datos de salud se conservaron.' : 'Respaldo completo restaurado.', 'fa-file-import', 'text-teal-400');
+            showToast('Importación Exitosa', isLegacyBackup ? 'Calendario restaurado. Los datos de salud se conservaron.' : 'Respaldo completo restaurado.', 'fa-file-import', 'text-teal-400');
           }
         } catch(err) {
           console.error('Error al importar respaldo:', err);
-          showToast('Error de ImportaciÃ³n', err.message || 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
+          showToast('Error de Importación', err.message || 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
         } finally {
           event.target.value = '';
         }
@@ -3596,7 +3596,7 @@
     }
 
     function confirmResetAllData() {
-      if (confirm('Â¿EstÃ¡s seguro de que deseas borrar TODOS los datos del calendario, medicamentos y tomas? Esta acciÃ³n no se puede deshacer.')) {
+      if (confirm('¿Estás seguro de que deseas borrar TODOS los datos del calendario, medicamentos y tomas? Esta acción no se puede deshacer.')) {
         dayDataMap = {};
         medications = [];
         medLogs = {};
@@ -3644,20 +3644,20 @@
         return;
       }
       if (!window.isSecureContext) {
-        showToast('ConexiÃ³n segura requerida', 'Las notificaciones necesitan HTTPS o localhost.', 'fa-lock', 'text-amber-400');
+        showToast('Conexión segura requerida', 'Las notificaciones necesitan HTTPS o localhost.', 'fa-lock', 'text-amber-400');
         return;
       }
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          showToast('Permiso concedido', 'Se activaron los avisos de medicamentos y cumpleaÃ±os mientras la app estÃ© abierta.', 'fa-bell', 'text-teal-400');
+          showToast('Permiso concedido', 'Se activaron los avisos de medicamentos y cumpleaños mientras la app esté abierta.', 'fa-bell', 'text-teal-400');
           checkNotificationsOnLaunch();
           checkMedicationReminders();
         } else {
-          showToast('Permiso Denegado', 'No se mostrarÃ¡n avisos del navegador. Revisa los permisos del navegador.', 'fa-bell-slash', 'text-amber-400');
+          showToast('Permiso Denegado', 'No se mostrarán avisos del navegador. Revisa los permisos del navegador.', 'fa-bell-slash', 'text-amber-400');
         }
       }).catch(error => {
         console.warn('No se pudo solicitar permiso de notificaciones:', error);
-        showToast('No se pudo activar', 'El navegador no permitiÃ³ solicitar el permiso.', 'fa-bell-slash', 'text-amber-400');
+        showToast('No se pudo activar', 'El navegador no permitió solicitar el permiso.', 'fa-bell-slash', 'text-amber-400');
       });
     }
 
@@ -3719,14 +3719,14 @@
       birthdays.forEach(n => {
         try {
           if (Notification.permission === 'granted') {
-            new Notification(`ðŸŽ‚ Â¡Hoy es el cumpleaÃ±os de ${n.title || n.text || 'alguien especial'}!`, {
-              body: n.description || 'Â¡No olvides desearle un feliz dÃ­a!',
+            new Notification(`🎂 ¡Hoy es el cumpleaños de ${n.title || n.text || 'alguien especial'}!`, {
+              body: n.description || '¡No olvides desearle un feliz día!',
               icon: './icon.svg',
               tag: `birthday-${todayKey}-${n.id || n.title || 'event'}`
             });
           }
         } catch (error) {
-          console.warn('No se pudo mostrar la notificaciÃ³n:', error);
+          console.warn('No se pudo mostrar la notificación:', error);
         }
       });
       localStorage.setItem(notifiedKey, '1');
