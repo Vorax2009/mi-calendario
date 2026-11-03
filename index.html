@@ -1,0 +1,3356 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Calendario, Turnos, Etiquetas y Cumpleaños PWA</title>
+  <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* Smooth Transitions */
+    .view-transition {
+      transition: opacity 0.2s ease-in-out;
+    }
+  </style>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Calendario PWA">
+</head>
+<body class="h-full flex flex-col font-sans select-none overflow-x-hidden bg-slate-950 text-slate-100">
+
+  <!-- NOTIFICATION BANNER / MODAL DE ALERTA PERSONALIZADA -->
+  <div id="toast-message" class="fixed top-4 right-4 z-50 transform translate-y-[-150%] transition-transform duration-300 max-w-sm w-full bg-slate-800 border border-teal-500/50 shadow-2xl rounded-xl p-3 flex items-center gap-3 pointer-events-auto">
+    <div id="toast-icon" class="p-2 bg-teal-500/20 text-teal-400 rounded-lg text-lg">
+      <i class="fa-solid fa-circle-info"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p id="toast-title" class="text-xs font-bold text-slate-200">Notificación</p>
+      <p id="toast-body" class="text-[11px] text-slate-400 truncate">Mensaje del sistema</p>
+    </div>
+  </div>
+
+  <!-- APP CONTAINER -->
+  <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col min-h-screen shadow-2xl bg-slate-900 border-x border-slate-800 relative">
+    
+    <!-- TOP BAR CONTROL -->
+    <div class="bg-slate-950 border-b border-slate-800 px-3 py-2.5 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-calendar-check text-teal-400 text-base"></i>
+        <span class="font-extrabold tracking-wide text-slate-200 text-sm">CALENDARIO PWA</span>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <!-- PWA Install Button -->
+        <button id="pwa-install-btn" onclick="installPWA()" class="hidden bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 px-2.5 py-1 rounded-md font-bold transition-all items-center gap-1.5 active:scale-95">
+          <i class="fa-solid fa-download text-xs"></i>
+          <span>Instalar App</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Cambiar Tema (Oscuro/Claro)">
+          <i id="theme-toggle-icon" class="fa-solid fa-sun text-xs"></i>
+        </button>
+
+        <!-- Notification Permission Button -->
+        <button id="notif-permission-btn" onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Activar Notificaciones">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+
+        <!-- Backup & Settings Modal Trigger -->
+        <button onclick="openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Ajustes y Respaldos">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TOP NAVIGATION TAB BAR -->
+    <header id="top-tab-header" class="bg-[#1e293b] border-b border-slate-700/60 sticky top-0 z-20 shadow-md">
+      <div class="flex text-center text-xs md:text-sm font-bold tracking-wider uppercase">
+        <button id="tab-month-btn" onclick="switchView('month')" class="flex-1 py-3.5 px-1 relative text-teal-400 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span id="tab-month-label">MES</span>
+          <div id="tab-month-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-teal-400"></div>
+        </button>
+        <button id="tab-year-btn" onclick="switchView('year')" class="flex-1 py-3.5 px-1 relative text-slate-300 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span id="tab-year-label">AÑO</span>
+          <div id="tab-year-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
+        <button id="tab-summary-btn" onclick="switchView('summary')" class="flex-1 py-3.5 px-1 relative text-slate-300 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span>RESUMEN</span>
+          <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
+        <button id="tab-birthdays-btn" onclick="switchView('birthdays')" class="flex-1 py-3.5 px-1 relative text-amber-400 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span class="flex items-center justify-center gap-1">
+            <i class="fa-solid fa-cake-candles text-xs"></i>
+            <span>CUMPLE</span>
+          </span>
+          <div id="tab-birthdays-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
+        <button id="tab-meds-btn" onclick="switchView('meds')" class="flex-1 py-3.5 px-1 relative text-blue-400 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span class="flex items-center justify-center gap-1">
+            <i class="fa-solid fa-pills text-xs"></i>
+            <span>SALUD</span>
+          </span>
+          <div id="tab-meds-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 flex flex-col p-2 sm:p-4 relative">
+
+      <!-- VISTA 1: CALENDARIO MENSUAL -->
+      <div id="view-month" class="flex-1 flex flex-col view-transition">
+        
+        <!-- MONTH & YEAR CONTROL HEADER -->
+        <div class="flex items-center justify-between py-2.5 px-3 bg-[#1e293b] rounded-t-lg border border-slate-700/60 mb-1">
+          <button onclick="changeMonth(-1)" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors focus:outline-none active:scale-95" title="Anterior Mes">
+            <i class="fa-solid fa-chevron-left text-lg"></i>
+          </button>
+          
+          <div class="flex items-center space-x-2">
+            <h2 id="month-year-title" class="text-base md:text-lg font-black tracking-wide text-slate-100 uppercase">NOVIEMBRE 2026</h2>
+            <button onclick="goToToday()" class="px-2 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-teal-400 border border-slate-700 rounded font-bold uppercase transition-colors active:scale-95" title="Ir a hoy">
+              Hoy
+            </button>
+          </div>
+
+          <button onclick="changeMonth(1)" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors focus:outline-none active:scale-95" title="Siguiente Mes">
+            <i class="fa-solid fa-chevron-right text-lg"></i>
+          </button>
+        </div>
+
+        <!-- DAYS OF THE WEEK HEADER -->
+        <div class="grid grid-cols-7 gap-px text-center text-xs md:text-sm font-bold bg-slate-800 border-x border-slate-700/60">
+          <div class="py-2 bg-[#C81E1E] text-white font-black">DOM</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">LUN</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">MAR</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">MIÉ</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">JUE</div>
+          <div class="py-2 bg-[#1e293b] text-slate-300">VIE</div>
+          <div class="py-2 bg-[#C81E1E] text-white font-black">SÁB</div>
+        </div>
+
+        <!-- CALENDAR GRID -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-slate-800 border border-slate-700/60 rounded-b-lg overflow-hidden shadow-2xl flex-1 min-h-[380px]">
+          <!-- Dynamic Content -->
+        </div>
+
+        <!-- EVENT QUICK INFO BAR -->
+        <div class="mt-4 bg-[#1e293b] p-3 rounded-lg border border-slate-700/60 flex items-center justify-between shadow-lg gap-2">
+          <div class="flex items-center space-x-2.5 overflow-hidden">
+            <span class="w-3 h-3 rounded-full bg-teal-400 shrink-0 animate-pulse"></span>
+            <span id="selected-date-info" class="text-xs sm:text-sm font-medium text-slate-200 truncate">Selecciona un día para abrir detalles</span>
+          </div>
+          <button onclick="openDayDetailModal()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md text-xs font-bold tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 shrink-0">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>Gestionar Día</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- VISTA 2: VISTAZO ANUAL -->
+      <div id="view-year" class="hidden flex-1 flex flex-col py-2 view-transition">
+        <div class="flex items-center justify-between mb-4 bg-[#1e293b] p-2.5 rounded-lg border border-slate-700/60 shadow gap-2">
+          <button onclick="changeYear(-1)" class="flex-1 py-2 px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-full border border-slate-700 font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+            <span id="year-prev-label">2025</span>
+          </button>
+          
+          <h2 id="year-title" class="text-base font-extrabold tracking-widest text-teal-400 px-3 uppercase shrink-0">2026</h2>
+
+          <button onclick="changeYear(1)" class="flex-1 py-2 px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-full border border-slate-700 font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95">
+            <span id="year-next-label">2027</span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+        
+        <div id="year-months-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 flex-1 overflow-y-auto pr-1">
+          <!-- 12 Mini Calendars -->
+        </div>
+      </div>
+
+      <!-- VISTA 3: RESUMEN Y ESTADÍSTICAS -->
+      <div id="view-summary" class="hidden flex-1 flex flex-col py-2 space-y-4 view-transition">
+        
+        <!-- PANEL 1: ESTADÍSTICAS Y HORAS -->
+        <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-chart-pie text-teal-400"></i>
+            <span>ESTADÍSTICAS</span>
+          </h3>
+
+          <!-- Segmented Filter Buttons -->
+          <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700/80 text-center">
+            <button id="summary-mode-month" onclick="setSummaryMode('month')" class="py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow">
+              Mes
+            </button>
+            <button id="summary-mode-year" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
+              Año
+            </button>
+            <button id="summary-mode-all" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
+              Histórico
+            </button>
+          </div>
+
+          <!-- Period Selector Banner -->
+          <div id="summary-nav-banner" class="flex items-center justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
+            <button onclick="changeSummaryPeriod(-1)" class="p-1 text-slate-400 hover:text-white transition-colors">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <span id="summary-period-title" class="text-xs font-extrabold text-slate-200 uppercase tracking-wide">NOVIEMBRE 2026</span>
+            <button onclick="changeSummaryPeriod(1)" class="p-1 text-slate-400 hover:text-white transition-colors">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Category Selector: Turnos vs Etiquetas -->
+          <div class="grid grid-cols-2 gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700/80 text-center">
+            <button id="summary-cat-turns" onclick="setSummaryCategory('turns')" class="py-1.5 text-xs font-bold rounded-md bg-purple-600 text-white transition-all shadow">
+              <i class="fa-solid fa-user-doctor mr-1"></i> Turnos
+            </button>
+            <button id="summary-cat-labels" onclick="setSummaryCategory('labels')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
+              <i class="fa-solid fa-tags mr-1"></i> Notas
+            </button>
+          </div>
+
+          <!-- Table Header -->
+          <div id="summary-table-header" class="grid grid-cols-12 text-[10px] font-bold text-slate-400 px-1 border-b border-slate-700/50 pb-1 italic">
+            <div class="col-span-5" id="summary-header-name">Turno</div>
+            <div class="col-span-3 text-center">Ocurrencias</div>
+            <div class="col-span-4 text-right" id="summary-header-time">Tiempo Total</div>
+          </div>
+
+          <!-- Breakdown List -->
+          <div id="summary-stats-breakdown" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <!-- Dynamic stats content -->
+          </div>
+
+          <div class="pt-2 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-300">
+            <span id="summary-global-time-wrapper">Tiempo Total: <span id="summary-global-time" class="text-amber-400 font-extrabold">0h 0m</span></span>
+            <span id="summary-global-count-label">Global: <span id="summary-global-count" class="text-teal-400 font-extrabold">0 Turnos</span></span>
+          </div>
+        </div>
+
+        <!-- PANEL 2: NOTAS CERCANAS -->
+        <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-clock-rotate-left text-teal-400"></i>
+            <span id="nearby-section-title">TURNOS CERCANOS</span>
+          </h3>
+
+          <div class="grid grid-cols-2 gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700/80 text-center">
+            <button id="notes-mode-past" onclick="setNotesTab('past')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">
+              Pasadas
+            </button>
+            <button id="notes-mode-next" onclick="setNotesTab('next')" class="py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow">
+              Próximas
+            </button>
+          </div>
+
+          <div id="nearby-notes-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+            <!-- List of nearby notes -->
+          </div>
+        </div>
+
+        <!-- PANEL 3: BÚSQUEDA GLOBAL -->
+        <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+          <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-magnifying-glass text-teal-400"></i>
+            <span>BUSCAR EN NOTAS</span>
+          </h3>
+
+          <div class="flex gap-2">
+            <input type="text" id="search-input" onkeyup="if(event.key==='Enter') executeSearch()" placeholder="Buscar por palabra..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-teal-400">
+            <button onclick="executeSearch()" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-all active:scale-95 shadow">
+              BUSCAR
+            </button>
+          </div>
+
+          <div id="search-results-list" class="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+            <div class="text-center py-2 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
+              Escribe un texto arriba para buscar.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VISTA 4: CUMPLEAÑOS -->
+      <div id="view-birthdays" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
+        
+        <!-- HEADER DE CUMPLEAÑOS -->
+        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-cake-candles text-amber-400 text-base"></i>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">GESTIÓN DE CUMPLEAÑOS</h3>
+          </div>
+          <button onclick="openDirectBirthdayModal()" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
+            <i class="fa-solid fa-plus"></i> Añadir
+          </button>
+        </div>
+
+        <!-- BOTONES DE FILTRO (PRÓXIMOS VS TODOS) -->
+        <div class="grid grid-cols-2 gap-2">
+          <button id="bday-tab-upcoming" onclick="setBirthdayFilterTab('upcoming')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-amber-500 text-slate-950">
+            <i class="fa-solid fa-star text-xs"></i>
+            <span>Próximos Cumpleaños</span>
+          </button>
+          <button id="bday-tab-all" onclick="setBirthdayFilterTab('all')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700">
+            <i class="fa-solid fa-list text-xs"></i>
+            <span>Todos los Registros</span>
+          </button>
+        </div>
+
+        <!-- TOTAL BADGE -->
+        <div class="flex items-center justify-between px-1 pt-1">
+          <span id="birthdays-total-badge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-0.5 rounded text-[11px]">
+            0 Registrados
+          </span>
+        </div>
+
+        <!-- LISTA DE CUMPLEAÑOS -->
+        <div id="birthdays-list-container" class="flex-1 space-y-2 overflow-y-auto max-h-[60vh] pr-1">
+          <!-- Birthday Cards -->
+        </div>
+      </div>
+
+      <!-- VISTA 5: CONTROL DE MEDICAMENTOS (MiMedicina) -->
+      <div id="view-meds" class="hidden flex-1 flex flex-col py-2 space-y-4 view-transition">
+        
+        <!-- HEADER DE SALUD / MEDICINAS -->
+        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-pills text-blue-400 text-base"></i>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">MiMedicina - Control & Recordatorios</h3>
+          </div>
+          <button onclick="openMedModal()" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
+            <i class="fa-solid fa-plus"></i> Agregar
+          </button>
+        </div>
+
+        <!-- TABS DE NAVEGACIÓN DENTRO DE SALUD -->
+        <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+          <button id="medSubTabHoy" onclick="switchMedSubTab('hoy')" class="flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow">
+            Hoy
+          </button>
+          <button id="medSubTabCal" onclick="switchMedSubTab('cal')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">
+            Calendario Toma
+          </button>
+          <button id="medSubTabMeds" onclick="switchMedSubTab('meds')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">
+            Tratamientos
+          </button>
+        </div>
+
+        <!-- SUB-VISTA 1: HOY & PRÓXIMAS TOMAS -->
+        <div id="medSubViewHoy" class="space-y-3">
+          <div class="bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-xl p-4 shadow-xl relative overflow-hidden">
+            <p class="text-[10px] font-bold opacity-80 uppercase tracking-wider" id="todayMedFullDate">Cargando fecha...</p>
+            <h2 class="text-lg font-black mt-0.5">Estado Diarios de Tomas</h2>
+            
+            <div class="mt-3 flex items-center justify-between bg-slate-950/40 backdrop-blur-md rounded-lg p-2 text-center border border-white/10">
+              <div class="flex-1 border-r border-white/10">
+                <span class="block text-lg font-black" id="statProg">0%</span>
+                <span class="text-[9px] opacity-80">Progreso</span>
+              </div>
+              <div class="flex-1 border-r border-white/10">
+                <span class="block text-lg font-black" id="statTaken">0</span>
+                <span class="text-[9px] opacity-80">Tomados</span>
+              </div>
+              <div class="flex-1">
+                <span class="block text-lg font-black" id="statPending">0</span>
+                <span class="text-[9px] opacity-80">Pendientes</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Tomas Programadas</h3>
+            <div id="todayDosesList" class="space-y-2">
+              <!-- Inject dynamic doses -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-VISTA 2: CALENDARIO DE SALUD -->
+        <div id="medSubViewCal" class="space-y-3 hidden">
+          <div class="bg-[#1e2733] rounded-xl p-3 border border-slate-700/60 shadow-lg">
+            <div class="flex items-center justify-between mb-3">
+              <button onclick="changeMedMonth(-1)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <h3 id="calMedMonthTitle" class="font-bold text-xs uppercase tracking-wider text-blue-400">Mes Año</h3>
+              <button onclick="changeMedMonth(1)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 mb-1">
+              <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+            </div>
+
+            <div id="calendarMedGrid" class="grid grid-cols-7 gap-1 text-center text-xs">
+              <!-- Dynamic days -->
+            </div>
+          </div>
+
+          <div class="bg-[#1e2733] rounded-xl p-3 border border-slate-700/60 shadow-lg">
+            <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2" id="selectedMedDateTitle">Tomas para el día</h3>
+            <div id="selectedMedDateDosesList" class="space-y-1.5">
+              <!-- Dynamic content -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-VISTA 3: TRATAMIENTOS REGISTRADOS -->
+        <div id="medSubViewMeds" class="space-y-3 hidden">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Mis Medicamentos</h3>
+            <button onclick="openMedModal()" class="text-xs font-bold text-blue-400 flex items-center gap-1 hover:text-blue-300">
+              <i class="fa-solid fa-plus"></i> Nuevo
+            </button>
+          </div>
+
+          <div id="allMedsList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+            <!-- Dynamic medications -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: DETALLES Y GESTIÓN DEL DÍA -->
+  <div id="day-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-50 transition-opacity overflow-y-auto">
+    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 max-h-[92vh] my-auto">
+      
+      <!-- Modal Header -->
+      <div class="text-white px-1 pb-3 mb-2 font-bold text-lg md:text-xl tracking-wide flex justify-between items-center border-b border-slate-700/60">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-tags text-teal-400"></i>
+          <span id="modal-title-text">Notas Asignadas</span>
+        </span>
+        <span id="modal-date-format" class="text-teal-400 font-semibold text-base bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">7/12/26</span>
+      </div>
+
+      <!-- VISTA 1: LISTA DE ETIQUETAS -->
+      <div id="modal-view-list" class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-y-auto space-y-2 my-2 pr-1 max-h-64" id="modal-notes-list">
+          <!-- Dynamic Content -->
+        </div>
+
+        <div class="grid grid-cols-3 gap-1.5 mt-2">
+          <button type="button" onclick="showCreateFormInModal()" class="py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nota</span>
+          </button>
+          <button type="button" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Turno</span>
+          </button>
+          <button type="button" onclick="showCreateBirthdayFormInModal()" class="py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-cake-candles"></i>
+            <span>Cumple</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VISTA 2: FORMULARIO DE CREACIÓN/EDICIÓN -->
+      <div id="modal-view-form" class="hidden flex-1 flex-col overflow-y-auto pr-1">
+        <input type="hidden" id="editing-note-id" value="">
+        <div class="bg-slate-800/90 p-3 rounded-lg border border-slate-700/60 my-2 space-y-3">
+          
+          <div>
+            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">Título de la nota:</label>
+            <div class="relative">
+              <input type="text" id="new-note-title" oninput="handleTitleInput(this.value)" onfocus="handleTitleSuggestions()" autocomplete="off" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2.5 py-2 text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400 transition-colors" placeholder="Ej. Reunión, Hospital...">
+              <!-- Advertencia de cumpleaños duplicado -->
+              <p id="bday-duplicate-error" class="hidden text-[10px] text-red-400 font-bold mt-1 flex items-center gap-1">
+                <i class="fa-solid fa-circle-xmark"></i> Ya existe un cumpleaños registrado con este nombre. Elige otro nombre.
+              </p>
+              <!-- Contenedor de Sugerencias de Títulos Anteriores -->
+              <div id="title-suggestions-container" class="hidden absolute top-full left-0 right-0 z-50 mt-1 max-h-28 overflow-y-auto bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-1 touch-auto">
+                <!-- Sugerencias dinámicas -->
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">Descripción:</label>
+            <textarea id="new-note-textarea" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg p-2.5 text-xs placeholder-slate-500 focus:outline-none focus:border-teal-400 resize-none h-14 transition-colors" placeholder="Detalles o notas adicionales..."></textarea>
+          </div>
+          
+          <div>
+            <span class="text-[11px] text-slate-300 font-semibold block mb-1">Abreviatura (Auto si está vacía):</span>
+            <input type="text" id="new-note-abbrev" maxlength="6" class="bg-slate-900 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-teal-400 w-full uppercase disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Ej. REU">
+            <div id="duration-input-container" class="hidden">
+              <input type="number" id="new-note-hours" min="0" max="24" value="0" readonly class="hidden">
+              <input type="number" id="new-note-mins" min="0" max="59" value="0" readonly class="hidden">
+            </div>
+          </div>
+
+          <!-- Campos Turnos -->
+          <div id="shift-details-container" class="hidden bg-slate-900/90 p-2.5 rounded-lg border border-slate-700/60 flex-col gap-2">
+            <input type="checkbox" id="is-shift-checkbox" class="hidden">
+            
+            <div>
+              <span class="text-[10px] text-slate-300 font-semibold block mb-0.5">Jornada:</span>
+              <select id="new-shift-type" onchange="handleShiftTypeChange()" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-1.5 py-1 text-[11px] focus:outline-none focus:border-purple-400 font-bold">
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noche">Noche</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div>
+                <span class="text-[10px] text-slate-300 font-semibold block mb-0.5">Hora Entrada:</span>
+                <input type="time" id="new-shift-start" onchange="calculateShiftDuration()" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-1 py-1 text-[11px] text-center focus:outline-none focus:border-purple-400 font-mono">
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-300 font-semibold block mb-0.5">Hora Salida:</span>
+                <input type="time" id="new-shift-end" onchange="calculateShiftDuration()" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-1 py-1 text-[11px] text-center focus:outline-none focus:border-purple-400 font-mono">
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos Cumpleaños -->
+          <div id="birthday-date-container" class="hidden bg-slate-900/90 p-2.5 rounded-lg border border-slate-700/60 flex-col gap-2">
+            <input type="checkbox" id="is-birthday-checkbox" class="hidden">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] text-slate-300 font-semibold whitespace-nowrap">Año Nacimiento:</span>
+              <select id="new-note-birthyear" class="bg-slate-950 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-[11px] focus:outline-none focus:border-teal-400 w-full font-mono cursor-pointer">
+                <option value="">Seleccionar año...</option>
+              </select>
+            </div>
+
+            <!-- Menú Desplegable: Opciones Avanzadas -->
+            <details class="group pt-1 border-t border-slate-800">
+              <summary class="flex items-center justify-between text-[10px] font-bold text-amber-300 cursor-pointer py-1 hover:text-amber-200 transition-colors list-none select-none">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-sliders text-amber-400"></i> Opciones Avanzadas
+                </span>
+                <i class="fa-solid fa-chevron-down text-[9px] transition-transform duration-200 group-open:rotate-180"></i>
+              </summary>
+              
+              <div class="flex flex-col gap-2 pt-2">
+                <div class="flex flex-col gap-1.5">
+                  <span class="text-[10px] text-amber-300 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-calculator text-amber-400"></i> Mostrar contadores transcurridos:
+                  </span>
+                  <div class="grid grid-cols-3 gap-1 bg-slate-950 p-2 rounded border border-slate-800 text-[10px]">
+                    <label class="flex items-center gap-1 cursor-pointer text-slate-300 hover:text-white">
+                      <input type="checkbox" id="bday-count-days" class="accent-amber-500 rounded">
+                      <span>Días</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer text-slate-300 hover:text-white">
+                      <input type="checkbox" id="bday-count-weeks" class="accent-amber-500 rounded">
+                      <span>Semanas</span>
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer text-slate-300 hover:text-white">
+                      <input type="checkbox" id="bday-count-months" class="accent-amber-500 rounded">
+                      <span>Meses</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5 pt-1 border-t border-slate-800">
+                  <span class="text-[10px] text-amber-300 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-palette"></i> Colores de Contadores:
+                  </span>
+                  <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-2 rounded border border-slate-800 text-[10px]">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-slate-300 truncate">Aniversario:</span>
+                      <input type="color" id="bday-color-anniversary" value="#EC4899" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
+                    </div>
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-slate-300 truncate">Cumple Día:</span>
+                      <input type="color" id="bday-color-day" value="#F59E0B" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
+                    </div>
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-slate-300 truncate">Cumple Semana:</span>
+                      <input type="color" id="bday-color-week" value="#38BDF8" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
+                    </div>
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-slate-300 truncate">Cumple Mes:</span>
+                      <input type="color" id="bday-color-month" value="#10B981" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800">
+              <span class="text-[10px] text-amber-300 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-bell"></i> Recordatorio PWA:
+              </span>
+              <select id="birthday-reminder-option" class="bg-slate-950 text-slate-100 border border-slate-700 rounded-md px-2 py-1 text-[10px] focus:outline-none focus:border-teal-400">
+                <option value="same_day">El mismo día</option>
+                <option value="1_day">1 día antes</option>
+                <option value="3_days">3 días antes</option>
+                <option value="1_week">1 semana antes</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Color & Repetition Selector -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div id="general-color-wrapper" class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-300 font-semibold">Color:</span>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="selectNoteColor('#EC4899')" class="color-btn w-5 h-5 rounded-full bg-pink-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#EC4899" title="Cumpleaños"></button>
+                <button type="button" onclick="selectNoteColor('#F59E0B')" class="color-btn w-5 h-5 rounded-full bg-amber-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#F59E0B" title="Alerta/Día"></button>
+                <button type="button" onclick="selectNoteColor('#38BDF8')" class="color-btn w-5 h-5 rounded-full bg-sky-400 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#38BDF8" title="Mañana/Semana"></button>
+                <button type="button" onclick="selectNoteColor('#10B981')" class="color-btn w-5 h-5 rounded-full bg-emerald-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#10B981" title="Éxito/Mes"></button>
+                <button type="button" onclick="selectNoteColor('#14B8A6')" class="color-btn w-5 h-5 rounded-full bg-teal-500 border-2 border-white ring-2 ring-teal-400 transition-all focus:outline-none" data-color="#14B8A6" title="General"></button>
+                <button type="button" onclick="selectNoteColor('#8B5CF6')" class="color-btn w-5 h-5 rounded-full bg-purple-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#8B5CF6" title="Noche"></button>
+                <button type="button" onclick="selectNoteColor('#EF4444')" class="color-btn w-5 h-5 rounded-full bg-red-500 border-2 border-transparent hover:border-white transition-all focus:outline-none" data-color="#EF4444" title="Urgente"></button>
+              </div>
+            </div>
+
+            <div id="repeat-select-wrapper" class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-300 font-semibold">Repetir:</span>
+              <select id="repeat-option" class="bg-slate-900 text-slate-200 border border-slate-700 rounded-md px-2 py-1 text-[11px] focus:outline-none focus:border-teal-400">
+                <option value="none">Ninguna</option>
+                <option value="daily">Diaria</option>
+                <option value="weekly">Semanal</option>
+                <option value="biweekly">Quincenal</option>
+                <option value="monthly">Mensual</option>
+                <option value="yearly">Anual</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button" onclick="addNoteToCurrentDay()" class="w-full mt-1 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md font-bold text-xs tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> <span id="form-submit-label">Guardar e Incluir Nota</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-1">
+          <button type="button" onclick="showListInModal()" class="flex-1 py-2 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1 transition-colors">
+            <i class="fa-solid fa-arrow-left"></i> Volver a la lista de notas
+          </button>
+          <button type="button" onclick="closeDayDetailModal()" class="flex-1 py-2 text-slate-400 hover:text-red-400 text-xs font-semibold flex items-center justify-center gap-1 transition-colors border-l border-slate-700/60">
+            <i class="fa-solid fa-xmark"></i> Cerrar
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Action Buttons (solo visibles en el modo lista) -->
+      <div id="modal-bottom-actions" class="grid grid-cols-2 gap-3 px-1 pt-3 border-t border-slate-700/60 mt-2">
+        <button type="button" onclick="closeDayDetailModal()" class="w-full py-2 bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700 rounded-lg font-bold text-xs tracking-wider transition-all active:scale-95">
+          CERRAR
+        </button>
+        <button type="button" onclick="saveDayDetails()" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-xs tracking-wider transition-all shadow-md active:scale-95">
+          GUARDAR CAMBIOS
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR / EDITAR MEDICAMENTO -->
+  <div id="medModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden transition-opacity">
+    <div class="bg-[#1e293b] text-slate-100 w-full max-w-md rounded-xl border border-slate-700/70 p-4 space-y-3 shadow-2xl max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 id="medModalTitle" class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-pills text-blue-400"></i>
+          <span>Registrar Medicamento</span>
+        </h3>
+        <button onclick="closeMedModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form id="medForm" onsubmit="handleMedFormSubmit(event)" class="space-y-3">
+        <input type="hidden" id="medId">
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Nombre del Medicamento</label>
+          <input type="text" id="medName" required list="commonMedsList" autocomplete="off" placeholder="Ej. Omeprazol, Paracetamol" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          <datalist id="commonMedsList">
+            <option value="Paracetamol">
+            <option value="Ibuprofeno">
+            <option value="Omeprazol">
+            <option value="Amoxicilina">
+            <option value="Losartán">
+            <option value="Enalapril">
+            <option value="Metformina">
+            <option value="Atorvastatina">
+            <option value="Sertralina">
+            <option value="Clonazepam">
+            <option value="Alprazolam">
+            <option value="Loratadina">
+            <option value="Cetirizina">
+            <option value="Salbutamol">
+            <option value="Prednisona">
+            <option value="Ketorolaco">
+            <option value="Naproxeno">
+            <option value="Azitromicina">
+            <option value="Ciprofloxacino">
+            <option value="Tramadol">
+            <option value="Buscapina (Escopolamina)">
+            <option value="Ácido Acetilsalicílico (Aspirina)">
+            <option value="Levotiroxina">
+            <option value="Amlodipino">
+            <option value="Furosemida">
+          </datalist>
+        </div>
+
+        <!-- Dosis y Unidad -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Dosis indicada</label>
+            <div class="flex space-x-1">
+              <input type="number" step="any" id="medDoseVal" oninput="calculateDoseHelper()" required placeholder="Ej. 70" class="w-2/3 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+              <select id="medDoseUnit" onchange="calculateDoseHelper()" class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-1 py-1.5 text-[10px] font-bold text-slate-100 focus:outline-none focus:border-blue-400">
+                <option value="mg">mg</option>
+                <option value="ml">ml</option>
+                <option value="g">g</option>
+                <option value="mcg">mcg</option>
+                <option value="UI">UI</option>
+                <option value="gotas">gotas</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Frasco / Presentación</label>
+            <input type="text" id="medFormType" oninput="calculateDoseHelper()" placeholder="Ej. 100mg/1ml" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          </div>
+        </div>
+
+        <!-- Calculadora dinámica visual -->
+        <div id="doseCalcResult" class="hidden p-2 rounded-lg bg-blue-950/60 border border-blue-800/60 text-[11px] text-blue-300 space-y-0.5">
+          <div class="flex items-center gap-1 font-bold text-blue-400">
+            <i class="fa-solid fa-calculator"></i>
+            <span>Cálculo automático:</span>
+          </div>
+          <p id="doseCalcText" class="font-semibold text-xs">--</p>
+        </div>
+
+        <!-- Horario Inicial & Frecuencia -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">1ª Hora Toma</label>
+            <input type="time" id="medTime" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-center font-mono text-slate-100 focus:outline-none focus:border-blue-400">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Frecuencia</label>
+            <select id="medFrequency" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+              <option value="3">Cada 3 horas</option>
+              <option value="4">Cada 4 horas</option>
+              <option value="6">Cada 6 horas</option>
+              <option value="8">Cada 8 horas</option>
+              <option value="9">Cada 9 horas</option>
+              <option value="12">Cada 12 horas</option>
+              <option value="24" selected>Cada 24h (Diario)</option>
+              <option value="48">Cada 48h (Cada 2 días)</option>
+              <option value="168">Cada 7 días (Semanal)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Fecha Inicio & Duración -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Fecha de Inicio</label>
+            <input type="date" id="medStartDate" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Duración (Días)</label>
+            <input type="number" id="medDuration" value="7" min="1" max="365" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          </div>
+        </div>
+
+        <!-- Notas / Indicaciones -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Notas / Indicaciones Médicas</label>
+          <textarea id="medNotes" rows="2" placeholder="Ej. Tomar en ayunas..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 resize-none"></textarea>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex space-x-2 pt-2">
+          <button type="button" onclick="closeMedModal()" class="flex-1 py-2 rounded-lg border border-slate-700 text-slate-300 font-bold text-xs">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md">
+            Guardar
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN REPETIDA -->
+  <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-opacity">
+    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-xs w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3">
+      <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Eliminar Elemento Repetido</span>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Esta etiqueta tiene una configuración de repetición activa. ¿Cómo deseas proceder?
+      </p>
+      <div class="flex flex-col gap-2 pt-2">
+        <button type="button" onclick="confirmDeleteAction('all')" class="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs tracking-wide transition-all shadow">
+          Eliminar todas las repetidas
+        </button>
+        <button type="button" onclick="confirmDeleteAction('single')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg font-bold text-xs tracking-wide transition-all">
+          Eliminar solo este día
+        </button>
+        <button type="button" onclick="closeDeleteConfirmModal()" class="w-full py-1.5 text-slate-400 hover:text-slate-200 text-xs font-semibold">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AJUSTES Y RESPALDOS -->
+  <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-50 transition-opacity">
+    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 class="font-extrabold text-sm text-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-gear text-teal-400"></i> Ajustes y Respaldos
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad:</span>
+          <button onclick="exportDataJSON()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-download"></i> Descargar JSON
+          </button>
+        </div>
+
+        <div>
+          <span class="font-semibold text-slate-300 block mb-1">Importar Copia de Seguridad:</span>
+          <label class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
+            <i class="fa-solid fa-upload"></i> Seleccionar Archivo JSON
+            <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+          </label>
+        </div>
+
+        <div class="pt-2 border-t border-slate-700/60">
+          <span class="font-semibold text-red-400 block mb-1">Zona de Peligro:</span>
+          <button onclick="confirmResetAllData()" class="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    const monthNames = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    let currentDate = new Date();
+    let selectedDate = new Date();
+    let selectedColor = '#14B8A6';
+    let activeView = 'month';
+    let summaryMode = 'month';
+    let summaryCategory = 'turns';
+    let notesTab = 'next';
+    let birthdayFilterTab = 'upcoming';
+    let summaryDate = new Date();
+    let deferredPrompt = null;
+    let noteIdPendingDelete = null;
+    let currentTheme = localStorage.getItem('cal_app_theme') || 'dark';
+
+    // Gestor de Temas (Claro / Oscuro)
+    function applyTheme(theme) {
+      currentTheme = theme;
+      localStorage.setItem('cal_app_theme', theme);
+      const htmlEl = document.documentElement;
+      const bodyEl = document.body;
+      const iconEl = document.getElementById('theme-toggle-icon');
+
+      if (theme === 'light') {
+        htmlEl.classList.remove('bg-slate-950', 'text-slate-100');
+        htmlEl.classList.add('bg-slate-100', 'text-slate-900');
+        bodyEl.classList.remove('bg-slate-950', 'text-slate-100');
+        bodyEl.classList.add('bg-slate-100', 'text-slate-900');
+        if (iconEl) iconEl.className = 'fa-solid fa-moon text-xs text-indigo-300';
+      } else {
+        htmlEl.classList.remove('bg-slate-100', 'text-slate-900');
+        htmlEl.classList.add('bg-slate-950', 'text-slate-100');
+        bodyEl.classList.remove('bg-slate-100', 'text-slate-900');
+        bodyEl.classList.add('bg-slate-950', 'text-slate-100');
+        if (iconEl) iconEl.className = 'fa-solid fa-sun text-xs text-amber-300';
+      }
+    }
+
+    function toggleTheme() {
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      showToast('Tema cambiado', `Modo ${nextTheme === 'light' ? 'Claro' : 'Oscuro'} activado`, 'fa-palette', 'text-teal-400');
+    }
+
+    // Variables de Estado de Medicamentos
+    const STORAGE_KEY_MEDS = 'mimedicina_meds_v2';
+    const STORAGE_KEY_LOGS = 'mimedicina_logs_v2';
+    function readStoredJSON(key, fallback, validator) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return !validator || validator(parsed) ? parsed : fallback;
+      } catch (error) {
+        console.warn(`No se pudo leer ${key} desde el almacenamiento local.`, error);
+        return fallback;
+      }
+    }
+
+    let medications = readStoredJSON(STORAGE_KEY_MEDS, [], Array.isArray);
+    let medLogs = readStoredJSON(STORAGE_KEY_LOGS, {}, value =>
+      value && typeof value === 'object' && !Array.isArray(value)
+    );
+    let medCurrentDate = new Date();
+    let selectedMedCalendarDate = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+    let dayDataMap = {};
+    try {
+      dayDataMap = JSON.parse(localStorage.getItem('cal_day_details_map') || '{}');
+    } catch(e) {
+      dayDataMap = {};
+    }
+
+    let currentModalNotes = [];
+
+    // INICIALIZACIÓN
+    document.addEventListener('DOMContentLoaded', function() {
+      applyTheme(currentTheme);
+      initPWAAndServiceWorker();
+      populateBirthYearSelect();
+      checkNotificationsOnLaunch();
+      setupSwipeGestures();
+      renderAll();
+    });
+
+    // Gestos táctiles (Swipe)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let touchTargetId = '';
+
+    function setupSwipeGestures() {
+      const calendarGrid = document.getElementById('calendar-grid');
+      const yearMonthsGrid = document.getElementById('year-months-grid');
+      const topTabHeader = document.getElementById('top-tab-header');
+
+      const handleTouchStart = (e, target) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+        touchTargetId = target;
+      };
+
+      const handleTouchEnd = (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipeGesture();
+      };
+
+      if (calendarGrid) {
+        calendarGrid.addEventListener('touchstart', (e) => handleTouchStart(e, 'grid'), { passive: true });
+        calendarGrid.addEventListener('touchend', handleTouchEnd, { passive: true });
+      }
+
+      if (yearMonthsGrid) {
+        yearMonthsGrid.addEventListener('touchstart', (e) => handleTouchStart(e, 'grid'), { passive: true });
+        yearMonthsGrid.addEventListener('touchend', handleTouchEnd, { passive: true });
+      }
+
+      if (topTabHeader) {
+        topTabHeader.addEventListener('touchstart', (e) => handleTouchStart(e, 'header'), { passive: true });
+        topTabHeader.addEventListener('touchend', handleTouchEnd, { passive: true });
+      }
+    }
+
+    function handleSwipeGesture() {
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+        if (touchTargetId === 'header') {
+          const views = ['month', 'year', 'summary', 'birthdays', 'meds'];
+          const currentIndex = views.indexOf(activeView);
+          if (diffX < 0) {
+            if (currentIndex < views.length - 1) switchView(views[currentIndex + 1]);
+          } else {
+            if (currentIndex > 0) switchView(views[currentIndex - 1]);
+          }
+        } else if (activeView === 'month') {
+          if (diffX < 0) changeMonth(1);
+          else changeMonth(-1);
+        } else if (activeView === 'year') {
+          if (diffX < 0) changeYear(1);
+          else changeYear(-1);
+        }
+      }
+    }
+
+    function renderAll() {
+      updateTopHeaderLabels();
+      if (activeView === 'month') {
+        renderMonthCalendar();
+      } else if (activeView === 'year') {
+        renderYearView();
+      } else if (activeView === 'summary') {
+        renderSummaryView();
+      } else if (activeView === 'birthdays') {
+        renderBirthdaysView();
+      } else if (activeView === 'meds') {
+        renderMedsView();
+      }
+    }
+
+    function switchView(view) {
+      activeView = view;
+      ['view-month', 'view-year', 'view-summary', 'view-birthdays', 'view-meds'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      ['tab-month', 'tab-year', 'tab-summary', 'tab-birthdays', 'tab-meds'].forEach(prefix => {
+        const ind = document.getElementById(`${prefix}-indicator`);
+        const btn = document.getElementById(`${prefix}-btn`);
+        if (ind) ind.className = "absolute bottom-0 left-0 right-0 h-1 bg-transparent";
+        if (btn) btn.className = "flex-1 py-3.5 px-1 relative text-slate-300 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none";
+      });
+
+      let activeColorClass = 'text-teal-400';
+      let activeBgClass = 'bg-teal-400';
+      if (view === 'birthdays') {
+        activeColorClass = 'text-amber-400';
+        activeBgClass = 'bg-amber-400';
+      } else if (view === 'meds') {
+        activeColorClass = 'text-blue-400';
+        activeBgClass = 'bg-blue-400';
+      }
+
+      const activeViewEl = document.getElementById(`view-${view}`);
+      if (activeViewEl) activeViewEl.classList.remove('hidden');
+
+      const activeIndEl = document.getElementById(`tab-${view}-indicator`);
+      if (activeIndEl) activeIndEl.className = `absolute bottom-0 left-0 right-0 h-1 ${activeBgClass}`;
+
+      const activeBtnEl = document.getElementById(`tab-${view}-btn`);
+      if (activeBtnEl) activeBtnEl.classList.add(activeColorClass);
+
+      renderAll();
+    }
+
+    // LÓGICA MEDICAMENTOS (MiMedicina)
+    function switchMedSubTab(tab) {
+      ['medSubViewHoy', 'medSubViewCal', 'medSubViewMeds'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      ['medSubTabHoy', 'medSubTabCal', 'medSubTabMeds'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = "flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all";
+      });
+
+      if (tab === 'hoy') {
+        document.getElementById('medSubViewHoy').classList.remove('hidden');
+        document.getElementById('medSubTabHoy').className = "flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow";
+        renderTodayMedView();
+      } else if (tab === 'cal') {
+        document.getElementById('medSubViewCal').classList.remove('hidden');
+        document.getElementById('medSubTabCal').className = "flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow";
+        renderMedCalendar();
+      } else if (tab === 'meds') {
+        document.getElementById('medSubViewMeds').classList.remove('hidden');
+        document.getElementById('medSubTabMeds').className = "flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow";
+        renderAllMedsList();
+      }
+    }
+
+    function renderMedsView() {
+      const todayEl = document.getElementById('todayMedFullDate');
+      if (todayEl) {
+        todayEl.textContent = new Date().toLocaleDateString('es-ES', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+      renderTodayMedView();
+    }
+
+    function openMedModal(editId = null) {
+      const modal = document.getElementById('medModal');
+      const form = document.getElementById('medForm');
+      form.reset();
+      document.getElementById('doseCalcResult').classList.add('hidden');
+
+      if (editId) {
+        const med = medications.find(m => m.id === editId);
+        if (med) {
+          document.getElementById('medModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-blue-400"></i> Editar Medicamento';
+          document.getElementById('medId').value = med.id;
+          document.getElementById('medName').value = med.name;
+          document.getElementById('medDoseVal').value = med.doseVal || '';
+          document.getElementById('medDoseUnit').value = med.doseUnit || 'mg';
+          document.getElementById('medFormType').value = med.formType || '';
+          document.getElementById('medTime').value = med.time;
+          document.getElementById('medFrequency').value = med.frequency;
+          document.getElementById('medStartDate').value = med.startDate;
+          document.getElementById('medDuration').value = med.duration;
+          document.getElementById('medNotes').value = med.notes || '';
+          calculateDoseHelper();
+        }
+      } else {
+        document.getElementById('medModalTitle').innerHTML = '<i class="fa-solid fa-pills text-blue-400"></i> Registrar Medicamento';
+        document.getElementById('medId').value = '';
+        const todayStr = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        document.getElementById('medStartDate').value = todayStr;
+        document.getElementById('medTime').value = '08:00';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeMedModal() {
+      const modal = document.getElementById('medModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function calculateDoseHelper() {
+      const doseVal = parseFloat(document.getElementById('medDoseVal').value);
+      const doseUnit = document.getElementById('medDoseUnit').value;
+      const formText = document.getElementById('medFormType').value.toLowerCase();
+      const calcBox = document.getElementById('doseCalcResult');
+      const calcText = document.getElementById('doseCalcText');
+
+      if (isNaN(doseVal) || doseVal <= 0 || !formText) {
+        calcBox.classList.add('hidden');
+        return;
+      }
+
+      const match = formText.match(/(\d+(?:\.\d+)?)\s*mg\s*[\/,a-z\s]+\s*(\d+(?:\.\d+)?)\s*ml/i);
+
+      if (match && doseUnit === 'mg') {
+        const mgPerPack = parseFloat(match[1]);
+        const mlPerPack = parseFloat(match[2]);
+
+        if (mgPerPack > 0 && mlPerPack > 0) {
+          const calculatedMl = (doseVal * mlPerPack) / mgPerPack;
+          calcText.innerHTML = `Equivalencia matemática: <strong class="text-white">${calculatedMl.toFixed(2)} ml</strong>. Confirma la dosis y la concentración con la indicación profesional y el envase.`;
+          calcBox.classList.remove('hidden');
+          return;
+        }
+      }
+
+      calcBox.classList.add('hidden');
+    }
+
+    function handleMedFormSubmit(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('medId').value || 'med_' + Date.now();
+      const name = document.getElementById('medName').value.trim();
+      const doseVal = document.getElementById('medDoseVal').value;
+      const doseUnit = document.getElementById('medDoseUnit').value;
+      const formType = document.getElementById('medFormType').value.trim();
+      const time = document.getElementById('medTime').value;
+      const frequency = parseInt(document.getElementById('medFrequency').value, 10);
+      const startDate = document.getElementById('medStartDate').value;
+      const duration = parseInt(document.getElementById('medDuration').value, 10);
+      const notes = document.getElementById('medNotes').value.trim();
+
+      let calculatedDoseStr = '';
+      if (doseVal && formType) {
+        const match = formType.toLowerCase().match(/(\d+(?:\.\d+)?)\s*mg\s*[\/,a-z\s]+\s*(\d+(?:\.\d+)?)\s*ml/i);
+        if (match && doseUnit === 'mg') {
+          const mgPerPack = parseFloat(match[1]);
+          const mlPerPack = parseFloat(match[2]);
+          if (mgPerPack > 0 && mlPerPack > 0) {
+            const calculatedMl = (parseFloat(doseVal) * mlPerPack) / mgPerPack;
+            calculatedDoseStr = `${calculatedMl.toFixed(2)} ml (estimación matemática; confirmar antes de usar)`;
+          }
+        }
+      }
+
+      const newMed = { id, name, doseVal, doseUnit, formType, calculatedDoseStr, time, frequency, startDate, duration, notes };
+
+      const existingIndex = medications.findIndex(m => m.id === id);
+      if (existingIndex >= 0) {
+        medications[existingIndex] = newMed;
+        showToast('Medicamento Actualizado', 'Modificación guardada exitosamente.', 'fa-circle-check', 'text-teal-400');
+      } else {
+        medications.push(newMed);
+        showToast('Medicamento Registrado', 'Se agregó correctamente.', 'fa-circle-check', 'text-teal-400');
+      }
+
+      persistMedicationData();
+
+      closeMedModal();
+      renderTodayMedView();
+      renderMedCalendar();
+      renderAllMedsList();
+    }
+
+    function deleteMed(id) {
+      if (confirm('¿Deseas eliminar este medicamento de tus tratamientos?')) {
+        medications = medications.filter(m => m.id !== id);
+        persistMedicationData();
+        showToast('Eliminado', 'Medicamento removido.', 'fa-trash-can', 'text-amber-400');
+        renderTodayMedView();
+        renderMedCalendar();
+        renderAllMedsList();
+      }
+    }
+
+    function toggleDoseLog(dateKey, doseId) {
+      const logKey = `${dateKey}_${doseId}`;
+      medLogs[logKey] = !medLogs[logKey];
+      persistMedicationData();
+      
+      showToast(medLogs[logKey] ? 'Completado' : 'Pendiente', medLogs[logKey] ? 'Toma registrada como completada.' : 'Toma marcada como pendiente.', 'fa-pills', 'text-blue-400');
+
+      renderTodayMedView();
+      renderMedCalendar();
+    }
+
+    function getDosesForMedDate(dateKey) {
+      const parts = dateKey.split('-').map(Number);
+      const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+      const doses = [];
+
+      medications.forEach(med => {
+        const startParts = med.startDate.split('-').map(Number);
+        const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(end.getDate() + med.duration);
+
+        if (targetDate >= start && targetDate < end) {
+          const freqHours = med.frequency;
+
+          if (freqHours <= 24) {
+            const dosesPerDay = Math.floor(24 / freqHours);
+            const [startHour, startMin] = med.time.split(':').map(Number);
+
+            for (let i = 0; i < dosesPerDay; i++) {
+              const h = (startHour + i * freqHours) % 24;
+              const timeStr = `${String(h).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+              const doseId = `${med.id}_${timeStr}`;
+
+              doses.push({ doseId, med, time: timeStr });
+            }
+          } else {
+            const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
+            const intervalDays = freqHours / 24;
+
+            if (diffDays % intervalDays === 0) {
+              const doseId = `${med.id}_${med.time}`;
+              doses.push({ doseId, med, time: med.time });
+            }
+          }
+        }
+      });
+
+      return doses.sort((a, b) => a.time.localeCompare(b.time));
+    }
+
+    function renderTodayMedView() {
+      const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const doses = getDosesForMedDate(todayKey);
+      const listContainer = document.getElementById('todayDosesList');
+      if (!listContainer) return;
+
+      let takenCount = 0;
+
+      if (doses.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-6 bg-slate-900/50 rounded-xl border border-slate-800">
+            <i class="fa-solid fa-circle-check text-3xl text-slate-600 mb-1"></i>
+            <p class="text-xs font-medium text-slate-400">No tienes tomas de medicamentos programadas para hoy.</p>
+          </div>
+        `;
+      } else {
+        listContainer.innerHTML = doses.map(item => {
+          const logKey = `${todayKey}_${item.doseId}`;
+          const isTaken = !!medLogs[logKey];
+          if (isTaken) takenCount++;
+
+          const doseDetails = item.med.calculatedDoseStr 
+            ? `${item.med.doseVal} ${item.med.doseUnit} (${item.med.calculatedDoseStr})`
+            : `${item.med.doseVal} ${item.med.doseUnit} ${item.med.formType ? `(${item.med.formType})` : ''}`;
+
+          return `
+            <div class="p-3 rounded-xl border ${isTaken ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-900 border-slate-800'} flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="px-2 py-1 rounded-lg font-mono font-bold text-xs ${isTaken ? 'bg-emerald-900/60 text-emerald-300' : 'bg-blue-900/60 text-blue-300'}">
+                  ${item.time}
+                </div>
+                <div>
+                  <h4 class="font-bold text-xs ${isTaken ? 'line-through text-slate-500' : 'text-slate-100'}">${escapeHtml(item.med.name)}</h4>
+                  <p class="text-[11px] text-slate-400">
+                    ${escapeHtml(doseDetails)}
+                  </p>
+                </div>
+              </div>
+              <button onclick="toggleDoseLog('${todayKey}', '${item.doseId}')" class="p-2 rounded-lg ${isTaken ? 'bg-emerald-600 text-white' : 'border border-slate-700 text-slate-400 hover:text-slate-200'} transition-all">
+                <i class="fa-solid ${isTaken ? 'fa-check' : 'fa-circle'} text-sm"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const total = doses.length;
+      const prog = total > 0 ? Math.round((takenCount / total) * 100) : 100;
+
+      const statProg = document.getElementById('statProg');
+      const statTaken = document.getElementById('statTaken');
+      const statPending = document.getElementById('statPending');
+
+      if (statProg) statProg.textContent = `${prog}%`;
+      if (statTaken) statTaken.textContent = takenCount;
+      if (statPending) statPending.textContent = total - takenCount;
+    }
+
+    function renderMedCalendar() {
+      const monthTitle = document.getElementById('calMedMonthTitle');
+      const grid = document.getElementById('calendarMedGrid');
+      if (!grid) return;
+
+      const year = medCurrentDate.getFullYear();
+      const month = medCurrentDate.getMonth();
+
+      monthTitle.textContent = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div class="p-1"></div>`;
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = formatDateKey(year, month, day);
+        const dayDoses = getDosesForMedDate(dateKey);
+        const isSelected = dateKey === selectedMedCalendarDate;
+
+        let dotColor = 'hidden';
+        if (dayDoses.length > 0) {
+          const allTaken = dayDoses.every(d => !!medLogs[`${dateKey}_${d.doseId}`]);
+          dotColor = allTaken ? 'bg-emerald-500' : 'bg-amber-500';
+        }
+
+        grid.innerHTML += `
+          <button onclick="selectMedCalDate('${dateKey}')" class="p-1.5 rounded-lg text-xs font-semibold relative flex flex-col items-center justify-center transition-all ${isSelected ? 'bg-blue-600 text-white shadow' : 'hover:bg-slate-800 text-slate-300'}">
+            <span>${day}</span>
+            <span class="w-1.5 h-1.5 rounded-full mt-0.5 ${dotColor}"></span>
+          </button>
+        `;
+      }
+
+      renderSelectedMedDateDoses();
+    }
+
+    function changeMedMonth(delta) {
+      medCurrentDate.setMonth(medCurrentDate.getMonth() + delta);
+      renderMedCalendar();
+    }
+
+    function selectMedCalDate(dateKey) {
+      selectedMedCalendarDate = dateKey;
+      renderMedCalendar();
+    }
+
+    function renderSelectedMedDateDoses() {
+      const doses = getDosesForMedDate(selectedMedCalendarDate);
+      const container = document.getElementById('selectedMedDateDosesList');
+      const title = document.getElementById('selectedMedDateTitle');
+      if (!container) return;
+
+      const parts = selectedMedCalendarDate.split('-').map(Number);
+      title.textContent = `Tomas para el ${parts[2]}/${parts[1]}/${parts[0]}`;
+
+      if (doses.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 py-1">Sin tomas registradas para este día.</p>`;
+        return;
+      }
+
+      container.innerHTML = doses.map(item => {
+        const logKey = `${selectedMedCalendarDate}_${item.doseId}`;
+        const isTaken = !!medLogs[logKey];
+
+        const doseDetails = item.med.calculatedDoseStr 
+          ? `${item.med.doseVal}${item.med.doseUnit} (${item.med.calculatedDoseStr})`
+          : `${item.med.doseVal}${item.med.doseUnit}`;
+
+        return `
+          <div class="p-2 rounded-lg border ${isTaken ? 'bg-emerald-950/20 border-emerald-800/30' : 'bg-slate-900 border-slate-800'} flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-slate-400">${item.time}</span>
+              <span class="font-semibold ${isTaken ? 'line-through text-slate-500' : 'text-slate-200'}">${escapeHtml(item.med.name)} - ${escapeHtml(doseDetails)}</span>
+            </div>
+            <button onclick="toggleDoseLog('${selectedMedCalendarDate}', '${item.doseId}')" class="px-2 py-0.5 rounded text-[10px] font-bold ${isTaken ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 border border-slate-700'}">
+              ${isTaken ? 'Tomado' : 'Pendiente'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAllMedsList() {
+      const container = document.getElementById('allMedsList');
+      if (!container) return;
+
+      if (medications.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 bg-slate-900/50 rounded-xl border border-slate-800">
+            <i class="fa-solid fa-pills text-3xl text-slate-600 mb-1"></i>
+            <p class="text-xs font-medium text-slate-400">Aún no has registrado ningún tratamiento o medicamento.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = medications.map(med => {
+        const doseDisplay = med.calculatedDoseStr 
+          ? `${med.doseVal} ${med.doseUnit} (${med.calculatedDoseStr}) - Frasco: ${med.formType}`
+          : `${med.doseVal} ${med.doseUnit} ${med.formType ? `(${med.formType})` : ''}`;
+
+        return `
+          <div class="p-3 rounded-xl border border-slate-800 bg-slate-900 shadow-sm space-y-1.5">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm text-slate-100">${escapeHtml(med.name)}</h4>
+              <div class="flex items-center gap-1">
+                <button onclick="openMedModal('${med.id}')" class="p-1 text-slate-400 hover:text-blue-400 rounded">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="deleteMed('${med.id}')" class="p-1 text-slate-400 hover:text-red-400 rounded">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 space-y-0.5">
+              <p><strong class="text-slate-300">Dosis:</strong> ${escapeHtml(doseDisplay)}</p>
+              <p><strong class="text-slate-300">Horarios:</strong> Cada ${med.frequency} horas desde las ${escapeHtml(med.time)}</p>
+              <p><strong class="text-slate-300">Duración:</strong> ${med.duration} días (Inicio: ${escapeHtml(med.startDate)})</p>
+              ${med.notes ? `<p class="italic text-slate-400 pt-0.5">"${escapeHtml(med.notes)}"</p>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function populateBirthYearSelect() {
+      const select = document.getElementById('new-note-birthyear');
+      if (!select) return;
+      const currentYear = new Date().getFullYear();
+      select.innerHTML = '<option value="">Seleccionar año...</option>';
+      for (let y = currentYear; y >= 1900; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        select.appendChild(opt);
+      }
+    }
+
+    function showToast(title, body, iconClass = 'fa-circle-info', colorClass = 'text-teal-400') {
+      const toast = document.getElementById('toast-message');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-body').textContent = body;
+      const iconContainer = document.getElementById('toast-icon');
+      iconContainer.className = `p-2 bg-slate-700/50 ${colorClass} rounded-lg text-lg`;
+      iconContainer.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+      toast.classList.remove('translate-y-[-150%]');
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-150%]');
+      }, 3000);
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('cal_day_details_map', JSON.stringify(dayDataMap));
+        return true;
+      } catch (error) {
+        console.error('No se pudieron guardar los datos del calendario.', error);
+        showToast('No se pudo guardar', 'El almacenamiento está lleno o no está disponible. Exporta una copia de seguridad.', 'fa-triangle-exclamation', 'text-red-400');
+        return false;
+      }
+    }
+
+    function persistMedicationData() {
+      try {
+        localStorage.setItem(STORAGE_KEY_MEDS, JSON.stringify(medications));
+        localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(medLogs));
+        return true;
+      } catch (error) {
+        console.error('No se pudieron guardar los datos de salud.', error);
+        showToast('No se pudo guardar', 'Revisa el espacio disponible del navegador y exporta un respaldo.', 'fa-triangle-exclamation', 'text-red-400');
+        return false;
+      }
+    }
+
+    function formatDateKey(year, month, day) {
+      const m = String(month + 1).padStart(2, '0');
+      const d = String(day).padStart(2, '0');
+      return `${year}-${m}-${d}`;
+    }
+
+    function createLocalDate(year, month, day) {
+      return new Date(year, month, day, 0, 0, 0, 0);
+    }
+
+    function generateSmartAbbrev(titleText, defaultFallback = 'NOTA') {
+      if (!titleText) return defaultFallback;
+      const clean = titleText.trim().replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '');
+      if (clean.length === 0) return defaultFallback;
+      return clean.substring(0, 4).toUpperCase();
+    }
+
+    function goToToday() {
+      currentDate = new Date();
+      selectedDate = new Date();
+      renderAll();
+    }
+
+    function updateTopHeaderLabels() {
+      const year = currentDate.getFullYear();
+      const monthIndex = currentDate.getMonth();
+      document.getElementById('tab-month-label').textContent = monthNames[monthIndex];
+      document.getElementById('tab-year-label').textContent = year;
+    }
+
+    function changeMonth(delta) {
+      const target = new Date(currentDate.getFullYear(), currentDate.getMonth() + delta, 1);
+      currentDate = createLocalDate(target.getFullYear(), target.getMonth(), 1);
+      renderAll();
+    }
+
+    function changeYear(delta) {
+      currentDate = createLocalDate(currentDate.getFullYear() + delta, currentDate.getMonth(), 1);
+      renderAll();
+    }
+
+    function jumpToMonth(year, monthIndex) {
+      currentDate = createLocalDate(year, monthIndex, 1);
+      selectedDate = createLocalDate(year, monthIndex, 1);
+      switchView('month');
+    }
+
+    function jumpToSpecificDate(year, monthIndex, day) {
+      currentDate = createLocalDate(year, monthIndex, day);
+      selectedDate = createLocalDate(year, monthIndex, day);
+      switchView('month');
+      openDayDetailModal();
+    }
+
+    function renderMonthCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const today = new Date();
+
+      document.getElementById('month-year-title').textContent = `${monthNames[month]} ${year}`;
+
+      const calendarGrid = document.getElementById('calendar-grid');
+      if (!calendarGrid) return;
+      calendarGrid.innerHTML = '';
+
+      const firstDayOfMonth = createLocalDate(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      let startDayOfWeek = firstDayOfMonth.getDay();
+
+      const prevMonthLastDate = new Date(year, month, 0).getDate();
+      const totalSlots = Math.ceil((startDayOfWeek + daysInMonth) / 7) * 7;
+
+      for (let i = 0; i < totalSlots; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'relative flex flex-col transition-all cursor-pointer min-h-[64px] border border-slate-800 overflow-hidden';
+
+        let cellYear = year;
+        let cellMonth = month;
+        let dayNum = 0;
+        let isCurrentMonth = false;
+
+        if (i < startDayOfWeek) {
+          dayNum = prevMonthLastDate - startDayOfWeek + i + 1;
+          cellMonth = month - 1;
+          if (cellMonth < 0) { cellMonth = 11; cellYear--; }
+          cell.classList.add('bg-slate-900/60', 'text-slate-600');
+        } else if (i >= startDayOfWeek + daysInMonth) {
+          dayNum = i - (startDayOfWeek + daysInMonth) + 1;
+          cellMonth = month + 1;
+          if (cellMonth > 11) { cellMonth = 0; cellYear++; }
+          cell.classList.add('bg-slate-900/60', 'text-slate-600');
+        } else {
+          dayNum = i - startDayOfWeek + 1;
+          isCurrentMonth = true;
+          cell.classList.add('bg-[#151d2a]', 'text-slate-200', 'hover:bg-slate-800/80');
+        }
+
+        const dateKey = formatDateKey(cellYear, cellMonth, dayNum);
+        const dayNotesList = dayDataMap[dateKey];
+
+        const isToday = today.getFullYear() === cellYear &&
+                        today.getMonth() === cellMonth &&
+                        today.getDate() === dayNum;
+
+        const isSelected = selectedDate.getFullYear() === cellYear &&
+                           selectedDate.getMonth() === cellMonth &&
+                           selectedDate.getDate() === dayNum;
+
+        if (isToday) {
+          cell.classList.add('border-2', 'border-amber-400', 'shadow-[0_0_10px_rgba(251,191,36,0.3)]');
+        }
+
+        if (isSelected && isCurrentMonth) {
+          cell.classList.add('ring-2', 'ring-teal-400', 'z-10');
+        }
+
+        const dayHeader = document.createElement('div');
+        dayHeader.className = `absolute top-0.5 right-1 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'text-amber-400 font-black' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600')}`;
+        
+        if (isToday) {
+          dayHeader.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
+        } else {
+          dayHeader.textContent = dayNum;
+        }
+        cell.appendChild(dayHeader);
+
+        if (dayNotesList && Array.isArray(dayNotesList) && dayNotesList.length > 0 && isCurrentMonth) {
+          const visibleNotes = dayNotesList.filter(note => !note.isHiddenCounter);
+          const counterNotes = dayNotesList.filter(note => note.isHiddenCounter);
+
+          if (counterNotes.length > 0) {
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'absolute top-1 left-1 flex gap-0.5 z-10 pointer-events-none';
+            const uniqueColors = [...new Set(counterNotes.map(n => n.color || '#EC4899'))];
+            uniqueColors.forEach(color => {
+              const dot = document.createElement('span');
+              dot.className = 'w-1.5 h-1.5 rounded-full';
+              dot.style.backgroundColor = color;
+              dotsContainer.appendChild(dot);
+            });
+            cell.appendChild(dotsContainer);
+          }
+
+          if (visibleNotes.length > 0) {
+            const blocksContainer = document.createElement('div');
+            blocksContainer.className = 'w-full h-full flex flex-col flex-1';
+
+            visibleNotes.forEach(note => {
+              const block = document.createElement('div');
+              block.className = 'flex-1 w-full flex items-center justify-center text-center font-extrabold text-[11px] text-slate-950 select-none px-0.5 leading-tight truncate';
+              block.style.backgroundColor = note.color || '#14B8A6';
+              
+              const labelText = note.abbrev ? note.abbrev : generateSmartAbbrev(note.title || note.text);
+              block.textContent = labelText;
+
+              blocksContainer.appendChild(block);
+            });
+
+            cell.appendChild(blocksContainer);
+          }
+        }
+
+        cell.onclick = () => {
+          selectedDate = createLocalDate(cellYear, cellMonth, dayNum);
+          updateSelectedDateInfo();
+          renderMonthCalendar();
+          openDayDetailModal();
+        };
+
+        calendarGrid.appendChild(cell);
+      }
+
+      updateSelectedDateInfo();
+    }
+
+    function renderYearView() {
+      const year = currentDate.getFullYear();
+      document.getElementById('year-title').textContent = year;
+      document.getElementById('year-prev-label').textContent = year - 1;
+      document.getElementById('year-next-label').textContent = year + 1;
+
+      const grid = document.getElementById('year-months-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      for (let m = 0; m < 12; m++) {
+        const miniCard = document.createElement('div');
+        miniCard.className = 'bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60 flex flex-col hover:border-teal-500/50 transition-all cursor-pointer';
+        
+        miniCard.onclick = () => {
+          jumpToMonth(year, m);
+        };
+
+        const monthHeader = document.createElement('div');
+        monthHeader.className = 'text-xs font-black text-teal-400 uppercase mb-1.5 tracking-wider text-center';
+        monthHeader.textContent = monthNames[m];
+        miniCard.appendChild(monthHeader);
+
+        const miniGrid = document.createElement('div');
+        miniGrid.className = 'grid grid-cols-7 gap-1 text-[9px] text-center flex-1';
+
+        ['D', 'L', 'M', 'X', 'J', 'V', 'S'].forEach((d, idx) => {
+          const dLabel = document.createElement('div');
+          dLabel.className = `font-bold ${idx === 0 || idx === 6 ? 'text-red-400' : 'text-slate-400'}`;
+          dLabel.textContent = d;
+          miniGrid.appendChild(dLabel);
+        });
+
+        const firstDay = createLocalDate(year, m, 1).getDay();
+        const daysInM = new Date(year, m + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          miniGrid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= daysInM; d++) {
+          const dayCell = document.createElement('div');
+          dayCell.className = 'aspect-square flex items-center justify-center rounded font-semibold text-slate-300 bg-slate-800/60 transition-all relative';
+          dayCell.textContent = d;
+
+          const dKey = formatDateKey(year, m, d);
+          if (dayDataMap[dKey] && dayDataMap[dKey].length > 0) {
+            const visibleNotes = dayDataMap[dKey].filter(n => !n.isHiddenCounter);
+            const counterNotes = dayDataMap[dKey].filter(n => n.isHiddenCounter);
+            
+            if (visibleNotes.length > 0) {
+              dayCell.style.backgroundColor = visibleNotes[0].color || '#14B8A6';
+              dayCell.style.color = '#0f172a';
+              dayCell.classList.add('font-black');
+            } else if (counterNotes.length > 0) {
+              const dot = document.createElement('span');
+              dot.className = 'absolute bottom-0.5 w-1 h-1 rounded-full';
+              dot.style.backgroundColor = counterNotes[0].color || '#EC4899';
+              dayCell.appendChild(dot);
+            }
+          }
+
+          miniGrid.appendChild(dayCell);
+        }
+
+        miniCard.appendChild(miniGrid);
+        grid.appendChild(miniCard);
+      }
+    }
+
+    function updateSelectedDateInfo() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = selectedDate.toLocaleDateString('es-ES', options);
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const dayNotes = dayDataMap[key];
+      const hasNotes = dayNotes && Array.isArray(dayNotes) && dayNotes.length > 0;
+      
+      const capitalizedStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      const el = document.getElementById('selected-date-info');
+      if (el) el.textContent = `${capitalizedStr}${hasNotes ? ` (${dayNotes.length} etiqueta${dayNotes.length > 1 ? 's' : ''})` : ''}`;
+    }
+
+    function selectNoteColor(color) {
+      selectedColor = color;
+      document.querySelectorAll('.color-btn').forEach(btn => {
+        if (btn.getAttribute('data-color') === color) {
+          btn.classList.add('border-white', 'ring-2', 'ring-teal-400');
+          btn.classList.remove('border-transparent');
+        } else {
+          btn.classList.remove('border-white', 'ring-2', 'ring-teal-400');
+          btn.classList.add('border-transparent');
+        }
+      });
+    }
+
+    function openDayDetailModal() {
+      const d = selectedDate.getDate();
+      const m = selectedDate.getMonth() + 1;
+      const yStr = String(selectedDate.getFullYear()).slice(-2);
+      
+      document.getElementById('modal-date-format').textContent = `${d}/${m}/${yStr}`;
+
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const existingNotes = dayDataMap[key];
+      currentModalNotes = existingNotes && Array.isArray(existingNotes) ? JSON.parse(JSON.stringify(existingNotes)) : [];
+
+      showListInModal();
+      renderModalNotesList();
+
+      const modal = document.getElementById('day-detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDayDetailModal() {
+      const modal = document.getElementById('day-detail-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function showListInModal() {
+      document.getElementById('modal-view-list').classList.remove('hidden');
+      document.getElementById('modal-view-list').classList.add('flex');
+      document.getElementById('modal-view-form').classList.add('hidden');
+      document.getElementById('modal-view-form').classList.remove('flex');
+      const bottomActions = document.getElementById('modal-bottom-actions');
+      if (bottomActions) bottomActions.classList.remove('hidden');
+      document.getElementById('modal-title-text').textContent = "Notas Asignadas";
+    }
+
+    function showCreateFormInModal(editNote = null) {
+      document.getElementById('modal-view-list').classList.add('hidden');
+      document.getElementById('modal-view-list').classList.remove('flex');
+      const formView = document.getElementById('modal-view-form');
+      formView.classList.remove('hidden');
+      formView.classList.add('flex');
+      formView.scrollTop = 0;
+      const bottomActions = document.getElementById('modal-bottom-actions');
+      if (bottomActions) bottomActions.classList.add('hidden');
+
+      hideTitleSuggestions();
+      setLockExistingTagFields(false);
+      clearBirthdayDuplicateError();
+
+      if (editNote) {
+        document.getElementById('modal-title-text').textContent = "Editar Nota";
+        document.getElementById('form-submit-label').textContent = "Guardar Nota";
+        document.getElementById('editing-note-id').value = editNote.id;
+        document.getElementById('new-note-title').value = editNote.title || editNote.text || '';
+        document.getElementById('new-note-textarea').value = editNote.description || '';
+        document.getElementById('new-note-abbrev').value = editNote.abbrev || '';
+        document.getElementById('new-note-hours').value = editNote.hours || '';
+        document.getElementById('new-note-mins').value = editNote.mins || '';
+        document.getElementById('is-birthday-checkbox').checked = !!editNote.isBirthday;
+        
+        let birthYearVal = '';
+        if (editNote.birthDate) {
+          const parts = editNote.birthDate.split('-');
+          if (parts.length === 3) birthYearVal = parts[0];
+        } else if (editNote.birthYear) {
+          birthYearVal = editNote.birthYear;
+        }
+        document.getElementById('new-note-birthyear').value = birthYearVal;
+        
+        const units = editNote.selectedUnits || [];
+        document.getElementById('bday-count-days').checked = units.includes('days');
+        document.getElementById('bday-count-weeks').checked = units.includes('weeks');
+        document.getElementById('bday-count-months').checked = units.includes('months');
+        
+        const customColors = editNote.bdayColors || {};
+        const bdayAnnivEl = document.getElementById('bday-color-anniversary');
+        if (bdayAnnivEl) bdayAnnivEl.value = customColors.anniversary || '#EC4899';
+        const bdayDayEl = document.getElementById('bday-color-day');
+        if (bdayDayEl) bdayDayEl.value = customColors.day || '#F59E0B';
+        const bdayWeekEl = document.getElementById('bday-color-week');
+        if (bdayWeekEl) bdayWeekEl.value = customColors.week || '#38BDF8';
+        const bdayMonthEl = document.getElementById('bday-color-month');
+        if (bdayMonthEl) bdayMonthEl.value = customColors.month || '#10B981';
+
+        document.getElementById('birthday-reminder-option').value = editNote.reminder || 'same_day';
+        document.getElementById('is-shift-checkbox').checked = !!editNote.isShift;
+        document.getElementById('new-shift-type').value = editNote.shiftType || 'Mañana';
+        document.getElementById('new-shift-start').value = editNote.shiftStart || '';
+        document.getElementById('new-shift-end').value = editNote.shiftEnd || '';
+        document.getElementById('repeat-option').value = editNote.repeat || 'none';
+        selectNoteColor(editNote.color || '#14B8A6');
+        toggleSpecialTypeInput(editNote.isBirthday ? 'birthday' : (editNote.isShift ? 'shift' : 'none'));
+
+        checkAndApplyExistingTagLock((editNote.title || editNote.text || '').trim().toLowerCase());
+      } else {
+        document.getElementById('modal-title-text').textContent = "Nueva Nota";
+        document.getElementById('form-submit-label').textContent = "Guardar e Incluir Nota";
+        document.getElementById('editing-note-id').value = '';
+        document.getElementById('new-note-title').value = '';
+        document.getElementById('new-note-textarea').value = '';
+        document.getElementById('new-note-abbrev').value = '';
+        document.getElementById('new-note-hours').value = '';
+        document.getElementById('new-note-mins').value = '';
+        document.getElementById('is-birthday-checkbox').checked = false;
+        document.getElementById('new-note-birthyear').value = '';
+        document.getElementById('bday-count-days').checked = false;
+        document.getElementById('bday-count-weeks').checked = false;
+        document.getElementById('bday-count-months').checked = false;
+        const bdayAnnivEl = document.getElementById('bday-color-anniversary');
+        if (bdayAnnivEl) bdayAnnivEl.value = '#EC4899';
+        const bdayDayEl = document.getElementById('bday-color-day');
+        if (bdayDayEl) bdayDayEl.value = '#F59E0B';
+        const bdayWeekEl = document.getElementById('bday-color-week');
+        if (bdayWeekEl) bdayWeekEl.value = '#38BDF8';
+        const bdayMonthEl = document.getElementById('bday-color-month');
+        if (bdayMonthEl) bdayMonthEl.value = '#10B981';
+        document.getElementById('is-shift-checkbox').checked = false;
+        document.getElementById('new-shift-type').value = 'Mañana';
+        document.getElementById('new-shift-start').value = '08:00';
+        document.getElementById('new-shift-end').value = '16:00';
+        toggleSpecialTypeInput('none');
+        document.getElementById('repeat-option').value = 'none';
+        selectNoteColor('#14B8A6');
+      }
+    }
+
+    function showCreateShiftFormInModal() {
+      showCreateFormInModal();
+      document.getElementById('modal-title-text').textContent = "Nuevo Turno";
+      document.getElementById('form-submit-label').textContent = "Guardar e Incluir Turno";
+      document.getElementById('is-shift-checkbox').checked = true;
+      toggleSpecialTypeInput('shift');
+      clearBirthdayDuplicateError();
+    }
+
+    function showCreateBirthdayFormInModal() {
+      showCreateFormInModal();
+      document.getElementById('modal-title-text').textContent = "Nuevo Cumpleaños";
+      document.getElementById('form-submit-label').textContent = "Guardar e Incluir Cumpleaños";
+      document.getElementById('is-birthday-checkbox').checked = true;
+      toggleSpecialTypeInput('birthday');
+      clearBirthdayDuplicateError();
+    }
+
+    function showTitleSuggestions(query) {
+      const container = document.getElementById('title-suggestions-container');
+      if (!container) return;
+
+      const isShift = document.getElementById('is-shift-checkbox').checked;
+      const isBirthday = document.getElementById('is-birthday-checkbox').checked;
+
+      if (isBirthday) {
+        hideTitleSuggestions();
+        return;
+      }
+
+      const suggestionsMap = new Map();
+      Object.keys(dayDataMap).forEach(key => {
+        const notesArr = dayDataMap[key];
+        if (Array.isArray(notesArr)) {
+          notesArr.forEach(note => {
+            const title = (note.title || note.text || '').trim();
+            if (!title) return;
+
+            if (isShift && !note.isShift) return;
+            if (!isShift && (note.isShift || note.isBirthday)) return;
+
+            const lowerTitle = title.toLowerCase();
+            if (!query || lowerTitle.includes(query)) {
+              if (!suggestionsMap.has(lowerTitle)) {
+                suggestionsMap.set(lowerTitle, note);
+              }
+            }
+          });
+        }
+      });
+
+      const matches = Array.from(suggestionsMap.values());
+      if (matches.length === 0) {
+        hideTitleSuggestions();
+        return;
+      }
+
+      container.innerHTML = '';
+      matches.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'px-2.5 py-1.5 hover:bg-slate-800 rounded cursor-pointer flex items-center justify-between text-xs text-slate-200 transition-colors border-b border-slate-800/50 last:border-0';
+        const displayTitle = item.title || item.text;
+        
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${item.color || '#14B8A6'}"></span>
+            <span class="font-bold">${escapeHtml(displayTitle)}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 uppercase bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">${escapeHtml(item.abbrev || 'NOTA')}</span>
+        `;
+
+        row.onmousedown = (e) => {
+          e.preventDefault();
+          pasteSuggestedNoteTemplate(item);
+          hideTitleSuggestions();
+        };
+        container.appendChild(row);
+      });
+
+      container.classList.remove('hidden');
+    }
+
+    function hideTitleSuggestions() {
+      const container = document.getElementById('title-suggestions-container');
+      if (container) container.classList.add('hidden');
+    }
+
+    function pasteSuggestedNoteTemplate(note) {
+      document.getElementById('new-note-title').value = note.title || note.text || '';
+      document.getElementById('new-note-textarea').value = '';
+      document.getElementById('new-note-abbrev').value = note.abbrev || '';
+      
+      if (note.isShift) {
+        document.getElementById('is-shift-checkbox').checked = true;
+        document.getElementById('new-shift-type').value = note.shiftType || 'Mañana';
+        document.getElementById('new-shift-start').value = note.shiftStart || '08:00';
+        document.getElementById('new-shift-end').value = note.shiftEnd || '16:00';
+        toggleSpecialTypeInput('shift');
+        calculateShiftDuration();
+      } else if (note.isBirthday) {
+        document.getElementById('is-birthday-checkbox').checked = true;
+        toggleSpecialTypeInput('birthday');
+      } else {
+        toggleSpecialTypeInput('none');
+      }
+
+      selectNoteColor(note.color || '#14B8A6');
+      checkAndApplyExistingTagLock((note.title || note.text || '').trim().toLowerCase());
+    }
+
+    function checkAndApplyExistingTagLock(titleLower) {
+      if (!titleLower) {
+        setLockExistingTagFields(false);
+        return;
+      }
+
+      const isShift = document.getElementById('is-shift-checkbox').checked;
+      const currentShiftType = document.getElementById('new-shift-type').value;
+
+      let foundNote = null;
+      Object.keys(dayDataMap).forEach(key => {
+        const notesArr = dayDataMap[key];
+        if (Array.isArray(notesArr) && !foundNote) {
+          const match = notesArr.find(n => {
+            const nameMatch = (n.title || n.text || '').trim().toLowerCase() === titleLower;
+            if (!nameMatch) return false;
+            if (isShift) {
+              return n.isShift && n.shiftType === currentShiftType;
+            }
+            return !n.isShift;
+          });
+          if (match) foundNote = match;
+        }
+      });
+
+      if (foundNote) {
+        document.getElementById('new-note-abbrev').value = foundNote.abbrev || '';
+        selectNoteColor(foundNote.color || '#14B8A6');
+        setLockExistingTagFields(true);
+      } else {
+        setLockExistingTagFields(false);
+      }
+    }
+
+    function setLockExistingTagFields(lock) {
+      const colorBtns = document.querySelectorAll('#general-color-wrapper .color-btn');
+      colorBtns.forEach(btn => {
+        btn.disabled = lock;
+        if (lock) {
+          btn.classList.add('opacity-40', 'cursor-not-allowed');
+        } else {
+          btn.classList.remove('opacity-40', 'cursor-not-allowed');
+        }
+      });
+
+      const abbrevInput = document.getElementById('new-note-abbrev');
+      if (abbrevInput) abbrevInput.disabled = lock;
+    }
+
+    function handleTitleInput(val) {
+      const isBirthday = document.getElementById('is-birthday-checkbox').checked;
+      
+      if (isBirthday) {
+        checkDuplicateBirthdayTitle(val);
+      } else {
+        clearBirthdayDuplicateError();
+      }
+
+      if (val.trim().length > 0) {
+        showTitleSuggestions(val.trim().toLowerCase());
+        checkAndApplyExistingTagLock(val.trim().toLowerCase());
+      } else {
+        showTitleSuggestions('');
+        checkAndApplyExistingTagLock('');
+      }
+    }
+
+    function handleTitleSuggestions() {
+      const val = document.getElementById('new-note-title').value;
+      showTitleSuggestions(val ? val.trim().toLowerCase() : '');
+    }
+
+    function checkDuplicateBirthdayTitle(val) {
+      const isBirthday = document.getElementById('is-birthday-checkbox').checked;
+      if (!isBirthday) {
+        clearBirthdayDuplicateError();
+        return false;
+      }
+
+      const titleLower = val.trim().toLowerCase();
+      const editingId = document.getElementById('editing-note-id').value;
+      const errorMsg = document.getElementById('bday-duplicate-error');
+      const submitBtn = document.querySelector('#modal-view-form button[onclick="addNoteToCurrentDay()"]');
+      const inputEl = document.getElementById('new-note-title');
+
+      if (!titleLower) {
+        clearBirthdayDuplicateError();
+        return false;
+      }
+
+      let exists = false;
+      Object.keys(dayDataMap).forEach(key => {
+        const notesArr = dayDataMap[key];
+        if (Array.isArray(notesArr) && !exists) {
+          const match = notesArr.find(n => {
+            if (editingId && n.id === editingId) return false;
+            return n.isBirthday && (n.title || n.text || '').trim().toLowerCase() === titleLower;
+          });
+          if (match) exists = true;
+        }
+      });
+
+      if (exists) {
+        if (errorMsg) errorMsg.classList.remove('hidden');
+        if (inputEl) inputEl.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        return true;
+      } else {
+        clearBirthdayDuplicateError();
+        return false;
+      }
+    }
+
+    function clearBirthdayDuplicateError() {
+      const errorMsg = document.getElementById('bday-duplicate-error');
+      const submitBtn = document.querySelector('#modal-view-form button[onclick="addNoteToCurrentDay()"]');
+      const inputEl = document.getElementById('new-note-title');
+
+      if (errorMsg) errorMsg.classList.add('hidden');
+      if (inputEl) inputEl.classList.remove('border-red-500', 'ring-1', 'ring-red-500');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function toggleSpecialTypeInput(type) {
+      const shiftContainer = document.getElementById('shift-details-container');
+      const bdayContainer = document.getElementById('birthday-date-container');
+      const repeatWrapper = document.getElementById('repeat-select-wrapper');
+
+      if (type === 'shift') {
+        shiftContainer.classList.remove('hidden');
+        shiftContainer.classList.add('flex');
+        bdayContainer.classList.add('hidden');
+        bdayContainer.classList.remove('flex');
+        if (repeatWrapper) repeatWrapper.classList.remove('hidden');
+      } else if (type === 'birthday') {
+        bdayContainer.classList.remove('hidden');
+        bdayContainer.classList.add('flex');
+        shiftContainer.classList.add('hidden');
+        shiftContainer.classList.remove('flex');
+        if (repeatWrapper) repeatWrapper.classList.add('hidden');
+      } else {
+        shiftContainer.classList.add('hidden');
+        shiftContainer.classList.remove('flex');
+        bdayContainer.classList.add('hidden');
+        bdayContainer.classList.remove('flex');
+        if (repeatWrapper) repeatWrapper.classList.remove('hidden');
+      }
+    }
+
+    function calculateShiftDuration() {
+      const startVal = document.getElementById('new-shift-start').value;
+      const endVal = document.getElementById('new-shift-end').value;
+      const hoursInput = document.getElementById('new-note-hours');
+      const minsInput = document.getElementById('new-note-mins');
+      
+      if (!startVal || !endVal) {
+        if (hoursInput) hoursInput.value = 0;
+        if (minsInput) minsInput.value = 0;
+        return;
+      }
+
+      const sParts = startVal.split(':').map(Number);
+      const eParts = endVal.split(':').map(Number);
+      if (sParts.length < 2 || eParts.length < 2 || isNaN(sParts[0]) || isNaN(eParts[0]) || isNaN(sParts[1]) || isNaN(eParts[1])) {
+        if (hoursInput) hoursInput.value = 0;
+        if (minsInput) minsInput.value = 0;
+        return;
+      }
+
+      let startMins = sParts[0] * 60 + sParts[1];
+      let endMins = eParts[0] * 60 + eParts[1];
+
+      if (endMins < startMins) {
+        endMins += 24 * 60;
+      }
+
+      // Si las horas son exactamente iguales, se asume un turno completo de 24 horas (1440 mins)
+      const diffMins = (endMins === startMins && startVal !== "") ? 24 * 60 : (endMins - startMins);
+      if (hoursInput) hoursInput.value = Math.floor(diffMins / 60);
+      if (minsInput) minsInput.value = diffMins % 60;
+    }
+
+    function renderModalNotesList() {
+      const container = document.getElementById('modal-notes-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const visibleNotes = currentModalNotes.filter(n => !n.isHiddenCounter);
+
+      if (visibleNotes.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
+            No hay notas asignadas para este día.
+          </div>
+        `;
+        return;
+      }
+
+      visibleNotes.forEach(note => {
+        const item = document.createElement('div');
+        item.className = 'bg-slate-900 p-2.5 rounded-lg border border-slate-700/80 flex items-center justify-between gap-2 shadow-sm';
+
+        const labelText = note.abbrev ? note.abbrev : generateSmartAbbrev(note.title || note.text);
+
+        let typeBadgeHTML = '';
+        if (note.isBirthday) {
+          typeBadgeHTML = `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1"><i class="fa-solid fa-cake-candles text-[9px]"></i> CUMPLE</span>`;
+        } else if (note.isShift) {
+          typeBadgeHTML = `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1"><i class="fa-solid fa-user-doctor text-[9px]"></i> TURNO</span>`;
+        } else {
+          typeBadgeHTML = `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/40 flex items-center gap-1"><i class="fa-solid fa-note-sticky text-[9px]"></i> NOTA</span>`;
+        }
+
+        const safeNoteJSON = escapeHtml(JSON.stringify(note));
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${note.color || '#14B8A6'}"></span>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(note.title || note.text)}</span>
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(labelText)}</span>
+                ${typeBadgeHTML}
+                ${note.repeat && note.repeat !== 'none' ? `<i class="fa-solid fa-arrows-rotate text-[10px] text-teal-400" title="Repetición activa"></i>` : ''}
+              </div>
+              ${note.description ? `<p class="text-[11px] text-slate-400 truncate mt-0.5">${escapeHtml(note.description)}</p>` : ''}
+              ${note.isShift ? `<span class="text-[10px] text-purple-400 font-semibold mt-0.5"><i class="fa-solid fa-clock text-[9px] mr-1"></i>${escapeHtml(note.shiftType || 'Turno')}: ${note.shiftStart || ''} - ${note.shiftEnd || ''}</span>` : ''}
+            </div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" data-note-data="${safeNoteJSON}" onclick="showCreateFormInModal(JSON.parse(this.getAttribute('data-note-data')))" class="p-1.5 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded transition-colors">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button type="button" onclick="deleteNoteFromModal('${note.id}')" class="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition-colors">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function addNoteToCurrentDay() {
+      const titleInput = document.getElementById('new-note-title').value.trim();
+      const descInput = document.getElementById('new-note-textarea').value.trim();
+      const abbrevInput = document.getElementById('new-note-abbrev').value.trim().toUpperCase();
+      const editingId = document.getElementById('editing-note-id').value;
+
+      const isShift = document.getElementById('is-shift-checkbox').checked;
+      const isBirthday = document.getElementById('is-birthday-checkbox').checked;
+
+      if (!titleInput) {
+        showToast('Campo Requerido', 'Por favor ingresa un título para la nota.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
+
+      if (isBirthday && checkDuplicateBirthdayTitle(titleInput)) {
+        return;
+      }
+
+      const repeatType = isBirthday ? 'none' : document.getElementById('repeat-option').value;
+      const existingNote = editingId ? getNoteById(editingId) : null;
+      const baseGroupId = existingNote ? (existingNote.repeatGroupId || 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)) : 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+      // Si se está editando una nota que tenía repeticiones o grupo de cumpleaños, limpiar la serie anterior
+      if (existingNote) {
+        if (existingNote.repeatGroupId || existingNote.birthdayOwnerId || existingNote.isBirthday) {
+          const groupId = existingNote.repeatGroupId;
+          const ownerId = existingNote.birthdayOwnerId || existingNote.id;
+
+          for (const k in dayDataMap) {
+            if (Array.isArray(dayDataMap[k])) {
+              dayDataMap[k] = dayDataMap[k].filter(n => {
+                if (groupId && n.repeatGroupId === groupId) return false;
+                if (ownerId && (n.birthdayOwnerId === ownerId || n.id === ownerId)) return false;
+                if (existingNote.isBirthday && n.isBirthday && n.title === existingNote.title) return false;
+                return true;
+              });
+            }
+          }
+        } else {
+          removeNoteById(editingId);
+        }
+      }
+
+      const noteObj = {
+        id: editingId || 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        repeatGroupId: baseGroupId,
+        title: titleInput,
+        text: titleInput,
+        description: descInput,
+        abbrev: abbrevInput || generateSmartAbbrev(titleInput),
+        color: selectedColor,
+        isShift: isShift,
+        isBirthday: isBirthday,
+        repeat: repeatType
+      };
+
+      if (isShift) {
+        noteObj.shiftType = document.getElementById('new-shift-type').value;
+        noteObj.shiftStart = document.getElementById('new-shift-start').value;
+        noteObj.shiftEnd = document.getElementById('new-shift-end').value;
+        noteObj.hours = parseInt(document.getElementById('new-note-hours').value) || 0;
+        noteObj.mins = parseInt(document.getElementById('new-note-mins').value) || 0;
+      }
+
+      if (isBirthday) {
+        const birthYear = document.getElementById('new-note-birthyear').value;
+        noteObj.birthYear = birthYear;
+        const selectedUnits = [];
+        if (document.getElementById('bday-count-days').checked) selectedUnits.push('days');
+        if (document.getElementById('bday-count-weeks').checked) selectedUnits.push('weeks');
+        if (document.getElementById('bday-count-months').checked) selectedUnits.push('months');
+        noteObj.selectedUnits = selectedUnits;
+
+        noteObj.bdayColors = {
+          anniversary: document.getElementById('bday-color-anniversary').value || '#EC4899',
+          day: document.getElementById('bday-color-day').value || '#F59E0B',
+          week: document.getElementById('bday-color-week').value || '#38BDF8',
+          month: document.getElementById('bday-color-month').value || '#10B981'
+        };
+        noteObj.reminder = document.getElementById('birthday-reminder-option').value;
+        noteObj.color = noteObj.bdayColors.anniversary;
+      }
+
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+
+      if (!dayDataMap[key]) dayDataMap[key] = [];
+      dayDataMap[key].push(noteObj);
+
+      if (isBirthday) {
+        generateBirthdayEvents(selectedDate, noteObj);
+      } else if (repeatType !== 'none') {
+        generateRecurringEvents(selectedDate, noteObj);
+      }
+
+      saveToLocalStorage();
+      renderAll();
+      closeDayDetailModal();
+      showToast('Guardado Exitoso', 'El registro se guardó correctamente.', 'fa-circle-check', 'text-teal-400');
+    }
+
+    function getNoteById(id) {
+      for (const k in dayDataMap) {
+        const arr = dayDataMap[k];
+        if (Array.isArray(arr)) {
+          const match = arr.find(n => n.id === id);
+          if (match) return match;
+        }
+      }
+      return null;
+    }
+
+    function removeNoteById(id) {
+      for (const k in dayDataMap) {
+        if (Array.isArray(dayDataMap[k])) {
+          dayDataMap[k] = dayDataMap[k].filter(n => n.id !== id);
+        }
+      }
+    }
+
+    function generateRecurringEvents(startDate, baseNote) {
+      const yearsLimit = 2;
+      let curr = new Date(startDate.getTime());
+      const originalDay = startDate.getDate();
+      const originalMonth = startDate.getMonth();
+      
+      for (let i = 0; i < 300; i++) {
+        if (baseNote.repeat === 'daily') {
+          curr.setDate(curr.getDate() + 1);
+        } else if (baseNote.repeat === 'weekly') {
+          curr.setDate(curr.getDate() + 7);
+        } else if (baseNote.repeat === 'biweekly') {
+          curr.setDate(curr.getDate() + 14);
+        } else if (baseNote.repeat === 'monthly') {
+          curr.setDate(1);
+          curr.setMonth(curr.getMonth() + 1);
+          const lastDay = new Date(curr.getFullYear(), curr.getMonth() + 1, 0).getDate();
+          curr.setDate(Math.min(originalDay, lastDay));
+        } else if (baseNote.repeat === 'yearly') {
+          curr.setDate(1);
+          curr.setFullYear(curr.getFullYear() + 1);
+          curr.setMonth(originalMonth);
+          const lastDay = new Date(curr.getFullYear(), originalMonth + 1, 0).getDate();
+          curr.setDate(Math.min(originalDay, lastDay));
+        }
+
+        if (curr.getFullYear() > startDate.getFullYear() + yearsLimit) break;
+
+        const k = formatDateKey(curr.getFullYear(), curr.getMonth(), curr.getDate());
+        if (!dayDataMap[k]) dayDataMap[k] = [];
+        
+        const clone = JSON.parse(JSON.stringify(baseNote));
+        clone.id = 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        dayDataMap[k].push(clone);
+      }
+    }
+
+    function generateBirthdayEvents(bdayDate, baseNote) {
+      if (!baseNote.birthYear) return;
+      const bYear = parseInt(baseNote.birthYear);
+      const bMonth = bdayDate.getMonth();
+      const bDay = bdayDate.getDate();
+
+      const maxYear = new Date().getFullYear() + 2;
+
+      for (const k in dayDataMap) {
+        if (Array.isArray(dayDataMap[k])) {
+          dayDataMap[k] = dayDataMap[k].filter(n => !(n.birthdayOwnerId === baseNote.id || (n.isBirthday && n.title === baseNote.title && n.id !== baseNote.id)));
+        }
+      }
+
+      for (let y = bYear + 1; y <= maxYear; y++) {
+        const anniversaryKey = formatDateKey(y, bMonth, bDay);
+        if (!dayDataMap[anniversaryKey]) dayDataMap[anniversaryKey] = [];
+        
+        const currentKey = formatDateKey(bdayDate.getFullYear(), bdayDate.getMonth(), bdayDate.getDate());
+        if (anniversaryKey !== currentKey) {
+          const annivNote = JSON.parse(JSON.stringify(baseNote));
+          annivNote.id = 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+          annivNote.birthdayOwnerId = baseNote.id;
+          dayDataMap[anniversaryKey].push(annivNote);
+        }
+      }
+
+      const selectedUnits = baseNote.selectedUnits || [];
+      if (selectedUnits.length === 0) return;
+
+      const startDate = new Date(bYear, bMonth, bDay);
+      
+      // Optimización de generación de hitos (días, semanas, meses)
+      if (selectedUnits.includes('days')) {
+        for (let d = 100; d <= 40000; d += 100) {
+          const target = new Date(startDate.getTime() + d * 86400000);
+          if (target.getFullYear() > maxYear) break;
+          const k = formatDateKey(target.getFullYear(), target.getMonth(), target.getDate());
+          if (!dayDataMap[k]) dayDataMap[k] = [];
+          dayDataMap[k].push({
+            id: 'bday_cnt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            birthdayOwnerId: baseNote.id,
+            title: `${baseNote.title}: ${d} días`,
+            text: `${baseNote.title}: ${d} días`,
+            abbrev: `${d}D`,
+            color: baseNote.bdayColors.day || '#F59E0B',
+            description: `Han transcurrido ${d} días desde el nacimiento.`,
+            isHiddenCounter: false
+          });
+        }
+      }
+
+      if (selectedUnits.includes('weeks')) {
+        [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 1000].forEach(weeks => {
+          const target = new Date(startDate.getTime() + (weeks * 7) * 86400000);
+          if (target.getFullYear() <= maxYear) {
+            const k = formatDateKey(target.getFullYear(), target.getMonth(), target.getDate());
+            if (!dayDataMap[k]) dayDataMap[k] = [];
+            dayDataMap[k].push({
+              id: 'bday_cnt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+              birthdayOwnerId: baseNote.id,
+              title: `${baseNote.title}: ${weeks} semanas`,
+              text: `${baseNote.title}: ${weeks} semanas`,
+              abbrev: `${weeks}S`,
+              color: baseNote.bdayColors.week || '#38BDF8',
+              description: `Han transcurrido ${weeks} semanas desde el nacimiento.`,
+              isHiddenCounter: false
+            });
+          }
+        });
+      }
+
+      if (selectedUnits.includes('months')) {
+        for (let m = 6; m <= (maxYear - bYear) * 12; m += 6) {
+          const target = new Date(bYear, bMonth + m, bDay);
+          if (target.getFullYear() > maxYear) break;
+          const k = formatDateKey(target.getFullYear(), target.getMonth(), target.getDate());
+          if (!dayDataMap[k]) dayDataMap[k] = [];
+          dayDataMap[k].push({
+            id: 'bday_cnt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            birthdayOwnerId: baseNote.id,
+            title: `${baseNote.title}: ${m} meses`,
+            text: `${baseNote.title}: ${m} meses`,
+            abbrev: `${m}M`,
+            color: baseNote.bdayColors.month || '#10B981',
+            description: `Han transcurrido ${m} meses desde el nacimiento.`,
+            isHiddenCounter: false
+          });
+        }
+      }
+    }
+
+    function saveDayDetails() {
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      dayDataMap[key] = currentModalNotes;
+      saveToLocalStorage();
+      renderAll();
+      closeDayDetailModal();
+      showToast('Cambios Guardados', 'Notas actualizadas para este día.', 'fa-circle-check', 'text-teal-400');
+    }
+
+    function deleteNoteFromModal(id) {
+      const noteToDelete = getNoteById(id);
+      if (!noteToDelete) return;
+
+      noteIdPendingDelete = id;
+
+      if ((noteToDelete.repeat && noteToDelete.repeat !== 'none') || noteToDelete.repeatGroupId || noteToDelete.isBirthday || noteToDelete.birthdayOwnerId) {
+        document.getElementById('delete-confirm-modal').classList.remove('hidden');
+        document.getElementById('delete-confirm-modal').classList.add('flex');
+      } else {
+        confirmDeleteAction('single');
+      }
+    }
+
+    function closeDeleteConfirmModal() {
+      document.getElementById('delete-confirm-modal').classList.add('hidden');
+      document.getElementById('delete-confirm-modal').classList.remove('flex');
+      noteIdPendingDelete = null;
+    }
+
+    function confirmDeleteAction(mode) {
+      if (!noteIdPendingDelete) return;
+
+      const targetNote = getNoteById(noteIdPendingDelete);
+      const currentKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+
+      if (mode === 'single' || !targetNote) {
+        if (dayDataMap[currentKey]) {
+          dayDataMap[currentKey] = dayDataMap[currentKey].filter(n => n.id !== noteIdPendingDelete);
+        }
+      } else if (mode === 'all') {
+        const groupId = targetNote.repeatGroupId;
+        const ownerId = targetNote.birthdayOwnerId || targetNote.id;
+
+        for (const k in dayDataMap) {
+          if (Array.isArray(dayDataMap[k])) {
+            dayDataMap[k] = dayDataMap[k].filter(n => {
+              if (groupId && n.repeatGroupId && n.repeatGroupId === groupId) return false;
+              if (ownerId && (n.birthdayOwnerId === ownerId || n.id === ownerId)) return false;
+              if (targetNote.isBirthday && n.isBirthday && (n.title || n.text || '').trim().toLowerCase() === (targetNote.title || targetNote.text || '').trim().toLowerCase()) return false;
+              return true;
+            });
+          }
+        }
+      }
+
+      saveToLocalStorage();
+      currentModalNotes = dayDataMap[currentKey] ? JSON.parse(JSON.stringify(dayDataMap[currentKey])) : [];
+      renderModalNotesList();
+      renderAll();
+      closeDeleteConfirmModal();
+      showToast('Eliminado', mode === 'all' ? 'Se eliminaron todas las repeticiones.' : 'Nota eliminada para este día.', 'fa-trash-can', 'text-amber-400');
+    }
+
+    function handleShiftTypeChange() {
+      const type = document.getElementById('new-shift-type').value;
+      const titleLower = document.getElementById('new-note-title').value.trim().toLowerCase();
+
+      if (type === 'Mañana') {
+        document.getElementById('new-shift-start').value = '08:00';
+        document.getElementById('new-shift-end').value = '16:00';
+        selectNoteColor('#38BDF8');
+      } else if (type === 'Tarde') {
+        document.getElementById('new-shift-start').value = '16:00';
+        document.getElementById('new-shift-end').value = '00:00';
+        selectNoteColor('#F59E0B');
+      } else if (type === 'Noche') {
+        document.getElementById('new-shift-start').value = '00:00';
+        document.getElementById('new-shift-end').value = '08:00';
+        selectNoteColor('#8B5CF6');
+      }
+
+      calculateShiftDuration();
+      checkAndApplyExistingTagLock(titleLower);
+    }
+
+    function setSummaryMode(mode) {
+      summaryMode = mode;
+      document.querySelectorAll('#summary-mode-month, #summary-mode-year, #summary-mode-all').forEach(btn => {
+        btn.className = "py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all";
+      });
+      document.getElementById(`summary-mode-${mode}`).className = "py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow";
+      renderSummaryView();
+    }
+
+    function setSummaryCategory(cat) {
+      summaryCategory = cat;
+      const turnsBtn = document.getElementById('summary-cat-turns');
+      const labelsBtn = document.getElementById('summary-cat-labels');
+      
+      if (turnsBtn) {
+        turnsBtn.className = cat === 'turns' ? 'py-1.5 text-xs font-bold rounded-md bg-purple-600 text-white transition-all shadow' : 'py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all';
+        turnsBtn.innerHTML = '<i class="fa-solid fa-user-doctor mr-1"></i> Turnos';
+      }
+      if (labelsBtn) {
+        labelsBtn.className = cat === 'labels' ? 'py-1.5 text-xs font-bold rounded-md bg-teal-600 text-white transition-all shadow' : 'py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all';
+        labelsBtn.innerHTML = '<i class="fa-solid fa-tags mr-1"></i> Notas';
+      }
+      renderSummaryView();
+    }
+
+    function renderSummaryView() {
+      const bannerTitle = document.getElementById('summary-period-title');
+      const breakdownContainer = document.getElementById('summary-stats-breakdown');
+
+      if (summaryMode === 'month') {
+        bannerTitle.textContent = `${monthNames[summaryDate.getMonth()]} ${summaryDate.getFullYear()}`;
+      } else if (summaryMode === 'year') {
+        bannerTitle.textContent = `${summaryDate.getFullYear()}`;
+      } else {
+        bannerTitle.textContent = `HISTÓRICO COMPLETO`;
+      }
+
+      breakdownContainer.innerHTML = '';
+      const statsMap = {};
+
+      Object.keys(dayDataMap).forEach(dateKey => {
+        const parts = dateKey.split('-').map(Number);
+        const y = parts[0], m = parts[1] - 1, d = parts[2];
+        const dateObj = new Date(y, m, d);
+
+        let inRange = false;
+        if (summaryMode === 'month') {
+          inRange = (y === summaryDate.getFullYear() && m === summaryDate.getMonth());
+        } else if (summaryMode === 'year') {
+          inRange = (y === summaryDate.getFullYear());
+        } else {
+          inRange = true;
+        }
+
+        if (inRange && Array.isArray(dayDataMap[dateKey])) {
+          dayDataMap[dateKey].forEach(n => {
+            if (n.isHiddenCounter) return;
+            const isTurn = !!n.isShift;
+
+            if ((summaryCategory === 'turns' && isTurn) || (summaryCategory === 'labels' && !isTurn && !n.isBirthday)) {
+              const name = n.title || n.text || 'Sin Título';
+              if (!statsMap[name]) {
+                statsMap[name] = {
+                  count: 0,
+                  hours: 0,
+                  mins: 0,
+                  color: n.color || '#14B8A6',
+                  items: []
+                };
+              }
+              statsMap[name].count += 1;
+              statsMap[name].hours += (n.hours || 0);
+              statsMap[name].mins += (n.mins || 0);
+              statsMap[name].items.push({ dateKey, dateObj, note: n });
+            }
+          });
+        }
+      });
+
+      let totalGlobalMins = 0;
+      let totalGlobalCount = 0;
+
+      Object.keys(statsMap).forEach((name, idx) => {
+        const data = statsMap[name];
+        const totalMins = data.hours * 60 + data.mins;
+        totalGlobalMins += totalMins;
+        totalGlobalCount += data.count;
+
+        const formatH = Math.floor(totalMins / 60);
+        const formatM = totalMins % 60;
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'rounded-lg bg-slate-900 border border-slate-800 overflow-hidden';
+
+        const mainHeader = document.createElement('div');
+        mainHeader.className = 'grid grid-cols-12 text-xs items-center p-2.5 cursor-pointer hover:bg-slate-800/60 transition-colors select-none font-bold text-slate-200';
+        mainHeader.innerHTML = `
+          <div class="col-span-5 flex items-center gap-2 truncate">
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 transition-transform duration-200 chevron-icon"></i>
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${data.color}"></span>
+            <span class="truncate">${escapeHtml(name)}</span>
+          </div>
+          <div class="col-span-3 text-center text-slate-300 font-semibold">${data.count} vez${data.count > 1 ? 'es' : ''}</div>
+          <div class="col-span-4 text-right font-mono text-teal-400">${formatH > 0 || formatM > 0 ? `${formatH}h ${formatM}m` : ''}</div>
+        `;
+
+        const detailsContainer = document.createElement('div');
+        detailsContainer.className = 'hidden bg-slate-950/70 border-t border-slate-800 p-2 space-y-1.5';
+
+        if (summaryCategory === 'turns') {
+          const shiftTypesMap = {};
+          data.items.forEach(item => {
+            const st = item.note.shiftType || 'General';
+            if (!shiftTypesMap[st]) {
+              shiftTypesMap[st] = { count: 0, hours: 0, mins: 0, list: [] };
+            }
+            shiftTypesMap[st].count += 1;
+            shiftTypesMap[st].hours += (item.note.hours || 0);
+            shiftTypesMap[st].mins += (item.note.mins || 0);
+            shiftTypesMap[st].list.push(item);
+          });
+
+          Object.keys(shiftTypesMap).forEach(sType => {
+            const sData = shiftTypesMap[sType];
+            const sMins = sData.hours * 60 + sData.mins;
+            const sH = Math.floor(sMins / 60);
+            const sM = sMins % 60;
+
+            const shiftSubGroup = document.createElement('div');
+            shiftSubGroup.className = 'rounded border border-slate-800/80 bg-slate-900/60 overflow-hidden';
+
+            const shiftSubHeader = document.createElement('div');
+            shiftSubHeader.className = 'flex items-center justify-between p-2 text-[11px] font-bold text-slate-300 cursor-pointer hover:bg-slate-800/40 select-none';
+            shiftSubHeader.innerHTML = `
+              <div class="flex items-center gap-1.5">
+                <i class="fa-solid fa-chevron-right text-[9px] text-slate-400 transition-transform duration-200 sub-chevron-icon"></i>
+                <span class="px-2 py-0.5 rounded bg-purple-900/40 border border-purple-700/50 text-purple-300 flex items-center gap-1">
+                  <i class="fa-solid fa-briefcase text-[9px]"></i> ${escapeHtml(sType)}
+                </span>
+                <span class="text-slate-400 text-[10px]">(${sData.count} vez${sData.count > 1 ? 'es' : ''})</span>
+              </div>
+              <span class="font-mono text-teal-400 text-[10px]">${sH}h ${sM}m</span>
+            `;
+
+            const shiftDatesList = document.createElement('div');
+            shiftDatesList.className = 'hidden p-2 space-y-1 bg-slate-950 border-t border-slate-800/60';
+
+            sData.list.forEach(i => {
+              const dateRow = document.createElement('div');
+              dateRow.className = 'flex items-center justify-between text-[11px] p-1.5 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 cursor-pointer';
+              dateRow.onclick = (e) => {
+                e.stopPropagation();
+                jumpToSpecificDate(i.dateObj.getFullYear(), i.dateObj.getMonth(), i.dateObj.getDate());
+              };
+
+              const d = i.dateObj.getDate();
+              const m = i.dateObj.getMonth() + 1;
+              const yStr = i.dateObj.getFullYear();
+
+              dateRow.innerHTML = `
+                <span class="font-bold text-slate-200 flex items-center gap-1">
+                  <i class="fa-regular fa-calendar text-slate-400"></i> ${d}/${m}/${yStr}
+                </span>
+                <span class="text-purple-300 font-mono text-[10px]"><i class="fa-regular fa-clock"></i> ${escapeHtml(i.note.shiftStart || '')} - ${escapeHtml(i.note.shiftEnd || '')} (${i.note.hours || 0}h ${i.note.mins || 0}m)</span>
+              `;
+              shiftDatesList.appendChild(dateRow);
+            });
+
+            shiftSubHeader.onclick = (e) => {
+              e.stopPropagation();
+              const isHidden = shiftDatesList.classList.contains('hidden');
+              shiftDatesList.classList.toggle('hidden', !isHidden);
+              const subIcon = shiftSubHeader.querySelector('.sub-chevron-icon');
+              if (subIcon) subIcon.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+            };
+
+            shiftSubGroup.appendChild(shiftSubHeader);
+            shiftSubGroup.appendChild(shiftDatesList);
+            detailsContainer.appendChild(shiftSubGroup);
+          });
+
+        } else {
+          data.items.forEach(i => {
+            const dateRow = document.createElement('div');
+            dateRow.className = 'p-2 rounded bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-pointer text-[11px]';
+            dateRow.onclick = (e) => {
+              e.stopPropagation();
+              jumpToSpecificDate(i.dateObj.getFullYear(), i.dateObj.getMonth(), i.dateObj.getDate());
+            };
+
+            const d = i.dateObj.getDate();
+            const m = i.dateObj.getMonth() + 1;
+            const yStr = i.dateObj.getFullYear();
+
+            dateRow.innerHTML = `
+              <div class="flex items-center justify-between font-bold text-slate-200">
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-teal-400"></i> ${d}/${m}/${yStr}</span>
+              </div>
+              ${i.note.description ? `<p class="text-[10px] text-slate-400 italic mt-1 font-sans pl-4 border-l border-teal-500/30">${escapeHtml(i.note.description)}</p>` : ''}
+            `;
+            detailsContainer.appendChild(dateRow);
+          });
+        }
+
+        mainHeader.onclick = () => {
+          const isHidden = detailsContainer.classList.contains('hidden');
+          detailsContainer.classList.toggle('hidden', !isHidden);
+          const icon = mainHeader.querySelector('.chevron-icon');
+          if (icon) icon.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+        };
+
+        groupDiv.appendChild(mainHeader);
+        groupDiv.appendChild(detailsContainer);
+        breakdownContainer.appendChild(groupDiv);
+      });
+
+      if (Object.keys(statsMap).length === 0) {
+        breakdownContainer.innerHTML = `
+          <div class="text-center py-4 text-slate-500 text-xs italic">
+            No hay registros para este período.
+          </div>
+        `;
+      }
+
+      const gH = Math.floor(totalGlobalMins / 60);
+      const gM = totalGlobalMins % 60;
+      document.getElementById('summary-global-time').textContent = `${gH}h ${gM}m`;
+      document.getElementById('summary-global-count').textContent = `${totalGlobalCount} ${summaryCategory === 'turns' ? 'Turnos' : 'Notas'}`;
+
+      renderNearbyNotes();
+    }
+
+    function renderNearbyNotes() {
+      const container = document.getElementById('nearby-notes-list');
+      const titleEl = document.getElementById('nearby-section-title');
+      container.innerHTML = '';
+
+      const isTurnsTab = summaryCategory === 'turns';
+      titleEl.textContent = isTurnsTab ? 'TURNOS CERCANOS' : 'NOTAS CERCANAS';
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const items = [];
+
+      Object.keys(dayDataMap).forEach(key => {
+        const parts = key.split('-').map(Number);
+        const itemDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+        const diffDays = Math.round((itemDate - today) / (1000 * 60 * 60 * 24));
+
+        let inRange = false;
+        if (notesTab === 'past' && diffDays >= -3 && diffDays < 0) inRange = true;
+        if (notesTab === 'next' && diffDays >= 0 && diffDays <= 3) inRange = true;
+
+        if (inRange && Array.isArray(dayDataMap[key])) {
+          dayDataMap[key].forEach(n => {
+            if (n.isHiddenCounter) return;
+            if (isTurnsTab && n.isShift) {
+              items.push({ date: itemDate, key: key, note: n });
+            } else if (!isTurnsTab && !n.isShift && !n.isBirthday) {
+              items.push({ date: itemDate, key: key, note: n });
+            }
+          });
+        }
+      });
+
+      items.sort((a, b) => notesTab === 'past' ? b.date - a.date : a.date - b.date);
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-3 text-slate-500 text-xs italic">
+            No hay ${isTurnsTab ? 'turnos cercanos' : 'notas cercanas'} en este rango (3 días).
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(i => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs cursor-pointer hover:border-slate-700 transition-colors';
+        
+        const d = i.date.getDate();
+        const m = i.date.getMonth() + 1;
+        const yStr = String(i.date.getFullYear()).slice(-2);
+
+        row.onclick = () => {
+          jumpToSpecificDate(i.date.getFullYear(), i.date.getMonth(), i.date.getDate());
+        };
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-slate-200">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${i.note.color || '#14B8A6'}"></span>
+            <span>${escapeHtml(i.note.title || i.note.text)}</span>
+            ${i.note.isShift ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-900/60 text-purple-300 font-semibold border border-purple-700/50">${escapeHtml(i.note.shiftType || 'Turno')}</span>` : ''}
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${d}/${m}/${yStr}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function executeSearch() {
+      const rawQuery = document.getElementById('search-input').value.trim();
+      const container = document.getElementById('search-results-list');
+      container.innerHTML = '';
+
+      if (!rawQuery) {
+        container.innerHTML = `
+          <div class="text-center py-2 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
+            Escribe un texto arriba para buscar.
+          </div>
+        `;
+        return;
+      }
+
+      const normalizeStr = (str) => (str || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const query = normalizeStr(rawQuery);
+
+      const results = [];
+      Object.keys(dayDataMap).forEach(key => {
+        const parts = key.split('-').map(Number);
+        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        if (Array.isArray(dayDataMap[key])) {
+          dayDataMap[key].forEach(n => {
+            const t = normalizeStr(n.title || n.text);
+            const d = normalizeStr(n.description);
+
+            if (t.includes(query) || d.includes(query)) {
+              results.push({ date: dateObj, key: key, note: n });
+            }
+          });
+        }
+      });
+
+      results.sort((a, b) => b.date - a.date);
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-3 text-slate-500 text-xs italic">
+            No se encontraron coincidencias.
+          </div>
+        `;
+        return;
+      }
+
+      results.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs cursor-pointer hover:border-slate-700 transition-colors';
+
+        const d = r.date.getDate();
+        const m = r.date.getMonth() + 1;
+        const yStr = String(r.date.getFullYear()).slice(-2);
+
+        row.onclick = () => {
+          jumpToSpecificDate(r.date.getFullYear(), r.date.getMonth(), r.date.getDate());
+        };
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-slate-200">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${r.note.color || '#14B8A6'}"></span>
+            <span>${escapeHtml(r.note.title || r.note.text)}</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${d}/${m}/${yStr}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function setBirthdayFilterTab(tab) {
+      birthdayFilterTab = tab;
+      document.getElementById('bday-tab-upcoming').className = tab === 'upcoming' ? 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-amber-500 text-slate-950' : 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700';
+      document.getElementById('bday-tab-all').className = tab === 'all' ? 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-amber-500 text-slate-950' : 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700';
+      renderBirthdaysView();
+    }
+
+    function renderBirthdaysView() {
+      const container = document.getElementById('birthdays-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const bdaysMap = new Map();
+      Object.keys(dayDataMap).forEach(key => {
+        const parts = key.split('-').map(Number);
+        const itemDate = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        if (Array.isArray(dayDataMap[key])) {
+          dayDataMap[key].forEach(n => {
+            if (n.isBirthday && !n.birthdayOwnerId) {
+              const uniqueTitle = (n.title || n.text || '').trim().toLowerCase();
+              if (!bdaysMap.has(uniqueTitle)) {
+                bdaysMap.set(uniqueTitle, { date: itemDate, key: key, note: n });
+              }
+            }
+          });
+        }
+      });
+
+      const bdays = Array.from(bdaysMap.values());
+      document.getElementById('birthdays-total-badge').textContent = `${bdays.length} Registrado${bdays.length !== 1 ? 's' : ''}`;
+
+      if (bdays.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-500 text-xs italic bg-slate-900/50 rounded-xl border border-slate-800">
+            No hay cumpleaños registrados aún.
+          </div>
+        `;
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const currentYear = today.getFullYear();
+
+      const processedBdays = bdays.map(item => {
+        const d = item.date.getDate();
+        const m = item.date.getMonth();
+        const birthYear = item.note.birthYear ? parseInt(item.note.birthYear) : null;
+
+        const maxDayInCurrentYear = new Date(currentYear, m + 1, 0).getDate();
+        const validDay = Math.min(d, maxDayInCurrentYear);
+
+        let nextBday = new Date(currentYear, m, validDay, 0, 0, 0, 0);
+        if (nextBday < today) {
+          const maxDayInNextYear = new Date(currentYear + 1, m + 1, 0).getDate();
+          nextBday = new Date(currentYear + 1, m, Math.min(d, maxDayInNextYear), 0, 0, 0, 0);
+        }
+
+        const diffTime = nextBday.getTime() - today.getTime();
+        const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        let ageToTurn = null;
+        if (birthYear) {
+          ageToTurn = nextBday.getFullYear() - birthYear;
+        }
+
+        return {
+          ...item,
+          day: d,
+          month: m + 1,
+          birthYear: birthYear,
+          nextBdayDate: nextBday,
+          daysLeft: daysLeft,
+          ageToTurn: ageToTurn
+        };
+      });
+
+      if (birthdayFilterTab === 'upcoming') {
+        processedBdays.sort((a, b) => a.daysLeft - b.daysLeft);
+      } else {
+        processedBdays.sort((a, b) => a.date - b.date);
+      }
+
+      processedBdays.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between gap-3';
+
+        let dateAndAgeHTML = '';
+
+        if (birthdayFilterTab === 'upcoming') {
+          const nextDay = item.nextBdayDate.getDate();
+          const nextMonth = item.nextBdayDate.getMonth() + 1;
+          const nextYear = item.nextBdayDate.getFullYear();
+          const nextBdayStr = `${nextDay}/${nextMonth}/${nextYear}`;
+
+          let daysBadgeText = '';
+          if (item.daysLeft === 0) {
+            daysBadgeText = '¡Es Hoy! 🎉';
+          } else if (item.daysLeft === 1) {
+            daysBadgeText = 'Falta 1 día';
+          } else {
+            daysBadgeText = `Faltan ${item.daysLeft} días`;
+          }
+
+          dateAndAgeHTML = `
+            <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+              <span class="text-[10px] text-amber-300 font-semibold">Próximo: ${nextBdayStr}</span>
+              ${item.ageToTurn !== null ? `<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">(Cumplirá ${item.ageToTurn} años)</span>` : ''}
+              <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${item.daysLeft === 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse' : 'bg-slate-800 text-teal-400 border border-slate-700'}">${daysBadgeText}</span>
+            </div>
+          `;
+        } else {
+          let ageText = '';
+          let fullBirthDateStr = `${item.day}/${item.month}`;
+
+          if (item.birthYear) {
+            fullBirthDateStr += `/${item.birthYear}`;
+            const currentAge = currentYear - item.birthYear;
+            if (currentAge >= 0) {
+              ageText = ` (${currentAge} años)`;
+            }
+          }
+
+          dateAndAgeHTML = `
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-[10px] text-amber-300 font-semibold">Nacimiento: ${fullBirthDateStr}</span>
+              ${ageText ? `<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">${escapeHtml(ageText)}</span>` : ''}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="p-2.5 bg-amber-500/20 text-amber-400 rounded-lg text-base shrink-0">
+              <i class="fa-solid fa-cake-candles"></i>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-extrabold text-sm text-slate-100 truncate">${escapeHtml(item.note.title || item.note.text)}</span>
+              ${item.note.description ? `<p class="text-xs text-slate-400 truncate">${escapeHtml(item.note.description)}</p>` : ''}
+              ${dateAndAgeHTML}
+            </div>
+          </div>
+          <button onclick="jumpToSpecificDate(${item.nextBdayDate.getFullYear()}, ${item.nextBdayDate.getMonth()}, ${item.nextBdayDate.getDate()})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-400 border border-slate-700 rounded-lg text-xs font-bold transition-all shrink-0">
+            Ver Día
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openDirectBirthdayModal() {
+      selectedDate = new Date();
+      openDayDetailModal();
+      showCreateBirthdayFormInModal();
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('hidden');
+      document.getElementById('settings-modal').classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+      document.getElementById('settings-modal').classList.remove('flex');
+    }
+
+    function exportDataJSON() {
+      const backup = {
+        app: 'Calendario PWA',
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        calendar: dayDataMap,
+        medications,
+        medicationLogs: medLogs
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = `backup_calendario_${formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())}.json`;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Exportación Exitosa', 'Respaldo completo descargado (calendario y salud).', 'fa-file-export', 'text-teal-400');
+    }
+
+    function isValidCalendarMap(value) {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+      return Object.entries(value).every(([key, notes]) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(key) && Array.isArray(notes)
+      );
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          // Compatibilidad con respaldos antiguos: el archivo era directamente el mapa del calendario.
+          const isLegacyBackup = isValidCalendarMap(importedData);
+          const calendar = isLegacyBackup ? importedData : importedData && importedData.calendar;
+          if (!isValidCalendarMap(calendar)) {
+            throw new Error('La estructura del calendario no es válida.');
+          }
+
+          const hasMeds = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medications');
+          const hasLogs = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medicationLogs');
+          if (hasMeds && !Array.isArray(importedData.medications)) {
+            throw new Error('La lista de medicamentos no es válida.');
+          }
+          if (hasLogs && (!importedData.medicationLogs || typeof importedData.medicationLogs !== 'object' || Array.isArray(importedData.medicationLogs))) {
+            throw new Error('Los registros de tomas no son válidos.');
+          }
+
+          // Solo sustituye datos después de validar el archivo completo.
+          dayDataMap = calendar;
+          if (hasMeds) medications = importedData.medications;
+          if (hasLogs) medLogs = importedData.medicationLogs;
+          const savedCalendar = saveToLocalStorage();
+          const savedHealth = persistMedicationData();
+          if (!savedCalendar || !savedHealth) {
+            showToast('Revisa el almacenamiento', 'La importación se leyó, pero el navegador no pudo guardar todos los datos.', 'fa-triangle-exclamation', 'text-amber-400');
+          } else {
+            renderAll();
+            closeSettingsModal();
+            showToast('Importación Exitosa', isLegacyBackup ? 'Calendario restaurado. Los datos de salud se conservaron.' : 'Respaldo completo restaurado.', 'fa-file-import', 'text-teal-400');
+          }
+        } catch(err) {
+          console.error('Error al importar respaldo:', err);
+          showToast('Error de Importación', err.message || 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.onerror = () => {
+        showToast('Error de Lectura', 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function confirmResetAllData() {
+      if (confirm('¿Estás seguro de que deseas borrar TODOS los datos del calendario, medicamentos y tomas? Esta acción no se puede deshacer.')) {
+        dayDataMap = {};
+        medications = [];
+        medLogs = {};
+        saveToLocalStorage();
+        persistMedicationData();
+        renderAll();
+        closeSettingsModal();
+        showToast('Datos Borrados', 'Se han restablecido todos los registros.', 'fa-trash-can', 'text-amber-400');
+      }
+    }
+
+    function initPWAAndServiceWorker() {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) installBtn.classList.remove('hidden');
+      });
+
+      if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => console.info('Service Worker activo:', registration.scope))
+            .catch(error => console.warn('Service worker opcional no registrado:', error.message || error));
+        });
+      }
+    }
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.classList.add('hidden');
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    function requestNotificationPermission() {
+      if (!('Notification' in window)) {
+        showToast('No Compatible', 'Este navegador no soporta notificaciones.', 'fa-bell-slash', 'text-amber-400');
+        return;
+      }
+      if (!window.isSecureContext) {
+        showToast('Conexión segura requerida', 'Las notificaciones necesitan HTTPS o localhost.', 'fa-lock', 'text-amber-400');
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          showToast('Permiso concedido', 'Se avisará de cumpleaños al abrir la aplicación.', 'fa-bell', 'text-teal-400');
+          checkNotificationsOnLaunch();
+        } else {
+          showToast('Permiso Denegado', 'Puedes habilitarlas desde los ajustes del navegador.', 'fa-bell-slash', 'text-amber-400');
+        }
+      }).catch(error => {
+        console.warn('No se pudo solicitar permiso de notificaciones:', error);
+        showToast('No se pudo activar', 'El navegador no permitió solicitar el permiso.', 'fa-bell-slash', 'text-amber-400');
+      });
+    }
+
+    function checkNotificationsOnLaunch() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const notifiedKey = `cal_birthday_notified_${todayKey}`;
+      if (localStorage.getItem(notifiedKey) === '1') return;
+
+      const todayNotes = dayDataMap[todayKey];
+      if (!Array.isArray(todayNotes)) return;
+      const birthdays = todayNotes.filter(n => n && n.isBirthday);
+      if (!birthdays.length) return;
+
+      birthdays.forEach(n => {
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(`🎂 ¡Hoy es el cumpleaños de ${n.title || n.text || 'alguien especial'}!`, {
+              body: n.description || '¡No olvides desearle un feliz día!',
+              icon: './icon.svg',
+              tag: `birthday-${todayKey}-${n.id || n.title || 'event'}`
+            });
+          }
+        } catch (error) {
+          console.warn('No se pudo mostrar la notificación:', error);
+        }
+      });
+      localStorage.setItem(notifiedKey, '1');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
