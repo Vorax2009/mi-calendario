@@ -254,20 +254,7 @@
             <i class="fa-solid fa-plus"></i> Añadir
           </button>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button id="notes-subtab-upcoming" type="button" onclick="setNotesSubTab('upcoming')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-teal-500 text-white">
-            <i class="fa-solid fa-clock text-xs"></i>
-            <span>Próximas Notas</span>
-          </button>
-          <button id="notes-subtab-stats" type="button" onclick="setNotesSubTab('stats')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700">
-            <i class="fa-solid fa-chart-pie text-xs"></i>
-            <span>Estadísticas</span>
-          </button>
-        </div>
-        <section id="notes-upcoming-panel" class="flex-1 flex flex-col space-y-2 min-h-0">
-          <div id="nearby-notes-list" class="flex-1 space-y-1.5 overflow-y-auto max-h-[70vh] pr-1"></div>
-        </section>
-        <section id="notes-stats-panel" class="hidden flex-1 space-y-3 overflow-y-auto max-h-[70vh] pr-1">
+        <section id="notes-stats-panel" class="flex-1 space-y-3 overflow-y-auto max-h-[70vh] pr-1">
           <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
               <i class="fa-solid fa-chart-pie text-teal-400"></i>
@@ -697,7 +684,7 @@
             <input type="hidden" id="new-shift-status" value="regular">
             <div id="special-permission-kind-container" class="hidden">
               <label for="special-permission-kind" class="text-[10px] text-slate-300 font-semibold block mb-1">Tipo de permiso especial:</label>
-              <select id="special-permission-kind" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-2 py-1.5 text-[11px] focus:outline-none focus:border-purple-400 font-bold">
+              <select id="special-permission-kind" onchange="handlePermissionKindChange()" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded px-2 py-1.5 text-[11px] focus:outline-none focus:border-purple-400 font-bold">
                 <option value="">Selecciona el tipo de permiso</option>
                 <option value="vacation">Permiso vacacional</option>
                 <option value="administrative">Permiso administrativo</option>
@@ -827,17 +814,6 @@
               </div>
             </div>
 
-            <div id="repeat-select-wrapper" class="flex items-center gap-1.5">
-              <span class="text-[11px] text-slate-300 font-semibold">Repetir:</span>
-              <select id="repeat-option" class="bg-slate-900 text-slate-200 border border-slate-700 rounded-md px-2 py-1 text-[11px] focus:outline-none focus:border-teal-400">
-                <option value="none">Ninguna</option>
-                <option value="daily">Diaria</option>
-                <option value="weekly">Semanal</option>
-                <option value="biweekly">Quincenal</option>
-                <option value="monthly">Mensual</option>
-                <option value="yearly">Anual</option>
-              </select>
-            </div>
           </div>
 
           <button type="button" onclick="addNoteToCurrentDay()" class="w-full mt-1 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md font-bold text-xs tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
@@ -1166,7 +1142,7 @@
     let summaryMode = 'month';
     let summaryCategory = 'labels';
     let notesTab = 'next';
-    let notesSubTab = 'upcoming';
+    let notesSubTab = 'stats';
     let birthdayFilterTab = 'upcoming';
     let summaryDate = new Date();
     let deferredPrompt = null;
@@ -1329,7 +1305,6 @@
       const titleContainer = document.getElementById('note-title-container');
       const abbrevFields = document.getElementById('note-abbrev-fields');
       const colorWrapper = document.getElementById('general-color-wrapper');
-      const repeatWrapper = document.getElementById('repeat-select-wrapper');
       if (!statusInput || !titleInput || !workDetails) return;
 
       statusInput.value = config ? status : 'regular';
@@ -1352,7 +1327,6 @@
       titleContainer.classList.toggle('hidden', isSpecialStatus);
       abbrevFields.classList.toggle('hidden', isSpecialStatus);
       colorWrapper.classList.toggle('hidden', isSpecialStatus);
-      if (repeatWrapper) repeatWrapper.classList.toggle('hidden', isSpecialStatus);
       titleInput.readOnly = isSpecialStatus;
       if (isSpecialStatus) {
         titleInput.value = config.title;
@@ -1362,7 +1336,14 @@
         document.getElementById('new-note-hours').value = '0';
         document.getElementById('new-note-mins').value = '0';
         if (status !== 'specialPermission') document.getElementById('special-permission-kind').value = '';
-        if (abbrevInput) abbrevInput.value = config.label;
+        if (abbrevInput) {
+          const permissionKind = document.getElementById('special-permission-kind').value;
+          if (status === 'specialPermission' && permissionKind === 'vacation') {
+            abbrevInput.value = 'VAC';
+          } else {
+            abbrevInput.value = config.label;
+          }
+        }
         selectNoteColor(config.color);
       } else {
         if (Object.values(DAY_MARKER_TYPES).some(item => titleInput.value === item.title)) titleInput.value = '';
@@ -3105,11 +3086,46 @@
 
             visibleNotes.forEach(note => {
               const block = document.createElement('div');
-              block.className = 'flex-1 w-full flex items-center justify-center text-center font-extrabold text-[11px] text-slate-950 select-none px-0.5 leading-tight truncate';
+              block.className = 'flex-1 w-full flex flex-col items-center justify-center text-center font-bold text-[9px] text-slate-950 select-none px-1 leading-tight border-b border-black/10';
               block.style.backgroundColor = note.color || '#14B8A6';
-              
-              const labelText = note.abbrev ? note.abbrev : generateSmartAbbrev(note.title || note.text);
-              block.textContent = labelText;
+
+              const hasTime = note.noteTime && note.noteTime.trim();
+              const hasDescription = note.description && note.description.trim();
+
+              if (note.isShift && note.shiftType) {
+                // Para turnos, mostrar abreviatura y tipo de jornada en líneas separadas
+                const abbrev = note.abbrev ? note.abbrev : generateSmartAbbrev(note.title || note.text);
+                const abbrevSpan = document.createElement('span');
+                abbrevSpan.className = 'font-bold text-[9px]';
+                abbrevSpan.textContent = abbrev;
+                block.appendChild(abbrevSpan);
+
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'truncate text-[8px] max-w-full';
+                typeSpan.textContent = note.shiftType;
+                block.appendChild(typeSpan);
+              } else {
+                // Para notas, mostrar abreviatura, hora y descripción en líneas separadas
+                const abbrev = note.abbrev ? note.abbrev : generateSmartAbbrev(note.title || note.text);
+                const abbrevSpan = document.createElement('span');
+                abbrevSpan.className = 'font-bold text-[9px]';
+                abbrevSpan.textContent = abbrev;
+                block.appendChild(abbrevSpan);
+
+                if (hasTime) {
+                  const timeSpan = document.createElement('span');
+                  timeSpan.className = 'truncate text-[8px] max-w-full';
+                  timeSpan.textContent = note.noteTime;
+                  block.appendChild(timeSpan);
+                }
+
+                if (hasDescription) {
+                  const descSpan = document.createElement('span');
+                  descSpan.className = 'truncate text-[8px] max-w-full';
+                  descSpan.textContent = note.description.trim();
+                  block.appendChild(descSpan);
+                }
+              }
               if (!note.isShift && !note.isBirthday && !note.birthdayOwnerId && !note.isHiddenCounter) {
                 block.dataset.noteId = note.id;
                 block.setAttribute('aria-label', `Mantén presionado para copiar ${note.title || note.text || 'nota'}`);
@@ -3503,8 +3519,22 @@
           : (editNote.isBirthday ? ['birthday'] : []);
         const isEventForm = !!editNote.isEvent || !!editNote.isBirthday || eventTypes.length > 0;
         setEventFormMode(isEventForm);
-        document.getElementById('modal-title-text').textContent = "Editar Nota";
-        document.getElementById('form-submit-label').textContent = "Guardar Nota";
+
+        // Determinar el título según el tipo de nota
+        let titleText = "Editar Nota";
+        let submitText = "Guardar Nota";
+        if (editNote.isShift) {
+          titleText = "Editar Turno";
+          submitText = "Guardar Turno";
+        } else if (editNote.isBirthday) {
+          titleText = "Editar Cumpleaños";
+          submitText = "Guardar Cumpleaños";
+        } else if (eventTypes.includes('anniversary')) {
+          titleText = "Editar Aniversario";
+          submitText = "Guardar Aniversario";
+        }
+        document.getElementById('modal-title-text').textContent = titleText;
+        document.getElementById('form-submit-label').textContent = submitText;
         document.getElementById('editing-note-id').value = editNote.id;
         document.getElementById('new-note-title').value = editNote.title || editNote.text || '';
         document.getElementById('new-note-textarea').value = editNote.description || '';
@@ -3532,7 +3562,6 @@
         document.getElementById('new-shift-end').value = editNote.shiftEnd || '';
         document.getElementById('new-shift-status').value = editNote.shiftStatus || 'regular';
         document.getElementById('special-permission-kind').value = editNote.shiftPermissionType || '';
-        document.getElementById('repeat-option').value = editNote.repeat || 'none';
         selectNoteColor(editNote.color || '#14B8A6');
         toggleSpecialTypeInput(isBirthday ? 'birthday' : (isAnniversary ? 'anniversary' : (editNote.isShift ? 'shift' : 'none')));
         if (editNote.isShift) {
@@ -3582,31 +3611,81 @@
         document.getElementById('special-permission-kind').value = '';
         toggleSpecialTypeInput('none');
         selectShiftStatus('regular');
-        document.getElementById('repeat-option').value = 'none';
         selectNoteColor('#14B8A6');
       }
     }
 
     function showCreateShiftFormInModal() {
-      showCreateFormInModal();
+      // Primero limpiar y configurar campos antes de llamar a showCreateFormInModal
+      document.getElementById('editing-note-id').value = '';
+      document.getElementById('new-note-title').value = '';
+      document.getElementById('new-note-textarea').value = '';
+      document.getElementById('new-note-abbrev').value = '';
+      configureNoteTimeControls('');
+      document.getElementById('is-shift-checkbox').checked = true;
+      document.getElementById('new-shift-type').value = 'Mañana';
+      document.getElementById('new-shift-start').value = '08:00';
+      document.getElementById('new-shift-end').value = '16:00';
+      document.getElementById('new-shift-status').value = 'regular';
+      document.getElementById('shift-status-duration').value = '1';
+      document.getElementById('special-permission-kind').value = '';
+      selectNoteColor('#14B8A6');
+
+      // Mostrar el formulario
+      document.getElementById('modal-view-list').classList.add('hidden');
+      document.getElementById('modal-view-list').classList.remove('flex');
+      document.getElementById('modal-view-note-preview').classList.add('hidden');
+      document.getElementById('modal-view-note-preview').classList.remove('flex');
+      const formView = document.getElementById('modal-view-form');
+      formView.classList.remove('hidden');
+      formView.classList.add('flex');
+      formView.scrollTop = 0;
+      const bottomActions = document.getElementById('modal-bottom-actions');
+      if (bottomActions) bottomActions.classList.add('hidden');
+
+      // Configurar el modo de turno
       document.getElementById('modal-title-text').textContent = "Nuevo Turno";
       document.getElementById('form-submit-label').textContent = "Guardar e Incluir Turno";
       document.getElementById('note-description-container').classList.add('hidden');
-      document.getElementById('is-shift-checkbox').checked = true;
+      document.getElementById('event-type-options').classList.add('hidden');
       toggleSpecialTypeInput('shift');
       selectShiftStatus('regular');
       clearBirthdayDuplicateError();
     }
 
     function showCreateBirthdayFormInModal() {
-      showCreateFormInModal();
+      // Primero limpiar y configurar campos antes de llamar a showCreateFormInModal
+      document.getElementById('editing-note-id').value = '';
+      document.getElementById('new-note-title').value = '';
+      document.getElementById('new-note-textarea').value = '';
+      document.getElementById('new-note-abbrev').value = '';
+      configureNoteTimeControls('');
+      document.getElementById('is-birthday-checkbox').checked = false;
+      document.getElementById('is-anniversary-checkbox').checked = false;
+      document.getElementById('new-note-birthdate').value = '';
+      document.getElementById('new-note-birthtime').value = '';
+      document.getElementById('new-note-anniversary-date').value = '';
+      document.getElementById('birthday-reminder-option').value = 'same_day';
+      document.getElementById('is-shift-checkbox').checked = false;
+      selectNoteColor('#14B8A6');
+
+      // Mostrar el formulario
+      document.getElementById('modal-view-list').classList.add('hidden');
+      document.getElementById('modal-view-list').classList.remove('flex');
+      document.getElementById('modal-view-note-preview').classList.add('hidden');
+      document.getElementById('modal-view-note-preview').classList.remove('flex');
+      const formView = document.getElementById('modal-view-form');
+      formView.classList.remove('hidden');
+      formView.classList.add('flex');
+      formView.scrollTop = 0;
+      const bottomActions = document.getElementById('modal-bottom-actions');
+      if (bottomActions) bottomActions.classList.add('hidden');
+
+      // Configurar el modo de evento
       document.getElementById('modal-title-text').textContent = "Nuevo Evento";
       document.getElementById('form-submit-label').textContent = "Guardar e Incluir Evento";
       setEventFormMode(true);
-      document.getElementById('is-birthday-checkbox').checked = true;
-      toggleSpecialTypeInput('birthday');
-      document.getElementById('new-note-abbrev').value = 'CUMPL';
-      selectNoteColor('#EC4899');
+      toggleSpecialTypeInput('none');
       clearBirthdayDuplicateError();
     }
 
@@ -3858,7 +3937,6 @@
       const noteTimeContainer = document.getElementById('note-time-container');
       const bdayContainer = document.getElementById('birthday-date-container');
       const anniversaryContainer = document.getElementById('anniversary-date-container');
-      const repeatWrapper = document.getElementById('repeat-select-wrapper');
       const isBirthday = type === 'birthday';
       const isAnniversary = type === 'anniversary';
       const isFixedAbbrev = isBirthday || isAnniversary;
@@ -3881,28 +3959,24 @@
         bdayContainer.classList.add('hidden');
         bdayContainer.classList.remove('flex');
         anniversaryContainer.classList.add('hidden');
-        if (repeatWrapper) repeatWrapper.classList.remove('hidden');
       } else if (type === 'birthday') {
         bdayContainer.classList.remove('hidden');
         bdayContainer.classList.add('flex');
         shiftContainer.classList.add('hidden');
         shiftContainer.classList.remove('flex');
         anniversaryContainer.classList.add('hidden');
-        if (repeatWrapper) repeatWrapper.classList.add('hidden');
       } else if (type === 'anniversary') {
         bdayContainer.classList.add('hidden');
         bdayContainer.classList.remove('flex');
         shiftContainer.classList.add('hidden');
         shiftContainer.classList.remove('flex');
         anniversaryContainer.classList.remove('hidden');
-        if (repeatWrapper) repeatWrapper.classList.add('hidden');
       } else {
         shiftContainer.classList.add('hidden');
         shiftContainer.classList.remove('flex');
         bdayContainer.classList.add('hidden');
         bdayContainer.classList.remove('flex');
         anniversaryContainer.classList.add('hidden');
-        if (repeatWrapper) repeatWrapper.classList.remove('hidden');
       }
     }
 
@@ -4211,7 +4285,7 @@
         }
       }
 
-      const repeatType = isBirthday || isAnniversary || shiftStatusConfig ? 'none' : document.getElementById('repeat-option').value;
+      const repeatType = 'none';
       const statusDuration = shiftStatusConfig
         ? Math.max(1, Math.min(30, Number(document.getElementById('shift-status-duration').value) || 1))
         : 1;
@@ -4499,6 +4573,15 @@
       checkAndApplyExistingTagLock(titleLower);
     }
 
+    function handlePermissionKindChange() {
+      const permissionKind = document.getElementById('special-permission-kind').value;
+      const abbrevInput = document.getElementById('new-note-abbrev');
+
+      if (permissionKind === 'vacation' && abbrevInput) {
+        abbrevInput.value = 'VAC';
+      }
+    }
+
     function setSummaryMode(mode) {
       summaryMode = mode;
       document.querySelectorAll('#summary-mode-month, #summary-mode-year, #summary-mode-all').forEach(btn => {
@@ -4509,14 +4592,7 @@
     }
 
     function setNotesSubTab(tab) {
-      if (!['upcoming', 'stats'].includes(tab)) return;
-      notesSubTab = tab;
-      const activeClass = 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-teal-500 text-white';
-      const inactiveClass = 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700';
-      document.getElementById('notes-subtab-upcoming').className = tab === 'upcoming' ? activeClass : inactiveClass;
-      document.getElementById('notes-subtab-stats').className = tab === 'stats' ? activeClass : inactiveClass;
-      document.getElementById('notes-upcoming-panel').classList.toggle('hidden', tab !== 'upcoming');
-      document.getElementById('notes-stats-panel').classList.toggle('hidden', tab !== 'stats');
+      notesSubTab = 'stats';
       renderSummaryView();
     }
 
@@ -5098,10 +5174,22 @@
         return;
       }
       selectedDate = createLocalDate(parts[0], parts[1] - 1, parts[2]);
-      openDayDetailModal();
+
+      // Configurar el modal directamente sin mostrar la lista primero
+      const d = selectedDate.getDate();
+      const m = selectedDate.getMonth() + 1;
+      const yStr = String(selectedDate.getFullYear()).slice(-2);
+      document.getElementById('modal-date-format').textContent = `${d}/${m}/${yStr}`;
+
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const existingNotes = dayDataMap[key];
+      currentModalNotes = existingNotes && Array.isArray(existingNotes) ? JSON.parse(JSON.stringify(existingNotes)) : [];
+
+      const modal = document.getElementById('day-detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
       showCreateFormInModal(note);
-      document.getElementById('modal-title-text').textContent = 'Editar Turno';
-      document.getElementById('form-submit-label').textContent = 'Guardar Cambios';
     }
 
     function deleteShiftFromAgenda(button) {
@@ -5380,10 +5468,22 @@
       }
 
       selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
-      openDayDetailModal();
+
+      // Configurar el modal directamente sin mostrar la lista primero
+      const d = selectedDate.getDate();
+      const m = selectedDate.getMonth() + 1;
+      const yStr = String(selectedDate.getFullYear()).slice(-2);
+      document.getElementById('modal-date-format').textContent = `${d}/${m}/${yStr}`;
+
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const existingNotes = dayDataMap[key];
+      currentModalNotes = existingNotes && Array.isArray(existingNotes) ? JSON.parse(JSON.stringify(existingNotes)) : [];
+
+      const modal = document.getElementById('day-detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
       showCreateFormInModal(note);
-      document.getElementById('modal-title-text').textContent = 'Editar Cumpleaños';
-      document.getElementById('form-submit-label').textContent = 'Guardar Cambios';
     }
 
     function editAnniversaryFromList(button) {
@@ -5395,10 +5495,22 @@
       }
 
       selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
-      openDayDetailModal();
+
+      // Configurar el modal directamente sin mostrar la lista primero
+      const d = selectedDate.getDate();
+      const m = selectedDate.getMonth() + 1;
+      const yStr = String(selectedDate.getFullYear()).slice(-2);
+      document.getElementById('modal-date-format').textContent = `${d}/${m}/${yStr}`;
+
+      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const existingNotes = dayDataMap[key];
+      currentModalNotes = existingNotes && Array.isArray(existingNotes) ? JSON.parse(JSON.stringify(existingNotes)) : [];
+
+      const modal = document.getElementById('day-detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
       showCreateFormInModal(note);
-      document.getElementById('modal-title-text').textContent = 'Editar Aniversario';
-      document.getElementById('form-submit-label').textContent = 'Guardar Cambios';
     }
 
     function showBirthdayDetails(button) {
