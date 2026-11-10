@@ -11,6 +11,7 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- Font Awesome Icons -->
   
   <!-- Google Fonts: Inter -->
@@ -116,6 +117,7 @@
 .fa-upload::before{content:"⬆"}
 .fa-user::before{content:"👤"}
 .fa-user-doctor::before{content:"🩺"}
+.fa-baby::before{content:"👶"}
 .fa-xmark::before{content:"✕"}
 </style>
 </head>
@@ -195,6 +197,13 @@
             <span>SALUD</span>
           </span>
           <div id="tab-meds-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
+        <button id="tab-baby-btn" onclick="switchView('baby')" class="flex-1 py-3.5 px-1 relative text-sky-400 font-semibold transition-all hover:bg-slate-800/40 focus:outline-none">
+          <span class="flex items-center justify-center gap-1">
+            <i class="fa-solid fa-baby text-xs"></i>
+            <span>BEBÉ</span>
+          </span>
+          <div id="tab-baby-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
       </div>
     </header>
@@ -547,6 +556,87 @@
             <!-- Dynamic medications -->
           </div>
         </div>
+
+      </div>
+
+      <!-- VISTA 6: CONTROL DEL BEBÉ (BABY TRACKER ARMONIZADO) -->
+      <div id="view-baby" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
+        
+        <!-- HEADER DEL MÓDULO BEBÉ (Idéntico a Notas, Turnos, Eventos y MiMedicina) -->
+        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-baby text-sky-400 text-base"></i>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">BABY TRACKER</h3>
+            <span id="btBabiesCountBadge" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">1 Bebé</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="btAddNewBabyBtn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active:scale-95" title="Registrar otro bebé">
+              <i class="fa-solid fa-plus"></i> Nuevo Bebé
+            </button>
+            <button type="button" id="btQuickAddHeaderBtn" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
+              <i class="fa-solid fa-plus"></i> Registro
+            </button>
+          </div>
+        </div>
+
+        <!-- SELECTOR DE BEBÉS REGISTRADOS -->
+        <div id="btBabiesSelectorBar" class="flex items-center gap-1.5 overflow-x-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-700/80 text-xs"></div>
+
+        <!-- TARJETA PERFIL DEL BEBÉ -->
+        <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <button type="button" id="btProfileAvatar" title="Editar perfil del bebé" class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-2xl shadow-md shrink-0 active:scale-95 transition-transform">
+                👶
+              </button>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 id="btProfileName" class="text-sm font-black text-slate-100 truncate">Registrar Bebé</h4>
+                  <span id="btProfileAgeBadge" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">Sin fecha</span>
+                </div>
+                <p id="btProfileAgeText" class="text-[11px] text-slate-300 font-semibold mt-0.5">Completa los datos en el botón Perfil</p>
+                <p id="btProfileDaysText" class="text-[10px] text-slate-400">Edad y signos se calculan automáticamente</p>
+              </div>
+            </div>
+            <button type="button" id="btBtnEditProfile" class="px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow active:scale-95">
+              <i class="fa-solid fa-pen mr-1"></i>Completar Perfil
+            </button>
+          </div>
+
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button type="button" id="btStatZodiacCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatZodiac" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">Zodiaco</span>
+            </button>
+            <button type="button" id="btStatChineseCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatChinese" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">Chino</span>
+            </button>
+            <button type="button" id="btStatMoonCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatMoon" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">Luna</span>
+            </button>
+            <button type="button" id="btStatDevCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatDev" class="block text-xs font-extrabold text-emerald-400 truncate">0%</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">Desarrollo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SUB-PESTAÑAS ARMONIZADAS -->
+        <div id="btTabsContainer" class="flex overflow-x-auto gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+          <button type="button" data-bt-tab="inicio" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap">Resumen</button>
+          <button type="button" data-bt-tab="salud" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🩺 Salud</button>
+          <button type="button" data-bt-tab="alimentacion" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🍼 Comida</button>
+          <button type="button" data-bt-tab="desarrollo" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🧸 Hitos</button>
+          <button type="button" data-bt-tab="sueno" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">😴 Sueño</button>
+          <button type="button" data-bt-tab="panales" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🚼 Pañales</button>
+          <button type="button" data-bt-tab="fotos" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📸 Fotos</button>
+          <button type="button" data-bt-tab="crecimiento" class="bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📈 Curva</button>
+        </div>
+
+        <!-- CONTENIDO DINÁMICO DEL BEBÉ -->
+        <div id="btMainContent" class="flex-1 space-y-3 overflow-y-auto max-h-[65vh] pr-1"></div>
 
       </div>
 
@@ -1138,6 +1228,11 @@
             <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
             <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
           </label>
+          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé</span>
+            <input type="checkbox" id="tab-visible-baby" onchange="setTabVisibility('baby', this.checked)" class="peer sr-only" checked>
+            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+          </label>
           </div>
         </div>
 
@@ -1212,7 +1307,7 @@
     let timeFormat = readStoredValue('cal_time_format', '24') === 'ampm' ? 'ampm' : '24';
     const TAB_VISIBILITY_KEY = 'cal_tab_visibility';
     let tabVisibility = (() => {
-      const defaults = { turns: true, birthdays: true, meds: true };
+      const defaults = { turns: true, birthdays: true, meds: true, baby: true };
       try {
         const saved = JSON.parse(readStoredValue(TAB_VISIBILITY_KEY, '{}'));
         Object.keys(defaults).forEach(key => {
@@ -1570,7 +1665,7 @@
 
       if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
         if (touchTargetId === 'header') {
-          const views = ['calendar', 'summary', 'turns', 'birthdays', 'meds'].filter(isTabVisible);
+          const views = ['calendar', 'summary', 'turns', 'birthdays', 'meds', 'baby'].filter(isTabVisible);
           const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
           const currentIndex = views.indexOf(currentView);
           if (diffX < 0) {
@@ -1606,6 +1701,8 @@
         renderTurnsView();
       } else if (activeView === 'meds') {
         renderMedsView();
+      } else if (activeView === 'baby') {
+        if (typeof window.renderBabyTrackerView === 'function') window.renderBabyTrackerView();
       }
     }
 
@@ -1701,12 +1798,12 @@
     function switchView(view) {
       activeView = view;
       if (view === 'month' || view === 'year') lastCalendarView = view;
-      ['view-month', 'view-year', 'view-summary', 'view-turns', 'view-birthdays', 'view-meds'].forEach(id => {
+      ['view-month', 'view-year', 'view-summary', 'view-turns', 'view-birthdays', 'view-meds', 'view-baby'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['tab-calendar', 'tab-summary', 'tab-turns', 'tab-birthdays', 'tab-meds'].forEach(prefix => {
+      ['tab-calendar', 'tab-summary', 'tab-turns', 'tab-birthdays', 'tab-meds', 'tab-baby'].forEach(prefix => {
         const ind = document.getElementById(`${prefix}-indicator`);
         const btn = document.getElementById(`${prefix}-btn`);
         if (ind) ind.className = "absolute bottom-0 left-0 right-0 h-1 bg-transparent";
@@ -1724,6 +1821,9 @@
       } else if (view === 'meds') {
         activeColorClass = 'text-blue-400';
         activeBgClass = 'bg-blue-400';
+      } else if (view === 'baby') {
+        activeColorClass = 'text-sky-400';
+        activeBgClass = 'bg-sky-400';
       }
 
       const activeViewEl = document.getElementById(`view-${view}`);
@@ -6044,7 +6144,8 @@
         calendar: dayDataMap,
         medications,
         medicationLogs: medLogs,
-        healthControls
+        healthControls,
+        babyTracker: typeof window.getBabyTrackerState === 'function' ? window.getBabyTrackerState() : undefined
       };
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -6099,6 +6200,9 @@
           if (hasMeds) medications = importedData.medications;
           if (hasLogs) medLogs = importedData.medicationLogs;
           if (hasHealthControls) healthControls = importedData.healthControls;
+          if (!isLegacyBackup && importedData.babyTracker && typeof window.setBabyTrackerState === 'function') {
+            window.setBabyTrackerState(importedData.babyTracker);
+          }
           const savedCalendar = saveToLocalStorage();
           const savedHealth = persistMedicationData();
           const savedControls = persistHealthControls();
@@ -6129,6 +6233,7 @@
         medications = [];
         medLogs = {};
         healthControls = [];
+        if (typeof window.resetBabyTrackerState === 'function') window.resetBabyTrackerState();
         saveToLocalStorage();
         persistMedicationData();
         persistHealthControls();
@@ -6306,6 +6411,1621 @@
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
     }
+  </script>
+
+  <!-- MODAL REGISTRO RÁPIDO BABY TRACKER (Armonizado con modales de index.html) -->
+  <div id="btQuickModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-[85]">
+    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl border border-slate-700/70 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 id="btModalTitle" class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-baby text-sky-400"></i>
+          <span>Registro Rápido del Bebé</span>
+        </h3>
+        <button type="button" id="btCloseModalBtn" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+      <div id="btModalBody" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const BT_STORAGE_KEY = 'baby_tracker_multi_v1';
+
+      function createEmptyBabyRecord(id, indexNum) {
+        return {
+          id: id || ('baby_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)),
+          sleepTimer: {
+            running: false,
+            startTime: null,
+            type: 'Siesta'
+          },
+          profile: {
+            name: '',
+            placeholderLabel: 'Bebé ' + (indexNum || 1),
+            avatar: '👶',
+            birthDate: '',
+            moonSign: '',
+            bloodType: '',
+            pediatrician: '',
+            allergies: ''
+          },
+          health: {
+            weightKg: null,
+            heightCm: null,
+            headCm: null,
+            temperatureC: null,
+            vaccines: [
+              { id: 'v1', name: 'BCG (Recién nacido)', age: 'RN', done: false },
+              { id: 'v2', name: 'Hepatitis B (Recién nacido)', age: 'RN', done: false },
+              { id: 'v3', name: 'Hexavalente 1ª Dosis', age: '2 meses', done: false },
+              { id: 'v4', name: 'Neumocócica Conjugada 1ª', age: '2 meses', done: false },
+              { id: 'v5', name: 'Rotavirus 1ª Dosis', age: '2 meses', done: false },
+              { id: 'v6', name: 'Hexavalente 2ª Dosis', age: '4 meses', done: false },
+              { id: 'v7', name: 'Neumocócica Conjugada 2ª', age: '4 meses', done: false },
+              { id: 'v8', name: 'Rotavirus 2ª Dosis', age: '4 meses', done: false },
+              { id: 'v9', name: 'Hexavalente 3ª Dosis', age: '6 meses', done: false },
+              { id: 'v10', name: 'Tres Vírica (SRP) 1ª Dosis', age: '12 meses', done: false },
+              { id: 'v11', name: 'Meningocócica Conjugada', age: '12 meses', done: false },
+              { id: 'v12', name: 'Neumocócica Refuerzo', age: '12 meses', done: false },
+              { id: 'v13', name: 'Hexavalente Refuerzo', age: '18 meses', done: false },
+              { id: 'v14', name: 'Varicela / Hepatitis A', age: '18 meses', done: false }
+            ],
+            logs: []
+          },
+          feeding: {
+            milkGoalMl: 600,
+            waterGoalMl: 400,
+            mealsGoal: 4,
+            entries: []
+          },
+          development: {
+            milestones: [
+              { id: 'm1', title: 'Primer diente', category: 'Crecimiento Físico', done: false },
+              { id: 'm2', title: 'Primeras palabras', category: 'Lenguaje', done: false },
+              { id: 'm3', title: 'Camina sin apoyo', category: 'Motricidad Gruesa', done: false },
+              { id: 'm4', title: 'Estimulación diaria', category: 'Rutina Cognitiva', done: false }
+            ]
+          },
+          sleep: {
+            entries: []
+          },
+          diapers: {
+            entries: []
+          },
+          photos: [],
+          growth: []
+        };
+      }
+
+      function createDefaultStore() {
+        const firstBaby = createEmptyBabyRecord('baby_1', 1);
+        return {
+          activeTab: 'inicio',
+          growthChartMetric: 'weight',
+          activeBabyId: firstBaby.id,
+          babies: [firstBaby]
+        };
+      }
+
+      let btStore = loadBtStore();
+      let btGrowthChart = null;
+      let btSleepInterval = null;
+
+      function normalizeStore(parsed) {
+        if (!parsed || typeof parsed !== 'object') return createDefaultStore();
+        // Migración si venía de formato de 1 solo bebé
+        if (!Array.isArray(parsed.babies) && parsed.profile) {
+          const migratedBaby = Object.assign(createEmptyBabyRecord('baby_1', 1), parsed);
+          return {
+            activeTab: parsed.activeTab || 'inicio',
+            growthChartMetric: parsed.growthChartMetric || 'weight',
+            activeBabyId: migratedBaby.id,
+            babies: [migratedBaby]
+          };
+        }
+        if (!Array.isArray(parsed.babies) || parsed.babies.length === 0) {
+          return createDefaultStore();
+        }
+        const babies = parsed.babies.map((b, idx) => {
+          const base = createEmptyBabyRecord(b && b.id ? b.id : ('baby_' + (idx + 1)), idx + 1);
+          return Object.assign({}, base, b, {
+            profile: Object.assign({}, base.profile, (b && b.profile) || {}),
+            health: Object.assign({}, base.health, (b && b.health) || {}),
+            feeding: Object.assign({}, base.feeding, (b && b.feeding) || {}),
+            development: Object.assign({}, base.development, (b && b.development) || {}),
+            sleep: Object.assign({}, base.sleep, (b && b.sleep) || {}),
+            diapers: Object.assign({}, base.diapers, (b && b.diapers) || {}),
+            sleepTimer: Object.assign({}, base.sleepTimer, (b && b.sleepTimer) || {})
+          });
+        });
+        const activeId = babies.some(b => b.id === parsed.activeBabyId) ? parsed.activeBabyId : babies[0].id;
+        return {
+          activeTab: parsed.activeTab || 'inicio',
+          growthChartMetric: parsed.growthChartMetric || 'weight',
+          activeBabyId: activeId,
+          babies
+        };
+      }
+
+      function loadBtStore() {
+        try {
+          const raw = localStorage.getItem(BT_STORAGE_KEY);
+          if (raw) return normalizeStore(JSON.parse(raw));
+        } catch (e) {}
+        return createDefaultStore();
+      }
+
+      function saveBtState() {
+        try {
+          localStorage.setItem(BT_STORAGE_KEY, JSON.stringify(btStore));
+        } catch (e) {}
+      }
+
+      function getCurrentBaby() {
+        let baby = btStore.babies.find(b => b.id === btStore.activeBabyId);
+        if (!baby) {
+          if (btStore.babies.length === 0) {
+            btStore.babies.push(createEmptyBabyRecord('baby_1', 1));
+          }
+          baby = btStore.babies[0];
+          btStore.activeBabyId = baby.id;
+        }
+        return baby;
+      }
+
+      function getBabyDisplayName(baby, index) {
+        const clean = baby && baby.profile && baby.profile.name ? baby.profile.name.trim() : '';
+        if (clean) return clean;
+        return (baby && baby.profile && baby.profile.placeholderLabel) || ('Bebé ' + ((index ?? 0) + 1));
+      }
+
+      function addNewBaby() {
+        const nextNum = btStore.babies.length + 1;
+        const newBaby = createEmptyBabyRecord('baby_' + Date.now(), nextNum);
+        btStore.babies.push(newBaby);
+        btStore.activeBabyId = newBaby.id;
+        btStore.activeTab = 'perfil';
+        saveBtState();
+        setBtActiveTab('perfil');
+        notifyBt('Nuevo bebé agregado', `Completa los datos de ${newBaby.profile.placeholderLabel}`);
+      }
+
+      function selectBabyById(babyId) {
+        if (!btStore.babies.some(b => b.id === babyId)) return;
+        btStore.activeBabyId = babyId;
+        saveBtState();
+        renderBtMainContent();
+      }
+
+      function deleteCurrentBaby() {
+        const current = getCurrentBaby();
+        const displayName = getBabyDisplayName(current, btStore.babies.indexOf(current));
+        if (btStore.babies.length <= 1) {
+          if (typeof showConfirmModal === 'function') {
+            showConfirmModal('Limpiar registro del bebé', `¿Deseas limpiar todos los datos registrados de ${displayName}?`, function() {
+              btStore.babies = [createEmptyBabyRecord('baby_1', 1)];
+              btStore.activeBabyId = btStore.babies[0].id;
+              btStore.activeTab = 'inicio';
+              saveBtState();
+              setBtActiveTab('inicio');
+              notifyBt('Datos reiniciados', 'El registro del bebé quedó vacío.');
+            }, 'Limpiar');
+          }
+          return;
+        }
+
+        if (typeof showConfirmModal === 'function') {
+          showConfirmModal('Eliminar bebé', `¿Seguro que deseas eliminar el registro de ${displayName}? Los demás bebés se conservarán.`, function() {
+            btStore.babies = btStore.babies.filter(b => b.id !== current.id);
+            btStore.activeBabyId = btStore.babies[0].id;
+            btStore.activeTab = 'inicio';
+            saveBtState();
+            setBtActiveTab('inicio');
+            notifyBt('Registro eliminado', `${displayName} fue eliminado.`);
+          }, 'Eliminar');
+        }
+      }
+
+      function notifyBt(title, body) {
+        if (typeof showToast === 'function') {
+          showToast(title, body || '', 'fa-circle-check', 'text-sky-400');
+        }
+      }
+
+      function fmtBtTime(t) {
+        if (!t || t === '--:--') return '--:--';
+        return typeof formatTime === 'function' ? formatTime(t) : t;
+      }
+
+      function getNowTimeStr() {
+        const now = new Date();
+        return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      }
+
+      function getBtProfileComputed(btState) {
+        if (!btState.profile.birthDate) {
+          return {
+            ageText: 'Completa los datos en el botón Perfil',
+            daysText: 'Edad y signos se calculan automáticamente',
+            totalDaysBadge: 'Sin fecha',
+            zodiac: '—',
+            chinese: '—'
+          };
+        }
+
+        const birth = new Date(btState.profile.birthDate + 'T00:00:00');
+        if (isNaN(birth.getTime())) {
+          return {
+            ageText: 'Fecha de nacimiento no válida',
+            daysText: 'Verifica la fecha en Perfil',
+            totalDaysBadge: 'Sin fecha',
+            zodiac: '—',
+            chinese: '—'
+          };
+        }
+
+        const now = new Date();
+        let years = now.getFullYear() - birth.getFullYear();
+        let months = now.getMonth() - birth.getMonth();
+        let days = now.getDate() - birth.getDate();
+
+        if (days < 0) {
+          months -= 1;
+          const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+          days += prevMonth.getDate();
+        }
+        if (months < 0) {
+          years -= 1;
+          months += 12;
+        }
+        if (years < 0) { years = 0; months = 0; days = 0; }
+
+        const totalDays = Math.max(0, Math.floor((now - birth) / (1000 * 60 * 60 * 24)));
+        const m = birth.getMonth() + 1;
+        const d = birth.getDate();
+        let zodiac = '♈ Piscis';
+        if ((m === 3 && d >= 21) || (m === 4 && d <= 19)) zodiac = '♈ Aries';
+        else if ((m === 4 && d >= 20) || (m === 5 && d <= 20)) zodiac = '♉ Tauro';
+        else if ((m === 5 && d >= 21) || (m === 6 && d <= 20)) zodiac = '♊ Géminis';
+        else if ((m === 6 && d >= 21) || (m === 7 && d <= 22)) zodiac = '♋ Cáncer';
+        else if ((m === 7 && d >= 23) || (m === 8 && d <= 22)) zodiac = '♌ Leo';
+        else if ((m === 8 && d >= 23) || (m === 9 && d <= 22)) zodiac = '♍ Virgo';
+        else if ((m === 9 && d >= 23) || (m === 10 && d <= 22)) zodiac = '♎ Libra';
+        else if ((m === 10 && d >= 23) || (m === 11 && d <= 21)) zodiac = '♏ Escorpio';
+        else if ((m === 11 && d >= 22) || (m === 12 && d <= 21)) zodiac = '♐ Sagitario';
+        else if ((m === 12 && d >= 22) || (m === 1 && d <= 19)) zodiac = '♑ Capricornio';
+        else if ((m === 1 && d >= 20) || (m === 2 && d <= 18)) zodiac = '♒ Acuario';
+
+        const chineseAnimals = [
+          '🐒 Mono', '🐓 Gallo', '🐕 Perro', '🐖 Cerdo',
+          '🐀 Rata', '🐂 Buey', '🐅 Tigre', '🐇 Conejo',
+          '🐉 Dragón', '🐉 Serpiente', '🐎 Caballo', '🐐 Cabra'
+        ];
+        const chinese = chineseAnimals[birth.getFullYear() % 12] || '—';
+
+        return {
+          ageText: `${years} ${years === 1 ? 'año' : 'años'} • ${months} ${months === 1 ? 'mes' : 'meses'} • ${days} días`,
+          daysText: `${totalDays} días desde su nacimiento`,
+          totalDaysBadge: `${totalDays} días`,
+          zodiac,
+          chinese
+        };
+      }
+
+      function getBtFeedingStats(btState) {
+        let milkMl = 0, waterMl = 0, solidMeals = 0, lastTime = '--:--';
+        btState.feeding.entries.forEach(item => {
+          if (item.kind === 'milk') milkMl += Number(item.amountMl) || 0;
+          if (item.kind === 'water') waterMl += Number(item.amountMl) || 0;
+          if (item.kind === 'solid') solidMeals += 1;
+          if (item.time) lastTime = item.time;
+        });
+        return { milkMl, waterMl, solidMeals, lastTime };
+      }
+
+      function getBtSleepStats(btState) {
+        let nightHours = 0, napsCount = 0, totalHours = 0;
+        btState.sleep.entries.forEach(item => {
+          const h = Number(item.hours) || 0;
+          totalHours += h;
+          if (item.type === 'Nocturno') nightHours += h;
+          else napsCount += 1;
+        });
+        return {
+          nightHours: Math.round(nightHours * 10) / 10,
+          napsCount,
+          totalHours: Math.round(totalHours * 10) / 10
+        };
+      }
+
+      function getBtDevStats(btState) {
+        const total = btState.development.milestones.length;
+        if (total === 0) return { total: 0, done: 0, pct: 0 };
+        const done = btState.development.milestones.filter(m => m.done).length;
+        const pct = Math.round((done / total) * 100);
+        return { total, done, pct };
+      }
+
+      function getBtVaxStats(btState) {
+        const total = btState.health.vaccines.length;
+        const done = btState.health.vaccines.filter(v => v.done).length;
+        return { total, done };
+      }
+
+      function renderBabiesSelectorBar() {
+        const bar = document.getElementById('btBabiesSelectorBar');
+        const countBadge = document.getElementById('btBabiesCountBadge');
+        if (countBadge) {
+          countBadge.textContent = `${btStore.babies.length} ${btStore.babies.length === 1 ? 'Bebé' : 'Bebés'}`;
+        }
+        if (!bar) return;
+
+        bar.innerHTML = btStore.babies.map((b, idx) => {
+          const isSelected = b.id === btStore.activeBabyId;
+          const label = getBabyDisplayName(b, idx);
+          const avatar = (b.profile && b.profile.avatar) || '👶';
+          const timerDot = b.sleepTimer && b.sleepTimer.running ? '<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span>' : '';
+          return `
+            <button type="button" data-bt-select-baby="${escapeHtml(b.id)}" class="py-1.5 px-3 rounded-lg font-bold flex items-center gap-1.5 whitespace-nowrap transition-all ${isSelected ? 'bg-sky-600 text-white shadow' : 'bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/70'}">
+              <span>${avatar}</span>
+              <span>${escapeHtml(label)}</span>
+              ${timerDot}
+            </button>
+          `;
+        }).join('') + `
+          <button type="button" data-bt-add-baby="1" class="py-1.5 px-2.5 rounded-lg font-bold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 flex items-center gap-1 whitespace-nowrap transition-all ml-auto shrink-0" title="Agregar otro bebé">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+            <span>Otro bebé</span>
+          </button>
+        `;
+      }
+
+      function renderBtProfileBanner() {
+        const btState = getCurrentBaby();
+        const idx = btStore.babies.indexOf(btState);
+        const computed = getBtProfileComputed(btState);
+        const dev = getBtDevStats(btState);
+        renderBabiesSelectorBar();
+
+        const avatarEl = document.getElementById('btProfileAvatar');
+        if (!avatarEl) return;
+        avatarEl.textContent = btState.profile.avatar || '👶';
+        document.getElementById('btProfileName').textContent = btState.profile.name
+          ? btState.profile.name
+          : `${getBabyDisplayName(btState, idx)} (Sin nombre)`;
+        document.getElementById('btProfileAgeText').textContent = computed.ageText;
+        document.getElementById('btProfileDaysText').textContent = computed.daysText;
+        const badgeEl = document.getElementById('btProfileAgeBadge');
+        if (badgeEl) badgeEl.textContent = computed.totalDaysBadge;
+        const editBtn = document.getElementById('btBtnEditProfile');
+        if (editBtn) {
+          editBtn.innerHTML = btState.profile.name
+            ? '<i class="fa-solid fa-pen mr-1"></i>Perfil'
+            : '<i class="fa-solid fa-pen mr-1"></i>Completar Perfil';
+        }
+        document.getElementById('btStatZodiac').textContent = computed.zodiac;
+        document.getElementById('btStatChinese').textContent = computed.chinese;
+        document.getElementById('btStatMoon').textContent = btState.profile.moonSign || '—';
+        document.getElementById('btStatDev').textContent = `${dev.pct}%`;
+      }
+
+      function setBtActiveTab(tabName) {
+        btStore.activeTab = tabName;
+        saveBtState();
+
+        document.querySelectorAll('#btTabsContainer .bt-subtab').forEach(btn => {
+          const isActive = btn.getAttribute('data-bt-tab') === tabName;
+          btn.className = isActive
+            ? 'bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap'
+            : 'bt-subtab flex-1 py-1.5 px-2.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap';
+        });
+
+        renderBtMainContent();
+      }
+
+      function renderBtMainContent() {
+        renderBtProfileBanner();
+        const container = document.getElementById('btMainContent');
+        if (!container) return;
+        if (btGrowthChart) {
+          btGrowthChart.destroy();
+          btGrowthChart = null;
+        }
+        const tab = btStore.activeTab || 'inicio';
+        if (tab === 'inicio') renderBtInicio(container);
+        else if (tab === 'salud') renderBtSalud(container);
+        else if (tab === 'alimentacion') renderBtAlimentacion(container);
+        else if (tab === 'desarrollo') renderBtDesarrollo(container);
+        else if (tab === 'sueno') renderBtSueno(container);
+        else if (tab === 'panales') renderBtPanales(container);
+        else if (tab === 'fotos') renderBtFotos(container);
+        else if (tab === 'crecimiento') renderBtCrecimiento(container);
+        else if (tab === 'perfil') renderBtPerfil(container);
+      }
+
+      function renderBtInicio(container) {
+        const btState = getCurrentBaby();
+        const vax = getBtVaxStats(btState);
+        const feed = getBtFeedingStats(btState);
+        const dev = getBtDevStats(btState);
+        const slp = getBtSleepStats(btState);
+        const diaperTotal = btState.diapers.entries.length;
+        const lastDiaper = btState.diapers.entries[btState.diapers.entries.length - 1];
+        const topMilestones = btState.development.milestones.slice(0, 4);
+
+        const weightDisp = btState.health.weightKg !== null ? `${btState.health.weightKg} kg` : 'Sin registrar';
+        const heightDisp = btState.health.heightCm !== null ? `${btState.health.heightCm} cm` : 'Sin registrar';
+        const tempDisp = btState.health.temperatureC !== null ? `${btState.health.temperatureC}°C` : 'Sin registrar';
+        const headDisp = btState.health.headCm !== null ? `${btState.health.headCm} cm` : 'Sin registrar';
+        const milkGoal = btState.feeding.milkGoalMl || 600;
+
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Salud -->
+            <div data-bt-goto="salud" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🩺 Salud</span>
+                  <span class="bg-slate-800 text-slate-300 border border-slate-700 font-bold px-2 py-0.5 rounded text-[10px]">${btState.health.temperatureC !== null ? 'Registrado' : 'Pendiente'}</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-400">
+                  <div class="flex justify-between"><span>⚖️ Peso:</span><strong class="text-slate-100">${weightDisp}</strong></div>
+                  <div class="flex justify-between"><span>📏 Altura:</span><strong class="text-slate-100">${heightDisp}</strong></div>
+                  <div class="flex justify-between"><span>💉 Vacunas:</span><strong class="text-slate-100">${vax.done}/${vax.total}</strong></div>
+                  <div class="flex justify-between"><span>🌡️ Temperatura:</span><strong class="text-slate-100">${tempDisp}</strong></div>
+                </div>
+              </div>
+              <div class="flex gap-1.5 mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-quick-action="temp" class="flex-1 py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all">🌡️ +Temp</button>
+                <button type="button" data-bt-goto="salud" class="flex-1 py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-[10px] font-bold transition-all">Completar →</button>
+              </div>
+            </div>
+
+            <!-- Alimentación -->
+            <div data-bt-goto="alimentacion" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🍼 Alimentación</span>
+                  <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${Math.round((feed.milkMl / milkGoal) * 100)}% meta</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-400">
+                  <div class="flex justify-between"><span>🍼 Leche hoy:</span><strong class="text-slate-100">${feed.milkMl} ml</strong></div>
+                  <div class="flex justify-between"><span>🍎 Sólidos:</span><strong class="text-slate-100">${feed.solidMeals} comidas</strong></div>
+                  <div class="flex justify-between"><span>💧 Agua:</span><strong class="text-slate-100">${feed.waterMl} ml</strong></div>
+                  <div class="flex justify-between"><span>⏰ Última toma:</span><strong class="text-slate-100">${fmtBtTime(feed.lastTime)}</strong></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-1 mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-quick-feed="milk" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">+120ml 🍼</button>
+                <button type="button" data-bt-quick-feed="water" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg text-[10px] font-bold">+50ml 💧</button>
+                <button type="button" data-bt-quick-feed="solid" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold">+Comida 🍎</button>
+              </div>
+            </div>
+
+            <!-- Desarrollo -->
+            <div data-bt-goto="desarrollo" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🧸 Desarrollo</span>
+                  <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${dev.done}/${dev.total} hitos</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-300">
+                  ${topMilestones.length > 0
+                    ? topMilestones.map(m => `<div class="truncate">${m.done ? '✅' : '⬜'} ${escapeHtml(m.title)}</div>`).join('')
+                    : '<p class="text-slate-500 italic">Sin hitos registrados aún.</p>'}
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-goto="desarrollo" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-[10px] font-bold">Gestionar hitos (${dev.pct}%) →</button>
+              </div>
+            </div>
+
+            <!-- Sueño -->
+            <div data-bt-goto="sueno" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">😴 Sueño</span>
+                  <span class="bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${btState.sleepTimer.running ? '🔴 Durmiendo' : 'Sin sesión'}</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-400">
+                  <div class="flex justify-between"><span>🌙 Nocturno:</span><strong class="text-slate-100">${slp.nightHours}h nocturnas</strong></div>
+                  <div class="flex justify-between"><span>☀️ Siestas hoy:</span><strong class="text-slate-100">${slp.napsCount} siestas</strong></div>
+                  <div class="flex justify-between"><span>⏱️ Total sueño:</span><strong class="text-slate-100">${slp.totalHours}h totales</strong></div>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-goto="sueno" class="w-full py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold shadow">
+                  ${btState.sleepTimer.running ? '⏹️ Ver cronómetro activo' : '▶️ Iniciar o registrar sueño'}
+                </button>
+              </div>
+            </div>
+
+            <!-- Pañales -->
+            <div data-bt-goto="panales" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🚼 Pañales</span>
+                  <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${diaperTotal} hoy</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-400">
+                  <div class="flex justify-between"><span>💧 Mojados:</span><strong class="text-slate-100">${btState.diapers.entries.filter(d => d.type === 'Mojado').length}</strong></div>
+                  <div class="flex justify-between"><span>💩 Sucios:</span><strong class="text-slate-100">${btState.diapers.entries.filter(d => d.type === 'Sucio').length}</strong></div>
+                  <div class="flex justify-between"><span>⏰ Último cambio:</span><strong class="text-slate-100">${lastDiaper ? fmtBtTime(lastDiaper.time) : '--:--'}</strong></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-3 gap-1 mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-quick-diaper="Mojado" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">+💧 Pipí</button>
+                <button type="button" data-bt-quick-diaper="Sucio" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold">+💩 Popó</button>
+                <button type="button" data-bt-quick-diaper="Ambos" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 rounded-lg text-[10px] font-bold">+✨ Ambos</button>
+              </div>
+            </div>
+
+            <!-- Crecimiento y Fotos -->
+            <div data-bt-goto="crecimiento" class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">📈 Crecimiento y Fotos</span>
+                  <span class="bg-teal-500/20 text-teal-300 border border-teal-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${btState.photos.length} fotos</span>
+                </div>
+                <div class="space-y-1 text-xs text-slate-400">
+                  <div class="flex justify-between"><span>📊 Mediciones:</span><strong class="text-slate-100">${btState.growth.length} registros</strong></div>
+                  <div class="flex justify-between"><span>🧠 Perímetro cefálico:</span><strong class="text-slate-100">${headDisp}</strong></div>
+                  <div class="flex justify-between"><span>📸 Álbum de recuerdos:</span><strong class="text-slate-100">${btState.photos.length} fotos</strong></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 mt-3 pt-2 border-t border-slate-700/60">
+                <button type="button" data-bt-goto="crecimiento" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">📈 Curva</button>
+                <button type="button" data-bt-goto="fotos" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold">📸 Galería</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderBtSalud(container) {
+        const btState = getCurrentBaby();
+        const vax = getBtVaxStats(btState);
+        const hasTemp = btState.health.temperatureC !== null;
+        const isFever = hasTemp && btState.health.temperatureC >= 37.5;
+
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🌡️ Registrar Signos y Biometría</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${!hasTemp ? 'bg-slate-800 text-slate-400 border border-slate-700' : (isFever ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40')}">
+                ${!hasTemp ? 'Sin registros' : (isFever ? 'Febrícula / Revisar' : 'Temperatura Normal')}
+              </span>
+            </div>
+            <form id="btHealthForm" class="space-y-2.5">
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Temp (°C)</label>
+                  <input type="number" step="0.1" name="temp" value="${btState.health.temperatureC !== null ? btState.health.temperatureC : ''}" placeholder="Ej. 36.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Peso (kg)</label>
+                  <input type="number" step="0.1" name="weight" value="${btState.health.weightKg !== null ? btState.health.weightKg : ''}" placeholder="Ej. 8.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Altura (cm)</label>
+                  <input type="number" step="0.5" name="height" value="${btState.health.heightCm !== null ? btState.health.heightCm : ''}" placeholder="Ej. 70" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" name="note" placeholder="Observación o suplemento (ej. Vitamina D, control sano)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">Guardar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">💉 Calendario de Vacunas (${vax.done}/${vax.total})</h4>
+              <span class="text-[10px] text-slate-400">Toca para marcar individualmente</span>
+            </div>
+            <div class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+              ${btState.health.vaccines.map(v => `
+                <div data-bt-toggle-vaccine="${v.id}" class="p-2 rounded-lg border ${v.done ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-900 border-slate-800'} flex items-center justify-between gap-2 cursor-pointer hover:border-sky-500/40 transition-colors">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold ${v.done ? 'bg-emerald-500 text-slate-950' : 'border border-slate-600 text-transparent'}">✓</span>
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold ${v.done ? 'text-slate-200' : 'text-slate-300'} truncate">${escapeHtml(v.name)}</p>
+                      <p class="text-[10px] text-slate-400">Edad: ${escapeHtml(v.age)}</p>
+                    </div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${v.done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${v.done ? 'Aplicada' : 'Pendiente'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📋 Historial de Controles y Notas</h4>
+            <div class="space-y-1.5">
+              ${btState.health.logs.length > 0 ? btState.health.logs.map(l => `
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                  <div class="min-w-0">
+                    <p class="font-bold text-slate-100">${escapeHtml(l.type)}: <span class="text-sky-300">${escapeHtml(l.value)}</span></p>
+                    <p class="text-[10px] text-slate-400">${escapeHtml(fmtBtTime(l.time))} • ${escapeHtml(l.note)}</p>
+                  </div>
+                  <button type="button" data-bt-del-health="${l.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+              `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">Aún no hay controles ni signos registrados.</p>'}
+            </div>
+          </div>
+        `;
+
+        const form = document.getElementById('btHealthForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const tempRaw = parseFloat(fd.get('temp'));
+          const weightRaw = parseFloat(fd.get('weight'));
+          const heightRaw = parseFloat(fd.get('height'));
+          const note = (fd.get('note') || '').trim() || 'Control registrado';
+
+          if (!isNaN(tempRaw)) btState.health.temperatureC = Math.round(tempRaw * 10) / 10;
+          if (!isNaN(weightRaw)) btState.health.weightKg = Math.round(weightRaw * 10) / 10;
+          if (!isNaN(heightRaw)) btState.health.heightCm = Math.round(heightRaw * 10) / 10;
+
+          const summaryParts = [];
+          if (!isNaN(tempRaw)) summaryParts.push(`${btState.health.temperatureC}°C`);
+          if (!isNaN(weightRaw)) summaryParts.push(`${btState.health.weightKg} kg`);
+          if (!isNaN(heightRaw)) summaryParts.push(`${btState.health.heightCm} cm`);
+
+          btState.health.logs.unshift({
+            id: 'hl_' + Date.now(),
+            time: getNowTimeStr(),
+            type: 'Control',
+            value: summaryParts.join(' • ') || 'Registro',
+            note
+          });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Salud del bebé', 'Signos vitales registrados');
+        });
+      }
+
+      function renderBtAlimentacion(container) {
+        const btState = getCurrentBaby();
+        const feed = getBtFeedingStats(btState);
+        const milkGoal = btState.feeding.milkGoalMl || 600;
+        const waterGoal = btState.feeding.waterGoalMl || 400;
+        const milkPct = Math.min(100, Math.round((feed.milkMl / milkGoal) * 100));
+        const waterPct = Math.min(100, Math.round((feed.waterMl / waterGoal) * 100));
+
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🍼 Metas de Alimentación Hoy</h4>
+              <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">Última: ${fmtBtTime(feed.lastTime)}</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between mb-1"><span class="text-slate-300 font-semibold">🍼 Leche (${feed.milkMl} / ${milkGoal} ml)</span><strong class="text-sky-300">${milkPct}%</strong></div>
+                <div class="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800"><div class="h-full bg-gradient-to-r from-sky-400 to-blue-600" style="width:${milkPct}%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1"><span class="text-slate-300 font-semibold">💧 Agua (${feed.waterMl} / ${waterGoal} ml)</span><strong class="text-teal-300">${waterPct}%</strong></div>
+                <div class="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800"><div class="h-full bg-gradient-to-r from-teal-400 to-emerald-500" style="width:${waterPct}%"></div></div>
+              </div>
+              <div class="flex justify-between pt-1"><span class="text-slate-400">🍎 Comidas sólidas registradas:</span><strong class="text-slate-100">${feed.solidMeals} comidas</strong></div>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 pt-1">
+              <button type="button" data-bt-quick-feed="milk" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">+120 ml Leche</button>
+              <button type="button" data-bt-quick-feed="water" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg text-[10px] font-bold">+50 ml Agua</button>
+              <button type="button" data-bt-quick-feed="solid" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold">+1 Comida</button>
+            </div>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">➕ Nuevo Registro de Alimentación</h4>
+            <form id="btFeedForm" class="space-y-2.5">
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Tipo</label>
+                  <select name="kind" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                    <option value="milk">🍼 Leche</option>
+                    <option value="solid">🍎 Sólido</option>
+                    <option value="water">💧 Agua</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Cantidad (ml)</label>
+                  <input type="number" name="amountMl" placeholder="Ej. 150" min="0" max="1000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Hora</label>
+                  <input type="time" name="time" value="${getNowTimeStr()}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" name="label" placeholder="Descripción (ej. Papilla de manzana, Biberón)..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">Agregar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🕒 Tomas y Comidas de Hoy (${btState.feeding.entries.length})</h4>
+            <div class="space-y-1.5">
+              ${btState.feeding.entries.length > 0 ? btState.feeding.entries.slice().reverse().map(item => {
+                const icon = item.kind === 'milk' ? '🍼' : (item.kind === 'water' ? '💧' : '🍎');
+                const amountBadge = item.amountMl > 0 ? `${item.amountMl} ml` : 'Porción sólida';
+                return `
+                  <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-base shrink-0">${icon}</span>
+                      <div class="min-w-0">
+                        <p class="font-bold text-slate-100 truncate">${escapeHtml(item.label)}</p>
+                        <p class="text-[10px] text-slate-400">${escapeHtml(fmtBtTime(item.time))} • ${amountBadge}</p>
+                      </div>
+                    </div>
+                    <button type="button" data-bt-del-feed="${item.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                  </div>
+                `;
+              }).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">No hay tomas ni comidas registradas hoy.</p>'}
+            </div>
+          </div>
+        `;
+
+        const form = document.getElementById('btFeedForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const kind = fd.get('kind');
+          const amountMl = kind === 'solid' ? 0 : (parseInt(fd.get('amountMl'), 10) || 0);
+          const time = fd.get('time') || getNowTimeStr();
+          const label = (fd.get('label') || '').trim();
+          if (!label) return;
+          btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind, amountMl, label });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Alimentación registrada', label);
+        });
+      }
+
+      function renderBtDesarrollo(container) {
+        const btState = getCurrentBaby();
+        const dev = getBtDevStats(btState);
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🧸 Hitos del Desarrollo</h4>
+              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${dev.pct}% (${dev.done}/${dev.total})</span>
+            </div>
+            <div class="h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400" style="width:${dev.pct}%"></div>
+            </div>
+            <form id="btMilestoneForm" class="flex flex-wrap gap-2">
+              <input type="text" name="title" placeholder="Añadir nuevo hito individual (ej. Dice mamá, Gatea)..." required class="flex-1 min-w-[160px] bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+              <select name="category" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                <option value="Motricidad Gruesa">Motricidad Gruesa</option>
+                <option value="Motricidad Fina">Motricidad Fina</option>
+                <option value="Lenguaje">Lenguaje</option>
+                <option value="Cognitivo">Cognitivo</option>
+                <option value="Socioemocional">Socioemocional</option>
+              </select>
+              <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">Añadir</button>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-1.5">
+            ${btState.development.milestones.length > 0 ? btState.development.milestones.map(m => `
+              <div class="p-2.5 rounded-lg border ${m.done ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-900 border-slate-800'} flex items-center justify-between gap-2">
+                <div data-bt-toggle-milestone="${m.id}" class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
+                  <span class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold shrink-0 ${m.done ? 'bg-emerald-500 text-slate-950' : 'border border-slate-600 text-transparent'}">✓</span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold text-slate-100 truncate">${escapeHtml(m.title)}</p>
+                    <p class="text-[10px] text-slate-400">${escapeHtml(m.category)}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span data-bt-toggle-milestone="${m.id}" class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${m.done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${m.done ? 'Logrado' : 'Pendiente'}</span>
+                  <button type="button" data-bt-del-milestone="${m.id}" class="p-1 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+                </div>
+              </div>
+            `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">Añade hitos de desarrollo arriba para llevar el seguimiento.</p>'}
+          </div>
+        `;
+
+        const form = document.getElementById('btMilestoneForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const title = (fd.get('title') || '').trim();
+          const category = fd.get('category') || 'General';
+          if (!title) return;
+          btState.development.milestones.push({ id: 'm_' + Date.now(), title, category, done: false });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Desarrollo', 'Hito añadido a la lista');
+        });
+      }
+
+      function renderBtSueno(container) {
+        const btState = getCurrentBaby();
+        const slp = getBtSleepStats(btState);
+        container.innerHTML = `
+          <div class="rounded-xl bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-900 p-4 border border-sky-500/30 shadow-lg text-center space-y-2">
+            <p class="text-[11px] font-black uppercase tracking-wider text-sky-300">
+              ${btState.sleepTimer.running ? `🌙 Registrando ${btState.sleepTimer.type}` : '⏱️ Cronómetro de Siesta y Sueño'}
+            </p>
+            <div id="btSleepTimerDisplay" class="text-3xl font-black text-white font-mono tracking-wider">00:00:00</div>
+            <div class="flex justify-center gap-2 pt-1">
+              ${!btState.sleepTimer.running ? `
+                <button type="button" data-bt-start-sleep="Siesta" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">☀️ Iniciar Siesta</button>
+                <button type="button" data-bt-start-sleep="Nocturno" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow">🌙 Sueño Nocturno</button>
+              ` : `
+                <button type="button" id="btStopSleepBtn" class="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold shadow">⏹️ Despertó (Guardar sesión)</button>
+              `}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">Nocturno</span>
+              <strong class="block text-base font-black text-indigo-300">${slp.nightHours}h</strong>
+            </div>
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">Siestas hoy</span>
+              <strong class="block text-base font-black text-amber-300">${slp.napsCount}</strong>
+            </div>
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">Total Día</span>
+              <strong class="block text-base font-black text-sky-300">${slp.totalHours}h</strong>
+            </div>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">➕ Registrar Sueño Manual</h4>
+            <form id="btSleepForm" class="space-y-2.5">
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Tipo</label>
+                  <select name="type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                    <option value="Siesta">☀️ Siesta</option>
+                    <option value="Nocturno">🌙 Nocturno</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Horas</label>
+                  <input type="number" step="0.25" min="0.25" max="16" name="hours" placeholder="Ej. 1.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Inicio</label>
+                  <input type="time" name="start" value="${getNowTimeStr()}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" name="note" placeholder="Notas del descanso..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🛏️ Historial de Sueño</h4>
+            <div class="space-y-1.5">
+              ${btState.sleep.entries.length > 0 ? btState.sleep.entries.slice().reverse().map(s => `
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-base shrink-0">${s.type === 'Nocturno' ? '🌙' : '☀️'}</span>
+                    <div class="min-w-0">
+                      <p class="font-bold text-slate-100">${escapeHtml(s.type)} • <span class="text-sky-300">${s.hours} h</span></p>
+                      <p class="text-[10px] text-slate-400">Inicio: ${escapeHtml(fmtBtTime(s.start))} • ${escapeHtml(s.note || 'Sin notas')}</p>
+                    </div>
+                  </div>
+                  <button type="button" data-bt-del-sleep="${s.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+              `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">No hay sesiones de sueño registradas.</p>'}
+            </div>
+          </div>
+        `;
+
+        updateBtSleepTimerDisplay();
+        const form = document.getElementById('btSleepForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const type = fd.get('type');
+          const hours = parseFloat(fd.get('hours')) || 1;
+          const start = fd.get('start') || getNowTimeStr();
+          const note = (fd.get('note') || '').trim() || 'Registro manual';
+          btState.sleep.entries.push({ id: 's_' + Date.now(), type, start, end: '', hours: Math.round(hours * 100) / 100, note });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Sueño registrado', `${type}: ${hours}h`);
+        });
+      }
+
+      function updateBtSleepTimerDisplay() {
+        const el = document.getElementById('btSleepTimerDisplay');
+        if (!el) return;
+        const btState = getCurrentBaby();
+        if (!btState.sleepTimer.running || !btState.sleepTimer.startTime) {
+          el.textContent = '00:00:00';
+          return;
+        }
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - btState.sleepTimer.startTime) / 1000));
+        const hh = String(Math.floor(elapsedSec / 3600)).padStart(2, '0');
+        const mm = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
+        const ss = String(elapsedSec % 60).padStart(2, '0');
+        el.textContent = `${hh}:${mm}:${ss}`;
+      }
+
+      function renderBtPanales(container) {
+        const btState = getCurrentBaby();
+        const wet = btState.diapers.entries.filter(d => d.type === 'Mojado').length;
+        const dirty = btState.diapers.entries.filter(d => d.type === 'Sucio').length;
+        const both = btState.diapers.entries.filter(d => d.type === 'Ambos').length;
+
+        container.innerHTML = `
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">💧 Mojados</span>
+              <strong class="block text-base font-black text-sky-300">${wet}</strong>
+            </div>
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">💩 Sucios</span>
+              <strong class="block text-base font-black text-amber-300">${dirty}</strong>
+            </div>
+            <div class="bg-[#1e2733] p-2.5 rounded-xl border border-slate-700/60">
+              <span class="text-[10px] text-slate-400 font-semibold">✨ Ambos</span>
+              <strong class="block text-base font-black text-purple-300">${both}</strong>
+            </div>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">➕ Registrar Cambio de Pañal</h4>
+            <form id="btDiaperForm" class="space-y-2.5">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Tipo</label>
+                  <select name="type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                    <option value="Mojado">💧 Mojado (Pipí)</option>
+                    <option value="Sucio">💩 Sucio (Popó)</option>
+                    <option value="Ambos">✨ Ambos</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Hora</label>
+                  <input type="time" name="time" value="${getNowTimeStr()}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" name="note" placeholder="Observaciones (ej. crema aplicada, sin irritación)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Registrar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🕒 Historial de Pañales (${btState.diapers.entries.length})</h4>
+            <div class="space-y-1.5">
+              ${btState.diapers.entries.length > 0 ? btState.diapers.entries.slice().reverse().map(d => `
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-base shrink-0">${d.icon || '🚼'}</span>
+                    <div class="min-w-0">
+                      <p class="font-bold text-slate-100">Pañal ${escapeHtml(d.type)}</p>
+                      <p class="text-[10px] text-slate-400">${escapeHtml(fmtBtTime(d.time))} • ${escapeHtml(d.note || 'Cambio normal')}</p>
+                    </div>
+                  </div>
+                  <button type="button" data-bt-del-diaper="${d.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+              `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">No hay cambios de pañal registrados hoy.</p>'}
+            </div>
+          </div>
+        `;
+
+        const form = document.getElementById('btDiaperForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const type = fd.get('type');
+          const time = fd.get('time') || getNowTimeStr();
+          const note = (fd.get('note') || '').trim() || 'Cambio normal';
+          const icon = type === 'Mojado' ? '💧' : (type === 'Sucio' ? '💩' : '✨');
+          btState.diapers.entries.push({ id: 'd_' + Date.now(), time, type, icon, note });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Pañal registrado', type);
+        });
+      }
+
+      function renderBtFotos(container) {
+        const btState = getCurrentBaby();
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📸 Nuevo Recuerdo o Foto</h4>
+            <form id="btPhotoForm" class="space-y-2.5">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Título</label>
+                  <input type="text" name="title" placeholder="Ej. Primera sonrisa..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha</label>
+                  <input type="text" name="date" placeholder="Ej. 10 Nov 2026" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 items-end">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Ícono / Imagen opcional</label>
+                  <div class="flex gap-1.5">
+                    <select name="emoji" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+                      <option value="📸">📸</option>
+                      <option value="🌟">🌟</option>
+                      <option value="🎀">🎀</option>
+                      <option value="🎂">🎂</option>
+                      <option value="🏖️">🏖️</option>
+                      <option value="🧸">🧸</option>
+                    </select>
+                    <input type="file" id="btPhotoFileInput" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-slate-300">
+                  </div>
+                </div>
+                <button type="submit" class="py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar en Álbum</button>
+              </div>
+            </form>
+          </div>
+
+          ${btState.photos.length > 0 ? `
+            <div class="grid grid-cols-2 gap-2.5">
+              ${btState.photos.map(p => `
+                <div class="bg-[#1e2733] rounded-xl border border-slate-700/60 overflow-hidden shadow-lg flex flex-col">
+                  <div class="h-28 flex items-center justify-center text-4xl relative overflow-hidden" style="background: ${p.bg || 'linear-gradient(135deg,#0284c7,#1e3a8a)'}">
+                    ${p.dataUrl ? `<img src="${p.dataUrl}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover">` : `<span>${p.emoji || '📸'}</span>`}
+                  </div>
+                  <div class="p-2.5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <p class="text-xs font-bold text-slate-100 truncate">${escapeHtml(p.title)}</p>
+                      <p class="text-[10px] text-slate-400">📅 ${escapeHtml(p.date)}</p>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                      <button type="button" data-bt-del-photo="${p.id}" class="text-[10px] text-slate-400 hover:text-red-400 font-bold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : '<div class="bg-[#1e2733] p-6 rounded-xl border border-slate-700/60 text-center text-xs text-slate-500 italic">Aún no hay recuerdos ni fotos en el álbum.</div>'}
+        `;
+
+        const form = document.getElementById('btPhotoForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const title = (fd.get('title') || '').trim();
+          const date = (fd.get('date') || '').trim() || 'Hoy';
+          const emoji = fd.get('emoji') || '📸';
+          const fileInput = document.getElementById('btPhotoFileInput');
+          const file = fileInput && fileInput.files && fileInput.files[0];
+
+          const finishSave = (dataUrl) => {
+            btState.photos.unshift({
+              id: 'p_' + Date.now(),
+              title,
+              date,
+              emoji,
+              bg: 'linear-gradient(135deg,#0284c7,#2563eb)',
+              dataUrl: dataUrl || ''
+            });
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Galería', 'Nuevo recuerdo guardado');
+          };
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) { finishSave(evt.target.result); };
+            reader.readAsDataURL(file);
+          } else {
+            finishSave('');
+          }
+        });
+      }
+
+      function renderBtCrecimiento(container) {
+        const btState = getCurrentBaby();
+        const metric = btStore.growthChartMetric || 'weight';
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">➕ Añadir Medición de Crecimiento</h4>
+            <form id="btGrowthForm" class="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Edad / Mes</label>
+                <input type="text" name="label" placeholder="Ej. 1m, 2m..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Peso (kg)</label>
+                <input type="number" step="0.1" name="weight" value="${btState.health.weightKg !== null ? btState.health.weightKg : ''}" placeholder="Ej. 4.2" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Altura (cm)</label>
+                <input type="number" step="0.5" name="height" value="${btState.health.heightCm !== null ? btState.health.heightCm : ''}" placeholder="Ej. 54" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Perímetro (cm)</label>
+                <input type="number" step="0.1" name="head" value="${btState.health.headCm !== null ? btState.health.headCm : ''}" placeholder="Ej. 37" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
+              </div>
+              <button type="submit" class="col-span-2 sm:col-span-1 py-1.5 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar</button>
+            </form>
+          </div>
+
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📈 Curva de Crecimiento (${btState.growth.length})</h4>
+              <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px]">
+                <button type="button" data-bt-growth-metric="weight" class="px-2 py-1 rounded-md font-bold ${metric === 'weight' ? 'bg-sky-600 text-white' : 'text-slate-400'}">Peso (kg)</button>
+                <button type="button" data-bt-growth-metric="height" class="px-2 py-1 rounded-md font-bold ${metric === 'height' ? 'bg-sky-600 text-white' : 'text-slate-400'}">Altura (cm)</button>
+                <button type="button" data-bt-growth-metric="head" class="px-2 py-1 rounded-md font-bold ${metric === 'head' ? 'bg-sky-600 text-white' : 'text-slate-400'}">Perímetro (cm)</button>
+              </div>
+            </div>
+            ${btState.growth.length > 0 ? `
+              <div class="relative h-56 w-full">
+                <canvas id="btGrowthCanvas"></canvas>
+              </div>
+              <div class="space-y-1.5 pt-2 border-t border-slate-700/60">
+                ${btState.growth.slice().reverse().map(g => `
+                  <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-200">${escapeHtml(g.label)}</span>
+                    <span class="text-slate-400">⚖️ ${g.weight} kg • 📏 ${g.height} cm • 🧠 ${g.head} cm</span>
+                    <button type="button" data-bt-del-growth="${g.id}" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                  </div>
+                `).join('')}
+              </div>
+            ` : '<p class="text-center py-6 text-xs text-slate-500 italic">Agrega la primera medición arriba para generar la curva de crecimiento.</p>'}
+          </div>
+        `;
+
+        if (btState.growth.length > 0) {
+          initBtGrowthChart(btState);
+        }
+
+        const form = document.getElementById('btGrowthForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          const label = (fd.get('label') || '').trim();
+          const weight = parseFloat(fd.get('weight'));
+          const height = parseFloat(fd.get('height'));
+          const head = parseFloat(fd.get('head'));
+          if (!label || isNaN(weight) || isNaN(height) || isNaN(head)) return;
+
+          btState.growth.push({
+            id: 'g_' + Date.now(),
+            label,
+            weight: Math.round(weight * 10) / 10,
+            height: Math.round(height * 10) / 10,
+            head: Math.round(head * 10) / 10
+          });
+          btState.health.weightKg = Math.round(weight * 10) / 10;
+          btState.health.heightCm = Math.round(height * 10) / 10;
+          btState.health.headCm = Math.round(head * 10) / 10;
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Crecimiento', 'Medición agregada a la curva');
+        });
+      }
+
+      function initBtGrowthChart(btState) {
+        const canvas = document.getElementById('btGrowthCanvas');
+        if (!canvas || typeof Chart === 'undefined') return;
+        const metric = btStore.growthChartMetric || 'weight';
+        const labels = btState.growth.map(g => g.label);
+        const values = btState.growth.map(g => g[metric]);
+        const metaMap = {
+          weight: { label: 'Peso (kg)', color: '#38bdf8' },
+          height: { label: 'Altura (cm)', color: '#22c55e' },
+          head: { label: 'Perímetro Cefálico (cm)', color: '#a855f7' }
+        };
+        const currentMeta = metaMap[metric] || metaMap.weight;
+
+        btGrowthChart = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: currentMeta.label,
+              data: values,
+              borderColor: currentMeta.color,
+              backgroundColor: 'rgba(56, 189, 248, 0.15)',
+              borderWidth: 2.5,
+              pointRadius: 4,
+              pointBackgroundColor: currentMeta.color,
+              fill: true,
+              tension: 0.35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#f8fafc', font: { size: 11 } } } },
+            scales: {
+              x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+              y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            }
+          }
+        });
+      }
+
+      function renderBtPerfil(container) {
+        const btState = getCurrentBaby();
+        const idx = btStore.babies.indexOf(btState);
+        const label = getBabyDisplayName(btState, idx);
+
+        container.innerHTML = `
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">👤 Datos Individuales (${escapeHtml(label)})</h4>
+              <button type="button" data-bt-add-baby="1" class="px-2.5 py-1 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Agregar otro bebé
+              </button>
+            </div>
+            <form id="btProfileForm" class="space-y-3">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Nombre del Bebé</label>
+                  <input type="text" name="name" value="${escapeHtml(btState.profile.name)}" placeholder="Ej. Sofía Martínez" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha de Nacimiento</label>
+                  <input type="date" name="birthDate" value="${escapeHtml(btState.profile.birthDate)}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Avatar</label>
+                  <select name="avatar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                    <option value="👶" ${btState.profile.avatar === '👶' ? 'selected' : ''}>👶 Bebé</option>
+                    <option value="👧" ${btState.profile.avatar === '👧' ? 'selected' : ''}>👧 Niña</option>
+                    <option value="🧒" ${btState.profile.avatar === '🧒' ? 'selected' : ''}>🧒 Niño</option>
+                    <option value="👼" ${btState.profile.avatar === '👼' ? 'selected' : ''}>👼 Angelito</option>
+                    <option value="🌟" ${btState.profile.avatar === '🌟' ? 'selected' : ''}>🌟 Estrellita</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Signo Lunar (opcional)</label>
+                  <input type="text" name="moonSign" value="${escapeHtml(btState.profile.moonSign)}" placeholder="Ej. 🌙 Leo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pediatra (opcional)</label>
+                  <input type="text" name="pediatrician" value="${escapeHtml(btState.profile.pediatrician)}" placeholder="Nombre del pediatra" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Grupo Sanguíneo (opcional)</label>
+                  <input type="text" name="bloodType" value="${escapeHtml(btState.profile.bloodType)}" placeholder="Ej. O+" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-700/60">
+                <button type="button" id="btDeleteCurrentBabyBtn" class="px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 rounded-lg text-xs font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-trash-can"></i> ${btStore.babies.length > 1 ? 'Eliminar este bebé' : 'Limpiar datos'}
+                </button>
+                <div class="flex gap-2">
+                  <button type="button" data-bt-goto="inicio" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg text-xs font-bold">Cancelar</button>
+                  <button type="submit" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar Perfil</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        `;
+
+        const form = document.getElementById('btProfileForm');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+          btState.profile.name = (fd.get('name') || '').trim();
+          btState.profile.birthDate = fd.get('birthDate') || '';
+          btState.profile.avatar = fd.get('avatar') || '👶';
+          btState.profile.moonSign = (fd.get('moonSign') || '').trim();
+          btState.profile.pediatrician = (fd.get('pediatrician') || '').trim();
+          btState.profile.bloodType = (fd.get('bloodType') || '').trim();
+          saveBtState();
+          setBtActiveTab('inicio');
+          notifyBt('Perfil guardado', btState.profile.name || 'Datos actualizados');
+        });
+
+        const delBtn = document.getElementById('btDeleteCurrentBabyBtn');
+        if (delBtn) delBtn.addEventListener('click', deleteCurrentBaby);
+      }
+
+      function openBtQuickModal() {
+        const btState = getCurrentBaby();
+        const idx = btStore.babies.indexOf(btState);
+        const modal = document.getElementById('btQuickModal');
+        const body = document.getElementById('btModalBody');
+        if (!modal || !body) return;
+        body.innerHTML = `
+          <p class="text-xs text-slate-400">Registro rápido para <strong class="text-sky-300">${escapeHtml(getBabyDisplayName(btState, idx))}</strong>:</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-bt-modal-quick="milk150" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-sky-300 border border-slate-700 rounded-lg text-xs font-bold text-left">🍼 +150 ml Leche</button>
+            <button type="button" data-bt-modal-quick="water100" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-teal-300 border border-slate-700 rounded-lg text-xs font-bold text-left">💧 +100 ml Agua</button>
+            <button type="button" data-bt-modal-quick="solidMeal" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold text-left">🍎 +Comida Sólida</button>
+            <button type="button" data-bt-modal-quick="diaperWet" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-sky-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💧 Pañal Mojado</button>
+            <button type="button" data-bt-modal-quick="diaperDirty" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💩 Pañal Sucio</button>
+            <button type="button" data-bt-modal-quick="nap1h" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-purple-300 border border-slate-700 rounded-lg text-xs font-bold text-left">😴 +Siesta (1h)</button>
+          </div>
+          <form id="btModalTempForm" class="flex gap-2 items-end border-t border-slate-700/60 pt-3">
+            <div class="flex-1">
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">🌡️ Registrar Temperatura (°C)</label>
+              <input type="number" step="0.1" name="temp" value="${btState.health.temperatureC !== null ? btState.health.temperatureC : ''}" placeholder="Ej. 36.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+            </div>
+            <button type="submit" class="py-1.5 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar</button>
+          </form>
+        `;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const tempForm = document.getElementById('btModalTempForm');
+        tempForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const val = parseFloat(new FormData(tempForm).get('temp'));
+          if (isNaN(val)) return;
+          btState.health.temperatureC = Math.round(val * 10) / 10;
+          btState.health.logs.unshift({
+            id: 'hl_' + Date.now(),
+            time: getNowTimeStr(),
+            type: 'Temperatura',
+            value: `${btState.health.temperatureC}°C`,
+            note: 'Registro rápido'
+          });
+          saveBtState();
+          closeBtQuickModal();
+          renderBtMainContent();
+          notifyBt('Temperatura', `${btState.health.temperatureC}°C registrados`);
+        });
+      }
+
+      function closeBtQuickModal() {
+        const modal = document.getElementById('btQuickModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
+
+      document.addEventListener('click', function(e) {
+        const selectBabyBtn = e.target.closest('[data-bt-select-baby]');
+        if (selectBabyBtn) {
+          selectBabyById(selectBabyBtn.getAttribute('data-bt-select-baby'));
+          return;
+        }
+        if (e.target.closest('[data-bt-add-baby]')) {
+          addNewBaby();
+          return;
+        }
+        const tabBtn = e.target.closest('[data-bt-tab]');
+        if (tabBtn) {
+          setBtActiveTab(tabBtn.getAttribute('data-bt-tab'));
+          return;
+        }
+
+        const btState = getCurrentBaby();
+
+        const quickFeedBtn = e.target.closest('[data-bt-quick-feed]');
+        if (quickFeedBtn) {
+          e.stopPropagation();
+          const kind = quickFeedBtn.getAttribute('data-bt-quick-feed');
+          const time = getNowTimeStr();
+          if (kind === 'milk') {
+            btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'milk', amountMl: 120, label: 'Toma rápida de leche' });
+            notifyBt('Alimentación', '+120 ml de leche añadidos');
+          } else if (kind === 'water') {
+            btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'water', amountMl: 50, label: 'Agua fresca' });
+            notifyBt('Hidratación', '+50 ml de agua añadidos');
+          } else if (kind === 'solid') {
+            btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'solid', amountMl: 0, label: 'Comida sólida / fruta' });
+            notifyBt('Alimentación', 'Comida sólida registrada');
+          }
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const quickDiaperBtn = e.target.closest('[data-bt-quick-diaper]');
+        if (quickDiaperBtn) {
+          e.stopPropagation();
+          const type = quickDiaperBtn.getAttribute('data-bt-quick-diaper');
+          const icon = type === 'Mojado' ? '💧' : (type === 'Sucio' ? '💩' : '✨');
+          btState.diapers.entries.push({
+            id: 'd_' + Date.now(),
+            time: getNowTimeStr(),
+            type,
+            icon,
+            note: 'Registro rápido'
+          });
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Pañales', `Pañal ${type.toLowerCase()} registrado`);
+          return;
+        }
+        if (e.target.closest('[data-bt-quick-action="temp"]')) {
+          e.stopPropagation();
+          openBtQuickModal();
+          return;
+        }
+        const gotoEl = e.target.closest('[data-bt-goto]');
+        if (gotoEl) {
+          setBtActiveTab(gotoEl.getAttribute('data-bt-goto'));
+          return;
+        }
+        const vaxEl = e.target.closest('[data-bt-toggle-vaccine]');
+        if (vaxEl) {
+          const id = vaxEl.getAttribute('data-bt-toggle-vaccine');
+          const v = btState.health.vaccines.find(x => x.id === id);
+          if (v) {
+            v.done = !v.done;
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Vacunas', `${v.name}: ${v.done ? 'Aplicada' : 'Pendiente'}`);
+          }
+          return;
+        }
+        const mileEl = e.target.closest('[data-bt-toggle-milestone]');
+        if (mileEl) {
+          const id = mileEl.getAttribute('data-bt-toggle-milestone');
+          const m = btState.development.milestones.find(x => x.id === id);
+          if (m) {
+            m.done = !m.done;
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Desarrollo', m.title);
+          }
+          return;
+        }
+        const delMilestone = e.target.closest('[data-bt-del-milestone]');
+        if (delMilestone) {
+          const id = delMilestone.getAttribute('data-bt-del-milestone');
+          btState.development.milestones = btState.development.milestones.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delGrowth = e.target.closest('[data-bt-del-growth]');
+        if (delGrowth) {
+          const id = delGrowth.getAttribute('data-bt-del-growth');
+          btState.growth = btState.growth.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delFeed = e.target.closest('[data-bt-del-feed]');
+        if (delFeed) {
+          const id = delFeed.getAttribute('data-bt-del-feed');
+          btState.feeding.entries = btState.feeding.entries.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delHealth = e.target.closest('[data-bt-del-health]');
+        if (delHealth) {
+          const id = delHealth.getAttribute('data-bt-del-health');
+          btState.health.logs = btState.health.logs.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delSleep = e.target.closest('[data-bt-del-sleep]');
+        if (delSleep) {
+          const id = delSleep.getAttribute('data-bt-del-sleep');
+          btState.sleep.entries = btState.sleep.entries.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delDiaper = e.target.closest('[data-bt-del-diaper]');
+        if (delDiaper) {
+          const id = delDiaper.getAttribute('data-bt-del-diaper');
+          btState.diapers.entries = btState.diapers.entries.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const delPhoto = e.target.closest('[data-bt-del-photo]');
+        if (delPhoto) {
+          const id = delPhoto.getAttribute('data-bt-del-photo');
+          btState.photos = btState.photos.filter(x => x.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const startSleepBtn = e.target.closest('[data-bt-start-sleep]');
+        if (startSleepBtn) {
+          const type = startSleepBtn.getAttribute('data-bt-start-sleep');
+          btState.sleepTimer = { running: true, startTime: Date.now(), type };
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Sueño', `Cronómetro de ${type.toLowerCase()} iniciado`);
+          return;
+        }
+        if (e.target.closest('#btStopSleepBtn')) {
+          const elapsedHours = Math.max(0.1, (Date.now() - (btState.sleepTimer.startTime || Date.now())) / (1000 * 60 * 60));
+          const roundedHours = Math.round(elapsedHours * 10) / 10;
+          btState.sleep.entries.push({
+            id: 's_' + Date.now(),
+            type: btState.sleepTimer.type || 'Siesta',
+            start: getNowTimeStr(),
+            end: getNowTimeStr(),
+            hours: roundedHours,
+            note: 'Registrado con cronómetro'
+          });
+          btState.sleepTimer = { running: false, startTime: null, type: 'Siesta' };
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Sueño guardado', `${roundedHours} horas registradas`);
+          return;
+        }
+        const metricBtn = e.target.closest('[data-bt-growth-metric]');
+        if (metricBtn) {
+          btStore.growthChartMetric = metricBtn.getAttribute('data-bt-growth-metric');
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+        const modalQuick = e.target.closest('[data-bt-modal-quick]');
+        if (modalQuick) {
+          const act = modalQuick.getAttribute('data-bt-modal-quick');
+          const time = getNowTimeStr();
+          if (act === 'milk150') btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'milk', amountMl: 150, label: 'Biberón de leche (150 ml)' });
+          else if (act === 'water100') btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'water', amountMl: 100, label: 'Vaso de agua (100 ml)' });
+          else if (act === 'solidMeal') btState.feeding.entries.push({ id: 'f_' + Date.now(), time, kind: 'solid', amountMl: 0, label: 'Comida sólida completa' });
+          else if (act === 'diaperWet') btState.diapers.entries.push({ id: 'd_' + Date.now(), time, type: 'Mojado', icon: '💧', note: 'Registro rápido' });
+          else if (act === 'diaperDirty') btState.diapers.entries.push({ id: 'd_' + Date.now(), time, type: 'Sucio', icon: '💩', note: 'Registro rápido' });
+          else if (act === 'nap1h') btState.sleep.entries.push({ id: 's_' + Date.now(), type: 'Siesta', start: time, end: '', hours: 1.0, note: 'Siesta rápida' });
+          saveBtState();
+          closeBtQuickModal();
+          renderBtMainContent();
+          notifyBt('Registro rápido', 'Guardado correctamente');
+          return;
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const editBtn = document.getElementById('btBtnEditProfile');
+        if (editBtn) editBtn.addEventListener('click', () => setBtActiveTab('perfil'));
+        const avatarEl = document.getElementById('btProfileAvatar');
+        if (avatarEl) avatarEl.addEventListener('click', () => setBtActiveTab('perfil'));
+        const devCard = document.getElementById('btStatDevCard');
+        if (devCard) devCard.addEventListener('click', () => setBtActiveTab('desarrollo'));
+        const moonCard = document.getElementById('btStatMoonCard');
+        if (moonCard) moonCard.addEventListener('click', () => setBtActiveTab('perfil'));
+        const zodiacCard = document.getElementById('btStatZodiacCard');
+        if (zodiacCard) zodiacCard.addEventListener('click', () => setBtActiveTab('perfil'));
+        const chineseCard = document.getElementById('btStatChineseCard');
+        if (chineseCard) chineseCard.addEventListener('click', () => setBtActiveTab('perfil'));
+
+        const addBabyHeaderBtn = document.getElementById('btAddNewBabyBtn');
+        if (addBabyHeaderBtn) addBabyHeaderBtn.addEventListener('click', addNewBaby);
+        const quickAddBtn = document.getElementById('btQuickAddHeaderBtn');
+        if (quickAddBtn) quickAddBtn.addEventListener('click', openBtQuickModal);
+        const closeBtn = document.getElementById('btCloseModalBtn');
+        if (closeBtn) closeBtn.addEventListener('click', closeBtQuickModal);
+        const qModal = document.getElementById('btQuickModal');
+        if (qModal) qModal.addEventListener('click', function(e) { if (e.target === this) closeBtQuickModal(); });
+
+        if (btSleepInterval) clearInterval(btSleepInterval);
+        btSleepInterval = setInterval(updateBtSleepTimerDisplay, 1000);
+      });
+
+      window.renderBabyTrackerView = function() {
+        renderBtMainContent();
+      };
+      window.getBabyTrackerState = function() {
+        return btStore;
+      };
+      window.setBabyTrackerState = function(newState) {
+        if (newState && typeof newState === 'object') {
+          btStore = normalizeStore(newState);
+          saveBtState();
+          renderBtMainContent();
+        }
+      };
+      window.resetBabyTrackerState = function() {
+        btStore = createDefaultStore();
+        saveBtState();
+        renderBtMainContent();
+      };
+    })();
   </script>
 
   <!-- MODAL DE CONFIRMACIÓN GENÉRICA (Canvas Sandbox Safe) -->
