@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Calendario, Turnos, Etiquetas y Cumpleaños</title>
   <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
-  <link rel="manifest" href="./manifest-v2.webmanifest">
+  
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
 
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
@@ -68,6 +68,56 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Calendario">
+<style>[class*="fa-solid"]{font-style:normal;display:inline-block;line-height:1}
+.fa-arrow-left::before{content:"←"}
+.fa-arrows-rotate::before{content:"⟳"}
+.fa-bell::before{content:"🔔"}
+.fa-bell-slash::before{content:"🔕"}
+.fa-briefcase::before{content:"💼"}
+.fa-cake-candles::before{content:"🎂"}
+.fa-calculator::before{content:"🧮"}
+.fa-calendar::before{content:"📅"}
+.fa-calendar-check::before{content:"📅"}
+.fa-calendar-day::before{content:"📆"}
+.fa-calendar-days::before{content:"📆"}
+.fa-calendar-plus::before{content:"📅"}
+.fa-calendar-week::before{content:"📆"}
+.fa-chart-pie::before{content:"📊"}
+.fa-chevron-left::before{content:"‹"}
+.fa-chevron-right::before{content:"›"}
+.fa-circle::before{content:"○"}
+.fa-circle-check::before{content:"✔"}
+.fa-circle-info::before{content:"ℹ"}
+.fa-circle-xmark::before{content:"✖"}
+.fa-clipboard-check::before{content:"📋"}
+.fa-clock::before{content:"🕒"}
+.fa-copy::before{content:"⧉"}
+.fa-download::before{content:"⬇"}
+.fa-file-export::before{content:"⬆"}
+.fa-file-import::before{content:"⬇"}
+.fa-flag-checkered::before{content:"🏁"}
+.fa-gear::before{content:"⚙"}
+.fa-house-medical::before{content:"🏥"}
+.fa-list::before{content:"☰"}
+.fa-location-dot::before{content:"📍"}
+.fa-lock::before{content:"🔒"}
+.fa-note-sticky::before{content:"🗒"}
+.fa-paste::before{content:"📋"}
+.fa-pen::before{content:"✎"}
+.fa-pen-to-square::before{content:"✎"}
+.fa-pills::before{content:"💊"}
+.fa-plus::before{content:"+"}
+.fa-star::before{content:"★"}
+.fa-tag::before{content:"🏷"}
+.fa-tags::before{content:"🏷"}
+.fa-trash-can::before{content:"🗑"}
+.fa-triangle-exclamation::before{content:"⚠"}
+.fa-umbrella-beach::before{content:"🏖"}
+.fa-upload::before{content:"⬆"}
+.fa-user::before{content:"👤"}
+.fa-user-doctor::before{content:"🩺"}
+.fa-xmark::before{content:"✕"}
+</style>
 </head>
 <body class="h-full flex flex-col font-sans select-none overflow-x-hidden bg-slate-950 text-slate-100">
 
@@ -424,6 +474,7 @@
         <div id="medicationSubTabs" class="hidden flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
           <button id="medicationTabToday" onclick="switchMedicationSubTab('today')" class="flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow">Hoy</button>
           <button id="medicationTabTreatments" onclick="switchMedicationSubTab('treatments')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">Tratamientos</button>
+          <button id="medicationTabStats" onclick="switchMedicationSubTab('stats')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">Estadísticas</button>
         </div>
 
         <!-- SUB-VISTA: PRÓXIMOS CONTROLES -->
@@ -454,31 +505,33 @@
             <h4 id="controlStatsPeriodTitle" class="text-xs font-bold uppercase text-slate-200"></h4>
             <button type="button" onclick="changeHealthControlStatsPeriod(1)" aria-label="Periodo siguiente" class="min-h-9 min-w-9 text-indigo-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="bg-slate-900 rounded-xl border border-slate-800 p-3 text-center">
-              <span id="controlStatsTotal" class="block text-xl font-black text-indigo-300">0</span>
-              <span class="text-[10px] text-slate-400">Total de controles</span>
-            </div>
-            <div class="bg-slate-900 rounded-xl border border-slate-800 p-3 text-center">
-              <span id="controlStatsUpcoming" class="block text-xl font-black text-blue-300">0</span>
-              <span class="text-[10px] text-slate-400">Próximos</span>
-            </div>
+          <div id="controlStatsOverview" class="grid grid-cols-2 gap-2"></div>
+          <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-300 mb-2">Controles por nombre</h4>
+            <div id="controlStatsBreakdown" class="space-y-2"></div>
           </div>
-          <div class="grid grid-cols-3 gap-2">
-            <div class="bg-slate-900 rounded-xl border border-slate-800 p-2.5 text-center">
-              <span id="controlStatsAppointments" class="block text-xl font-black text-violet-300">0</span>
-              <span class="text-[10px] text-slate-400">Citas médicas</span>
-            </div>
-            <div class="bg-slate-900 rounded-xl border border-slate-800 p-2.5 text-center">
-              <span id="controlStatsExams" class="block text-xl font-black text-amber-300">0</span>
-              <span class="text-[10px] text-slate-400">Exámenes</span>
-            </div>
-            <div class="bg-slate-900 rounded-xl border border-slate-800 p-2.5 text-center">
-              <span id="controlStatsOthers" class="block text-xl font-black text-teal-300">0</span>
-              <span class="text-[10px] text-slate-400">Otros</span>
-            </div>
+          <p class="px-1 text-[10px] text-slate-500">Toca un nombre para ver solo sus números. Un registro que incluye ambos tipos se cuenta en Citas médicas y Exámenes.</p>
+        </div>
+
+        <!-- ESTADÍSTICAS DE MEDICAMENTOS -->
+        <div id="medicationViewStats" class="space-y-3 hidden">
+          <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider px-1">Estadísticas de medicamentos</h3>
+          <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+            <button id="medStatsTabMonth" type="button" onclick="setMedicationStatsMode('month')" class="flex-1 py-1.5 rounded-lg font-bold bg-slate-600 text-white transition-all shadow">Mes</button>
+            <button id="medStatsTabYear" type="button" onclick="setMedicationStatsMode('year')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">Año</button>
+            <button id="medStatsTabHistory" type="button" onclick="setMedicationStatsMode('history')" class="flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all">Histórico</button>
           </div>
-          <p class="px-1 text-[10px] text-slate-500">Un registro que incluye ambos tipos se cuenta en Citas médicas y Exámenes.</p>
+          <div id="medStatsPeriodNavigator" class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1.5">
+            <button type="button" onclick="changeMedicationStatsPeriod(-1)" aria-label="Periodo anterior" class="min-h-9 min-w-9 text-blue-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+            <h4 id="medStatsPeriodTitle" class="text-xs font-bold uppercase text-slate-200"></h4>
+            <button type="button" onclick="changeMedicationStatsPeriod(1)" aria-label="Periodo siguiente" class="min-h-9 min-w-9 text-blue-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div id="medStatsOverview" class="grid grid-cols-2 gap-2"></div>
+          <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-300 mb-2">Medicamentos por nombre</h4>
+            <div id="medStatsBreakdown" class="space-y-2"></div>
+          </div>
+          <p class="px-1 text-[10px] text-slate-500">Toca un nombre para ver solo sus números. Las tomas cuya hora aún no llega cuentan como próximas.</p>
         </div>
 
         <!-- REGISTRO DE MEDICAMENTOS -->
@@ -546,18 +599,22 @@
           <!-- Dynamic Content -->
         </div>
 
-        <div class="grid grid-cols-3 gap-1.5 mt-2">
+        <div id="day-add-actions" class="grid grid-cols-4 gap-1.5 mt-2">
           <button type="button" onclick="showCreateFormInModal()" class="py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
             <i class="fa-solid fa-plus"></i>
             <span>Nota</span>
           </button>
-          <button type="button" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+          <button type="button" id="day-add-turns-btn" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
             <i class="fa-solid fa-user-doctor"></i>
             <span>Turno</span>
           </button>
-          <button type="button" onclick="showCreateBirthdayFormInModal()" class="py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+          <button type="button" id="day-add-birthdays-btn" onclick="showCreateBirthdayFormInModal()" class="py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
             <i class="fa-solid fa-cake-candles"></i>
             <span>Eventos</span>
+          </button>
+          <button type="button" id="day-add-meds-btn" onclick="openHealthControlFromDay()" class="py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-pills"></i>
+            <span>Salud</span>
           </button>
         </div>
         <button id="paste-note-button" type="button" onclick="pasteNoteToCurrentDay()" class="hidden w-full min-h-11 mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 touch-manipulation">
@@ -1064,6 +1121,27 @@
         </div>
 
         <div>
+          <span class="font-semibold text-slate-300 block mb-1">Menús visibles:</span>
+          <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
+          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-300 text-xs"></i>Turnos</span>
+            <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
+            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+          </label>
+          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cake-candles text-amber-400 text-xs"></i>Eventos</span>
+            <input type="checkbox" id="tab-visible-birthdays" onchange="setTabVisibility('birthdays', this.checked)" class="peer sr-only" checked>
+            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+          </label>
+          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
+            <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
+            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+          </label>
+          </div>
+        </div>
+
+        <div>
           <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad:</span>
           <button onclick="exportDataJSON()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
             <i class="fa-solid fa-download"></i> Descargar JSON
@@ -1105,6 +1183,8 @@
     let turnsStatsDate = new Date();
     let expandedShiftTypes = new Set();
     let selectedShiftStatsName = null;
+    let selectedControlStatsPerson = null;
+    let expandedControlStatsPeople = new Set();
     let copiedNote = null;
     const selectedPasteDateKeys = new Set();
     let pasteRangeStartDateKey = null;
@@ -1130,6 +1210,52 @@
     }
 
     let timeFormat = readStoredValue('cal_time_format', '24') === 'ampm' ? 'ampm' : '24';
+    const TAB_VISIBILITY_KEY = 'cal_tab_visibility';
+    let tabVisibility = (() => {
+      const defaults = { turns: true, birthdays: true, meds: true };
+      try {
+        const saved = JSON.parse(readStoredValue(TAB_VISIBILITY_KEY, '{}'));
+        Object.keys(defaults).forEach(key => {
+          if (saved && saved[key] === false) defaults[key] = false;
+        });
+      } catch (error) {
+        console.warn('No se pudo leer la visibilidad de los menús.', error);
+      }
+      return defaults;
+    })();
+
+    function isTabVisible(view) {
+      return !Object.prototype.hasOwnProperty.call(tabVisibility, view) || tabVisibility[view] !== false;
+    }
+
+    function applyTabVisibility() {
+      Object.keys(tabVisibility).forEach(key => {
+        const button = document.getElementById(`tab-${key}-btn`);
+        if (button) button.style.display = isTabVisible(key) ? '' : 'none';
+        const toggle = document.getElementById(`tab-visible-${key}`);
+        if (toggle) toggle.checked = isTabVisible(key);
+        const dayButton = document.getElementById(`day-add-${key}-btn`);
+        if (dayButton) dayButton.style.display = isTabVisible(key) ? '' : 'none';
+      });
+      const dayActions = document.getElementById('day-add-actions');
+      if (dayActions) {
+        const visibleButtons = Array.from(dayActions.children).filter(child => child.style.display !== 'none').length;
+        dayActions.style.gridTemplateColumns = `repeat(${Math.max(visibleButtons, 1)}, minmax(0, 1fr))`;
+      }
+    }
+
+    function setTabVisibility(key, visible) {
+      if (!Object.prototype.hasOwnProperty.call(tabVisibility, key)) return;
+      tabVisibility[key] = visible === true;
+      try {
+        localStorage.setItem(TAB_VISIBILITY_KEY, JSON.stringify(tabVisibility));
+      } catch (error) {
+        console.error('No se pudo guardar la visibilidad de los menús.', error);
+        showToast('No se pudo guardar', 'El cambio se aplicará hasta cerrar esta página.', 'fa-triangle-exclamation', 'text-red-400');
+      }
+      applyTabVisibility();
+      if (!tabVisibility[key] && activeView === key) switchView('month');
+    }
 
     function readStoredJSON(key, fallback, validator) {
       try {
@@ -1173,6 +1299,10 @@
     let activeMedicationSubTab = 'today';
     let healthControlStatsMode = 'month';
     let healthControlStatsDate = new Date();
+    let medStatsMode = 'month';
+    let medStatsDate = new Date();
+    let selectedMedStatsId = null;
+    let expandedMedStatsIds = new Set();
     let healthControlCalendarDate = new Date();
     let selectedHealthControlCalendarDate = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     const shownMedicationReminders = new Set();
@@ -1319,7 +1449,9 @@
         if (abbrevInput) {
           const permissionKind = document.getElementById('special-permission-kind').value;
           if (status === 'specialPermission' && permissionKind === 'vacation') {
-            abbrevInput.value = 'VAC';
+            abbrevInput.value = 'VACAC';
+          } else if (status === 'specialPermission' && permissionKind === 'administrative') {
+            abbrevInput.value = 'ADMIN';
           } else {
             abbrevInput.value = config.label;
           }
@@ -1381,6 +1513,7 @@
 
     // INICIALIZACIÓN
     document.addEventListener('DOMContentLoaded', function() {
+      applyTabVisibility();
       initPWAAndServiceWorker();
       setBirthdayDateMax();
       syncBirthdayCalendarEvents();
@@ -1437,7 +1570,7 @@
 
       if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
         if (touchTargetId === 'header') {
-          const views = ['calendar', 'summary', 'turns', 'birthdays', 'meds'];
+          const views = ['calendar', 'summary', 'turns', 'birthdays', 'meds'].filter(isTabVisible);
           const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
           const currentIndex = views.indexOf(currentView);
           if (diffX < 0) {
@@ -1707,7 +1840,7 @@
       }
     }
 
-    function openHealthControlForm(controlId = null) {
+    function openHealthControlForm(controlId = null, presetDateKey = null) {
       closeHealthRegistrationChooser();
       switchMedRegistration('control');
       const form = document.querySelector('#healthControlModal form');
@@ -1737,7 +1870,9 @@
         if (otherInput) otherInput.value = control.customType || '';
       } else {
         const today = new Date();
-        document.getElementById('healthControlDate').value = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+        document.getElementById('healthControlDate').value = typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)
+          ? presetDateKey
+          : formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
         document.getElementById('healthControlTime').value = '09:00';
         const otherContainer = document.getElementById('healthControlOtherTypeContainer');
         const otherInput = document.getElementById('healthControlOtherTypeText');
@@ -1749,6 +1884,10 @@
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       document.getElementById('healthControlPerson').focus();
+    }
+
+    function openHealthControlFromDay() {
+      openHealthControlForm(null, formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()));
     }
 
     function closeHealthControlForm() {
@@ -1855,21 +1994,50 @@
         return;
       }
 
-      container.innerHTML = upcomingControls.map(control => `
-        <div class="p-3 rounded-xl border border-indigo-800/50 bg-indigo-950/20 flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            <h4 class="font-bold text-xs text-slate-100"><i class="fa-solid fa-user mr-1 text-indigo-300"></i>${escapeHtml(control.person || control.name)}</h4>
-            ${control.type ? `<p class="mt-1 text-[11px] text-indigo-300">${escapeHtml(formatHealthControlTypes(control))}</p>` : ''}
-            <p class="mt-1 text-[11px] text-indigo-200">${escapeHtml(formatHealthControlDate(control.date))} · ${escapeHtml(formatTime(control.time))}</p>
-            ${control.location ? `<p class="mt-1 text-[11px] text-slate-300"><i class="fa-solid fa-location-dot mr-1 text-indigo-300"></i>${escapeHtml(control.location)}</p>` : ''}
-            ${control.notes ? `<p class="mt-1 text-[11px] text-slate-400 whitespace-pre-wrap">${escapeHtml(control.notes)}</p>` : ''}
+      container.innerHTML = upcomingControls.map(control => {
+        const attended = control.attended === true;
+        const label = escapeHtml(control.person || control.name);
+        return `
+        <div class="p-3 rounded-xl border ${attended ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-indigo-800/50 bg-indigo-950/20'}">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <h4 class="font-bold text-xs text-slate-100"><i class="fa-solid fa-user mr-1 text-indigo-300"></i>${label}</h4>
+              ${control.type ? `<p class="mt-1 text-[11px] text-indigo-300">${escapeHtml(formatHealthControlTypes(control))}</p>` : ''}
+              <p class="mt-1 text-[11px] text-indigo-200">${escapeHtml(formatHealthControlDate(control.date))} · ${escapeHtml(formatTime(control.time))}</p>
+              ${control.location ? `<p class="mt-1 text-[11px] text-slate-300"><i class="fa-solid fa-location-dot mr-1 text-indigo-300"></i>${escapeHtml(control.location)}</p>` : ''}
+              ${control.notes ? `<p class="mt-1 text-[11px] text-slate-400 whitespace-pre-wrap">${escapeHtml(control.notes)}</p>` : ''}
+            </div>
+            <div class="flex shrink-0 items-center">
+              <button type="button" onclick="openHealthControlForm('${control.id}')" aria-label="Editar control de ${label}" class="p-2 text-slate-500 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" onclick="deleteHealthControl('${control.id}')" aria-label="Eliminar control de ${label}" class="p-2 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
           </div>
-          <div class="flex shrink-0 items-center">
-            <button type="button" onclick="openHealthControlForm('${control.id}')" aria-label="Editar control de ${escapeHtml(control.person || control.name)}" class="p-2 text-slate-500 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" onclick="deleteHealthControl('${control.id}')" aria-label="Eliminar control de ${escapeHtml(control.person || control.name)}" class="p-2 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
-          </div>
+          <button type="button" onclick="toggleHealthControlAttended('${control.id}')" aria-pressed="${attended}" class="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold border transition-all active:scale-95 ${attended ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-indigo-500/10 border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/20'}">
+            <i class="fa-solid ${attended ? 'fa-circle-check' : 'fa-circle'}"></i>
+            <span>${attended ? 'Asistió al control' : 'Marcar como asistido'}</span>
+          </button>
         </div>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function toggleHealthControlAttended(id) {
+      const control = healthControls.find(item => item.id === id);
+      if (!control) return;
+      const previous = control.attended === true;
+      control.attended = !previous;
+      if (!persistHealthControls()) {
+        control.attended = previous;
+        return;
+      }
+      renderUpcomingHealthControls();
+      renderHealthControlStats();
+      showToast(
+        control.attended ? 'Asistencia registrada' : 'Asistencia desmarcada',
+        control.attended ? `${control.person || 'El paciente'} asistió al control.` : 'Se quitó la marca de asistencia.',
+        'fa-circle-check',
+        control.attended ? 'text-emerald-300' : 'text-slate-300'
+      );
     }
 
     function deleteHealthControl(id) {
@@ -1894,7 +2062,7 @@
       activeHealthControlSubTab = tab;
       document.getElementById('healthControlSubTabs').classList.remove('hidden');
       document.getElementById('medicationSubTabs').classList.add('hidden');
-      ['medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday'].forEach(id => {
+      ['medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday', 'medicationViewStats'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
@@ -1931,8 +2099,9 @@
       activeMedRegistration = 'meds';
       document.getElementById('healthControlSubTabs').classList.add('hidden');
       document.getElementById('medicationSubTabs').classList.remove('hidden');
-      ['medSubViewHoy', 'medSubViewCal', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday', 'medicationViewCalendar'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
+      ['medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday', 'medicationViewStats'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
       });
       document.getElementById('medRegistrationControl').className = "flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all";
       document.getElementById('medRegistrationMeds').className = "flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow";
@@ -1940,27 +2109,29 @@
     }
 
     function switchMedicationSubTab(tab) {
-      if (!['today', 'treatments'].includes(tab)) return;
+      if (!['today', 'treatments', 'stats'].includes(tab)) return;
       activeMedicationSubTab = tab;
       document.getElementById('healthControlSubTabs').classList.add('hidden');
       document.getElementById('medicationSubTabs').classList.remove('hidden');
-      ['medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday'].forEach(id => {
+      ['medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'medicationViewToday', 'medicationViewStats'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
-      ['medicationTabToday', 'medicationTabTreatments'].forEach(id => {
+      ['medicationTabToday', 'medicationTabTreatments', 'medicationTabStats'].forEach(id => {
         const btn = document.getElementById(id);
         if (btn) btn.className = 'flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all';
       });
 
       const selectedTab = {
         today: ['medicationTabToday', 'medicationViewToday'],
-        treatments: ['medicationTabTreatments', 'medSubViewMeds']
+        treatments: ['medicationTabTreatments', 'medSubViewMeds'],
+        stats: ['medicationTabStats', 'medicationViewStats']
       }[tab];
       document.getElementById(selectedTab[0]).className = 'flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow';
       document.getElementById(selectedTab[1]).classList.remove('hidden');
 
       if (tab === 'today') renderTodayMedView();
+      else if (tab === 'stats') renderMedicationStats();
       else renderAllMedsList();
     }
 
@@ -1978,6 +2149,7 @@
       renderHealthControlStats();
       renderMedCalendar();
       renderAllMedsList();
+      renderMedicationStats();
     }
 
     function openMedModal(editId = null) {
@@ -2435,25 +2607,94 @@
         return types.includes(type);
       };
 
-      const values = {
-        controlStatsTotal: periodControls.length,
-        controlStatsUpcoming: upcomingControls.length,
-        controlStatsAppointments: periodControls.filter(control => hasControlType(control, 'appointment')).length,
-        controlStatsExams: periodControls.filter(control => hasControlType(control, 'exam')).length,
-        controlStatsOthers: periodControls.filter(control => hasControlType(control, 'other')).length
-      };
-      Object.entries(values).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value;
+      const groups = new Map();
+      periodControls.forEach(control => {
+        const name = String(control.person || '').trim() || 'Sin nombre';
+        const key = name.toLocaleLowerCase('es');
+        if (!groups.has(key)) groups.set(key, { name, controls: [] });
+        groups.get(key).controls.push(control);
       });
+      if (selectedControlStatsPerson !== null && !groups.has(selectedControlStatsPerson)) {
+        selectedControlStatsPerson = null;
+      }
 
+      const scopeControls = selectedControlStatsPerson === null
+        ? periodControls
+        : groups.get(selectedControlStatsPerson).controls;
+      const selectedLabel = selectedControlStatsPerson === null
+        ? 'Todos'
+        : groups.get(selectedControlStatsPerson).name;
+      const card = (label, value, colorClass) => `
+        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60">
+          <span class="text-[10px] text-slate-400 font-semibold">${label}</span>
+          <strong class="block text-xl ${colorClass} font-black truncate">${value}</strong>
+        </div>`;
+      const overview = document.getElementById('controlStatsOverview');
+      if (overview) {
+        overview.innerHTML =
+          card('Controles registrados', scopeControls.length, 'text-indigo-300') +
+          card('Próximos', scopeControls.filter(control => control.date >= todayKey).length, 'text-blue-300') +
+          card('Citas médicas', scopeControls.filter(control => hasControlType(control, 'appointment')).length, 'text-violet-300') +
+          card('Exámenes', scopeControls.filter(control => hasControlType(control, 'exam')).length, 'text-amber-300') +
+          card('Otros', scopeControls.filter(control => hasControlType(control, 'other')).length, 'text-teal-300') +
+          card('Paciente seleccionado', escapeHtml(selectedLabel), 'text-slate-100');
+      }
+
+      const breakdown = document.getElementById('controlStatsBreakdown');
+      if (!breakdown) return;
+      if (groups.size === 0) {
+        breakdown.innerHTML = '<p class="text-center py-3 text-slate-500 text-xs italic">Aún no hay estadísticas para mostrar.</p>';
+        return;
+      }
+
+      breakdown.innerHTML = Array.from(groups.entries())
+        .sort((a, b) => b[1].controls.length - a[1].controls.length || a[1].name.localeCompare(b[1].name, 'es'))
+        .map(([key, group]) => {
+          const expanded = expandedControlStatsPeople.has(key);
+          const isSelected = selectedControlStatsPerson === key;
+          const count = group.controls.length;
+          const itemsHTML = [...group.controls]
+            .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+            .map(control => `
+              <div class="p-2 rounded-lg bg-slate-950/80 border border-slate-800 space-y-0.5">
+                <span class="block text-[11px] font-semibold text-slate-200 capitalize">${escapeHtml(formatHealthControlDate(control.date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))}</span>
+                <span class="block text-[10px] text-slate-400"><span class="text-slate-500">Hora:</span> ${escapeHtml(control.time)} · <span class="text-indigo-300">${escapeHtml(formatHealthControlTypes(control))}</span></span>
+                ${control.attended === true ? '<span class="block text-[10px] font-bold text-emerald-300">✔ Asistió</span>' : ''}
+                <span class="block text-[10px] text-slate-400"><span class="text-slate-500">Lugar:</span> ${escapeHtml(control.location) || '—'}</span>
+                <span class="block text-[10px] text-slate-400"><span class="text-slate-500">Detalle:</span> ${escapeHtml(control.notes) || '—'}</span>
+              </div>`).join('');
+          return `<div class="rounded-lg bg-slate-900 border ${isSelected ? 'border-indigo-400/70' : 'border-slate-800'} overflow-hidden">
+            <div class="flex items-center gap-2">
+              <button type="button" data-person-key="${escapeHtml(key)}" aria-pressed="${isSelected}" onclick="selectHealthControlStatsPerson(this.dataset.personKey)" class="flex-1 min-w-0 flex items-center justify-between gap-3 p-2.5 text-left hover:bg-slate-800/70 transition-colors">
+                <span class="text-xs font-bold text-slate-100 truncate">${escapeHtml(group.name)}</span>
+                <span class="text-[10px] text-slate-400 whitespace-nowrap">${count} control${count !== 1 ? 'es' : ''}</span>
+              </button>
+              <button type="button" data-person-key="${escapeHtml(key)}" aria-label="${expanded ? 'Ocultar' : 'Mostrar'} detalle de ${escapeHtml(group.name)}" aria-expanded="${expanded}" onclick="toggleHealthControlStatsPerson(this.dataset.personKey)" class="px-3 py-2.5 text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-chevron-right text-[10px] transition-transform ${expanded ? 'rotate-90' : ''}"></i>
+              </button>
+            </div>
+            <div class="${expanded ? 'block' : 'hidden'} border-t border-slate-800 p-2 space-y-1.5">${itemsHTML}</div>
+          </div>`;
+        }).join('');
+    }
+
+    function toggleHealthControlStatsPerson(key) {
+      if (expandedControlStatsPeople.has(key)) expandedControlStatsPeople.delete(key);
+      else expandedControlStatsPeople.add(key);
+      renderHealthControlStats();
+    }
+
+    function selectHealthControlStatsPerson(key) {
+      selectedControlStatsPerson = selectedControlStatsPerson === key ? null : key;
+      renderHealthControlStats();
     }
 
     function renderHealthControlCalendar() {}
     function changeHealthControlCalendarMonth() {}
     function selectHealthControlCalendarDate() {}
     function renderSelectedHealthControlDate() {}
-    function renderMedCalendar() {}
+    // renderMedCalendar se invoca tras cada cambio de tomas o tratamientos; aquí refresca también las estadísticas.
+    function renderMedCalendar() { renderMedicationStats(); }
     function changeMedMonth() {}
     function selectMedCalDate() {}
     function renderSelectedMedDateDoses() {}
@@ -2499,6 +2740,157 @@
           </div>
         `;
       }).join('');
+    }
+
+    function setMedicationStatsMode(mode) {
+      if (!['month', 'year', 'history'].includes(mode)) return;
+      medStatsMode = mode;
+      renderMedicationStats();
+    }
+
+    function changeMedicationStatsPeriod(delta) {
+      if (medStatsMode === 'month') {
+        medStatsDate = new Date(medStatsDate.getFullYear(), medStatsDate.getMonth() + delta, 1);
+      } else if (medStatsMode === 'year') {
+        medStatsDate = new Date(medStatsDate.getFullYear() + delta, medStatsDate.getMonth(), 1);
+      }
+      renderMedicationStats();
+    }
+
+    function toggleMedicationStatsGroup(id) {
+      if (expandedMedStatsIds.has(id)) expandedMedStatsIds.delete(id);
+      else expandedMedStatsIds.add(id);
+      renderMedicationStats();
+    }
+
+    function selectMedicationStatsMed(id) {
+      selectedMedStatsId = selectedMedStatsId === id ? null : id;
+      renderMedicationStats();
+    }
+
+    function renderMedicationStats() {
+      const overview = document.getElementById('medStatsOverview');
+      const breakdown = document.getElementById('medStatsBreakdown');
+      if (!overview || !breakdown) return;
+
+      const now = new Date();
+      const selectedYear = medStatsDate.getFullYear();
+      const selectedMonth = medStatsDate.getMonth();
+
+      [['month', 'medStatsTabMonth'], ['year', 'medStatsTabYear'], ['history', 'medStatsTabHistory']].forEach(([mode, id]) => {
+        const button = document.getElementById(id);
+        if (button) button.className = mode === medStatsMode
+          ? 'flex-1 py-1.5 rounded-lg font-bold bg-slate-600 text-white transition-all shadow'
+          : 'flex-1 py-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all';
+      });
+      const navigator = document.getElementById('medStatsPeriodNavigator');
+      const periodTitle = document.getElementById('medStatsPeriodTitle');
+      if (navigator) navigator.classList.toggle('hidden', medStatsMode === 'history');
+      if (periodTitle) {
+        periodTitle.textContent = medStatsMode === 'month' ? `${monthNames[selectedMonth]} ${selectedYear}` : String(selectedYear);
+      }
+
+      let rangeStart;
+      let rangeEnd;
+      if (medStatsMode === 'month') {
+        rangeStart = new Date(selectedYear, selectedMonth, 1);
+        rangeEnd = new Date(selectedYear, selectedMonth + 1, 0);
+      } else if (medStatsMode === 'year') {
+        rangeStart = new Date(selectedYear, 0, 1);
+        rangeEnd = new Date(selectedYear, 11, 31);
+      } else {
+        let earliest = null;
+        let latest = null;
+        medications.forEach(med => {
+          const [year, month, day] = String(med.startDate).split('-').map(Number);
+          if (!year || !month || !day) return;
+          const start = new Date(year, month - 1, day);
+          const end = new Date(year, month - 1, day + Math.max(Number(med.duration) || 1, 1) - 1);
+          if (!earliest || start < earliest) earliest = start;
+          if (!latest || end > latest) latest = end;
+        });
+        rangeStart = earliest || new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        rangeEnd = latest || rangeStart;
+      }
+
+      const groups = new Map();
+      const cursor = new Date(rangeStart);
+      let guard = 0;
+      while (cursor <= rangeEnd && guard < 4000) {
+        const dateKey = formatDateKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
+        getDosesForMedDate(dateKey).forEach(({ med, doseId, time }) => {
+          const [hours, minutes] = time.split(':').map(Number);
+          const scheduled = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate(), hours, minutes);
+          const taken = !!medLogs[`${dateKey}_${doseId}`];
+          const status = taken ? 'taken' : (scheduled <= now ? 'missed' : 'upcoming');
+          if (!groups.has(med.id)) groups.set(med.id, { med, taken: 0, missed: 0, upcoming: 0, items: [] });
+          const group = groups.get(med.id);
+          group[status] += 1;
+          group.items.push({ dateKey, time, status });
+        });
+        cursor.setDate(cursor.getDate() + 1);
+        guard += 1;
+      }
+
+      if (selectedMedStatsId !== null && !groups.has(selectedMedStatsId)) selectedMedStatsId = null;
+
+      const scope = selectedMedStatsId === null ? Array.from(groups.values()) : [groups.get(selectedMedStatsId)];
+      const totals = scope.reduce((acc, group) => ({
+        taken: acc.taken + group.taken,
+        missed: acc.missed + group.missed,
+        upcoming: acc.upcoming + group.upcoming
+      }), { taken: 0, missed: 0, upcoming: 0 });
+      const percent = (taken, missed) => taken + missed > 0 ? `${Math.round(taken / (taken + missed) * 100)}%` : '—';
+      const selectedLabel = selectedMedStatsId === null ? 'Todos' : groups.get(selectedMedStatsId).med.name;
+      const card = (label, value, colorClass) => `
+        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60">
+          <span class="text-[10px] text-slate-400 font-semibold">${label}</span>
+          <strong class="block text-xl ${colorClass} font-black truncate">${value}</strong>
+        </div>`;
+      overview.innerHTML =
+        card('Total de tomas', totals.taken + totals.missed + totals.upcoming, 'text-blue-300') +
+        card('Tomadas', totals.taken, 'text-emerald-300') +
+        card('Sin tomar', totals.missed, 'text-rose-300') +
+        card('Próximas', totals.upcoming, 'text-amber-300') +
+        card('Adherencia', percent(totals.taken, totals.missed), 'text-teal-300') +
+        card('Medicamento seleccionado', escapeHtml(selectedLabel), 'text-slate-100');
+
+      if (groups.size === 0) {
+        breakdown.innerHTML = '<p class="text-center py-3 text-slate-500 text-xs italic">Aún no hay estadísticas para mostrar.</p>';
+        return;
+      }
+
+      const statusLabel = {
+        taken: '<span class="font-bold text-emerald-300">✔ Tomada</span>',
+        missed: '<span class="font-bold text-rose-300">✖ Sin tomar</span>',
+        upcoming: '<span class="font-bold text-amber-300">Próxima</span>'
+      };
+      breakdown.innerHTML = Array.from(groups.entries())
+        .sort((a, b) => (b[1].taken + b[1].missed + b[1].upcoming) - (a[1].taken + a[1].missed + a[1].upcoming) || a[1].med.name.localeCompare(b[1].med.name, 'es'))
+        .map(([id, group]) => {
+          const total = group.taken + group.missed + group.upcoming;
+          const expanded = expandedMedStatsIds.has(id);
+          const isSelected = selectedMedStatsId === id;
+          const itemsHTML = [...group.items]
+            .sort((a, b) => `${a.dateKey} ${a.time}`.localeCompare(`${b.dateKey} ${b.time}`))
+            .map(item => `
+              <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-[10px]">
+                <span class="text-slate-300 capitalize">${escapeHtml(formatHealthControlDate(item.dateKey, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))} · ${escapeHtml(formatTime(item.time))}</span>
+                ${statusLabel[item.status]}
+              </div>`).join('');
+          return `<div class="rounded-lg bg-slate-900 border ${isSelected ? 'border-blue-400/70' : 'border-slate-800'} overflow-hidden">
+            <div class="flex items-center gap-2">
+              <button type="button" data-med-id="${escapeHtml(id)}" aria-pressed="${isSelected}" onclick="selectMedicationStatsMed(this.dataset.medId)" class="flex-1 min-w-0 flex items-center justify-between gap-3 p-2.5 text-left hover:bg-slate-800/70 transition-colors">
+                <span class="text-xs font-bold text-slate-100 truncate">${escapeHtml(group.med.name)}</span>
+                <span class="text-[10px] text-slate-400 whitespace-nowrap">${group.taken} de ${total} toma${total !== 1 ? 's' : ''} · ${percent(group.taken, group.missed)}</span>
+              </button>
+              <button type="button" data-med-id="${escapeHtml(id)}" aria-label="${expanded ? 'Ocultar' : 'Mostrar'} tomas de ${escapeHtml(group.med.name)}" aria-expanded="${expanded}" onclick="toggleMedicationStatsGroup(this.dataset.medId)" class="px-3 py-2.5 text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-chevron-right text-[10px] transition-transform ${expanded ? 'rotate-90' : ''}"></i>
+              </button>
+            </div>
+            <div class="${expanded ? 'block' : 'hidden'} border-t border-slate-800 p-2 space-y-1.5 max-h-64 overflow-y-auto">${itemsHTML}</div>
+          </div>`;
+        }).join('');
     }
 
     function setBirthdayDateMax() {
@@ -3044,7 +3436,7 @@
                 if (hasTime) {
                   const timeSpan = document.createElement('span');
                   timeSpan.className = 'truncate text-[8px] max-w-full leading-tight';
-                  timeSpan.textContent = note.noteTime;
+                  timeSpan.textContent = formatTime(note.noteTime);
                   block.appendChild(timeSpan);
                 }
 
@@ -3610,11 +4002,14 @@
       const bottomActions = document.getElementById('modal-bottom-actions');
       if (bottomActions) bottomActions.classList.add('hidden');
 
-      // Configurar el modo de evento
+      // Configurar el modo de evento (preseleccionar según pestaña activa)
+      const defaultAnniversary = activeView === 'birthdays' && birthdayFilterTab === 'anniversaries';
+      document.getElementById('is-birthday-checkbox').checked = !defaultAnniversary;
+      document.getElementById('is-anniversary-checkbox').checked = defaultAnniversary;
       document.getElementById('modal-title-text').textContent = "Nuevo Evento";
       document.getElementById('form-submit-label').textContent = "Guardar e Incluir Evento";
       setEventFormMode(true);
-      toggleSpecialTypeInput('none');
+      toggleSpecialTypeInput(defaultAnniversary ? 'anniversary' : 'birthday');
       clearBirthdayDuplicateError();
     }
 
@@ -4008,7 +4403,8 @@
           typeBadgeHTML = `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/40 flex items-center gap-1"><i class="fa-solid fa-note-sticky text-[9px]"></i> NOTA</span>`;
         }
 
-        const safeNoteJSON = escapeHtml(JSON.stringify(note));
+        const editableNote = (note.birthdayOwnerId && getNoteById(note.birthdayOwnerId)) || note;
+        const safeNoteJSON = escapeHtml(JSON.stringify(editableNote));
 
         item.innerHTML = `
           <div class="flex items-center gap-2.5 flex-1 min-w-0">
@@ -4025,14 +4421,14 @@
               ${note.isShift ? `<span class="text-[10px] text-purple-400 font-semibold mt-0.5"><i class="fa-solid ${note.shiftStatus ? 'fa-tag' : 'fa-clock'} text-[9px] mr-1"></i>${escapeHtml(note.shiftType || 'Turno')}${note.shiftStatus ? '' : `: ${escapeHtml(formatTime(note.shiftStart))} - ${escapeHtml(formatTime(note.shiftEnd))}`}</span>` : ''}
             </div>
           </div>
-          ${note.birthdayOwnerId ? '' : `<div class="flex items-center gap-1 shrink-0">
+          <div class="flex items-center gap-1 shrink-0">
             <button type="button" data-note-data="${safeNoteJSON}" onclick="event.stopPropagation(); showCreateFormInModal(JSON.parse(this.getAttribute('data-note-data')))" class="p-1.5 text-slate-400 hover:text-teal-400 hover:bg-slate-800 rounded transition-colors">
               <i class="fa-solid fa-pen"></i>
             </button>
             <button type="button" onclick="event.stopPropagation(); deleteNoteFromModal('${escapeHtml(note.id)}')" class="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition-colors">
               <i class="fa-solid fa-trash-can"></i>
             </button>
-          </div>`}
+          </div>
         `;
         container.appendChild(item);
       });
@@ -4158,6 +4554,10 @@
         showToast('Campo Requerido', 'Por favor ingresa un título para la nota.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
       }
+      if (isEventForm && !isBirthday && !isAnniversary) {
+        showToast('Tipo de evento requerido', 'Selecciona si el evento es un Cumpleaños o un Aniversario.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
       if (shiftStatus === 'specialPermission' && !shiftPermissionType) {
         showToast('Tipo requerido', 'Selecciona si el permiso especial es vacacional o administrativo.', 'fa-triangle-exclamation', 'text-amber-400');
         return;
@@ -4219,7 +4619,10 @@
         ? Math.max(1, Math.min(30, Number(document.getElementById('shift-status-duration').value) || 1))
         : 1;
       const existingNote = editingId ? getNoteById(editingId) : null;
-      const baseGroupId = existingNote ? (existingNote.repeatGroupId || 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)) : 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+      const needsRepeatGroup = statusDuration > 1 || repeatType !== 'none' || isBirthday || isAnniversary;
+      const baseGroupId = needsRepeatGroup
+        ? (existingNote && existingNote.repeatGroupId ? existingNote.repeatGroupId : 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5))
+        : '';
       const noteAbbrev = shiftStatus === 'specialPermission'
         ? (shiftPermissionType === 'vacation' ? 'VACAC' : 'ADMIN')
         : (shiftStatusConfig
@@ -4359,13 +4762,14 @@
       const month = birthDate.getMonth();
       const day = birthDate.getDate();
 
-      for (let year = Math.max(currentYear, birthYear + 1); year <= currentYear + 2; year++) {
+      for (let year = Math.max(currentYear - 1, birthYear + 1); year <= currentYear + 5; year++) {
         const eventDay = Math.min(day, new Date(year, month + 1, 0).getDate());
         const eventKey = formatDateKey(year, month, eventDay);
         if (!dayDataMap[eventKey]) dayDataMap[eventKey] = [];
         dayDataMap[eventKey].push({
           id: 'bday_event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
           birthdayOwnerId: birthday.id,
+          repeatGroupId: birthday.repeatGroupId || birthday.id,
           title: birthday.title || birthday.text,
           text: birthday.title || birthday.text,
           description: birthday.description || '',
@@ -4376,9 +4780,11 @@
           ),
           isBirthday: true,
           isEvent: true,
+          isFavorite: !!birthday.isFavorite,
           eventTypes: birthday.eventTypes || ['birthday'],
           birthDate: birthday.birthDate,
           birthYear: birthday.birthYear,
+          birthTime: birthday.birthTime || '',
           reminder: birthday.reminder || 'same_day'
         });
       }
@@ -4456,13 +4862,34 @@
       showToast('Cambios Guardados', 'Notas actualizadas para este día.', 'fa-circle-check', 'text-teal-400');
     }
 
+    function countRepeatGroupOccurrences(groupId) {
+      if (!groupId) return 0;
+      let count = 0;
+      Object.values(dayDataMap).forEach(notes => {
+        if (!Array.isArray(notes)) return;
+        notes.forEach(item => {
+          if (item && item.repeatGroupId === groupId) count++;
+        });
+      });
+      return count;
+    }
+
+    function isRepeatedNoteSeries(note) {
+      if (!note) return false;
+      if (note.repeat && note.repeat !== 'none') return true;
+      if (note.isBirthday || note.birthdayOwnerId || note.isEvent || note.anniversaryDate) return true;
+      if (Array.isArray(note.eventTypes) && note.eventTypes.length > 0) return true;
+      if (note.repeatGroupId && countRepeatGroupOccurrences(note.repeatGroupId) > 1) return true;
+      return false;
+    }
+
     function deleteNoteFromModal(id) {
       const noteToDelete = getNoteById(id);
       if (!noteToDelete) return;
 
       noteIdPendingDelete = id;
 
-      if ((noteToDelete.repeat && noteToDelete.repeat !== 'none') || noteToDelete.repeatGroupId || noteToDelete.isBirthday || noteToDelete.birthdayOwnerId) {
+      if (isRepeatedNoteSeries(noteToDelete)) {
         document.getElementById('delete-confirm-modal').classList.remove('hidden');
         document.getElementById('delete-confirm-modal').classList.add('flex');
       } else {
@@ -4537,8 +4964,13 @@
       const permissionKind = document.getElementById('special-permission-kind').value;
       const abbrevInput = document.getElementById('new-note-abbrev');
 
-      if (permissionKind === 'vacation' && abbrevInput) {
-        abbrevInput.value = 'VAC';
+      if (!abbrevInput) return;
+      if (permissionKind === 'vacation') {
+        abbrevInput.value = 'VACAC';
+      } else if (permissionKind === 'administrative') {
+        abbrevInput.value = 'ADMIN';
+      } else {
+        abbrevInput.value = DAY_MARKER_TYPES.specialPermission.label;
       }
     }
 
@@ -4827,7 +5259,7 @@
       if (items.length === 0) {
         container.innerHTML = `
           <div class="text-center py-3 text-slate-500 text-xs italic">
-            No hay ${isTurnsTab ? 'turnos cercanos' : 'notas cercanas'} en este rango (3 días).
+            No hay ${isTurnsTab ? 'turnos cercanos' : 'notas cercanas'} próximos.
           </div>
         `;
         return;
@@ -5154,7 +5586,7 @@
 
       selectedDate = createLocalDate(parts[0], parts[1] - 1, parts[2]);
       noteIdPendingDelete = note.id;
-      if (note.repeat && note.repeat !== 'none') {
+      if (isRepeatedNoteSeries(note)) {
         document.getElementById('delete-confirm-modal').classList.remove('hidden');
         document.getElementById('delete-confirm-modal').classList.add('flex');
       } else {
@@ -5290,9 +5722,12 @@
               ${dateAndAgeHTML}
             </div>
           </div>
-          <div class="flex items-center shrink-0">
-            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editBirthdayFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold transition-all active:scale-95">
+          <div class="flex flex-col items-stretch gap-1 shrink-0">
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editBirthdayFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
               Editar
+            </button>
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); deleteEventFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-red-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
+              Eliminar
             </button>
           </div>
         `;
@@ -5381,9 +5816,12 @@
               </div>
             </div>
           </div>
-          <div class="flex items-center shrink-0">
-            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editAnniversaryFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold transition-all active:scale-95">
+          <div class="flex flex-col items-stretch gap-1 shrink-0">
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editAnniversaryFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
               Editar
+            </button>
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); deleteEventFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-red-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
+              Eliminar
             </button>
           </div>
         `;
@@ -5450,6 +5888,18 @@
       modal.classList.add('flex');
 
       showCreateFormInModal(note);
+    }
+
+    function deleteEventFromList(button) {
+      const note = getNoteById(button.dataset.noteId);
+      const parts = String(button.dataset.dateKey || '').split('-').map(Number);
+      if (!note || parts.length !== 3 || parts.some(part => !Number.isInteger(part))) {
+        showToast('No se pudo eliminar', 'No se encontró el evento seleccionado.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
+      selectedDate = createLocalDate(parts[0], parts[1] - 1, parts[2]);
+      noteIdPendingDelete = note.id;
+      confirmDeleteAction('all');
     }
 
     function editAnniversaryFromList(button) {
@@ -5576,6 +6026,7 @@
 
     function openSettingsModal() {
       document.getElementById('time-format-setting').value = timeFormat;
+      applyTabVisibility();
       document.getElementById('settings-modal').classList.remove('hidden');
       document.getElementById('settings-modal').classList.add('flex');
     }
@@ -5786,33 +6237,64 @@
 
     function checkNotificationsOnLaunch() {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-      const notifiedKey = `cal_birthday_notified_${todayKey}`;
-      if (readStoredValue(notifiedKey) === '1') return;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+      const currentYear = today.getFullYear();
 
-      const todayNotes = dayDataMap[todayKey];
-      if (!Array.isArray(todayNotes)) return;
-      const birthdays = todayNotes.filter(n => n && n.isBirthday);
-      if (!birthdays.length) return;
-
-      birthdays.forEach(n => {
-        try {
-          if (Notification.permission === 'granted') {
-            new Notification(`🎂 ¡Hoy es el cumpleaños de ${n.title || n.text || 'alguien especial'}!`, {
-              body: n.description || '¡No olvides desearle un feliz día!',
-              icon: './icon.svg',
-              tag: `birthday-${todayKey}-${n.id || n.title || 'event'}`
-            });
+      const owners = new Map();
+      Object.entries(dayDataMap).forEach(([key, notes]) => {
+        if (!Array.isArray(notes)) return;
+        notes.forEach(n => {
+          if (n && n.isBirthday && !n.birthdayOwnerId) {
+            owners.set(n.id || `${key}_${n.title}`, { key, note: n });
           }
+        });
+      });
+
+      owners.forEach(({ key, note }) => {
+        const birthSource = note.birthDate || key;
+        const parts = String(birthSource).split('-').map(Number);
+        if (parts.length !== 3 || parts.some(p => !Number.isInteger(p))) return;
+        const m = parts[1] - 1;
+        const d = parts[2];
+
+        const maxDayThisYear = new Date(currentYear, m + 1, 0).getDate();
+        let nextBday = new Date(currentYear, m, Math.min(d, maxDayThisYear), 0, 0, 0, 0);
+        if (nextBday < today) {
+          const maxDayNextYear = new Date(currentYear + 1, m + 1, 0).getDate();
+          nextBday = new Date(currentYear + 1, m, Math.min(d, maxDayNextYear), 0, 0, 0, 0);
+        }
+
+        const daysLeft = Math.round((nextBday.getTime() - today.getTime()) / 86400000);
+        const reminder = note.reminder || 'same_day';
+        const shouldNotify =
+          daysLeft === 0 ||
+          (daysLeft === 1 && reminder === '1_day') ||
+          (daysLeft === 3 && reminder === '3_days') ||
+          (daysLeft === 7 && reminder === '1_week');
+
+        if (!shouldNotify) return;
+
+        const notifiedKey = `cal_birthday_notified_${todayKey}_${note.id || note.title}_${daysLeft}`;
+        if (readStoredValue(notifiedKey) === '1') return;
+
+        const person = note.title || note.text || 'alguien especial';
+        const titleMsg = daysLeft === 0
+          ? `🎂 ¡Hoy es el cumpleaños de ${person}!`
+          : `🎂 Recordatorio: Cumpleaños de ${person} en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'}`;
+
+        try {
+          new Notification(titleMsg, {
+            body: note.description || '¡No olvides desearle un feliz día!',
+            icon: './icon.svg',
+            tag: `birthday-${todayKey}-${note.id || person}-${daysLeft}`
+          });
+          localStorage.setItem(notifiedKey, '1');
         } catch (error) {
-          console.warn('No se pudo mostrar la notificación:', error);
+          console.warn('No se pudo mostrar o registrar la notificación de cumpleaños:', error);
         }
       });
-      try {
-        localStorage.setItem(notifiedKey, '1');
-      } catch (error) {
-        console.warn('No se pudo registrar la notificación de cumpleaños.', error);
-      }
     }
 
     function escapeHtml(str) {
