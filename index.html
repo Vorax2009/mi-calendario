@@ -222,6 +222,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-prescription-bottle-medical::before{content:"💊"}
 .fa-stethoscope::before{content:"🩺"}
 .fa-tooth::before{content:"🦷"}
+.fa-box-open::before{content:"📦"}
+.fa-jar::before{content:"🥫"}
 </style>
 </head>
 <body class="h-full flex flex-col font-sans overflow-x-hidden bg-slate-950 text-slate-100">
@@ -730,7 +732,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div id="btTabsContainer" class="flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
           <button type="button" data-bt-tab="cuidados" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap">🍼 Cuidados</button>
           <button type="button" data-bt-tab="salud" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🩺 Salud y Vacunas</button>
-          <button type="button" data-bt-tab="crecimiento" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📈 Crecimiento</button>
+          <button type="button" data-bt-tab="inventario" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📦 Inventario</button>
         </div>
 
         <!-- CONTENIDO DINÁMICO DEL BEBÉ -->
@@ -1336,6 +1338,229 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <button type="submit" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-bottle-droplet"></i>
             <span>Guardar Alimentación</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- MODAL INDIVIDUAL PARA REGISTRAR FECHA DE RETIRO DE LECHE -->
+  <div id="babyMilkPickupModal" class="fixed inset-0 z-[80] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyMilkPickupModal()">
+    <section class="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-amber-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+        <h3 class="font-bold text-sm flex items-center gap-2 text-amber-300">
+          <i class="fa-solid fa-box-open text-amber-400"></i>
+          <span id="babyMilkPickupModalTitle">Registrar Retiro de Leche</span>
+        </h3>
+        <button type="button" onclick="closeBabyMilkPickupModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="babyMilkPickupModalForm" onsubmit="saveBabyMilkPickupFromModal(event)" class="space-y-3">
+        <input type="hidden" id="babyMilkPickupModalEditId" value="">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
+          <input type="text" id="babyMilkPickupModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyMilkPickupModalDate" class="block text-[11px] font-semibold text-slate-300 mb-1">📅 Fecha de retiro</label>
+            <input type="date" id="babyMilkPickupModalDate" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-mono font-bold">
+          </div>
+          <div>
+            <label for="babyMilkPickupModalNextDate" class="block text-[11px] font-semibold text-slate-300 mb-1">⏭️ Próximo retiro <span class="text-slate-500 font-normal">(Opc.)</span></label>
+            <input type="date" id="babyMilkPickupModalNextDate" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-mono font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyMilkPickupModalCans" class="block text-[11px] font-semibold text-slate-300 mb-1">🥫 N° de tarros / cajas</label>
+            <input type="number" id="babyMilkPickupModalCans" min="1" max="50" value="2" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-bold">
+          </div>
+          <div>
+            <label for="babyMilkPickupModalGrams" class="block text-[11px] font-semibold text-slate-300 mb-1">⚖️ Gramos por tarro</label>
+            <input type="number" id="babyMilkPickupModalGrams" min="50" max="5000" step="10" value="800" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400 font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label for="babyMilkPickupModalBrand" class="block text-[11px] font-semibold text-slate-300 mb-1">🍼 Nombre / Tipo de Leche</label>
+          <input type="text" id="babyMilkPickupModalBrand" required placeholder="Ej. Purita Mamá / Fórmula Etapa 1 / NAN..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <label for="babyMilkPickupModalPlace" class="block text-[11px] font-semibold text-slate-300 mb-1">🏥 Lugar / Consultorio / Farmacia <span class="text-slate-500 font-normal">(Opcional)</span></label>
+          <input type="text" id="babyMilkPickupModalPlace" placeholder="Ej. CESFAM, Consultorio, Farmacia..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <label for="babyMilkPickupModalNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">📝 Observaciones <span class="text-slate-500 font-normal">(Opcional)</span></label>
+          <input type="text" id="babyMilkPickupModalNotes" placeholder="Ej. Retirado al día, llevar carnet en próximo control..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeBabyMilkPickupModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Guardar Retiro</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- MODAL INDIVIDUAL PARA CONTADOR DE TARRO DE LECHE (DESDE QUE SE ABRIÓ HASTA CUÁNDO DURA) -->
+  <div id="babyFormulaCanModal" class="fixed inset-0 z-[80] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyFormulaCanModal()">
+    <section class="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-sky-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+        <h3 class="font-bold text-sm flex items-center gap-2 text-sky-300">
+          <i class="fa-solid fa-jar text-sky-400"></i>
+          <span id="babyFormulaCanModalTitle">Abrir / Configurar Tarro de Leche</span>
+        </h3>
+        <button type="button" onclick="closeBabyFormulaCanModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="babyFormulaCanModalForm" onsubmit="saveBabyFormulaCanFromModal(event)" class="space-y-3">
+        <input type="hidden" id="babyFormulaCanModalEditId" value="">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
+          <input type="text" id="babyFormulaCanModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
+        </div>
+
+        <div>
+          <label for="babyFormulaCanModalBrand" class="block text-[11px] font-semibold text-slate-300 mb-1">🥫 Nombre / Marca del Tarro</label>
+          <input type="text" id="babyFormulaCanModalBrand" required placeholder="Ej. NAN 1, Similac, Nidal, Purita..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyFormulaCanModalWeight" class="block text-[11px] font-semibold text-slate-300 mb-1">⚖️ Peso del tarro (g)</label>
+            <select id="babyFormulaCanModalWeight" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-sky-400">
+              <option value="400">400 g (Tarro chico)</option>
+              <option value="800" selected>800 g (Tarro estándar)</option>
+              <option value="900">900 g (Tarro grande)</option>
+              <option value="1000">1000 g (1 Kilo)</option>
+              <option value="1200">1200 g (Formato ahorro)</option>
+            </select>
+          </div>
+          <div>
+            <label for="babyFormulaCanModalDuration" class="block text-[11px] font-semibold text-slate-300 mb-1">⏳ Duración estimada (días)</label>
+            <input type="number" id="babyFormulaCanModalDuration" min="1" max="90" value="15" required oninput="updateFormulaCanEndDatePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400 font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyFormulaCanModalOpenDate" class="block text-[11px] font-semibold text-slate-300 mb-1">📅 Fecha en que se abrió</label>
+            <input type="date" id="babyFormulaCanModalOpenDate" required onchange="updateFormulaCanEndDatePreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400 font-mono font-bold">
+          </div>
+          <div>
+            <label for="babyFormulaCanModalEndDate" class="block text-[11px] font-semibold text-slate-300 mb-1">🏁 Fecha en que se acaba</label>
+            <input type="date" id="babyFormulaCanModalEndDate" required onchange="updateFormulaCanDurationFromEndDate()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-emerald-300 focus:outline-none focus:border-sky-400 font-mono font-bold">
+          </div>
+        </div>
+
+        <div id="babyFormulaCanPreviewBanner" class="p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/30 text-[11px] text-sky-200 flex items-center justify-between">
+          <span><i class="fa-solid fa-clock mr-1 text-sky-400"></i> Cálculo del contador:</span>
+          <strong id="babyFormulaCanPreviewText" class="text-white font-bold">15 días de duración</strong>
+        </div>
+
+        <div>
+          <label for="babyFormulaCanModalNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">📝 Notas <span class="text-slate-500 font-normal">(Opcional)</span></label>
+          <input type="text" id="babyFormulaCanModalNotes" placeholder="Ej. 5 medidas por mamadera, 4 tomas al día..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeBabyFormulaCanModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-jar"></i>
+            <span>Iniciar Contador</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- MODAL INDIVIDUAL PARA REGISTRAR COMPRA / PAQUETE DE PAÑALES EN INVENTARIO -->
+  <div id="babyDiaperPurchaseModal" class="fixed inset-0 z-[80] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyDiaperPurchaseModal()">
+    <section class="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-teal-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+        <h3 class="font-bold text-sm flex items-center gap-2 text-teal-300">
+          <i class="fa-solid fa-box-open text-teal-400"></i>
+          <span id="babyDiaperPurchaseModalTitle">Agregar Pañales al Stock</span>
+        </h3>
+        <button type="button" onclick="closeBabyDiaperPurchaseModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="babyDiaperPurchaseModalForm" onsubmit="saveBabyDiaperPurchaseFromModal(event)" class="space-y-3">
+        <input type="hidden" id="babyDiaperPurchaseModalEditId" value="">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
+          <input type="text" id="babyDiaperPurchaseModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyDiaperPurchaseModalDate" class="block text-[11px] font-semibold text-slate-300 mb-1">📅 Fecha de ingreso</label>
+            <input type="date" id="babyDiaperPurchaseModalDate" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400 font-mono font-bold">
+          </div>
+          <div>
+            <label for="babyDiaperPurchaseModalSize" class="block text-[11px] font-semibold text-slate-300 mb-1">📏 Talla de pañal</label>
+            <select id="babyDiaperPurchaseModalSize" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-teal-400">
+              <option value="RN">RN (Recién Nacido)</option>
+              <option value="P">P / S (Pequeño)</option>
+              <option value="M" selected>M (Mediano)</option>
+              <option value="G">G / L (Grande)</option>
+              <option value="XG">XG / XL (Extra Grande)</option>
+              <option value="XXG">XXG (Junior)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyDiaperPurchaseModalPacks" class="block text-[11px] font-semibold text-slate-300 mb-1">📦 N° de paquetes</label>
+            <input type="number" id="babyDiaperPurchaseModalPacks" min="1" max="50" value="1" required oninput="updateDiaperPurchaseTotalPreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400 font-bold">
+          </div>
+          <div>
+            <label for="babyDiaperPurchaseModalUnitsPerPack" class="block text-[11px] font-semibold text-slate-300 mb-1">🚼 Pañales por paquete</label>
+            <input type="number" id="babyDiaperPurchaseModalUnitsPerPack" min="1" max="500" value="40" required oninput="updateDiaperPurchaseTotalPreview()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400 font-bold">
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/30 text-[11px] text-teal-200 flex items-center justify-between">
+          <span><i class="fa-solid fa-calculator mr-1 text-teal-400"></i> Total de pañales a sumar al stock:</span>
+          <strong id="babyDiaperPurchaseTotalPreviewText" class="text-white font-black text-xs">+40 unidades</strong>
+        </div>
+
+        <div>
+          <label for="babyDiaperPurchaseModalBrand" class="block text-[11px] font-semibold text-slate-300 mb-1">🏷️ Marca / Modelo <span class="text-slate-500 font-normal">(Opcional)</span></label>
+          <input type="text" id="babyDiaperPurchaseModalBrand" placeholder="Ej. Huggies Natural Care, Pampers, Babysec..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400">
+        </div>
+
+        <div>
+          <label for="babyDiaperPurchaseModalNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">📝 Notas <span class="text-slate-500 font-normal">(Opcional)</span></label>
+          <input type="text" id="babyDiaperPurchaseModalNotes" placeholder="Ej. Oferta supermercado, regalo baby shower..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400">
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeBabyDiaperPurchaseModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Guardar en Stock</span>
           </button>
         </div>
       </form>
@@ -3417,6 +3642,394 @@ Check your Browserslist config to be sure that your targets are set up correctly
       renderAll();
 
       showToast('Alimentación Registrada', `${label}${amountMl ? ` (${amountMl} ml)` : ''} para ${bName} guardado.`, 'fa-bottle-droplet', 'text-amber-400');
+    }
+
+    // 3B. MODAL INDIVIDUAL: FECHA DE RETIRO DE LECHE
+    function openBabyMilkPickupModal(presetDateKey = null, editId = null) {
+      closeBabyRegistrationChooser();
+      const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
+
+      const modal = document.getElementById('babyMilkPickupModal');
+      const form = document.getElementById('babyMilkPickupModalForm');
+      if (form) form.reset();
+
+      const nameInput = document.getElementById('babyMilkPickupModalBabyName');
+      if (nameInput) nameInput.value = `👶 ${babyName}`;
+
+      const editInput = document.getElementById('babyMilkPickupModalEditId');
+      if (editInput) editInput.value = editId || '';
+
+      const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const defaultDate = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
+
+      const dateInput = document.getElementById('babyMilkPickupModalDate');
+      const nextDateInput = document.getElementById('babyMilkPickupModalNextDate');
+      const cansInput = document.getElementById('babyMilkPickupModalCans');
+      const gramsInput = document.getElementById('babyMilkPickupModalGrams');
+      const brandInput = document.getElementById('babyMilkPickupModalBrand');
+      const placeInput = document.getElementById('babyMilkPickupModalPlace');
+      const notesInput = document.getElementById('babyMilkPickupModalNotes');
+      const titleSpan = document.getElementById('babyMilkPickupModalTitle');
+
+      const existing = (editId && btState && btState.feeding && Array.isArray(btState.feeding.milkPickups))
+        ? btState.feeding.milkPickups.find(p => p && p.id === editId)
+        : null;
+
+      if (existing) {
+        if (titleSpan) titleSpan.textContent = `Editar Retiro de Leche`;
+        if (dateInput) dateInput.value = existing.date || defaultDate;
+        if (nextDateInput) nextDateInput.value = existing.nextDate || '';
+        if (cansInput) cansInput.value = existing.cans || 2;
+        if (gramsInput) gramsInput.value = existing.gramsPerCan || 800;
+        if (brandInput) brandInput.value = existing.brand || '';
+        if (placeInput) placeInput.value = existing.place || '';
+        if (notesInput) notesInput.value = existing.notes || '';
+      } else {
+        if (titleSpan) titleSpan.textContent = `Registrar Retiro de Leche`;
+        if (dateInput) dateInput.value = defaultDate;
+        // Sugerir próximo retiro a 30 días
+        const dParts = defaultDate.split('-').map(Number);
+        const nextD = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+        nextD.setDate(nextD.getDate() + 30);
+        if (nextDateInput) nextDateInput.value = formatDateKey(nextD.getFullYear(), nextD.getMonth(), nextD.getDate());
+        if (cansInput) cansInput.value = 2;
+        if (gramsInput) gramsInput.value = 800;
+      }
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeBabyMilkPickupModal() {
+      const modal = document.getElementById('babyMilkPickupModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function saveBabyMilkPickupFromModal(e) {
+      e.preventDefault();
+      const { store, baby: btState, name: bName } = getActiveBabyObjectSafe();
+      if (!btState) {
+        showToast('Error', 'No se encontró el registro del bebé.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
+
+      const editId = document.getElementById('babyMilkPickupModalEditId')?.value || '';
+      const date = document.getElementById('babyMilkPickupModalDate')?.value || formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const nextDate = document.getElementById('babyMilkPickupModalNextDate')?.value || '';
+      const cans = Math.max(1, parseInt(document.getElementById('babyMilkPickupModalCans')?.value, 10) || 1);
+      const gramsPerCan = Math.max(50, parseInt(document.getElementById('babyMilkPickupModalGrams')?.value, 10) || 800);
+      const brand = (document.getElementById('babyMilkPickupModalBrand')?.value || '').trim() || 'Leche / Fórmula';
+      const place = (document.getElementById('babyMilkPickupModalPlace')?.value || '').trim();
+      const notes = (document.getElementById('babyMilkPickupModalNotes')?.value || '').trim();
+
+      if (!btState.feeding) btState.feeding = { milkGoalMl: 600, entries: [], milkPickups: [], formulaCans: [] };
+      if (!Array.isArray(btState.feeding.milkPickups)) btState.feeding.milkPickups = [];
+
+      const record = {
+        id: editId || ('mp_' + Date.now()),
+        date,
+        nextDate,
+        cans,
+        gramsPerCan,
+        brand,
+        place,
+        notes
+      };
+
+      const existingIdx = editId ? btState.feeding.milkPickups.findIndex(p => p && p.id === editId) : -1;
+      if (existingIdx >= 0) {
+        btState.feeding.milkPickups[existingIdx] = record;
+      } else {
+        btState.feeding.milkPickups.push(record);
+      }
+
+      persistBabyTrackerStoreSafe(store);
+      closeBabyMilkPickupModal();
+      renderAll();
+
+      showToast(existingIdx >= 0 ? 'Retiro Actualizado' : 'Retiro de Leche Guardado', `${cans} tarro(s) de ${brand} (${date}) para ${bName}.`, 'fa-box-open', 'text-amber-400');
+    }
+
+    // 3C. MODAL INDIVIDUAL: CONTADOR DE TARRO DE LECHE (DESDE APERTURA HASTA CUÁNDO DURA)
+    function updateFormulaCanEndDatePreview() {
+      const openDateVal = document.getElementById('babyFormulaCanModalOpenDate')?.value;
+      const durationVal = Math.max(1, parseInt(document.getElementById('babyFormulaCanModalDuration')?.value, 10) || 15);
+      const endDateInput = document.getElementById('babyFormulaCanModalEndDate');
+      const previewText = document.getElementById('babyFormulaCanPreviewText');
+
+      if (openDateVal && /^\d{4}-\d{2}-\d{2}$/.test(openDateVal)) {
+        const parts = openDateVal.split('-').map(Number);
+        const endD = new Date(parts[0], parts[1] - 1, parts[2]);
+        endD.setDate(endD.getDate() + durationVal);
+        const endIso = formatDateKey(endD.getFullYear(), endD.getMonth(), endD.getDate());
+        if (endDateInput) endDateInput.value = endIso;
+        if (previewText) {
+          previewText.textContent = `Dura ${durationVal} día${durationVal === 1 ? '' : 's'} (hasta el ${formatHealthControlDate(endIso, { day: 'numeric', month: 'short' })})`;
+        }
+      }
+    }
+
+    function updateFormulaCanDurationFromEndDate() {
+      const openDateVal = document.getElementById('babyFormulaCanModalOpenDate')?.value;
+      const endDateVal = document.getElementById('babyFormulaCanModalEndDate')?.value;
+      const durationInput = document.getElementById('babyFormulaCanModalDuration');
+      const previewText = document.getElementById('babyFormulaCanPreviewText');
+
+      if (openDateVal && endDateVal && /^\d{4}-\d{2}-\d{2}$/.test(openDateVal) && /^\d{4}-\d{2}-\d{2}$/.test(endDateVal)) {
+        const [oy, om, od] = openDateVal.split('-').map(Number);
+        const [ey, em, ed] = endDateVal.split('-').map(Number);
+        const diffDays = Math.max(1, Math.round((Date.UTC(ey, em - 1, ed) - Date.UTC(oy, om - 1, od)) / 86400000));
+        if (durationInput) durationInput.value = diffDays;
+        if (previewText) {
+          previewText.textContent = `Dura ${diffDays} día${diffDays === 1 ? '' : 's'} (hasta el ${formatHealthControlDate(endDateVal, { day: 'numeric', month: 'short' })})`;
+        }
+      }
+    }
+
+    function openBabyFormulaCanModal(presetDateKey = null, editId = null) {
+      closeBabyRegistrationChooser();
+      const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
+
+      const modal = document.getElementById('babyFormulaCanModal');
+      const form = document.getElementById('babyFormulaCanModalForm');
+      if (form) form.reset();
+
+      const nameInput = document.getElementById('babyFormulaCanModalBabyName');
+      if (nameInput) nameInput.value = `👶 ${babyName}`;
+
+      const editInput = document.getElementById('babyFormulaCanModalEditId');
+      if (editInput) editInput.value = editId || '';
+
+      const fallbackDate = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const defaultDate = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
+
+      const brandInput = document.getElementById('babyFormulaCanModalBrand');
+      const weightSelect = document.getElementById('babyFormulaCanModalWeight');
+      const durationInput = document.getElementById('babyFormulaCanModalDuration');
+      const openDateInput = document.getElementById('babyFormulaCanModalOpenDate');
+      const endDateInput = document.getElementById('babyFormulaCanModalEndDate');
+      const notesInput = document.getElementById('babyFormulaCanModalNotes');
+      const titleSpan = document.getElementById('babyFormulaCanModalTitle');
+
+      const existing = (editId && btState && btState.feeding && Array.isArray(btState.feeding.formulaCans))
+        ? btState.feeding.formulaCans.find(c => c && c.id === editId)
+        : null;
+
+      if (existing) {
+        if (titleSpan) titleSpan.textContent = 'Editar Contador del Tarro';
+        if (brandInput) brandInput.value = existing.brand || '';
+        if (weightSelect) weightSelect.value = String(existing.weightGrams || 800);
+        if (durationInput) durationInput.value = existing.expectedDays || 15;
+        if (openDateInput) openDateInput.value = existing.openDate || defaultDate;
+        if (endDateInput && existing.endDate) {
+          endDateInput.value = existing.endDate;
+          updateFormulaCanDurationFromEndDate();
+        } else {
+          updateFormulaCanEndDatePreview();
+        }
+        if (notesInput) notesInput.value = existing.notes || '';
+      } else {
+        if (titleSpan) titleSpan.textContent = 'Abrir Nuevo Tarro de Leche';
+        if (weightSelect) weightSelect.value = '800';
+        if (durationInput) durationInput.value = '15';
+        if (openDateInput) openDateInput.value = defaultDate;
+        updateFormulaCanEndDatePreview();
+      }
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeBabyFormulaCanModal() {
+      const modal = document.getElementById('babyFormulaCanModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function saveBabyFormulaCanFromModal(e) {
+      e.preventDefault();
+      const { store, baby: btState, name: bName } = getActiveBabyObjectSafe();
+      if (!btState) {
+        showToast('Error', 'No se encontró el registro del bebé.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
+
+      const editId = document.getElementById('babyFormulaCanModalEditId')?.value || '';
+      const brand = (document.getElementById('babyFormulaCanModalBrand')?.value || '').trim() || 'Tarro de Leche';
+      const weightGrams = parseInt(document.getElementById('babyFormulaCanModalWeight')?.value, 10) || 800;
+      const expectedDays = Math.max(1, parseInt(document.getElementById('babyFormulaCanModalDuration')?.value, 10) || 15);
+      const openDate = document.getElementById('babyFormulaCanModalOpenDate')?.value || formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const endDate = document.getElementById('babyFormulaCanModalEndDate')?.value || '';
+      const notes = (document.getElementById('babyFormulaCanModalNotes')?.value || '').trim();
+
+      if (!btState.feeding) btState.feeding = { milkGoalMl: 600, entries: [], milkPickups: [], formulaCans: [] };
+      if (!Array.isArray(btState.feeding.formulaCans)) btState.feeding.formulaCans = [];
+
+      const existingIdx = editId ? btState.feeding.formulaCans.findIndex(c => c && c.id === editId) : -1;
+      if (existingIdx >= 0) {
+        const prev = btState.feeding.formulaCans[existingIdx];
+        btState.feeding.formulaCans[existingIdx] = {
+          ...prev,
+          brand,
+          weightGrams,
+          expectedDays,
+          openDate,
+          endDate,
+          notes
+        };
+      } else {
+        // Si abre un nuevo tarro, marcar cualquier tarro activo anterior como terminado hoy
+        const todayIso = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        btState.feeding.formulaCans.forEach(c => {
+          if (c && c.status === 'active') {
+            c.status = 'finished';
+            if (!c.finishedDate) c.finishedDate = openDate || todayIso;
+          }
+        });
+
+        btState.feeding.formulaCans.push({
+          id: 'can_' + Date.now(),
+          brand,
+          weightGrams,
+          expectedDays,
+          openDate,
+          endDate,
+          finishedDate: '',
+          status: 'active',
+          notes
+        });
+      }
+
+      persistBabyTrackerStoreSafe(store);
+      closeBabyFormulaCanModal();
+      renderAll();
+
+      showToast(existingIdx >= 0 ? 'Tarro Actualizado' : 'Contador de Tarro Iniciado', `${brand} (${weightGrams}g) abierto el ${openDate}.`, 'fa-jar', 'text-sky-400');
+    }
+
+    // 3D. MODAL INDIVIDUAL: COMPRA / INGRESO DE PAÑALES EN INVENTARIO
+    function updateDiaperPurchaseTotalPreview() {
+      const packs = Math.max(1, parseInt(document.getElementById('babyDiaperPurchaseModalPacks')?.value, 10) || 1);
+      const unitsPerPack = Math.max(1, parseInt(document.getElementById('babyDiaperPurchaseModalUnitsPerPack')?.value, 10) || 40);
+      const total = packs * unitsPerPack;
+      const previewEl = document.getElementById('babyDiaperPurchaseTotalPreviewText');
+      if (previewEl) {
+        previewEl.textContent = `+${total} ${total === 1 ? 'unidad' : 'unidades'}`;
+      }
+    }
+
+    function openBabyDiaperPurchaseModal(presetDateKey = null, editId = null) {
+      closeBabyRegistrationChooser();
+      const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
+
+      const modal = document.getElementById('babyDiaperPurchaseModal');
+      const form = document.getElementById('babyDiaperPurchaseModalForm');
+      if (form) form.reset();
+
+      const nameInput = document.getElementById('babyDiaperPurchaseModalBabyName');
+      if (nameInput) nameInput.value = `👶 ${babyName}`;
+
+      const editInput = document.getElementById('babyDiaperPurchaseModalEditId');
+      if (editInput) editInput.value = editId || '';
+
+      const fallbackDate = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const defaultDate = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
+
+      const dateInput = document.getElementById('babyDiaperPurchaseModalDate');
+      const sizeSelect = document.getElementById('babyDiaperPurchaseModalSize');
+      const packsInput = document.getElementById('babyDiaperPurchaseModalPacks');
+      const unitsInput = document.getElementById('babyDiaperPurchaseModalUnitsPerPack');
+      const brandInput = document.getElementById('babyDiaperPurchaseModalBrand');
+      const notesInput = document.getElementById('babyDiaperPurchaseModalNotes');
+      const titleSpan = document.getElementById('babyDiaperPurchaseModalTitle');
+
+      const existing = (editId && btState && btState.diapers && Array.isArray(btState.diapers.purchases))
+        ? btState.diapers.purchases.find(p => p && p.id === editId)
+        : null;
+
+      if (existing) {
+        if (titleSpan) titleSpan.textContent = 'Editar Ingreso de Pañales';
+        if (dateInput) dateInput.value = existing.date || defaultDate;
+        if (sizeSelect) sizeSelect.value = existing.size || 'M';
+        if (packsInput) packsInput.value = existing.packs || 1;
+        if (unitsInput) unitsInput.value = existing.unitsPerPack || existing.quantity || 40;
+        if (brandInput) brandInput.value = existing.brand || '';
+        if (notesInput) notesInput.value = existing.notes || '';
+      } else {
+        if (titleSpan) titleSpan.textContent = 'Agregar Pañales al Stock';
+        if (dateInput) dateInput.value = defaultDate;
+        if (sizeSelect) sizeSelect.value = 'M';
+        if (packsInput) packsInput.value = 1;
+        if (unitsInput) unitsInput.value = 40;
+      }
+      updateDiaperPurchaseTotalPreview();
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeBabyDiaperPurchaseModal() {
+      const modal = document.getElementById('babyDiaperPurchaseModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function saveBabyDiaperPurchaseFromModal(e) {
+      e.preventDefault();
+      const { store, baby: btState, name: bName } = getActiveBabyObjectSafe();
+      if (!btState) {
+        showToast('Error', 'No se encontró el registro del bebé.', 'fa-triangle-exclamation', 'text-amber-400');
+        return;
+      }
+
+      const editId = document.getElementById('babyDiaperPurchaseModalEditId')?.value || '';
+      const date = document.getElementById('babyDiaperPurchaseModalDate')?.value || formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const size = document.getElementById('babyDiaperPurchaseModalSize')?.value || 'M';
+      const packs = Math.max(1, parseInt(document.getElementById('babyDiaperPurchaseModalPacks')?.value, 10) || 1);
+      const unitsPerPack = Math.max(1, parseInt(document.getElementById('babyDiaperPurchaseModalUnitsPerPack')?.value, 10) || 40);
+      const quantity = packs * unitsPerPack;
+      const brand = (document.getElementById('babyDiaperPurchaseModalBrand')?.value || '').trim() || 'Pañales';
+      const notes = (document.getElementById('babyDiaperPurchaseModalNotes')?.value || '').trim();
+
+      if (!btState.diapers) btState.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+      if (!Array.isArray(btState.diapers.purchases)) btState.diapers.purchases = [];
+
+      const record = {
+        id: editId || ('dp_' + Date.now()),
+        date,
+        size,
+        packs,
+        unitsPerPack,
+        quantity,
+        brand,
+        notes
+      };
+
+      const existingIdx = editId ? btState.diapers.purchases.findIndex(p => p && p.id === editId) : -1;
+      if (existingIdx >= 0) {
+        btState.diapers.purchases[existingIdx] = record;
+      } else {
+        btState.diapers.purchases.push(record);
+      }
+
+      persistBabyTrackerStoreSafe(store);
+      closeBabyDiaperPurchaseModal();
+      renderAll();
+
+      showToast(existingIdx >= 0 ? 'Stock de Pañales Actualizado' : 'Pañales Sumados al Stock', `+${quantity} pañales (${brand} Talla ${size}) para ${bName}.`, 'fa-box-open', 'text-teal-400');
     }
 
     // 4. MODAL INDIVIDUAL: PAÑAL DEL BEBÉ
@@ -8979,6 +9592,39 @@ Check your Browserslist config to be sure that your targets are set up correctly
               }
             });
 
+            if (incBaby.feeding && Array.isArray(incBaby.feeding.milkPickups)) {
+              if (!matchBaby.feeding) matchBaby.feeding = { entries: [], milkPickups: [], formulaCans: [] };
+              if (!Array.isArray(matchBaby.feeding.milkPickups)) matchBaby.feeding.milkPickups = [];
+              incBaby.feeding.milkPickups.forEach(mp => {
+                if (mp && !matchBaby.feeding.milkPickups.some(x => x && x.id === mp.id)) {
+                  matchBaby.feeding.milkPickups.push(JSON.parse(JSON.stringify(mp)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            if (incBaby.feeding && Array.isArray(incBaby.feeding.formulaCans)) {
+              if (!matchBaby.feeding) matchBaby.feeding = { entries: [], milkPickups: [], formulaCans: [] };
+              if (!Array.isArray(matchBaby.feeding.formulaCans)) matchBaby.feeding.formulaCans = [];
+              incBaby.feeding.formulaCans.forEach(fc => {
+                if (fc && !matchBaby.feeding.formulaCans.some(x => x && x.id === fc.id)) {
+                  matchBaby.feeding.formulaCans.push(JSON.parse(JSON.stringify(fc)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            if (incBaby.diapers && Array.isArray(incBaby.diapers.purchases)) {
+              if (!matchBaby.diapers) matchBaby.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+              if (!Array.isArray(matchBaby.diapers.purchases)) matchBaby.diapers.purchases = [];
+              incBaby.diapers.purchases.forEach(dp => {
+                if (dp && !matchBaby.diapers.purchases.some(x => x && x.id === dp.id)) {
+                  matchBaby.diapers.purchases.push(JSON.parse(JSON.stringify(dp)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
             // Fusionar vacunas completadas
             if (incBaby.health && Array.isArray(incBaby.health.vaccines) && Array.isArray(matchBaby.health.vaccines)) {
               incBaby.health.vaccines.forEach(v => {
@@ -9396,6 +10042,102 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
+  <!-- BARRA FLOTANTE GLOBAL CUANDO EL CRONÓMETRO DE SUEÑO ESTÁ ACTIVO Y MINIMIZADO -->
+  <div id="btLiveSleepFloatingBanner" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] hidden w-[94%] max-w-md bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-400/50 rounded-2xl px-3.5 py-2.5 shadow-2xl items-center justify-between gap-2">
+    <button type="button" id="btOpenLiveSleepScreenFromBannerBtn" class="flex items-center gap-2.5 min-w-0 flex-1 text-left">
+      <span class="relative flex h-3 w-3 shrink-0">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <span id="btLiveSleepBannerTitle" class="text-[10px] font-black uppercase tracking-wider text-indigo-300 block truncate">😴 Durmiendo en vivo</span>
+        <span id="btLiveSleepBannerClock" class="text-sm font-black font-mono text-white tracking-wider">00:00:00</span>
+      </div>
+    </button>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button type="button" id="btBannerExpandSleepBtn" class="px-2.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 rounded-xl text-[10px] font-bold active:scale-95">
+        Ver pantalla
+      </button>
+      <button type="button" id="btBannerStopSleepBtn" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[10px] font-black shadow active:scale-95">
+        ⏹️ Detener
+      </button>
+    </div>
+  </div>
+
+  <!-- PANTALLA / MODAL DE CRONÓMETRO DE SUEÑO EN VIVO (Se abre al activar o al volver a abrir la app) -->
+  <div id="btLiveSleepScreenModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md hidden items-center justify-center p-4 z-[95]">
+    <div class="bg-gradient-to-b from-[#172036] via-[#0f172a] to-[#090d16] text-slate-100 rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-indigo-500/50 space-y-4 text-center relative overflow-hidden">
+      <!-- Cabecera de estado en vivo -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-200 text-[10px] font-black uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Cronómetro de Sueño en Vivo</span>
+        </div>
+        <button type="button" id="btLiveSleepCloseTopBtn" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/70 border border-slate-700/70 text-xs" title="Minimizar pantalla">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Icono animado y datos del bebé -->
+      <div class="pt-1 space-y-1.5">
+        <div id="btLiveSleepIconCircle" class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-3xl shadow-inner">
+          🌙
+        </div>
+        <h3 id="btLiveSleepBabyLabel" class="text-base font-black text-white tracking-tight">Bebé durmiendo</h3>
+        <div class="flex items-center justify-center gap-2">
+          <span id="btLiveSleepTypeBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40">
+            ☀️ Siesta en curso
+          </span>
+        </div>
+      </div>
+
+      <!-- Reloj digital principal en vivo -->
+      <div class="py-4 px-3 rounded-2xl bg-slate-950/90 border border-indigo-500/40 shadow-inner space-y-1">
+        <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold block">Tiempo Transcurrido</span>
+        <div id="btLiveSleepClockDisplay" class="text-4xl sm:text-5xl font-black font-mono tracking-widest text-white py-1">
+          00:00:00
+        </div>
+        <p id="btLiveSleepHoursPreview" class="text-xs font-bold text-indigo-300">
+          0 min acumulados (0.1 h)
+        </p>
+      </div>
+
+      <!-- Detalles de hora de inicio -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <span class="text-[10px] text-slate-400 font-semibold block">🕒 Hora de inicio</span>
+          <strong id="btLiveSleepStartTime" class="text-xs font-black text-sky-300 block mt-0.5">--:--</strong>
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+          <span class="text-[10px] text-slate-400 font-semibold block">📅 Fecha de inicio</span>
+          <strong id="btLiveSleepStartDate" class="text-xs font-black text-emerald-300 capitalize block mt-0.5">Hoy</strong>
+        </div>
+      </div>
+
+      <!-- Nota opcional antes de detener -->
+      <div class="text-left">
+        <label for="btLiveSleepNoteInput" class="block text-[10px] font-bold text-slate-300 mb-1">📝 Nota opcional al despertar:</label>
+        <input type="text" id="btLiveSleepNoteInput" placeholder="Ej. Despertó tranquilo, durmió de corrido..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+      </div>
+
+      <!-- Botón principal para detener el cronómetro y guardar -->
+      <div class="space-y-2 pt-1">
+        <button type="button" id="btLiveSleepStopSaveBtn" class="w-full py-3.5 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-2xl text-sm font-black shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all">
+          <span>⏹️ Despertó · Detener y Guardar</span>
+        </button>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="btLiveSleepMinimizeBtn" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-bold active:scale-95">
+            Seguir en la app
+          </button>
+          <button type="button" id="btLiveSleepCancelTimerBtn" class="py-2 px-3 bg-slate-900 hover:bg-rose-950/50 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold active:scale-95">
+            Cancelar cronómetro
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function() {
       const BT_STORAGE_KEY = 'baby_tracker_multi_v1';
@@ -9448,7 +10190,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
             milkGoalMl: 600,
             waterGoalMl: 400,
             mealsGoal: 4,
-            entries: []
+            entries: [],
+            milkPickups: [],
+            formulaCans: [],
+            milkStockAdjustment: 0
           },
           development: {
             milestones: [
@@ -9462,7 +10207,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
             entries: []
           },
           diapers: {
-            entries: []
+            entries: [],
+            purchases: [],
+            stockAdjustment: 0
           },
           photos: [],
           growth: []
@@ -9562,10 +10309,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const rawFeeding = (b && b.feeding) || {};
           const feedingData = Object.assign({}, base.feeding, rawFeeding);
           feedingData.entries = sanitizeListWithDate(feedingData.entries);
+          feedingData.milkPickups = sanitizeListWithDate(feedingData.milkPickups);
+          feedingData.formulaCans = Array.isArray(rawFeeding.formulaCans)
+            ? rawFeeding.formulaCans.filter(c => c && typeof c === 'object')
+            : [];
 
           const rawDiapers = (b && b.diapers) || {};
           const diapersData = Object.assign({}, base.diapers, rawDiapers);
           diapersData.entries = sanitizeListWithDate(diapersData.entries);
+          diapersData.purchases = sanitizeListWithDate(diapersData.purchases);
+          diapersData.stockAdjustment = Number(rawDiapers.stockAdjustment) || 0;
 
           const rawSleep = (b && b.sleep) || {};
           const sleepData = Object.assign({}, base.sleep, rawSleep);
@@ -9600,7 +10353,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const t = tab.toLowerCase();
         if (t === 'inicio' || t === 'resumen' || t === 'cuidados' || t === 'alimentacion' || t === 'comida' || t === 'panales' || t === 'sueno') return 'cuidados';
         if (t === 'salud') return 'salud';
-        if (t === 'crecimiento' || t === 'desarrollo' || t === 'fotos' || t === 'curva') return 'crecimiento';
+        if (t === 'inventario' || t === 'crecimiento' || t === 'desarrollo' || t === 'fotos' || t === 'curva') return 'inventario';
         if (t === 'perfil') return 'perfil';
         return 'cuidados';
       }
@@ -10175,7 +10928,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         if (tab === 'cuidados') renderBtCuidados(container);
         else if (tab === 'salud') renderBtSalud(container);
-        else if (tab === 'crecimiento') renderBtCrecimiento(container);
+        else if (tab === 'inventario' || tab === 'crecimiento') renderBtInventario(container);
         else if (tab === 'perfil') renderBtPerfil(container);
         else renderBtCuidados(container);
 
@@ -10297,9 +11050,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       let btCuidadosSubTab = 'comida'; // 'comida' | 'panal' | 'sueno' | 'hitos'
-      let btCuidadosFeedSubTab = 'today'; // 'today' | 'stats'
+      let btCuidadosFeedSubTab = 'today'; // 'today' | 'stats' | 'pickup' | 'can'
       let btCuidadosFeedStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btCuidadosFeedStatsDate = new Date();
+      let btCuidadosPickupStatsMode = 'month'; // 'month' | 'year' | 'history'
+      let btCuidadosPickupStatsDate = new Date();
+      let btCuidadosCanStatsMode = 'month'; // 'month' | 'year' | 'history'
+      let btCuidadosCanStatsDate = new Date();
       let btCuidadosDiaperSubTab = 'today'; // 'today' | 'stats'
       let btCuidadosDiaperStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btCuidadosDiaperStatsDate = new Date();
@@ -10358,6 +11115,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             else if (f.kind === 'solid') pSolids += 1;
           });
 
+          const activeFeedTab = (btCuidadosFeedSubTab === 'stats') ? 'stats' : 'today';
+
           return `
             <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-amber-500/40 shadow-lg space-y-3">
               <div class="flex items-center justify-between flex-wrap gap-2">
@@ -10367,22 +11126,27 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   </h5>
                   <p class="text-[10px] text-slate-400">Tomas del día, comidas sólidas y estadísticas por mes, año e histórico</p>
                 </div>
-                <button type="button" onclick="openBabyFeedingModal('${activeDayKey}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
-                  <i class="fa-solid fa-plus"></i> Nueva Comida
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" data-bt-goto-inv="leche" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95" title="Ver Stock, Retiro y Contador de Leche">
+                    📦 Stock Leche
+                  </button>
+                  <button type="button" onclick="openBabyFeedingModal('${activeDayKey}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Nueva Comida
+                  </button>
+                </div>
               </div>
 
               <!-- Sub-pestañas: Hoy vs Historial y Estadísticas -->
               <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
-                <button type="button" data-bt-feed-subtab="today" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosFeedSubTab === 'today' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
+                <button type="button" data-bt-feed-subtab="today" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${activeFeedTab === 'today' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Hoy (${todayFeed.length})
                 </button>
-                <button type="button" data-bt-feed-subtab="stats" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosFeedSubTab === 'stats' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
+                <button type="button" data-bt-feed-subtab="stats" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${activeFeedTab === 'stats' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Historial y Estadísticas (${feedEntries.length})
                 </button>
               </div>
 
-              ${btCuidadosFeedSubTab === 'today' ? `
+              ${activeFeedTab === 'today' ? `
                 <div class="space-y-3">
                   <!-- Botones rápidos de toma -->
                   <div class="grid grid-cols-3 gap-1.5">
@@ -10498,8 +11262,34 @@ Check your Browserslist config to be sure that your targets are set up correctly
           `;
         };
 
-        // Sub-vista 2: PAÑALES
+        // Sub-vista 2: PAÑALES (Incorpora Stock y Control de Pañales + Cambios del Día + Estadísticas Mes/Año/Histórico)
         const renderPanalPanel = () => {
+          const diaperPurchases = Array.isArray(btState.diapers && btState.diapers.purchases) ? btState.diapers.purchases : [];
+          const diaperAdj = Number(btState.diapers && btState.diapers.stockAdjustment) || 0;
+
+          let totalDiapersPurchasedAll = 0;
+          diaperPurchases.forEach(p => {
+            if (!p) return;
+            totalDiapersPurchasedAll += Number(p.quantity) || ((Number(p.packs) || 1) * (Number(p.unitsPerPack) || 40));
+          });
+          const totalDiapersUsedAll = diaperEntries.length;
+          const currentDiaperStock = Math.max(0, totalDiapersPurchasedAll - totalDiapersUsedAll + diaperAdj);
+
+          const uniqueDiaperDays = new Set(diaperEntries.map(d => ensureEntryDate(d))).size;
+          const avgDailyDiapers = uniqueDiaperDays > 0
+            ? Math.round((totalDiapersUsedAll / uniqueDiaperDays) * 10) / 10
+            : 6;
+          const effectiveDailyRate = avgDailyDiapers > 0 ? avgDailyDiapers : 6;
+          const diaperDaysAutonomy = currentDiaperStock > 0 ? Math.floor(currentDiaperStock / effectiveDailyRate) : 0;
+
+          const [tY, tM, tD] = todayStr.split('-').map(Number);
+          let estimatedDepletionDateStr = '';
+          if (currentDiaperStock > 0) {
+            const depDate = new Date(tY, tM - 1, tD);
+            depDate.setDate(depDate.getDate() + diaperDaysAutonomy);
+            estimatedDepletionDateStr = formatDateKey(depDate.getFullYear(), depDate.getMonth(), depDate.getDate());
+          }
+
           const todayDiapers = diaperEntries
             .filter(d => d && ensureEntryDate(d) === activeDayKey)
             .slice()
@@ -10517,12 +11307,25 @@ Check your Browserslist config to be sure that your targets are set up correctly
             : String(selYear);
 
           let periodDiapers = diaperEntries.filter(Boolean).map(d => ({ ...d, _date: ensureEntryDate(d) }));
+          let periodPurchases = diaperPurchases.filter(Boolean).map(p => ({ ...p, _date: ensureEntryDate(p) }));
           if (btCuidadosDiaperStatsMode === 'month') {
             periodDiapers = periodDiapers.filter(d => d._date.slice(0, 7) === selMonthKey);
+            periodPurchases = periodPurchases.filter(p => p._date.slice(0, 7) === selMonthKey);
           } else if (btCuidadosDiaperStatsMode === 'year') {
             periodDiapers = periodDiapers.filter(d => Number(d._date.slice(0, 4)) === selYear);
+            periodPurchases = periodPurchases.filter(p => Number(p._date.slice(0, 4)) === selYear);
           }
           periodDiapers.sort((a, b) => `${b._date} ${b.time || '00:00'}`.localeCompare(`${a._date} ${a.time || '00:00'}`));
+          periodPurchases.sort((a, b) => b._date.localeCompare(a._date));
+
+          let periodAddedUnits = 0;
+          let periodPacksCount = 0;
+          periodPurchases.forEach(p => {
+            const packs = Number(p.packs) || 1;
+            const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
+            periodPacksCount += packs;
+            periodAddedUnits += units;
+          });
 
           const pWet = periodDiapers.filter(d => d.type === 'Mojado').length;
           const pDirty = periodDiapers.filter(d => d.type === 'Sucio').length;
@@ -10535,11 +11338,58 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <h5 class="text-xs font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
                     <i class="fa-solid fa-baby"></i> Control y Estadísticas de Pañales
                   </h5>
-                  <p class="text-[10px] text-slate-400">Cambios del día e historial por mes, año e histórico</p>
+                  <p class="text-[10px] text-slate-400">Stock disponible, control de paquetes, cambios del día y estadísticas</p>
                 </div>
-                <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
-                  <i class="fa-solid fa-plus"></i> Nuevo Pañal
-                </button>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button type="button" onclick="openBabyDiaperPurchaseModal('${activeDayKey}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95">
+                    <i class="fa-solid fa-box-open"></i> +Paquete
+                  </button>
+                  <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Nuevo Pañal
+                  </button>
+                </div>
+              </div>
+
+              <!-- BLOQUE INTEGRADO: STOCK Y CONTROL DE PAÑALES -->
+              <div class="p-3 rounded-2xl bg-slate-900/90 border border-teal-500/35 space-y-2.5">
+                <div class="flex items-center justify-between flex-wrap gap-1.5">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                    📦 Stock y Control de Pañales
+                  </span>
+                  <span class="text-[10px] text-slate-400">Se descuenta automáticamente con cada pañal registrado</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                  <div class="bg-slate-950/80 p-2 rounded-xl border ${currentDiaperStock <= 15 ? 'border-rose-500/50 bg-rose-950/25' : 'border-teal-500/40'}">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Disponibles Hoy</span>
+                    <strong class="text-sm font-black ${currentDiaperStock <= 15 ? 'text-rose-400' : 'text-teal-300'}">${currentDiaperStock} u.</strong>
+                  </div>
+                  <div class="bg-slate-950/80 p-2 rounded-xl border border-sky-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">⏳ Alcanzan para</span>
+                    <strong class="text-sm font-black text-sky-300">${diaperDaysAutonomy} ${diaperDaysAutonomy === 1 ? 'día' : 'días'}</strong>
+                  </div>
+                  <div class="bg-slate-950/80 p-2 rounded-xl border border-amber-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">📊 Consumo Diario</span>
+                    <strong class="text-sm font-black text-amber-300">~${effectiveDailyRate}/día</strong>
+                  </div>
+                  <div class="bg-slate-950/80 p-2 rounded-xl border border-purple-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🏁 Duran hasta</span>
+                    <strong class="text-xs font-black text-purple-300 capitalize block mt-0.5">${estimatedDepletionDateStr ? escapeHtml(formatHealthControlDate(estimatedDepletionDateStr, { day: 'numeric', month: 'short' })) : 'Sin stock'}</strong>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-800/80">
+                  <div class="flex items-center gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 mr-1">Ajuste rápido:</span>
+                    <button type="button" data-bt-diaper-stock-adj="-5" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-5</button>
+                    <button type="button" data-bt-diaper-stock-adj="-1" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-1</button>
+                    <button type="button" data-bt-diaper-stock-adj="1" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+1</button>
+                    <button type="button" data-bt-diaper-stock-adj="10" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+10</button>
+                  </div>
+                  <button type="button" onclick="openBabyDiaperPurchaseModal('${activeDayKey}')" class="px-2.5 py-1 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold active:scale-95">
+                    📦 Agregar paquete de pañales
+                  </button>
+                </div>
               </div>
 
               <!-- Sub-pestañas: Hoy vs Historial y Estadísticas -->
@@ -10621,9 +11471,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     </div>
                   ` : ''}
 
-                  <div class="grid grid-cols-4 gap-2 text-center">
+                  <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                    <div class="bg-slate-900/90 p-2 rounded-xl border border-emerald-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">📦 Ingresados</span>
+                      <strong class="text-sm font-black text-emerald-300">+${periodAddedUnits} u. <span class="text-[9px] text-slate-400 font-normal">(${periodPacksCount} paq.)</span></strong>
+                    </div>
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-teal-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Total</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🚼 Usados</span>
                       <strong class="text-sm font-black text-teal-300">${periodDiapers.length}</strong>
                     </div>
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-sky-500/30">
@@ -10634,13 +11488,43 @@ Check your Browserslist config to be sure that your targets are set up correctly
                       <span class="text-[10px] text-slate-400 font-semibold block">💩 Sucios</span>
                       <strong class="text-sm font-black text-amber-300">${pDirty}</strong>
                     </div>
-                    <div class="bg-slate-900/90 p-2 rounded-xl border border-purple-500/30">
+                    <div class="col-span-2 sm:col-span-1 bg-slate-900/90 p-2 rounded-xl border border-purple-500/30">
                       <span class="text-[10px] text-slate-400 font-semibold block">✨ Ambos</span>
                       <strong class="text-sm font-black text-purple-300">${pBoth}</strong>
                     </div>
                   </div>
 
+                  ${periodPurchases.length > 0 ? `
+                    <div class="space-y-1.5 pt-1">
+                      <h6 class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Paquetes Ingresados en este Periodo (${periodPurchases.length})</h6>
+                      ${periodPurchases.map(p => {
+                        const packs = Number(p.packs) || 1;
+                        const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
+                        return `
+                          <div class="p-2.5 rounded-xl bg-slate-900 border border-teal-500/30 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                              <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">📦</span>
+                              <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                  <span class="font-bold text-slate-100">${escapeHtml(p.brand || 'Pañales')}</span>
+                                  <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Talla ${escapeHtml(p.size || 'M')}</span>
+                                  <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">+${units} u. (${packs} paq.)</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-0.5 capitalize">📅 ${escapeHtml(formatHealthControlDate(p._date))}${p.notes ? ` · ${escapeHtml(p.notes)}` : ''}</p>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                              <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
+                              <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  ` : ''}
+
                   <div class="space-y-1.5">
+                    <h6 class="text-[10px] font-black uppercase tracking-wider text-slate-400">🚼 Cambios de Pañal en este Periodo (${periodDiapers.length})</h6>
                     ${periodDiapers.length > 0 ? periodDiapers.map(dp => `
                       <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -10731,6 +11615,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     <button type="button" data-bt-start-sleep="Siesta" class="px-2.5 py-1 bg-sky-600/30 hover:bg-sky-600/50 text-sky-200 border border-sky-500/40 rounded-lg text-[10px] font-bold">☀️ Iniciar Siesta</button>
                     <button type="button" data-bt-start-sleep="Nocturno" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 rounded-lg text-[10px] font-bold">🌙 Iniciar Noche</button>
                   ` : `
+                    <button type="button" data-bt-open-live-sleep="1" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold shadow">🖥️ Pantalla</button>
                     <button type="button" id="btStopSleepBtn" class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-bold shadow animate-pulse">⏹️ Despertó (Guardar)</button>
                   `}
                 </div>
@@ -11919,28 +12804,658 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
       window.closeBtVaccineModal = closeBtVaccineModal;
 
-      function renderBtCrecimiento(container) {
+      let btInventarioSubTab = 'leche'; // 'leche' | 'panales'
+      let btInvDiaperStatsMode = 'month'; // 'month' | 'year' | 'history'
+      let btInvDiaperStatsDate = new Date();
+
+      function renderBtInventario(container) {
         const btState = getCurrentBaby();
-        const dev = getBtDevStats(btState);
-        const sub = btCrecimientoFilter || 'chart';
+        const todayStr = getTodayDateKey();
+        const activeDayKey = btSelectedDateKey || todayStr;
+        const [tY, tM, tD] = todayStr.split('-').map(Number);
+        const todayUtc = Date.UTC(tY, tM - 1, tD);
 
-        container.innerHTML = `
-          <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs shadow-inner">
-            <button type="button" data-bt-growth-sub="chart" class="py-1.5 px-1 rounded-lg font-bold ${sub === 'chart' ? 'bg-sky-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">📈 Curva</button>
-            <button type="button" data-bt-growth-sub="milestones" class="py-1.5 px-1 rounded-lg font-bold ${sub === 'milestones' ? 'bg-sky-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">🧸 Hitos (${dev.done}/${dev.total})</button>
-            <button type="button" data-bt-growth-sub="photos" class="py-1.5 px-1 rounded-lg font-bold ${sub === 'photos' ? 'bg-sky-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">📸 Recuerdos (${btState.photos.length})</button>
-          </div>
+        const milkPickups = Array.isArray(btState.feeding && btState.feeding.milkPickups) ? btState.feeding.milkPickups : [];
+        const formulaCans = Array.isArray(btState.feeding && btState.feeding.formulaCans) ? btState.feeding.formulaCans : [];
+        const milkAdj = Number(btState.feeding && btState.feeding.milkStockAdjustment) || 0;
 
-          ${sub === 'chart' ? renderBtCrecimientoChartSection(btState) : ''}
-          ${sub === 'milestones' ? renderBtMilestonesSection(btState) : ''}
-          ${sub === 'photos' ? renderBtPhotosSection(btState) : ''}
-        `;
+        const diaperEntries = Array.isArray(btState.diapers && btState.diapers.entries) ? btState.diapers.entries : [];
+        const diaperPurchases = Array.isArray(btState.diapers && btState.diapers.purchases) ? btState.diapers.purchases : [];
+        const diaperAdj = Number(btState.diapers && btState.diapers.stockAdjustment) || 0;
 
-        if (sub === 'chart' && btState.growth.length > 0) {
-          initBtGrowthChart(btState);
+        // Cálculos de Stock de Leche
+        let allTotalCansPicked = 0;
+        let allTotalGramsPicked = 0;
+        milkPickups.forEach(mp => {
+          if (!mp) return;
+          const c = Number(mp.cans) || 1;
+          const g = Number(mp.gramsPerCan) || 800;
+          allTotalCansPicked += c;
+          allTotalGramsPicked += c * g;
+        });
+
+        const activeCan = formulaCans.find(c => c && c.status === 'active') || null;
+        const finishedCansAll = formulaCans.filter(c => c && c.status === 'finished');
+        const openedOrFinishedCount = formulaCans.length;
+        const sealedCansInStock = Math.max(0, allTotalCansPicked - openedOrFinishedCount + milkAdj);
+
+        const calcCanMetrics = (can) => {
+          const openIso = (can && can.openDate && /^\d{4}-\d{2}-\d{2}$/.test(can.openDate)) ? can.openDate : todayStr;
+          const [oY, oM, oD] = openIso.split('-').map(Number);
+          const openUtc = Date.UTC(oY, oM - 1, oD);
+          const expectedDays = Math.max(1, Number(can && can.expectedDays) || 15);
+
+          let endIso = can && can.endDate && /^\d{4}-\d{2}-\d{2}$/.test(can.endDate) ? can.endDate : '';
+          if (!endIso) {
+            const endD = new Date(oY, oM - 1, oD);
+            endD.setDate(endD.getDate() + expectedDays);
+            endIso = formatDateKey(endD.getFullYear(), endD.getMonth(), endD.getDate());
+          }
+          const [eY, eM, eD] = endIso.split('-').map(Number);
+          const endUtc = Date.UTC(eY, eM - 1, eD);
+
+          if (can && can.status === 'finished') {
+            const finIso = (can.finishedDate && /^\d{4}-\d{2}-\d{2}$/.test(can.finishedDate)) ? can.finishedDate : endIso;
+            const [fY, fM, fD] = finIso.split('-').map(Number);
+            const finUtc = Date.UTC(fY, fM - 1, fD);
+            const lastedDays = Math.max(1, Math.round((finUtc - openUtc) / 86400000));
+            return { openIso, endIso, finIso, expectedDays, elapsedDays: lastedDays, remainingDays: 0, lastedDays, pctUsed: 100 };
+          }
+
+          const elapsedDays = Math.max(0, Math.round((todayUtc - openUtc) / 86400000));
+          const totalSpanDays = Math.max(1, Math.round((endUtc - openUtc) / 86400000));
+          const remainingDays = Math.round((endUtc - todayUtc) / 86400000);
+          const pctUsed = Math.min(100, Math.max(0, Math.round((elapsedDays / totalSpanDays) * 100)));
+          return { openIso, endIso, finIso: '', expectedDays: totalSpanDays, elapsedDays, remainingDays, lastedDays: elapsedDays, pctUsed };
+        };
+
+        const activeCanMetrics = activeCan ? calcCanMetrics(activeCan) : null;
+        const avgCanDurationDays = finishedCansAll.length > 0
+          ? Math.round(finishedCansAll.reduce((acc, c) => acc + calcCanMetrics(c).lastedDays, 0) / finishedCansAll.length)
+          : (activeCanMetrics ? activeCanMetrics.expectedDays : 15);
+
+        const totalStockAutonomyDays = (sealedCansInStock * avgCanDurationDays) + (activeCanMetrics ? Math.max(0, activeCanMetrics.remainingDays) : 0);
+        const activeCanRemainingGrams = activeCan && activeCanMetrics
+          ? Math.round(((Number(activeCan.weightGrams) || 800) * Math.max(0, 100 - activeCanMetrics.pctUsed)) / 100)
+          : 0;
+        const estimatedStockGrams = (sealedCansInStock * 800) + activeCanRemainingGrams;
+
+        // Cálculos de Stock de Pañales
+        let totalDiapersPurchasedAll = 0;
+        diaperPurchases.forEach(p => {
+          if (!p) return;
+          totalDiapersPurchasedAll += Number(p.quantity) || ((Number(p.packs) || 1) * (Number(p.unitsPerPack) || 40));
+        });
+        const totalDiapersUsedAll = diaperEntries.length;
+        const currentDiaperStock = Math.max(0, totalDiapersPurchasedAll - totalDiapersUsedAll + diaperAdj);
+
+        // Promedio diario de pañales usados
+        const uniqueDiaperDays = new Set(diaperEntries.map(d => ensureEntryDate(d))).size;
+        const avgDailyDiapers = uniqueDiaperDays > 0
+          ? Math.round((totalDiapersUsedAll / uniqueDiaperDays) * 10) / 10
+          : 6;
+        const effectiveDailyRate = avgDailyDiapers > 0 ? avgDailyDiapers : 6;
+        const diaperDaysAutonomy = currentDiaperStock > 0 ? Math.floor(currentDiaperStock / effectiveDailyRate) : 0;
+
+        let estimatedDepletionDateStr = '';
+        if (currentDiaperStock > 0) {
+          const depDate = new Date(tY, tM - 1, tD);
+          depDate.setDate(depDate.getDate() + diaperDaysAutonomy);
+          estimatedDepletionDateStr = formatDateKey(depDate.getFullYear(), depDate.getMonth(), depDate.getDate());
         }
 
-        attachBtGrowthListeners(btState, sub);
+        // Sub-panel 1: INVENTARIO DE LECHE (Stock Actual + Contador del Tarro + Retiro de Leche Mes/Año/Histórico)
+        const renderLecheInventoryPanel = () => {
+          const pSelYear = btCuidadosPickupStatsDate.getFullYear();
+          const pSelMonth = btCuidadosPickupStatsDate.getMonth();
+          const pSelMonthKey = formatDateKey(pSelYear, pSelMonth, 1).slice(0, 7);
+          const pickupPeriodTitle = btCuidadosPickupStatsMode === 'month'
+            ? `${monthNames[pSelMonth]} ${pSelYear}`
+            : String(pSelYear);
+
+          let periodPickups = milkPickups.filter(Boolean).map(mp => ({ ...mp, _date: ensureEntryDate(mp) }));
+          if (btCuidadosPickupStatsMode === 'month') {
+            periodPickups = periodPickups.filter(mp => mp._date.slice(0, 7) === pSelMonthKey);
+          } else if (btCuidadosPickupStatsMode === 'year') {
+            periodPickups = periodPickups.filter(mp => Number(mp._date.slice(0, 4)) === pSelYear);
+          }
+          periodPickups.sort((a, b) => b._date.localeCompare(a._date));
+
+          let periodCansPicked = 0;
+          let periodGramsPicked = 0;
+          periodPickups.forEach(mp => {
+            const c = Number(mp.cans) || 1;
+            const g = Number(mp.gramsPerCan) || 800;
+            periodCansPicked += c;
+            periodGramsPicked += c * g;
+          });
+          const periodKgPicked = (periodGramsPicked / 1000).toFixed(1).replace(/\.0$/, '');
+
+          const allSortedPickups = milkPickups
+            .filter(Boolean)
+            .map(mp => ({ ...mp, _date: ensureEntryDate(mp) }))
+            .sort((a, b) => b._date.localeCompare(a._date));
+          const latestPickup = allSortedPickups[0] || null;
+          const nextPickupDateStr = latestPickup && latestPickup.nextDate ? latestPickup.nextDate : '';
+          let nextPickupDaysDiff = null;
+          if (nextPickupDateStr && /^\d{4}-\d{2}-\d{2}$/.test(nextPickupDateStr)) {
+            const [ny, nm, nd] = nextPickupDateStr.split('-').map(Number);
+            nextPickupDaysDiff = Math.round((Date.UTC(ny, nm - 1, nd) - todayUtc) / 86400000);
+          }
+
+          // Historial de tarros abiertos
+          const cSelYear = btCuidadosCanStatsDate.getFullYear();
+          const cSelMonth = btCuidadosCanStatsDate.getMonth();
+          const cSelMonthKey = formatDateKey(cSelYear, cSelMonth, 1).slice(0, 7);
+          const canPeriodTitle = btCuidadosCanStatsMode === 'month'
+            ? `${monthNames[cSelMonth]} ${cSelYear}`
+            : String(cSelYear);
+
+          let periodCans = formulaCans.filter(Boolean).map(c => ({
+            ...c,
+            _date: (c.openDate && /^\d{4}-\d{2}-\d{2}$/.test(c.openDate)) ? c.openDate : todayStr,
+            _metrics: calcCanMetrics(c)
+          }));
+          if (btCuidadosCanStatsMode === 'month') {
+            periodCans = periodCans.filter(c => c._date.slice(0, 7) === cSelMonthKey);
+          } else if (btCuidadosCanStatsMode === 'year') {
+            periodCans = periodCans.filter(c => Number(c._date.slice(0, 4)) === cSelYear);
+          }
+          periodCans.sort((a, b) => b._date.localeCompare(a._date));
+
+          return `
+            <div class="space-y-3">
+              <!-- 1. TARJETA DE STOCK ACTUAL DE LECHE -->
+              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-amber-500/40 shadow-lg space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-boxes-stacked"></i> Stock Actual de Leche
+                    </h5>
+                    <p class="text-[10px] text-slate-400">Tarros sellados disponibles, tarro en uso y autonomía estimada</p>
+                  </div>
+                  <div class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-xl border border-slate-700">
+                    <span class="text-[10px] text-slate-400 font-bold mr-1">Ajustar sellados:</span>
+                    <button type="button" data-bt-milk-stock-adj="-1" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs flex items-center justify-center active:scale-95">−</button>
+                    <span class="text-xs font-black text-white px-1.5">${sealedCansInStock}</span>
+                    <button type="button" data-bt-milk-stock-adj="1" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-xs flex items-center justify-center active:scale-95">+</button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border ${sealedCansInStock === 0 ? 'border-rose-500/40 bg-rose-950/20' : 'border-amber-500/30'}">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🥫 Tarros Sellados</span>
+                    <strong class="text-base font-black ${sealedCansInStock === 0 ? 'text-rose-300' : 'text-amber-300'}">${sealedCansInStock} ${sealedCansInStock === 1 ? 'tarro' : 'tarros'}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-sky-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🍼 Tarro en Uso</span>
+                    <strong class="text-base font-black text-sky-300">${activeCan && activeCanMetrics ? `${100 - activeCanMetrics.pctUsed}% libre` : 'Ninguno'}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-emerald-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">⏳ Stock alcanza para</span>
+                    <strong class="text-base font-black text-emerald-400">~${totalStockAutonomyDays} días</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-purple-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">⚖️ Leche Estimada</span>
+                    <strong class="text-base font-black text-purple-300">${(estimatedStockGrams / 1000).toFixed(1).replace(/\.0$/, '')} kg</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. CONTADOR DEL TARRO DESDE LA FECHA QUE SE ABRIÓ HASTA CUÁNDO LE DURA -->
+              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-sky-500/40 shadow-lg space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="text-xs font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-jar"></i> Contador del Tarro de Leche
+                    </h5>
+                    <p class="text-[10px] text-slate-400">Control desde la fecha en que se abrió hasta cuándo le dura</p>
+                  </div>
+                  <button type="button" onclick="openBabyFormulaCanModal('${todayStr}')" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Abrir Tarro
+                  </button>
+                </div>
+
+                ${activeCan && activeCanMetrics ? `
+                  <div class="p-3.5 rounded-2xl bg-gradient-to-br from-sky-950/60 via-slate-900 to-slate-900 border border-sky-500/50 space-y-3">
+                    <div class="flex items-start justify-between gap-2 flex-wrap">
+                      <div class="flex items-center gap-2.5">
+                        <span class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-xl shrink-0">🥫</span>
+                        <div>
+                          <div class="flex items-center gap-1.5 flex-wrap">
+                            <h6 class="text-sm font-black text-white">${escapeHtml(activeCan.brand)}</h6>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40">${escapeHtml(activeCan.weightGrams || 800)} g</span>
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ABIERTO</span>
+                          </div>
+                          <p class="text-[11px] text-slate-300 mt-0.5">Quedan aprox. <strong>${activeCanRemainingGrams} g</strong> disponibles en este tarro</p>
+                        </div>
+                      </div>
+                      <button type="button" onclick="openBabyFormulaCanModal('${activeCanMetrics.openIso}', '${escapeHtml(activeCan.id)}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-pen"></i> Editar
+                      </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                      <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
+                        <span class="text-[10px] text-slate-400 font-semibold block">📅 Fecha en que se abrió</span>
+                        <strong class="text-xs font-black text-sky-300 capitalize block mt-0.5">${escapeHtml(formatHealthControlDate(activeCanMetrics.openIso, { day: 'numeric', month: 'short', year: 'numeric' }))}</strong>
+                      </div>
+                      <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800">
+                        <span class="text-[10px] text-slate-400 font-semibold block">🏁 Hasta cuándo le dura</span>
+                        <strong class="text-xs font-black text-emerald-300 capitalize block mt-0.5">${escapeHtml(formatHealthControlDate(activeCanMetrics.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}</strong>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                      <div class="p-2.5 rounded-xl bg-slate-900/90 border border-sky-500/30">
+                        <span class="text-[10px] text-slate-400 font-semibold block">⏱️ Lleva abierto</span>
+                        <strong class="text-base font-black text-sky-300">${activeCanMetrics.elapsedDays} ${activeCanMetrics.elapsedDays === 1 ? 'día' : 'días'}</strong>
+                      </div>
+                      <div class="p-2.5 rounded-xl bg-slate-900/90 border ${activeCanMetrics.remainingDays <= 2 ? 'border-rose-500/50 bg-rose-950/20' : 'border-emerald-500/30'}">
+                        <span class="text-[10px] text-slate-400 font-semibold block">⏳ Le quedan</span>
+                        <strong class="text-base font-black ${activeCanMetrics.remainingDays < 0 ? 'text-rose-400' : (activeCanMetrics.remainingDays <= 2 ? 'text-amber-300' : 'text-emerald-400')}">
+                          ${activeCanMetrics.remainingDays >= 0 ? `${activeCanMetrics.remainingDays} ${activeCanMetrics.remainingDays === 1 ? 'día' : 'días'}` : `+${Math.abs(activeCanMetrics.remainingDays)}d extra`}
+                        </strong>
+                      </div>
+                      <div class="p-2.5 rounded-xl bg-slate-900/90 border border-purple-500/30">
+                        <span class="text-[10px] text-slate-400 font-semibold block">📊 Duración total</span>
+                        <strong class="text-base font-black text-purple-300">${activeCanMetrics.expectedDays} días</strong>
+                      </div>
+                    </div>
+
+                    <div class="space-y-1">
+                      <div class="flex justify-between text-[10px] font-bold">
+                        <span class="text-slate-300">Consumo del tarro actual</span>
+                        <span class="${activeCanMetrics.pctUsed >= 85 ? 'text-amber-300' : 'text-sky-300'}">${activeCanMetrics.pctUsed}% consumido (${Math.max(0, 100 - activeCanMetrics.pctUsed)}% restante)</span>
+                      </div>
+                      <div class="h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                        <div class="h-full transition-all duration-300 ${activeCanMetrics.pctUsed >= 90 ? 'bg-gradient-to-r from-amber-500 to-rose-500' : 'bg-gradient-to-r from-sky-500 to-emerald-400'}" style="width:${activeCanMetrics.pctUsed}%"></div>
+                      </div>
+                    </div>
+
+                    ${activeCan.notes ? `<p class="text-[11px] text-slate-300 italic bg-slate-950/50 p-2 rounded-lg border border-slate-800">"${escapeHtml(activeCan.notes)}"</p>` : ''}
+
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                      <button type="button" data-bt-finish-can="${escapeHtml(activeCan.id)}" class="py-2 px-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all">
+                        <i class="fa-solid fa-flag-checkered"></i> Se acabó hoy
+                      </button>
+                      <button type="button" onclick="openBabyFormulaCanModal('${todayStr}')" class="py-2 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow active:scale-95 transition-all">
+                        <i class="fa-solid fa-plus"></i> Abrir otro tarro
+                      </button>
+                    </div>
+                  </div>
+                ` : `
+                  <div class="p-4 rounded-2xl bg-slate-900/70 border border-slate-800 text-center space-y-2">
+                    <span class="text-2xl block">🥫</span>
+                    <p class="text-xs font-bold text-slate-200">No hay ningún tarro abierto en este momento</p>
+                    <p class="text-[11px] text-slate-400">Registra cuando abras un tarro para activar el contador de días desde su apertura hasta que se termine.</p>
+                    <button type="button" onclick="openBabyFormulaCanModal('${todayStr}')" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow active:scale-95">
+                      <i class="fa-solid fa-jar"></i> Iniciar Contador de Tarro
+                    </button>
+                  </div>
+                `}
+
+                ${periodCans.length > 0 ? `
+                  <div class="pt-2 border-t border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Historial de Tarros Abiertos (${periodCans.length})</span>
+                      <span class="text-[10px] text-slate-400">Promedio: <strong class="text-sky-300">${avgCanDurationDays} días/tarro</strong></span>
+                    </div>
+                    <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                      ${periodCans.map(c => {
+                        const m = c._metrics;
+                        const isAct = c.status === 'active';
+                        return `
+                          <div class="p-2.5 rounded-xl bg-slate-900 border ${isAct ? 'border-sky-500/40' : 'border-slate-800'} flex items-center justify-between gap-2 text-xs">
+                            <div class="min-w-0 flex-1">
+                              <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-slate-100">${escapeHtml(c.brand)} (${escapeHtml(c.weightGrams || 800)}g)</span>
+                                ${isAct
+                                  ? `<span class="text-[9px] px-1.5 py-0.2 rounded font-black bg-sky-500/20 text-sky-300 border border-sky-500/40">En uso · Día ${m.elapsedDays}/${m.expectedDays}</span>`
+                                  : `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Duró ${m.lastedDays} ${m.lastedDays === 1 ? 'día' : 'días'}</span>`
+                                }
+                              </div>
+                              <p class="text-[10px] text-slate-400 mt-0.5 capitalize">
+                                📅 Abierto: ${escapeHtml(formatHealthControlDate(m.openIso, { day: 'numeric', month: 'short', year: 'numeric' }))}
+                                · 🏁 ${isAct ? `Dura hasta: ${escapeHtml(formatHealthControlDate(m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}` : `Terminó: ${escapeHtml(formatHealthControlDate(m.finIso || m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}`}
+                              </p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                              <button type="button" onclick="openBabyFormulaCanModal('${m.openIso}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-sky-300"><i class="fa-solid fa-pen"></i></button>
+                              <button type="button" data-bt-del-can="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- 3. FECHA DE RETIRO DE LECHE CON HISTORIAL DE MES, AÑO E HISTÓRICO -->
+              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-amber-500/40 shadow-lg space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-box-open"></i> Fecha de Retiro de Leche e Historial
+                    </h5>
+                    <p class="text-[10px] text-slate-400">Control de fechas de retiro y estadísticas por mes, año e histórico</p>
+                  </div>
+                  <button type="button" onclick="openBabyMilkPickupModal('${activeDayKey}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Registrar Retiro
+                  </button>
+                </div>
+
+                ${latestPickup ? `
+                  <div class="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/40 flex items-center justify-between gap-2 flex-wrap text-xs">
+                    <div>
+                      <span class="text-[10px] text-amber-300 font-bold block">Último retiro: ${escapeHtml(formatHealthControlDate(latestPickup._date, { day: 'numeric', month: 'short', year: 'numeric' }))} (${escapeHtml(latestPickup.cans)} tarros)</span>
+                      ${nextPickupDateStr ? `
+                        <span class="text-[11px] text-emerald-300 font-black block mt-0.5 capitalize">
+                          ⏭️ Próximo retiro: ${escapeHtml(formatHealthControlDate(nextPickupDateStr, { day: 'numeric', month: 'short', year: 'numeric' }))}
+                          ${nextPickupDaysDiff !== null ? `(${nextPickupDaysDiff === 0 ? '¡Es hoy!' : (nextPickupDaysDiff > 0 ? `faltan ${nextPickupDaysDiff} días` : `hace ${Math.abs(nextPickupDaysDiff)} días`)})` : ''}
+                        </span>
+                      ` : ''}
+                    </div>
+                  </div>
+                ` : ''}
+
+                <!-- Selector Mes / Año / Histórico -->
+                <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+                  <button type="button" data-bt-pickup-mode="month" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosPickupStatsMode === 'month' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Mes</button>
+                  <button type="button" data-bt-pickup-mode="year" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosPickupStatsMode === 'year' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Año</button>
+                  <button type="button" data-bt-pickup-mode="history" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosPickupStatsMode === 'history' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Histórico</button>
+                </div>
+
+                ${btCuidadosPickupStatsMode !== 'history' ? `
+                  <div class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1.5">
+                    <button type="button" data-bt-pickup-period-delta="-1" class="min-h-8 min-w-8 text-amber-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h4 class="text-xs font-bold uppercase text-slate-200">${escapeHtml(pickupPeriodTitle)}</h4>
+                    <button type="button" data-bt-pickup-period-delta="1" class="min-h-8 min-w-8 text-amber-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                ` : ''}
+
+                <!-- KPIs del periodo -->
+                <div class="grid grid-cols-3 gap-2 text-center">
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">📦 Retiros</span>
+                    <strong class="text-sm font-black text-amber-300">${periodPickups.length}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-sky-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🥫 Tarros Retirados</span>
+                    <strong class="text-sm font-black text-sky-300">${periodCansPicked}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-emerald-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">⚖️ Total Leche</span>
+                    <strong class="text-sm font-black text-emerald-300">${periodKgPicked} kg <span class="text-[9px] font-normal text-slate-400">(${periodGramsPicked}g)</span></strong>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  ${periodPickups.length > 0 ? periodPickups.map(mp => {
+                    const c = Number(mp.cans) || 1;
+                    const g = Number(mp.gramsPerCan) || 800;
+                    return `
+                      <div class="p-3 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-between gap-2.5 text-xs">
+                        <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                          <span class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-center text-sm shrink-0">📦</span>
+                          <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                              <span class="font-extrabold text-slate-100">${escapeHtml(mp.brand || 'Leche / Fórmula')}</span>
+                              <span class="text-[10px] px-2 py-0.5 rounded-md font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                🥫 +${c} ${c === 1 ? 'tarro' : 'tarros'} (${g}g c/u)
+                              </span>
+                            </div>
+                            <p class="text-[11px] text-amber-200 font-semibold mt-1 capitalize">
+                              📅 Retirado el: ${escapeHtml(formatHealthControlDate(mp._date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))}
+                            </p>
+                            ${mp.nextDate ? `
+                              <p class="text-[10px] text-emerald-300 font-semibold mt-0.5 capitalize">
+                                ⏭️ Próximo retiro: ${escapeHtml(formatHealthControlDate(mp.nextDate, { day: 'numeric', month: 'short', year: 'numeric' }))}
+                              </p>
+                            ` : ''}
+                            ${mp.place ? `<p class="text-[10px] text-slate-300 mt-0.5">🏥 Lugar: ${escapeHtml(mp.place)}</p>` : ''}
+                            ${mp.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5">"${escapeHtml(mp.notes)}"</p>` : ''}
+                          </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 shrink-0">
+                          <button type="button" onclick="openBabyMilkPickupModal('${mp._date}', '${escapeHtml(mp.id)}')" class="p-1.5 text-slate-400 hover:text-amber-300 rounded" title="Editar retiro">
+                            <i class="fa-solid fa-pen"></i>
+                          </button>
+                          <button type="button" data-bt-del-milkpickup="${escapeHtml(mp.id)}" class="p-1.5 text-slate-500 hover:text-red-400 rounded" title="Eliminar retiro">
+                            <i class="fa-solid fa-trash-can"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }).join('') : `
+                    <div class="text-center py-5 bg-slate-900/50 rounded-xl border border-slate-800 space-y-1">
+                      <span class="text-2xl block">📦</span>
+                      <p class="text-xs text-slate-400">No hay retiros de leche registrados en este periodo.</p>
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        };
+
+        // Sub-panel 2: CONTROL Y ESTADÍSTICAS DE PAÑALES (Con Stock y Control Integrado)
+        const renderPanalesInventoryPanel = () => {
+          const dSelYear = btInvDiaperStatsDate.getFullYear();
+          const dSelMonth = btInvDiaperStatsDate.getMonth();
+          const dSelMonthKey = formatDateKey(dSelYear, dSelMonth, 1).slice(0, 7);
+          const diaperInvPeriodTitle = btInvDiaperStatsMode === 'month'
+            ? `${monthNames[dSelMonth]} ${dSelYear}`
+            : String(dSelYear);
+
+          let periodPurchases = diaperPurchases.filter(Boolean).map(p => ({ ...p, _date: ensureEntryDate(p) }));
+          let periodUsed = diaperEntries.filter(Boolean).map(d => ({ ...d, _date: ensureEntryDate(d) }));
+
+          if (btInvDiaperStatsMode === 'month') {
+            periodPurchases = periodPurchases.filter(p => p._date.slice(0, 7) === dSelMonthKey);
+            periodUsed = periodUsed.filter(d => d._date.slice(0, 7) === dSelMonthKey);
+          } else if (btInvDiaperStatsMode === 'year') {
+            periodPurchases = periodPurchases.filter(p => Number(p._date.slice(0, 4)) === dSelYear);
+            periodUsed = periodUsed.filter(d => Number(d._date.slice(0, 4)) === dSelYear);
+          }
+          periodPurchases.sort((a, b) => b._date.localeCompare(a._date));
+
+          let periodAddedUnits = 0;
+          let periodPacksCount = 0;
+          periodPurchases.forEach(p => {
+            const packs = Number(p.packs) || 1;
+            const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
+            periodPacksCount += packs;
+            periodAddedUnits += units;
+          });
+
+          const periodWet = periodUsed.filter(d => d.type === 'Mojado').length;
+          const periodDirty = periodUsed.filter(d => d.type === 'Sucio').length;
+          const periodBoth = periodUsed.filter(d => d.type === 'Ambos').length;
+
+          return `
+            <div class="space-y-3">
+              <!-- TARJETA UNIFICADA: CONTROL Y ESTADÍSTICAS DE PAÑALES (CON STOCK Y CONTROL INCORPORADO) -->
+              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-teal-500/40 shadow-lg space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="text-xs font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-baby"></i> Control y Estadísticas de Pañales
+                    </h5>
+                    <p class="text-[10px] text-slate-400">Stock y control de pañales integrado con estadísticas por mes, año e histórico</p>
+                  </div>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95">
+                      🚼 Registrar cambio (-1)
+                    </button>
+                    <button type="button" onclick="openBabyDiaperPurchaseModal('${todayStr}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                      <i class="fa-solid fa-plus"></i> Agregar Paquete
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sub-bloque: Stock y Control de Pañales -->
+                <div class="p-3 rounded-2xl bg-slate-900/90 border border-teal-500/35 space-y-2.5">
+                  <div class="flex items-center justify-between flex-wrap gap-1.5">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Stock y Control de Pañales</span>
+                    <span class="text-[10px] text-slate-400">Se descuenta automáticamente con cada cambio registrado</span>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border ${currentDiaperStock <= 15 ? 'border-rose-500/50 bg-rose-950/25' : 'border-teal-500/40'}">
+                      <span class="text-[10px] text-slate-400 font-semibold block">🚼 Disponibles Hoy</span>
+                      <strong class="text-base font-black ${currentDiaperStock <= 15 ? 'text-rose-400' : 'text-teal-300'}">${currentDiaperStock} u.</strong>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">⏳ Alcanzan para</span>
+                      <strong class="text-base font-black text-sky-300">${diaperDaysAutonomy} ${diaperDaysAutonomy === 1 ? 'día' : 'días'}</strong>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-amber-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">📊 Consumo Diario</span>
+                      <strong class="text-base font-black text-amber-300">~${effectiveDailyRate}/día</strong>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-purple-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">🏁 Duran hasta</span>
+                      <strong class="text-xs font-black text-purple-300 capitalize block mt-1">${estimatedDepletionDateStr ? escapeHtml(formatHealthControlDate(estimatedDepletionDateStr, { day: 'numeric', month: 'short' })) : 'Sin stock'}</strong>
+                    </div>
+                  </div>
+
+                  <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[11px] font-bold text-slate-300">Ajuste rápido de unidades:</span>
+                      <button type="button" data-bt-diaper-stock-adj="-5" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-5</button>
+                      <button type="button" data-bt-diaper-stock-adj="-1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-1</button>
+                      <button type="button" data-bt-diaper-stock-adj="1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+1</button>
+                      <button type="button" data-bt-diaper-stock-adj="10" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+10</button>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <button type="button" data-bt-quick-diaper="Mojado" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[10px] border border-slate-700 active:scale-95">💧 +Pipí</button>
+                      <button type="button" data-bt-quick-diaper="Sucio" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-[10px] border border-slate-700 active:scale-95">💩 +Popó</button>
+                      <button type="button" data-bt-quick-diaper="Ambos" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 font-bold text-[10px] border border-slate-700 active:scale-95">✨ +Ambos</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sub-bloque: Estadísticas de Pañales (Ingresos vs Uso por Mes / Año / Histórico) -->
+                <div class="pt-1 space-y-2.5">
+                  <div>
+                    <h6 class="text-[11px] font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-chart-pie"></i> Estadísticas e Historial de Pañales (Ingresos vs Uso)
+                    </h6>
+                    <p class="text-[10px] text-slate-400">Balance de paquetes comprados y pañales utilizados por periodo</p>
+                  </div>
+                </div>
+
+                <!-- Selector Mes / Año / Histórico -->
+                <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+                  <button type="button" data-bt-inv-diaper-mode="month" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'month' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Mes</button>
+                  <button type="button" data-bt-inv-diaper-mode="year" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'year' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Año</button>
+                  <button type="button" data-bt-inv-diaper-mode="history" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'history' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Histórico</button>
+                </div>
+
+                ${btInvDiaperStatsMode !== 'history' ? `
+                  <div class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1.5">
+                    <button type="button" data-bt-inv-diaper-delta="-1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h4 class="text-xs font-bold uppercase text-slate-200">${escapeHtml(diaperInvPeriodTitle)}</h4>
+                    <button type="button" data-bt-inv-diaper-delta="1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                ` : ''}
+
+                <!-- KPIs del Periodo -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-emerald-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">📦 Ingresados</span>
+                    <strong class="text-sm font-black text-emerald-300">+${periodAddedUnits} u. <span class="text-[9px] text-slate-400 font-normal">(${periodPacksCount} paq.)</span></strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-rose-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Utilizados</span>
+                    <strong class="text-sm font-black text-rose-300">-${periodUsed.length} u.</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-sky-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">💧 Pipí / 💩 Popó</span>
+                    <strong class="text-sm font-black text-sky-300">${periodWet} / ${periodDirty}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-purple-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">✨ Ambos</span>
+                    <strong class="text-sm font-black text-purple-300">${periodBoth}</strong>
+                  </div>
+                </div>
+
+                <!-- Lista de compras / ingresos de paquetes de pañales -->
+                <div class="space-y-2 pt-1">
+                  <div class="flex items-center justify-between">
+                    <h6 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Historial de Paquetes Ingresados (${periodPurchases.length})</h6>
+                  </div>
+                  ${periodPurchases.length > 0 ? periodPurchases.map(p => {
+                    const packs = Number(p.packs) || 1;
+                    const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
+                    return `
+                      <div class="p-3 rounded-xl bg-slate-900 border border-teal-500/30 flex items-center justify-between gap-2.5 text-xs">
+                        <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                          <span class="w-8 h-8 rounded-xl bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">📦</span>
+                          <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                              <span class="font-extrabold text-slate-100">${escapeHtml(p.brand || 'Pañales')}</span>
+                              <span class="text-[10px] px-2 py-0.5 rounded-md font-black bg-sky-500/20 text-sky-300 border border-sky-500/40">Talla ${escapeHtml(p.size || 'M')}</span>
+                              <span class="text-[10px] px-2 py-0.5 rounded-md font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">+${units} u. (${packs} paq.)</span>
+                            </div>
+                            <p class="text-[11px] text-teal-200 font-semibold mt-1 capitalize">
+                              📅 Ingresado el: ${escapeHtml(formatHealthControlDate(p._date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))}
+                            </p>
+                            ${p.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5">"${escapeHtml(p.notes)}"</p>` : ''}
+                          </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 shrink-0">
+                          <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300 rounded" title="Editar paquete">
+                            <i class="fa-solid fa-pen"></i>
+                          </button>
+                          <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400 rounded" title="Eliminar paquete">
+                            <i class="fa-solid fa-trash-can"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }).join('') : `
+                    <div class="text-center py-5 bg-slate-900/50 rounded-xl border border-slate-800 space-y-1.5">
+                      <span class="text-2xl block">🚼</span>
+                      <p class="text-xs text-slate-400">No hay paquetes de pañales registrados en este periodo.</p>
+                      <button type="button" onclick="openBabyDiaperPurchaseModal('${todayStr}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-plus"></i> Agregar primer paquete
+                      </button>
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        };
+
+        container.innerHTML = `
+          <!-- Selector superior del módulo INVENTARIO: Leche vs Pañales -->
+          <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 shadow-lg space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-100 flex items-center gap-1.5">
+                  <i class="fa-solid fa-box-open text-amber-400"></i>
+                  <span>Inventario y Stock del Bebé</span>
+                </h4>
+                <p class="text-[10px] text-slate-400">Control de stock de leche (retiros y duración del tarro) y stock de pañales</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" data-bt-inv-tab="leche" class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${btInventarioSubTab === 'leche' ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400/50' : 'bg-amber-600/15 hover:bg-amber-600/25 text-amber-300 border border-amber-500/30'}">
+                <span>🍼 Leche (${sealedCansInStock} sellados${activeCan ? ' + 1 abierto' : ''})</span>
+              </button>
+              <button type="button" data-bt-inv-tab="panales" class="py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${btInventarioSubTab === 'panales' ? 'bg-teal-600 text-white shadow-md ring-1 ring-teal-400/50' : 'bg-teal-600/15 hover:bg-teal-600/25 text-teal-300 border border-teal-500/30'}">
+                <span>🚼 Pañales (${currentDiaperStock} disp.)</span>
+              </button>
+            </div>
+          </div>
+
+          ${btInventarioSubTab === 'leche' ? renderLecheInventoryPanel() : renderPanalesInventoryPanel()}
+        `;
       }
 
       function renderBtCrecimientoChartSection(btState) {
@@ -12301,19 +13816,207 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (delBtn) delBtn.addEventListener('click', deleteCurrentBaby);
       }
 
+      function getRunningSleepBaby() {
+        const current = getCurrentBaby();
+        if (current && current.sleepTimer && current.sleepTimer.running && current.sleepTimer.startTime) {
+          return current;
+        }
+        if (btStore && Array.isArray(btStore.babies)) {
+          const found = btStore.babies.find(b => b && b.sleepTimer && b.sleepTimer.running && b.sleepTimer.startTime);
+          if (found) return found;
+        }
+        return null;
+      }
+
+      function formatTimeFromTimestamp(ts) {
+        if (!ts) return getNowTimeStr();
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return getNowTimeStr();
+        return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      }
+
+      function formatDateKeyFromTimestamp(ts) {
+        if (!ts) return getTodayDateKey();
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return getTodayDateKey();
+        return formatDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+      }
+
       function updateBtSleepTimerDisplay() {
         const el = document.getElementById('btSleepTimerDisplay');
-        if (!el) return;
         const btState = getCurrentBaby();
-        if (!btState.sleepTimer.running || !btState.sleepTimer.startTime) {
-          el.textContent = '00:00:00';
+        const activeTimerBaby = getRunningSleepBaby();
+
+        if (el) {
+          if (!btState.sleepTimer || !btState.sleepTimer.running || !btState.sleepTimer.startTime) {
+            el.textContent = '00:00:00';
+          } else {
+            const elapsedSec = Math.max(0, Math.floor((Date.now() - btState.sleepTimer.startTime) / 1000));
+            const hh = String(Math.floor(elapsedSec / 3600)).padStart(2, '0');
+            const mm = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
+            const ss = String(elapsedSec % 60).padStart(2, '0');
+            el.textContent = `${hh}:${mm}:${ss}`;
+          }
+        }
+
+        const modal = document.getElementById('btLiveSleepScreenModal');
+        const banner = document.getElementById('btLiveSleepFloatingBanner');
+
+        if (!activeTimerBaby || !activeTimerBaby.sleepTimer || !activeTimerBaby.sleepTimer.running || !activeTimerBaby.sleepTimer.startTime) {
+          if (modal && !modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+          }
+          if (banner && !banner.classList.contains('hidden')) {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+          }
           return;
         }
-        const elapsedSec = Math.max(0, Math.floor((Date.now() - btState.sleepTimer.startTime) / 1000));
+
+        const st = activeTimerBaby.sleepTimer;
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - st.startTime) / 1000));
         const hh = String(Math.floor(elapsedSec / 3600)).padStart(2, '0');
         const mm = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
         const ss = String(elapsedSec % 60).padStart(2, '0');
-        el.textContent = `${hh}:${mm}:${ss}`;
+        const clockStr = `${hh}:${mm}:${ss}`;
+
+        const totalMin = Math.floor(elapsedSec / 60);
+        const hPart = Math.floor(totalMin / 60);
+        const mPart = totalMin % 60;
+        const decHours = Math.max(0.1, Math.round((elapsedSec / 3600) * 10) / 10);
+        const durationHuman = hPart > 0 ? `${hPart} h ${mPart} min (${decHours} h)` : `${mPart} min (${decHours} h)`;
+
+        const idx = btStore.babies.indexOf(activeTimerBaby);
+        const babyName = getBabyDisplayName(activeTimerBaby, idx >= 0 ? idx : 0);
+        const avatar = (activeTimerBaby.profile && activeTimerBaby.profile.avatar) || '👶';
+        const isNight = st.type === 'Nocturno';
+        const startTimeStr = st.startTimeStr || formatTimeFromTimestamp(st.startTime);
+        const startDateStr = st.startDateKey || formatDateKeyFromTimestamp(st.startTime);
+
+        const clockEl = document.getElementById('btLiveSleepClockDisplay');
+        if (clockEl) clockEl.textContent = clockStr;
+        const hoursPrevEl = document.getElementById('btLiveSleepHoursPreview');
+        if (hoursPrevEl) hoursPrevEl.textContent = `${durationHuman} acumulados`;
+        const babyLblEl = document.getElementById('btLiveSleepBabyLabel');
+        if (babyLblEl) babyLblEl.textContent = `${avatar} ${babyName}`;
+        const iconCircleEl = document.getElementById('btLiveSleepIconCircle');
+        if (iconCircleEl) iconCircleEl.textContent = isNight ? '🌙' : '☀️';
+        const badgeEl = document.getElementById('btLiveSleepTypeBadge');
+        if (badgeEl) {
+          badgeEl.textContent = isNight ? '🌙 Sueño Nocturno en curso' : '☀️ Siesta en curso';
+          badgeEl.className = isNight
+            ? 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/40'
+            : 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40';
+        }
+        const startTimeEl = document.getElementById('btLiveSleepStartTime');
+        if (startTimeEl) startTimeEl.textContent = fmtBtTime(startTimeStr);
+        const startDateEl = document.getElementById('btLiveSleepStartDate');
+        if (startDateEl) startDateEl.textContent = formatHealthControlDate(startDateStr, { day: 'numeric', month: 'short' });
+
+        const bannerTitleEl = document.getElementById('btLiveSleepBannerTitle');
+        if (bannerTitleEl) bannerTitleEl.textContent = `${isNight ? '🌙' : '☀️'} ${babyName} · Durmiendo (${st.type || 'Siesta'})`;
+        const bannerClockEl = document.getElementById('btLiveSleepBannerClock');
+        if (bannerClockEl) bannerClockEl.textContent = clockStr;
+
+        const isModalOpen = modal && !modal.classList.contains('hidden');
+        if (banner) {
+          if (isModalOpen) {
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
+          } else {
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+          }
+        }
+      }
+
+      function openBtLiveSleepScreen() {
+        const activeTimerBaby = getRunningSleepBaby();
+        if (!activeTimerBaby) return;
+        if (btStore.activeBabyId !== activeTimerBaby.id) {
+          btStore.activeBabyId = activeTimerBaby.id;
+        }
+        const modal = document.getElementById('btLiveSleepScreenModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        updateBtSleepTimerDisplay();
+      }
+
+      function closeBtLiveSleepScreen() {
+        const modal = document.getElementById('btLiveSleepScreenModal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        updateBtSleepTimerDisplay();
+      }
+
+      function stopAndSaveBtLiveSleep(optionalNote) {
+        const activeTimerBaby = getRunningSleepBaby() || getCurrentBaby();
+        if (!activeTimerBaby || !activeTimerBaby.sleepTimer || !activeTimerBaby.sleepTimer.running) {
+          closeBtLiveSleepScreen();
+          return;
+        }
+        const st = activeTimerBaby.sleepTimer;
+        const startMs = st.startTime || Date.now();
+        const elapsedHours = Math.max(0.1, (Date.now() - startMs) / (1000 * 60 * 60));
+        const roundedHours = Math.round(elapsedHours * 10) / 10;
+        const entryDate = st.startDateKey || formatDateKeyFromTimestamp(startMs);
+        const startStr = st.startTimeStr || formatTimeFromTimestamp(startMs);
+        const endStr = getNowTimeStr();
+        const noteInput = document.getElementById('btLiveSleepNoteInput');
+        const userNote = (typeof optionalNote === 'string' && optionalNote.trim())
+          ? optionalNote.trim()
+          : (noteInput && noteInput.value ? noteInput.value.trim() : '');
+
+        if (!activeTimerBaby.sleep || !Array.isArray(activeTimerBaby.sleep.entries)) {
+          activeTimerBaby.sleep = { entries: [] };
+        }
+        activeTimerBaby.sleep.entries.push({
+          id: 's_' + Date.now(),
+          date: entryDate,
+          type: st.type || 'Siesta',
+          start: startStr,
+          end: endStr,
+          hours: roundedHours,
+          note: userNote || 'Registrado con cronómetro en vivo'
+        });
+
+        activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta' };
+        if (noteInput) noteInput.value = '';
+        saveBtState();
+        closeBtLiveSleepScreen();
+        renderBtMainContent();
+        notifyBt('Sueño guardado', `${roundedHours} horas registradas (${entryDate})`);
+      }
+
+      function cancelBtLiveSleep() {
+        const activeTimerBaby = getRunningSleepBaby() || getCurrentBaby();
+        if (activeTimerBaby) {
+          activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta' };
+        }
+        const noteInput = document.getElementById('btLiveSleepNoteInput');
+        if (noteInput) noteInput.value = '';
+        saveBtState();
+        closeBtLiveSleepScreen();
+        renderBtMainContent();
+        notifyBt('Cronómetro cancelado', 'Se detuvo el cronómetro sin guardar');
+      }
+
+      function checkAndShowRunningSleepScreenOnResume() {
+        try {
+          const raw = localStorage.getItem(BT_STORAGE_KEY);
+          if (raw) {
+            btStore = normalizeStore(JSON.parse(raw));
+          }
+        } catch (e) {}
+        const runningBaby = getRunningSleepBaby();
+        if (runningBaby) {
+          btStore.activeBabyId = runningBaby.id;
+          openBtLiveSleepScreen();
+          renderBtMainContent();
+        }
       }
 
       function openBtQuickModal() {
@@ -12547,6 +14250,97 @@ Check your Browserslist config to be sure that your targets are set up correctly
           return;
         }
 
+        const pickupModeBtn = e.target.closest('[data-bt-pickup-mode]');
+        if (pickupModeBtn) {
+          btCuidadosPickupStatsMode = pickupModeBtn.getAttribute('data-bt-pickup-mode') || 'month';
+          renderBtMainContent();
+          return;
+        }
+        const pickupDeltaBtn = e.target.closest('[data-bt-pickup-period-delta]');
+        if (pickupDeltaBtn) {
+          const delta = parseInt(pickupDeltaBtn.getAttribute('data-bt-pickup-period-delta'), 10) || 0;
+          if (btCuidadosPickupStatsMode === 'month') {
+            btCuidadosPickupStatsDate = new Date(btCuidadosPickupStatsDate.getFullYear(), btCuidadosPickupStatsDate.getMonth() + delta, 1);
+          } else if (btCuidadosPickupStatsMode === 'year') {
+            btCuidadosPickupStatsDate = new Date(btCuidadosPickupStatsDate.getFullYear() + delta, btCuidadosPickupStatsDate.getMonth(), 1);
+          }
+          renderBtMainContent();
+          return;
+        }
+
+        const canModeBtn = e.target.closest('[data-bt-can-mode]');
+        if (canModeBtn) {
+          btCuidadosCanStatsMode = canModeBtn.getAttribute('data-bt-can-mode') || 'month';
+          renderBtMainContent();
+          return;
+        }
+        const canDeltaBtn = e.target.closest('[data-bt-can-period-delta]');
+        if (canDeltaBtn) {
+          const delta = parseInt(canDeltaBtn.getAttribute('data-bt-can-period-delta'), 10) || 0;
+          if (btCuidadosCanStatsMode === 'month') {
+            btCuidadosCanStatsDate = new Date(btCuidadosCanStatsDate.getFullYear(), btCuidadosCanStatsDate.getMonth() + delta, 1);
+          } else if (btCuidadosCanStatsMode === 'year') {
+            btCuidadosCanStatsDate = new Date(btCuidadosCanStatsDate.getFullYear() + delta, btCuidadosCanStatsDate.getMonth(), 1);
+          }
+          renderBtMainContent();
+          return;
+        }
+
+        const invTabBtn = e.target.closest('[data-bt-inv-tab]');
+        if (invTabBtn) {
+          btInventarioSubTab = invTabBtn.getAttribute('data-bt-inv-tab') || 'leche';
+          renderBtMainContent();
+          return;
+        }
+
+        const gotoInvBtn = e.target.closest('[data-bt-goto-inv]');
+        if (gotoInvBtn) {
+          btInventarioSubTab = gotoInvBtn.getAttribute('data-bt-goto-inv') || 'leche';
+          setBtActiveTab('inventario');
+          return;
+        }
+
+        const milkAdjBtn = e.target.closest('[data-bt-milk-stock-adj]');
+        if (milkAdjBtn) {
+          const delta = parseInt(milkAdjBtn.getAttribute('data-bt-milk-stock-adj'), 10) || 0;
+          const btSt = getCurrentBaby();
+          if (!btSt.feeding) btSt.feeding = { milkGoalMl: 600, entries: [], milkPickups: [], formulaCans: [], milkStockAdjustment: 0 };
+          btSt.feeding.milkStockAdjustment = (Number(btSt.feeding.milkStockAdjustment) || 0) + delta;
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+
+        const diaperAdjBtn = e.target.closest('[data-bt-diaper-stock-adj]');
+        if (diaperAdjBtn) {
+          const delta = parseInt(diaperAdjBtn.getAttribute('data-bt-diaper-stock-adj'), 10) || 0;
+          const btSt = getCurrentBaby();
+          if (!btSt.diapers) btSt.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+          btSt.diapers.stockAdjustment = (Number(btSt.diapers.stockAdjustment) || 0) + delta;
+          saveBtState();
+          renderBtMainContent();
+          return;
+        }
+
+        const invDiaperModeBtn = e.target.closest('[data-bt-inv-diaper-mode]');
+        if (invDiaperModeBtn) {
+          btInvDiaperStatsMode = invDiaperModeBtn.getAttribute('data-bt-inv-diaper-mode') || 'month';
+          renderBtMainContent();
+          return;
+        }
+
+        const invDiaperDeltaBtn = e.target.closest('[data-bt-inv-diaper-delta]');
+        if (invDiaperDeltaBtn) {
+          const delta = parseInt(invDiaperDeltaBtn.getAttribute('data-bt-inv-diaper-delta'), 10) || 0;
+          if (btInvDiaperStatsMode === 'month') {
+            btInvDiaperStatsDate = new Date(btInvDiaperStatsDate.getFullYear(), btInvDiaperStatsDate.getMonth() + delta, 1);
+          } else if (btInvDiaperStatsMode === 'year') {
+            btInvDiaperStatsDate = new Date(btInvDiaperStatsDate.getFullYear() + delta, btInvDiaperStatsDate.getMonth(), 1);
+          }
+          renderBtMainContent();
+          return;
+        }
+
         const diaperSubTabBtn = e.target.closest('[data-bt-diaper-subtab]');
         if (diaperSubTabBtn) {
           btCuidadosDiaperSubTab = diaperSubTabBtn.getAttribute('data-bt-diaper-subtab') || 'today';
@@ -12695,6 +14489,54 @@ Check your Browserslist config to be sure that your targets are set up correctly
           renderBtMainContent();
           return;
         }
+        const delMilkPickup = e.target.closest('[data-bt-del-milkpickup]');
+        if (delMilkPickup) {
+          const id = delMilkPickup.getAttribute('data-bt-del-milkpickup');
+          if (btState.feeding && Array.isArray(btState.feeding.milkPickups)) {
+            btState.feeding.milkPickups = btState.feeding.milkPickups.filter(x => x && x.id !== id);
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Retiro eliminado', 'Se eliminó el registro de retiro de leche');
+          }
+          return;
+        }
+        const finishCanBtn = e.target.closest('[data-bt-finish-can]');
+        if (finishCanBtn) {
+          const id = finishCanBtn.getAttribute('data-bt-finish-can');
+          if (btState.feeding && Array.isArray(btState.feeding.formulaCans)) {
+            const targetCan = btState.feeding.formulaCans.find(x => x && x.id === id);
+            if (targetCan) {
+              targetCan.status = 'finished';
+              targetCan.finishedDate = getTodayDateKey();
+              saveBtState();
+              renderBtMainContent();
+              notifyBt('Tarro finalizado', `${targetCan.brand} marcado como terminado hoy`);
+            }
+          }
+          return;
+        }
+        const delCanBtn = e.target.closest('[data-bt-del-can]');
+        if (delCanBtn) {
+          const id = delCanBtn.getAttribute('data-bt-del-can');
+          if (btState.feeding && Array.isArray(btState.feeding.formulaCans)) {
+            btState.feeding.formulaCans = btState.feeding.formulaCans.filter(x => x && x.id !== id);
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Tarro eliminado', 'Se eliminó el registro del tarro');
+          }
+          return;
+        }
+        const delDiaperPurchaseBtn = e.target.closest('[data-bt-del-diaperpurchase]');
+        if (delDiaperPurchaseBtn) {
+          const id = delDiaperPurchaseBtn.getAttribute('data-bt-del-diaperpurchase');
+          if (btState.diapers && Array.isArray(btState.diapers.purchases)) {
+            btState.diapers.purchases = btState.diapers.purchases.filter(x => x && x.id !== id);
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Paquete eliminado', 'Se actualizó el stock de pañales');
+          }
+          return;
+        }
         const delHealth = e.target.closest('[data-bt-del-health]');
         if (delHealth) {
           const id = delHealth.getAttribute('data-bt-del-health');
@@ -12771,31 +14613,29 @@ Check your Browserslist config to be sure that your targets are set up correctly
           return;
         }
 
+        const openLiveSleepBtn = e.target.closest('[data-bt-open-live-sleep]');
+        if (openLiveSleepBtn) {
+          openBtLiveSleepScreen();
+          return;
+        }
         const startSleepBtn = e.target.closest('[data-bt-start-sleep]');
         if (startSleepBtn) {
           const type = startSleepBtn.getAttribute('data-bt-start-sleep');
-          btState.sleepTimer = { running: true, startTime: Date.now(), type };
+          btState.sleepTimer = {
+            running: true,
+            startTime: Date.now(),
+            startTimeStr: getNowTimeStr(),
+            startDateKey: dateKey,
+            type
+          };
           saveBtState();
           renderBtMainContent();
-          notifyBt('Sueño', `Cronómetro de ${type.toLowerCase()} iniciado`);
+          openBtLiveSleepScreen();
+          notifyBt('Sueño en vivo', `Cronómetro de ${type.toLowerCase()} iniciado`);
           return;
         }
         if (e.target.closest('#btStopSleepBtn')) {
-          const elapsedHours = Math.max(0.1, (Date.now() - (btState.sleepTimer.startTime || Date.now())) / (1000 * 60 * 60));
-          const roundedHours = Math.round(elapsedHours * 10) / 10;
-          btState.sleep.entries.push({
-            id: 's_' + Date.now(),
-            date: dateKey,
-            type: btState.sleepTimer.type || 'Siesta',
-            start: getNowTimeStr(),
-            end: getNowTimeStr(),
-            hours: roundedHours,
-            note: 'Registrado con cronómetro'
-          });
-          btState.sleepTimer = { running: false, startTime: null, type: 'Siesta' };
-          saveBtState();
-          renderBtMainContent();
-          notifyBt('Sueño guardado', `${roundedHours} horas registradas (${dateKey})`);
+          stopAndSaveBtLiveSleep();
           return;
         }
 
@@ -12859,7 +14699,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const avatarEl = document.getElementById('btProfileAvatar');
         if (avatarEl) avatarEl.addEventListener('click', () => setBtActiveTab('perfil'));
         const devCard = document.getElementById('btStatDevCard');
-        if (devCard) devCard.addEventListener('click', () => setBtActiveTab('crecimiento'));
+        if (devCard) devCard.addEventListener('click', () => { btCuidadosSubTab = 'hitos'; setBtActiveTab('cuidados'); });
         const moonCard = document.getElementById('btStatMoonCard');
         if (moonCard) moonCard.addEventListener('click', () => setBtActiveTab('perfil'));
         const zodiacCard = document.getElementById('btStatZodiacCard');
@@ -12925,8 +14765,37 @@ Check your Browserslist config to be sure that your targets are set up correctly
           });
         }
 
+        const liveStopSaveBtn = document.getElementById('btLiveSleepStopSaveBtn');
+        if (liveStopSaveBtn) liveStopSaveBtn.addEventListener('click', () => stopAndSaveBtLiveSleep());
+        const liveMinimizeBtn = document.getElementById('btLiveSleepMinimizeBtn');
+        if (liveMinimizeBtn) liveMinimizeBtn.addEventListener('click', closeBtLiveSleepScreen);
+        const liveCloseTopBtn = document.getElementById('btLiveSleepCloseTopBtn');
+        if (liveCloseTopBtn) liveCloseTopBtn.addEventListener('click', closeBtLiveSleepScreen);
+        const liveCancelBtn = document.getElementById('btLiveSleepCancelTimerBtn');
+        if (liveCancelBtn) liveCancelBtn.addEventListener('click', cancelBtLiveSleep);
+
+        const bannerOpenBtn = document.getElementById('btOpenLiveSleepScreenFromBannerBtn');
+        if (bannerOpenBtn) bannerOpenBtn.addEventListener('click', openBtLiveSleepScreen);
+        const bannerExpandBtn = document.getElementById('btBannerExpandSleepBtn');
+        if (bannerExpandBtn) bannerExpandBtn.addEventListener('click', openBtLiveSleepScreen);
+        const bannerStopBtn = document.getElementById('btBannerStopSleepBtn');
+        if (bannerStopBtn) bannerStopBtn.addEventListener('click', () => stopAndSaveBtLiveSleep());
+
         if (btSleepInterval) clearInterval(btSleepInterval);
         btSleepInterval = setInterval(updateBtSleepTimerDisplay, 1000);
+
+        // Si había un cronómetro de sueño en vivo activo al abrir la app, mostrar de inmediato la pantalla del cronómetro
+        checkAndShowRunningSleepScreenOnResume();
+      });
+
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+          checkAndShowRunningSleepScreenOnResume();
+        }
+      });
+
+      window.addEventListener('pageshow', function() {
+        checkAndShowRunningSleepScreenOnResume();
       });
 
       setTimeout(btShrinkExistingPhotos, 2500);
@@ -12935,6 +14804,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       window.openBtQuickModal = openBtQuickModal;
       window.openBtVaccineModal = openBtVaccineModal;
       window.closeBtVaccineModal = closeBtVaccineModal;
+      window.openBtLiveSleepScreen = openBtLiveSleepScreen;
+      window.closeBtLiveSleepScreen = closeBtLiveSleepScreen;
       window.renderBabyTrackerView = function() {
         renderBtMainContent();
       };
@@ -12989,6 +14860,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'settings-modal': { label: 'Ajustes y respaldos', close: () => window.closeSettingsModal && window.closeSettingsModal() },
         'btQuickModal': { label: 'Registro rápido del bebé', close: (el) => el.click() },
         'btVaccineModal': { label: 'Registro de vacuna', close: () => window.closeBtVaccineModal && window.closeBtVaccineModal() },
+        'babyMilkPickupModal': { label: 'Retiro de leche', close: () => window.closeBabyMilkPickupModal && window.closeBabyMilkPickupModal() },
+        'babyFormulaCanModal': { label: 'Contador de tarro de leche', close: () => window.closeBabyFormulaCanModal && window.closeBabyFormulaCanModal() },
+        'babyDiaperPurchaseModal': { label: 'Stock de pañales', close: () => window.closeBabyDiaperPurchaseModal && window.closeBabyDiaperPurchaseModal() },
+        'btLiveSleepScreenModal': { label: 'Cronómetro de sueño en vivo', close: () => window.closeBtLiveSleepScreen && window.closeBtLiveSleepScreen() },
         'generic-confirm-modal': { label: 'Confirmar acción', close: () => window.closeGenericConfirm && window.closeGenericConfirm(false) }
       };
       const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
