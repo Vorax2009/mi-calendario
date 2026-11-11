@@ -207,6 +207,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-user-doctor::before{content:"🩺"}
 .fa-baby::before{content:"👶"}
 .fa-xmark::before{content:"✕"}
+.fa-share-nodes::before{content:"📤"}
+.fa-paper-plane::before{content:"➤"}
+.fa-circle-exclamation::before{content:"❗"}
+.fa-heart::before{content:"❤"}
+.fa-apple-whole::before{content:"🍎"}
+.fa-arrow-up-right-from-square::before{content:"↗"}
+.fa-bone::before{content:"🦴"}
+.fa-bookmark::before{content:"🔖"}
+.fa-bottle-droplet::before{content:"🍼"}
+.fa-hourglass-half::before{content:"⏳"}
+.fa-notes-medical::before{content:"📝"}
+.fa-object-ungroup::before{content:"▣"}
+.fa-prescription-bottle-medical::before{content:"💊"}
+.fa-stethoscope::before{content:"🩺"}
+.fa-tooth::before{content:"🦷"}
 </style>
 </head>
 <body class="h-full flex flex-col font-sans overflow-x-hidden bg-slate-950 text-slate-100">
@@ -1414,11 +1429,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </div>
 
       <div class="space-y-2 pt-1">
-        <button type="button" onclick="executeShareData('direct')" class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
-          <i class="fa-solid fa-paper-plane"></i>
-          <span>Compartir por WhatsApp / Mensaje</span>
-        </button>
-        <button type="button" onclick="executeShareData('file')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95">
+        <button type="button" onclick="executeShareData('file')" class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
           <i class="fa-solid fa-download"></i>
           <span>Descargar archivo para compartir (.json)</span>
         </button>
@@ -1524,6 +1535,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </button>
         </div>
 
+        <div id="storage-status" class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1.5"></div>
+
         <div>
           <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad Completa:</span>
           <button onclick="exportDataJSON()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
@@ -1535,7 +1548,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <span class="font-semibold text-slate-300 block mb-1">Importar Copia de Seguridad:</span>
           <label class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
             <i class="fa-solid fa-upload"></i> Seleccionar Archivo JSON
-            <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+            <input type="file" accept=".json,.txt,application/json,text/plain" onchange="importDataJSON(event)" class="hidden">
           </label>
         </div>
 
@@ -1678,6 +1691,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
         /^\d{4}-\d{2}-\d{2}$/.test(control.date) &&
         /^\d{2}:\d{2}$/.test(control.time) &&
         typeof control.notes === 'string'
+      );
+    }
+
+    // Validación mínima (solo lo que la app necesita para no fallar al renderizar).
+    function isValidMedicationList(value) {
+      return Array.isArray(value) && value.every(med =>
+        med && typeof med === 'object' &&
+        (typeof med.id === 'string' || typeof med.id === 'number') &&
+        typeof med.name === 'string' &&
+        typeof med.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(med.startDate) &&
+        typeof med.time === 'string' && /^\d{1,2}:\d{2}$/.test(med.time) &&
+        Number.isFinite(Number(med.frequency)) && Number(med.frequency) > 0 &&
+        Number.isFinite(Number(med.duration)) && Number(med.duration) >= 0
       );
     }
 
@@ -1904,8 +1930,121 @@ Check your Browserslist config to be sure that your targets are set up correctly
       saveToLocalStorage();
     }
 
+    // ALMACENAMIENTO: persistencia, limpieza de claves viejas, estado y aviso de respaldo
+    const LAST_BACKUP_KEY = 'cal_last_backup';
+    const FIRST_SEEN_KEY = 'cal_first_seen';
+    const BACKUP_NAG_DAY_KEY = 'cal_backup_nag_day';
+    const BACKUP_MAX_AGE_DAYS = 30;
+    let lastActiveDayKey = null;
+
+    function requestPersistentStorage() {
+      try {
+        if (navigator.storage && typeof navigator.storage.persist === 'function') {
+          navigator.storage.persist().catch(() => {});
+        }
+      } catch (error) { /* no disponible */ }
+    }
+
+    // Borra las marcas de recordatorios (medicamentos y cumpleaños) de hace más de 7 días.
+    function pruneOldReminderKeys() {
+      try {
+        const limit = new Date();
+        limit.setHours(0, 0, 0, 0);
+        limit.setDate(limit.getDate() - 7);
+        const limitKey = formatDateKey(limit.getFullYear(), limit.getMonth(), limit.getDate());
+        const toRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          const match = key && key.match(/^(?:cal_med_reminder_|cal_birthday_notified_)(\d{4}-\d{2}-\d{2})_/);
+          if (match && match[1] < limitKey) toRemove.push(key);
+        }
+        toRemove.forEach(key => localStorage.removeItem(key));
+      } catch (error) {
+        console.warn('No se pudieron limpiar los recordatorios antiguos.', error);
+      }
+    }
+
+    function getStorageUsage() {
+      let chars = 0;
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          chars += key.length + (localStorage.getItem(key) || '').length;
+        }
+      } catch (error) { /* sin acceso */ }
+      // Los navegadores suelen permitir ~5 millones de caracteres por sitio (cifra aproximada).
+      return { chars, bytes: chars * 2, percent: Math.min(100, Math.round(chars / 5000000 * 100)) };
+    }
+
+    function formatStorageSize(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+      return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+    }
+
+    function updateStorageStatus() {
+      const box = document.getElementById('storage-status');
+      if (!box) return;
+      const usage = getStorageUsage();
+      let last = NaN;
+      try { last = parseInt(localStorage.getItem(LAST_BACKUP_KEY) || '', 10); } catch (error) { /* sin acceso */ }
+      const days = Number.isFinite(last) ? Math.floor((Date.now() - last) / 86400000) : null;
+      const backupText = days === null
+        ? 'Aún no has hecho un respaldo.'
+        : (days <= 0 ? 'Último respaldo: hoy.' : `Último respaldo: hace ${days} día${days === 1 ? '' : 's'}.`);
+      const warn = usage.percent >= 70;
+      box.innerHTML = `
+        <div class="flex items-center justify-between text-[11px]">
+          <span class="font-semibold text-slate-300">Almacenamiento del navegador</span>
+          <span class="${warn ? 'text-amber-300' : 'text-slate-400'}">${formatStorageSize(usage.bytes)} · ≈ ${usage.percent}%</span>
+        </div>
+        <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden"><div class="h-full ${warn ? 'bg-amber-400' : 'bg-teal-500'}" style="width:${usage.percent}%"></div></div>
+        <p class="text-[10px] text-slate-400">${backupText}${warn ? ' Exporta un respaldo y revisa las fotos pesadas.' : ''}</p>`;
+    }
+
+    function maybeRemindBackup() {
+      try {
+        const hasData = Object.keys(dayDataMap).length > 0 || medications.length > 0 || healthControls.length > 0;
+        if (!hasData) return;
+        const now = Date.now();
+        let first = parseInt(localStorage.getItem(FIRST_SEEN_KEY) || '', 10);
+        if (!Number.isFinite(first)) {
+          first = now;
+          localStorage.setItem(FIRST_SEEN_KEY, String(now));
+        }
+        const last = parseInt(localStorage.getItem(LAST_BACKUP_KEY) || '', 10);
+        const reference = Number.isFinite(last) ? last : first;
+        if ((now - reference) / 86400000 < BACKUP_MAX_AGE_DAYS) return;
+        const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        if (localStorage.getItem(BACKUP_NAG_DAY_KEY) === todayKey) return;
+        localStorage.setItem(BACKUP_NAG_DAY_KEY, todayKey);
+        showToast('Haz un respaldo', 'Pasaron más de 30 días sin copia de seguridad. Ve a Ajustes > Exportar.', 'fa-triangle-exclamation', 'text-amber-400');
+      } catch (error) { /* sin acceso */ }
+    }
+
+    // Al volver a la app (desde segundo plano) se revisan recordatorios y, si cambió el día, se refresca todo.
+    function handleAppResume() {
+      const now = new Date();
+      const dayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      checkMedicationReminders();
+      if (lastActiveDayKey && lastActiveDayKey !== dayKey) {
+        pruneOldReminderKeys();
+        checkNotificationsOnLaunch();
+        renderAll();
+      }
+      lastActiveDayKey = dayKey;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') handleAppResume();
+    });
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) handleAppResume();
+    });
+
     // INICIALIZACIÓN
     document.addEventListener('DOMContentLoaded', function() {
+      requestPersistentStorage();
+      pruneOldReminderKeys();
       applyTabVisibility();
       initPWAAndServiceWorker();
       setBirthdayDateMax();
@@ -1915,6 +2054,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       setInterval(checkMedicationReminders, 15000);
       setupSwipeGestures();
       renderAll();
+      lastActiveDayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      setTimeout(maybeRemindBackup, 1500);
     });
 
     // Gestos táctiles (Swipe)
@@ -2737,25 +2878,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }).join('');
     }
 
-    function toggleHealthControlAttended(id) {
-      const control = healthControls.find(item => item.id === id);
-      if (!control) return;
-      const previous = control.attended === true;
-      control.attended = !previous;
-      if (!persistHealthControls()) {
-        control.attended = previous;
-        return;
-      }
-      renderUpcomingHealthControls();
-      renderHealthControlStats();
-      showToast(
-        control.attended ? 'Asistencia registrada' : 'Asistencia desmarcada',
-        control.attended ? `${control.person || 'El paciente'} asistió al control.` : 'Se quitó la marca de asistencia.',
-        'fa-circle-check',
-        control.attended ? 'text-emerald-300' : 'text-slate-300'
-      );
-    }
-
     function deleteHealthControl(id) {
       const controlIndex = healthControls.findIndex(control => control.id === id);
       if (controlIndex < 0) return;
@@ -3139,6 +3261,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
               }
               showToast(ctrl.attended ? 'Control realizado' : 'Control pendiente', 'Estado del control del bebé actualizado.', 'fa-house-medical', 'text-indigo-400');
               renderModalNotesList();
+              renderUpcomingHealthControls();
+              renderHealthControlStats();
               refreshPrimaryCalendarMarkers();
               return;
             }
@@ -3148,11 +3272,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const control = healthControls.find(c => c.id === controlId);
       if (control) {
-        control.attended = !control.attended;
-        persistHealthControls();
+        const previousAttended = control.attended === true;
+        control.attended = !previousAttended;
+        if (!persistHealthControls()) {
+          control.attended = previousAttended;
+          return;
+        }
         showToast(control.attended ? 'Control realizado' : 'Control pendiente', 'Estado del control actualizado.', 'fa-house-medical', 'text-indigo-400');
         renderModalNotesList();
         renderUpcomingHealthControls();
+        renderHealthControlStats();
         refreshPrimaryCalendarMarkers();
       }
     }
@@ -6938,6 +7067,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     function openSettingsModal() {
       document.getElementById('time-format-setting').value = timeFormat;
       applyTabVisibility();
+      updateStorageStatus();
       document.getElementById('settings-modal').classList.remove('hidden');
       document.getElementById('settings-modal').classList.add('flex');
     }
@@ -6949,6 +7079,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function exportDataJSON(options = {}) {
       const isAutoBackup = options && options.auto === true;
+      if (!isAutoBackup) {
+        try { localStorage.setItem(LAST_BACKUP_KEY, String(Date.now())); } catch (error) { /* sin acceso */ }
+        updateStorageStatus();
+      }
       const backup = {
         app: 'Calendario',
         version: 2,
@@ -7057,7 +7191,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       return payload;
     }
 
-    async function executeShareData(mode = 'direct') {
+    async function executeShareData(mode = 'file') {
       const categories = {
         turns: !!document.getElementById('share-opt-turns')?.checked,
         events: !!document.getElementById('share-opt-events')?.checked,
@@ -7076,23 +7210,32 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const dateStr = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
       const fileName = `calendario_compartido_${dateStr}.json`;
 
-      if (mode === 'direct' && navigator.share) {
-        try {
-          const file = new File([jsonStr], fileName, { type: 'application/json' });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      if (mode === 'direct' && navigator.share && navigator.canShare) {
+        // Chrome/Android solo permite compartir ciertos tipos (text/plain sí, application/json no).
+        // Se prueba primero .json y, si el sistema no lo acepta, el mismo contenido como .txt.
+        const candidates = [
+          new File([jsonStr], fileName, { type: 'application/json' }),
+          new File([jsonStr], fileName.replace(/\.json$/, '.txt'), { type: 'text/plain' })
+        ];
+        for (const file of candidates) {
+          let allowed = false;
+          try { allowed = navigator.canShare({ files: [file] }); } catch (e) { allowed = false; }
+          if (!allowed) continue;
+          try {
             await navigator.share({
               title: 'Calendario y Registros Compartidos',
-              text: 'Te comparto mis turnos, eventos, notas, salud y registros de bebé para cargarlos en tu app.',
+              text: 'Te comparto mis datos del calendario. En tu app: Ajustes > Importar Copia de Seguridad y elige "Combinar".',
               files: [file]
             });
             closeShareModal();
             showToast('Compartido con éxito', 'Se envió el archivo a la otra persona.', 'fa-paper-plane', 'text-sky-400');
             return;
+          } catch (e) {
+            if (e && e.name === 'AbortError') return;
+            console.warn('Error con Web Share, probando otra opción:', e);
           }
-        } catch (e) {
-          if (e.name !== 'AbortError') console.warn('Error con Web Share directo, usando descarga:', e);
-          else return;
         }
+        showToast('No se pudo abrir el menú de compartir', 'Se descargó el archivo; envíalo manualmente por WhatsApp.', 'fa-triangle-exclamation', 'text-amber-400');
       }
 
       // Descarga de archivo json como método estándar y confiable
@@ -7347,7 +7490,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const hasMeds = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medications');
           const hasLogs = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'medicationLogs');
           const hasHealthControls = !isLegacyBackup && Object.prototype.hasOwnProperty.call(importedData, 'healthControls');
-          if (hasMeds && !Array.isArray(importedData.medications)) {
+          if (hasMeds && !isValidMedicationList(importedData.medications)) {
             throw new Error('La lista de medicamentos no es válida.');
           }
           if (hasLogs && (!importedData.medicationLogs || typeof importedData.medicationLogs !== 'object' || Array.isArray(importedData.medicationLogs))) {
@@ -7707,7 +7850,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const rawHealth = (b && b.health) || {};
           const healthData = Object.assign({}, base.health, rawHealth);
           healthData.medicalControls = Array.isArray(rawHealth.medicalControls) ? rawHealth.medicalControls : [];
-          healthData.medications = Array.isArray(rawHealth.medications) ? rawHealth.medications : [];
+          healthData.medications = Array.isArray(rawHealth.medications)
+            ? rawHealth.medications.filter(m => m && typeof m.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(m.startDate))
+            : [];
           healthData.medLogs = rawHealth.medLogs && typeof rawHealth.medLogs === 'object' && !Array.isArray(rawHealth.medLogs) ? rawHealth.medLogs : {};
           return Object.assign({}, base, b, {
             profile: Object.assign({}, base.profile, (b && b.profile) || {}),
@@ -7737,11 +7882,77 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       function saveBtState() {
+        let saved = true;
         try {
           localStorage.setItem(BT_STORAGE_KEY, JSON.stringify(btStore));
-        } catch (e) {}
+        } catch (e) {
+          saved = false;
+          console.error('No se pudo guardar el registro del bebé.', e);
+          if (typeof showToast === 'function') {
+            showToast('No se pudo guardar', 'El espacio del navegador está lleno. Exporta un respaldo y elimina fotos pesadas.', 'fa-triangle-exclamation', 'text-red-400');
+          }
+        }
         if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
         if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
+        return saved;
+      }
+
+      // Reduce una imagen (archivo o dataURL) a un JPEG de máx. maxDim px para no llenar el almacenamiento.
+      function btCompressImage(source, maxDim, quality) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          let objectUrl = null;
+          const cleanup = () => { if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; } };
+          img.onload = () => {
+            try {
+              const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight, 1));
+              const w = Math.max(1, Math.round(img.naturalWidth * scale));
+              const h = Math.max(1, Math.round(img.naturalHeight * scale));
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              let q = quality;
+              let out = canvas.toDataURL('image/jpeg', q);
+              while (out.length > 250000 && q > 0.4) {
+                q -= 0.1;
+                out = canvas.toDataURL('image/jpeg', q);
+              }
+              resolve(out);
+            } catch (err) {
+              reject(err);
+            } finally {
+              cleanup();
+            }
+          };
+          img.onerror = () => { cleanup(); reject(new Error('Imagen no válida')); };
+          if (typeof source === 'string') {
+            img.src = source;
+          } else {
+            objectUrl = URL.createObjectURL(source);
+            img.src = objectUrl;
+          }
+        });
+      }
+
+      // Reduce, una sola vez y de a una, las fotos ya guardadas que pesan demasiado.
+      function btShrinkExistingPhotos() {
+        const jobs = [];
+        btStore.babies.forEach(b => (Array.isArray(b.photos) ? b.photos : []).forEach(photo => {
+          if (photo && typeof photo.dataUrl === 'string' && photo.dataUrl.startsWith('data:image/') && photo.dataUrl.length > 350000) jobs.push(photo);
+        }));
+        if (jobs.length === 0) return;
+        jobs.reduce((chain, photo) => chain.then(() =>
+          btCompressImage(photo.dataUrl, 800, 0.7)
+            .then(small => { if (small.length < photo.dataUrl.length) photo.dataUrl = small; })
+            .catch(() => {})
+        ), Promise.resolve()).then(() => {
+          saveBtState();
+          renderBtMainContent();
+        });
       }
 
       function getCurrentBaby() {
@@ -8508,7 +8719,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                         <span class="font-mono font-bold text-slate-300 text-xs w-12 shrink-0">${escapeHtml(formatTime(dose.time))}</span>
                         <div class="min-w-0 flex-1">
                           <span class="block font-bold ${isTaken ? 'line-through text-slate-500' : 'text-slate-100'} truncate">${escapeHtml(dose.med.name)}</span>
-                          <span class="block text-[10px] text-blue-300 font-semibold">${escapeHtml(dose.med.dose)} · cada ${dose.med.frequency}h</span>
+                          <span class="block text-[10px] text-blue-300 font-semibold">${escapeHtml(dose.med.dose)} · cada ${escapeHtml(dose.med.frequency)}h</span>
                         </div>
                       </div>
                       <button type="button" data-bt-toggle-babydose="${escapeHtml(logKey)}" class="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 font-bold text-[11px] transition-all active:scale-95 ${isTaken ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent shadow'}">
@@ -8576,7 +8787,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
                   <div class="min-w-0 flex-1">
                     <p class="font-bold text-slate-100 truncate">${escapeHtml(m.name)}</p>
-                    <p class="text-[10px] text-blue-300">Dosis: ${escapeHtml(m.dose)} · Cada ${m.frequency}h · Inicio: ${escapeHtml(m.startDate)} (${m.duration} días)</p>
+                    <p class="text-[10px] text-blue-300">Dosis: ${escapeHtml(m.dose)} · Cada ${escapeHtml(m.frequency)}h · Inicio: ${escapeHtml(m.startDate)} (${escapeHtml(m.duration)} días)</p>
                     ${m.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5 truncate">${escapeHtml(m.notes)}</p>` : ''}
                   </div>
                   <button type="button" data-bt-del-babymed="${m.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
@@ -8979,7 +9190,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <div class="flex items-center gap-2.5 min-w-0">
                     <span class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-base shrink-0">${s.type === 'Nocturno' ? '🌙' : '☀️'}</span>
                     <div class="min-w-0">
-                      <p class="font-bold text-slate-100">${escapeHtml(s.type)} • <span class="text-sky-300">${s.hours} h</span></p>
+                      <p class="font-bold text-slate-100">${escapeHtml(s.type)} • <span class="text-sky-300">${escapeHtml(s.hours)} h</span></p>
                       <p class="text-[10px] text-slate-400">Inicio: ${escapeHtml(fmtBtTime(s.start))} • ${escapeHtml(s.note || 'Sin notas')}</p>
                     </div>
                   </div>
@@ -9142,7 +9353,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               ${btState.photos.map(p => `
                 <div class="bg-[#1e2733] rounded-xl border border-slate-700/60 overflow-hidden shadow-lg flex flex-col">
                   <div class="h-28 flex items-center justify-center text-4xl relative overflow-hidden" style="background: ${escapeHtml(p.bg || 'linear-gradient(135deg,#0284c7,#1e3a8a)')}">
-                    ${p.dataUrl ? `<img src="${p.dataUrl}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover">` : `<span>${p.emoji || '📸'}</span>`}
+                    ${typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/') ? `<img src="${escapeHtml(p.dataUrl)}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover">` : `<span>${escapeHtml(p.emoji || '📸')}</span>`}
                   </div>
                   <div class="p-2.5 flex-1 flex flex-col justify-between">
                     <div>
@@ -9178,15 +9389,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
               bg: 'linear-gradient(135deg,#0284c7,#2563eb)',
               dataUrl: dataUrl || ''
             });
-            saveBtState();
+            if (!saveBtState()) {
+              btState.photos.shift();
+              renderBtMainContent();
+              return;
+            }
             renderBtMainContent();
             notifyBt('Galería', 'Nuevo recuerdo guardado');
           };
 
           if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) { finishSave(evt.target.result); };
-            reader.readAsDataURL(file);
+            if (!/^image\//.test(file.type)) {
+              notifyBt('Galería', 'El archivo elegido no es una imagen');
+              return;
+            }
+            btCompressImage(file, 800, 0.7)
+              .then(finishSave)
+              .catch(() => notifyBt('Galería', 'No se pudo procesar la foto'));
           } else {
             finishSave('');
           }
@@ -9237,7 +9456,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 ${btState.growth.slice().reverse().map(g => `
                   <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
                     <span class="font-bold text-slate-200">${escapeHtml(g.label)}</span>
-                    <span class="text-slate-400">⚖️ ${g.weight} kg • 📏 ${g.height} cm • 🧠 ${g.head} cm</span>
+                    <span class="text-slate-400">⚖️ ${escapeHtml(g.weight)} kg • 📏 ${escapeHtml(g.height)} cm • 🧠 ${escapeHtml(g.head)} cm</span>
                     <button type="button" data-bt-del-growth="${g.id}" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
                   </div>
                 `).join('')}
@@ -9923,6 +10142,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         btSleepInterval = setInterval(updateBtSleepTimerDisplay, 1000);
       });
 
+      setTimeout(btShrinkExistingPhotos, 2500);
       window.setBtActiveTab = setBtActiveTab;
       window.openBtQuickModal = openBtQuickModal;
       window.renderBabyTrackerView = function() {
