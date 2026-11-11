@@ -244,6 +244,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <i class="fa-solid fa-bell"></i>
         </button>
 
+        <!-- Share with Another Person Trigger -->
+        <button onclick="openShareModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95 shadow-sm" title="Compartir con otra persona (combina sin borrar)">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+
         <!-- Backup & Settings Modal Trigger -->
         <button onclick="openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Ajustes y Respaldos">
           <i class="fa-solid fa-gear"></i>
@@ -259,20 +264,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <span id="tab-calendar-label" class="block max-w-full truncate uppercase text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">CALENDARIO</span>
           <div id="tab-calendar-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-400"></div>
         </button>
-        <button id="tab-summary-btn" onclick="switchView('summary')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-teal-300">
-          <i class="fa-solid fa-note-sticky text-lg md:text-sm leading-none"></i>
-          <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">NOTAS</span>
+        <button id="tab-summary-btn" onclick="switchView('summary')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
+          <i class="fa-solid fa-cake-candles text-lg md:text-sm leading-none"></i>
+          <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
         <button id="tab-turns-btn" onclick="switchView('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
           <i class="fa-solid fa-user-doctor text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">TURNOS</span>
           <div id="tab-turns-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
-        </button>
-        <button id="tab-birthdays-btn" onclick="switchView('birthdays')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400">
-          <i class="fa-solid fa-cake-candles text-lg md:text-sm leading-none"></i>
-          <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">EVENTO</span>
-          <div id="tab-birthdays-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
         <button id="tab-meds-btn" onclick="switchView('meds')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400">
           <i class="fa-solid fa-pills text-lg md:text-sm leading-none"></i>
@@ -381,32 +381,82 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </form>
       </div>
 
-      <!-- VISTA 3: AGENDA DE NOTAS -->
+      <!-- VISTA UNIFICADA: EVENTOS Y NOTAS -->
       <div id="view-summary" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
-        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-note-sticky text-teal-400 text-base"></i>
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">AGENDA DE NOTAS</h3>
+        
+        <!-- HEADER DE EVENTOS Y NOTAS (Optimizado para móvil) -->
+        <div class="bg-gradient-to-r from-[#1e2733] to-[#17202c] p-3 rounded-2xl border border-slate-700/70 shadow-lg flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
+              <i class="fa-solid fa-cake-candles text-sm"></i>
+            </span>
+            <div class="min-w-0">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-100 truncate">EVENTOS Y NOTAS</h3>
+              <p class="text-[10px] text-slate-400 truncate">Cumpleaños, aniversarios y notas</p>
+            </div>
           </div>
-          <button type="button" onclick="openDirectNoteModal()" class="px-2.5 py-1 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
-            <i class="fa-solid fa-plus"></i> Añadir
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="openDirectBirthdayModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95" title="Añadir nuevo evento o cumpleaños">
+              <i class="fa-solid fa-cake-candles text-xs"></i> <span>+ Evento</span>
+            </button>
+            <button type="button" onclick="openDirectNoteModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-md shadow-teal-500/20 active:scale-95" title="Añadir nueva nota">
+              <i class="fa-solid fa-note-sticky text-xs"></i> <span>+ Nota</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SUB-PESTAÑAS: PRIMERO EVENTOS, DESPUÉS NOTAS -->
+        <div class="grid grid-cols-2 gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+          <button id="tab-birthdays-btn" type="button" onclick="setNotesEventsSubTab('events')" class="py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 active:scale-95">
+            <i class="fa-solid fa-cake-candles text-xs"></i>
+            <span>Eventos</span>
+          </button>
+          <button id="notes-subtab-btn" type="button" onclick="setNotesEventsSubTab('notes')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200 active:scale-95">
+            <i class="fa-solid fa-note-sticky text-xs"></i>
+            <span>Notas</span>
           </button>
         </div>
-        <section id="notes-stats-panel" class="flex-1 space-y-3 overflow-y-auto max-h-[70vh] pr-1">
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-300 text-center flex items-center justify-center gap-2">
+
+        <!-- 1. PANEL DE EVENTOS Y CUMPLEAÑOS (MOSTRADO PRIMERO) -->
+        <section id="events-list-panel" class="flex-1 flex flex-col space-y-2.5 min-h-0">
+          <div class="grid grid-cols-2 gap-2">
+            <button id="bday-tab-upcoming" onclick="setBirthdayFilterTab('upcoming')" class="py-2.5 px-3 rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-sm bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 active:scale-95">
+              <i class="fa-solid fa-star text-xs"></i>
+              <span>Próximos Cumpleaños</span>
+            </button>
+            <button id="bday-tab-anniversaries" onclick="setBirthdayFilterTab('anniversaries')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700 active:scale-95">
+              <i class="fa-solid fa-heart text-xs text-rose-400"></i>
+              <span>Aniversarios</span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between px-1 pt-0.5">
+            <span id="birthdays-total-badge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-0.5 rounded-lg text-[11px] flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-cake-candles text-[10px]"></i>
+              <span>0 Registrados</span>
+            </span>
+            <span class="text-[10px] text-slate-400 italic">Toca una tarjeta para ver detalle</span>
+          </div>
+          <div id="birthdays-list-container" class="flex-1 space-y-2.5 overflow-y-auto max-h-[62vh] pr-1 pb-4">
+            <!-- Event Cards Dinámicas -->
+          </div>
+        </section>
+
+        <!-- 2. PANEL DE NOTAS (MOSTRADO EN SEGUNDO LUGAR) -->
+        <section id="notes-stats-panel" class="hidden flex-1 space-y-3 overflow-y-auto max-h-[70vh] pr-1 pb-4">
+          <div class="bg-gradient-to-br from-[#1e2733] to-[#17202c] p-3.5 rounded-2xl border border-slate-700/70 shadow-lg space-y-3">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 text-center flex items-center justify-center gap-2">
               <i class="fa-solid fa-chart-pie text-teal-400"></i>
               <span>ESTADÍSTICAS DE NOTAS</span>
             </h3>
-            <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700/80 text-center">
-              <button id="summary-mode-month" onclick="setSummaryMode('month')" class="py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow">Mes</button>
-              <button id="summary-mode-year" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">Año</button>
-              <button id="summary-mode-all" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">Histórico</button>
+            <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center shadow-inner">
+              <button id="summary-mode-month" onclick="setSummaryMode('month')" class="py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white transition-all shadow">Mes</button>
+              <button id="summary-mode-year" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Año</button>
+              <button id="summary-mode-all" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Histórico</button>
             </div>
-            <div id="summary-nav-banner" class="flex items-center justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
-              <button onclick="changeSummaryPeriod(-1)" class="p-1 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-              <span id="summary-period-title" class="text-xs font-extrabold text-slate-200 uppercase tracking-wide">NOVIEMBRE 2026</span>
-              <button onclick="changeSummaryPeriod(1)" class="p-1 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            <div id="summary-nav-banner" class="flex items-center justify-between bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-800">
+              <button onclick="changeSummaryPeriod(-1)" aria-label="Anterior" class="p-1.5 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+              <span id="summary-period-title" class="text-xs font-extrabold text-slate-100 uppercase tracking-wide">NOVIEMBRE 2026</span>
+              <button onclick="changeSummaryPeriod(1)" aria-label="Siguiente" class="p-1.5 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
             </div>
             <div id="summary-table-header" class="grid grid-cols-12 text-[10px] font-bold text-slate-400 px-1 border-b border-slate-700/50 pb-1 italic">
               <div class="col-span-5" id="summary-header-name">Nota</div>
@@ -414,13 +464,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <div class="col-span-4 text-right" id="summary-header-time">Tiempo Total</div>
             </div>
             <div id="summary-stats-breakdown" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
-            <div class="pt-2 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-300">
+            <div class="pt-2.5 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-200">
               <span id="summary-global-time-wrapper">Tiempo Total: <span id="summary-global-time" class="text-amber-400 font-extrabold">0h 0m</span></span>
               <span id="summary-global-count-label">Global: <span id="summary-global-count" class="text-teal-400 font-extrabold">0 Notas</span></span>
             </div>
           </div>
-                  <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg space-y-2 mt-3">
-            <h4 id="nearby-section-title" class="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <div class="bg-gradient-to-br from-[#1e2733] to-[#17202c] p-3 rounded-2xl border border-slate-700/70 shadow-lg space-y-2 mt-3">
+            <h4 id="nearby-section-title" class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-clock text-teal-400"></i>
               <span>NOTAS CERCANAS</span>
             </h4>
@@ -479,44 +529,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </section>
       </div>
 
-      <!-- VISTA 4: CUMPLEAÑOS -->
-      <div id="view-birthdays" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
-        
-        <!-- HEADER DE CUMPLEAÑOS -->
-        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-cake-candles text-amber-400 text-base"></i>
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">GESTIÓN DE EVENTOS</h3>
-          </div>
-          <button onclick="openDirectBirthdayModal()" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
-            <i class="fa-solid fa-plus"></i> Añadir
-          </button>
-        </div>
-
-        <!-- BOTONES DE FILTRO (PRÓXIMOS Y ANIVERSARIOS) -->
-        <div class="grid grid-cols-2 gap-2">
-          <button id="bday-tab-upcoming" onclick="setBirthdayFilterTab('upcoming')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-amber-500 text-slate-950">
-            <i class="fa-solid fa-star text-xs"></i>
-            <span>Próximos Cumpleaños</span>
-          </button>
-          <button id="bday-tab-anniversaries" onclick="setBirthdayFilterTab('anniversaries')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700">
-            <i class="fa-solid fa-list text-xs"></i>
-            <span>Aniversarios</span>
-          </button>
-        </div>
-
-        <!-- TOTAL BADGE -->
-        <div class="flex items-center justify-between px-1 pt-1">
-          <span id="birthdays-total-badge" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-0.5 rounded text-[11px]">
-            0 Registrados
-          </span>
-        </div>
-
-        <!-- LISTA DE CUMPLEAÑOS -->
-        <div id="birthdays-list-container" class="flex-1 space-y-2 overflow-y-auto max-h-[60vh] pr-1">
-          <!-- Birthday Cards -->
-        </div>
-      </div>
+      <!-- CONTENEDOR AUXILIAR DE COMPATIBILIDAD -->
+      <div id="view-birthdays" class="hidden"><div id="tab-birthdays-indicator" class="hidden"></div></div>
 
       <!-- VISTA 5: CONTROL DE MEDICAMENTOS (MiMedicina) -->
       <div id="view-meds" class="hidden flex-1 flex flex-col py-2 space-y-4 view-transition">
@@ -646,16 +660,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-baby text-sky-400 text-base"></i>
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">BABY TRACKER</h3>
-            <span id="btBabiesCountBadge" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">1 Bebé</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button type="button" id="btAddNewBabyBtn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1 active:scale-95" title="Registrar otro bebé">
-              <i class="fa-solid fa-plus"></i> Nuevo Bebé
-            </button>
-            <button type="button" id="btQuickAddHeaderBtn" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
-              <i class="fa-solid fa-plus"></i> Registro
-            </button>
-          </div>
+          <button type="button" id="btQuickAddHeaderBtn" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
+            <i class="fa-solid fa-plus"></i> Registro
+          </button>
         </div>
 
         <!-- SELECTOR DE BEBÉS REGISTRADOS -->
@@ -687,12 +695,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <strong id="btStatZodiac" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Zodiaco</span>
             </button>
-            <button type="button" id="btStatChineseCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
-              <strong id="btStatChinese" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
+            <button type="button" id="btStatChineseCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatChinese" class="block text-[11px] sm:text-xs font-extrabold text-slate-100 truncate leading-tight" title="Horóscopo Chino">—</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Chino</span>
             </button>
-            <button type="button" id="btStatMoonCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
-              <strong id="btStatMoon" class="block text-xs font-extrabold text-slate-100 truncate">—</strong>
+            <button type="button" id="btStatMoonCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 transition-colors">
+              <strong id="btStatMoon" class="block text-[11px] sm:text-xs font-extrabold text-slate-100 truncate leading-tight" title="Horóscopo Lunar">—</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Luna</span>
             </button>
             <button type="button" id="btStatDevCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
@@ -769,21 +777,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
 
         <div id="day-add-actions" class="grid grid-cols-4 gap-1.5 mt-2">
-          <button type="button" onclick="showCreateFormInModal()" class="py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
-            <i class="fa-solid fa-plus"></i>
-            <span>Nota</span>
+          <button type="button" id="day-add-birthdays-btn" onclick="openNoteOrEventChooserFromDay()" class="py-2.5 bg-gradient-to-r from-amber-500 to-teal-600 hover:from-amber-400 hover:to-teal-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1" title="Añadir nota o evento a este día">
+            <i class="fa-solid fa-cake-candles text-[10px]"></i>
+            <span>Evento/Nota</span>
           </button>
           <button type="button" id="day-add-turns-btn" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
             <i class="fa-solid fa-user-doctor"></i>
             <span>Turno</span>
           </button>
-          <button type="button" id="day-add-birthdays-btn" onclick="showCreateBirthdayFormInModal()" class="py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
-            <i class="fa-solid fa-cake-candles"></i>
-            <span>Eventos</span>
-          </button>
-          <button type="button" id="day-add-meds-btn" onclick="openHealthControlFromDay()" class="py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1">
+          <button type="button" id="day-add-meds-btn" onclick="openHealthRegistrationChooserFromDay()" class="py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1" title="Registrar medicamento o control de salud">
             <i class="fa-solid fa-pills"></i>
             <span>Salud</span>
+          </button>
+          <button type="button" id="day-add-baby-btn" onclick="openBabyRegistrationChooserFromDay()" class="py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1" title="Registros del bebé para este día">
+            <i class="fa-solid fa-baby"></i>
+            <span>Bebé</span>
           </button>
         </div>
         <button id="paste-note-button" type="button" onclick="pasteNoteToCurrentDay()" class="hidden w-full min-h-11 mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 touch-manipulation">
@@ -1028,19 +1036,118 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
+  <!-- MODAL SELECTOR UNIFICADO: NOTA O EVENTO DESDE EL DÍA -->
+  <div id="noteOrEventChooser" class="fixed inset-0 z-[75] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeNoteOrEventChooser()">
+    <section class="w-full max-w-sm rounded-2xl border border-slate-700 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span>¿Qué deseas agregar?</span>
+        </h3>
+        <button type="button" onclick="closeNoteOrEventChooser()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="chooseAddBirthdayFromModal()" class="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 hover:to-amber-600/40 border border-amber-500/50 text-left font-bold text-xs flex flex-col gap-1.5 shadow transition-all active:scale-95 text-amber-200">
+          <span class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center text-sm shadow">
+            <i class="fa-solid fa-cake-candles"></i>
+          </span>
+          Eventos
+        </button>
+        <button type="button" onclick="chooseAddNoteFromModal()" class="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-600/30 hover:from-teal-500/30 hover:to-teal-600/40 border border-teal-500/50 text-left font-bold text-xs flex flex-col gap-1.5 shadow transition-all active:scale-95 text-teal-200">
+          <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center text-sm shadow">
+            <i class="fa-solid fa-note-sticky"></i>
+          </span>
+          Nota
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL SELECTOR DE REGISTRO DE BEBÉ DESDE EL DÍA -->
+  <div id="babyRegistrationChooser" class="fixed inset-0 z-[75] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyRegistrationChooser()">
+    <section class="w-full max-w-sm rounded-2xl border border-slate-700 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i class="fa-solid fa-baby text-sky-400"></i>
+          <span>Registro del Bebé</span>
+        </h3>
+        <button type="button" onclick="closeBabyRegistrationChooser()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <p class="text-[11px] text-slate-400">Selecciona el tipo de registro para <strong class="text-sky-300" id="baby-chooser-name">el bebé</strong>:</p>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="babyChooserAction('control')" class="p-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/50 text-left font-bold text-xs flex flex-col gap-1 transition-all active:scale-95 shadow">
+          <span class="flex items-center gap-1.5 text-purple-200"><i class="fa-solid fa-user-doctor text-purple-400"></i> Control Médico</span>
+          <span class="text-[10px] text-purple-300 font-normal">Pediatría, cita o examen</span>
+        </button>
+        <button type="button" onclick="babyChooserAction('med')" class="p-2.5 rounded-xl bg-blue-900/40 hover:bg-blue-900/60 border border-blue-500/50 text-left font-bold text-xs flex flex-col gap-1 transition-all active:scale-95 shadow">
+          <span class="flex items-center gap-1.5 text-blue-200"><i class="fa-solid fa-pills text-blue-400"></i> Medicamento</span>
+          <span class="text-[10px] text-blue-300 font-normal">Gotas, jarabes y tomas</span>
+        </button>
+        <button type="button" onclick="babyChooserAction('feeding')" class="p-2.5 rounded-xl bg-amber-900/30 hover:bg-amber-900/50 border border-amber-500/40 text-left font-bold text-xs flex flex-col gap-1 transition-all active:scale-95 shadow">
+          <span class="flex items-center gap-1.5 text-amber-200"><i class="fa-solid fa-bottle-droplet text-amber-400"></i> Alimentación</span>
+          <span class="text-[10px] text-amber-300 font-normal">Biberón, comida o agua</span>
+        </button>
+        <button type="button" onclick="babyChooserAction('diaper')" class="p-2.5 rounded-xl bg-teal-900/30 hover:bg-teal-900/50 border border-teal-500/40 text-left font-bold text-xs flex flex-col gap-1 transition-all active:scale-95 shadow">
+          <span class="flex items-center gap-1.5 text-teal-200"><i class="fa-solid fa-baby text-teal-400"></i> Pañal</span>
+          <span class="text-[10px] text-teal-300 font-normal">Mojado o sucio</span>
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-slate-700/60">
+        <button type="button" onclick="babyChooserAction('tracker')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Abrir panel Baby Tracker</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
   <div id="healthRegistrationChooser" class="fixed inset-0 z-[70] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeHealthRegistrationChooser()">
-    <section class="w-full max-w-sm rounded-2xl border border-slate-700 bg-[#1e293b] p-4 text-slate-100 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-700/70 pb-3 mb-3">
-        <h3 class="font-bold text-sm">¿Qué deseas agregar?</h3>
+    <section class="w-full max-w-sm rounded-2xl border border-slate-700 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <i class="fa-solid fa-notes-medical text-teal-400"></i>
+          <span>¿Qué deseas registrar?</span>
+        </h3>
         <button type="button" onclick="closeHealthRegistrationChooser()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="grid gap-2">
-        <button type="button" onclick="openHealthControlForm()" class="min-h-12 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3 text-left text-xs font-bold flex items-center gap-2">
-          <i class="fa-solid fa-calendar-check"></i> Crear registro de control
-        </button>
-        <button type="button" onclick="openMedicationRegistration()" class="min-h-12 rounded-lg bg-blue-600 hover:bg-blue-500 px-3 text-left text-xs font-bold flex items-center gap-2">
-          <i class="fa-solid fa-pills"></i> Crear registro de medicamento
-        </button>
+
+      <!-- Sección Salud Adultos / General -->
+      <div class="space-y-1.5">
+        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 flex items-center gap-1.5">
+          <i class="fa-solid fa-user text-blue-400"></i> Salud General / Adulto
+        </span>
+        <div class="grid gap-2">
+          <button type="button" onclick="openHealthControlForm(null, currentHealthPresetDate)" class="min-h-11 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3 text-left text-xs font-bold flex items-center gap-2 text-white shadow transition-all active:scale-95">
+            <i class="fa-solid fa-calendar-check"></i> Crear registro de control
+          </button>
+          <button type="button" onclick="openMedicationRegistration(currentHealthPresetDate)" class="min-h-11 rounded-lg bg-blue-600 hover:bg-blue-500 px-3 text-left text-xs font-bold flex items-center gap-2 text-white shadow transition-all active:scale-95">
+            <i class="fa-solid fa-pills"></i> Crear registro de medicamento
+          </button>
+        </div>
+      </div>
+
+      <!-- Sección Bebé -->
+      <div class="space-y-1.5 pt-2 border-t border-slate-800">
+        <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 block px-1 flex items-center gap-1.5">
+          <span>👶</span> Bebé (Baby Tracker)
+        </span>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="registerBabyControlFromChooser(currentHealthPresetDate)" class="p-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-left font-bold text-xs flex flex-col gap-1 shadow transition-all active:scale-95">
+            <span class="flex items-center gap-1.5 text-purple-100"><i class="fa-solid fa-user-doctor"></i> Control Bebé</span>
+            <span class="text-[10px] text-purple-200 font-normal">Pediatría / Cita</span>
+          </button>
+          <button type="button" onclick="registerBabyMedFromChooser(currentHealthPresetDate)" class="p-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-left font-bold text-xs flex flex-col gap-1 shadow transition-all active:scale-95">
+            <span class="flex items-center gap-1.5 text-sky-100"><i class="fa-solid fa-prescription-bottle-medical"></i> Med Bebé</span>
+            <span class="text-[10px] text-sky-200 font-normal">Dosis y tomas</span>
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -1268,6 +1375,98 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
+  <!-- MODAL: COMPARTIR CON OTRA PERSONA -->
+  <div id="share-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-[80] transition-opacity" onclick="if(event.target===this) closeShareModal()">
+    <div class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3.5">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-share-nodes text-sky-400"></i>
+          <span>Compartir con otra persona</span>
+        </h3>
+        <button type="button" onclick="closeShareModal()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300">Selecciona qué apartados deseas compartir. Al cargarlo en la otra app <strong>se combinará automáticamente sin borrar</strong> lo que esa persona ya tenga:</p>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl divide-y divide-slate-800 text-xs shadow-inner">
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-400 text-xs"></i>Turnos</span>
+          <input type="checkbox" id="share-opt-turns" checked class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cake-candles text-amber-400 text-xs"></i>Eventos (Cumpleaños y fechas)</span>
+          <input type="checkbox" id="share-opt-events" checked class="w-4 h-4 rounded text-amber-500 focus:ring-amber-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-note-sticky text-teal-400 text-xs"></i>Notas y recordatorios</span>
+          <input type="checkbox" id="share-opt-notes" checked class="w-4 h-4 rounded text-teal-500 focus:ring-teal-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud (Citas y medicamentos)</span>
+          <input type="checkbox" id="share-opt-health" checked class="w-4 h-4 rounded text-blue-500 focus:ring-blue-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé (Controles, tomas y registros)</span>
+          <input type="checkbox" id="share-opt-baby" checked class="w-4 h-4 rounded text-sky-500 focus:ring-sky-400 bg-slate-800 border-slate-700">
+        </label>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button type="button" onclick="executeShareData('direct')" class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Compartir por WhatsApp / Mensaje</span>
+        </button>
+        <button type="button" onclick="executeShareData('file')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95">
+          <i class="fa-solid fa-download"></i>
+          <span>Descargar archivo para compartir (.json)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MODO DE CARGA / IMPORTACIÓN (COMBINAR vs REEMPLAZAR) -->
+  <div id="import-choice-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-3 z-[80] transition-opacity" onclick="if(event.target===this) closeImportChoiceModal()">
+    <div class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3.5">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-file-import text-teal-400"></i>
+          <span>Cargar datos en tu App</span>
+        </h3>
+        <button type="button" onclick="closeImportChoiceModal()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300">El archivo contiene datos de calendario, salud y/o bebé. ¿Cómo deseas cargarlos?</p>
+
+      <div class="space-y-2.5">
+        <!-- OPCIÓN RECOMENDADA: COMBINAR SIN BORRAR -->
+        <button type="button" onclick="confirmImportChoice('merge')" class="w-full p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-sky-500/20 hover:from-teal-500/30 hover:to-sky-500/30 border border-teal-500/50 text-left flex flex-col gap-1 transition-all active:scale-95 shadow">
+          <span class="flex items-center gap-2 text-xs font-black text-teal-300">
+            <i class="fa-solid fa-object-ungroup text-base"></i>
+            <span>Combinar con mis datos (Recomendado)</span>
+          </span>
+          <span class="text-[11px] text-slate-300 font-normal leading-tight">
+            <strong>NO borra nada</strong> de lo que ya tienes creado en tu app. Agrega los turnos, eventos, notas, datos del bebé y salud compartidos.
+          </span>
+        </button>
+
+        <!-- OPCIÓN SECUNDARIA: REEMPLAZAR TODO -->
+        <button type="button" onclick="confirmImportChoice('replace')" class="w-full p-3 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-700 text-left flex flex-col gap-1 transition-all active:scale-95">
+          <span class="flex items-center gap-2 text-xs font-bold text-amber-300">
+            <i class="fa-solid fa-arrows-rotate text-sm"></i>
+            <span>Reemplazar todo (Copia completa)</span>
+          </span>
+          <span class="text-[11px] text-slate-400 font-normal leading-tight">
+            Sustituye todos tus datos actuales por los del archivo. Antes se descargará una copia de seguridad automática.
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: AJUSTES Y RESPALDOS -->
   <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-50 transition-opacity">
     <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-4">
@@ -1297,11 +1496,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
             <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
           </label>
-          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
-            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cake-candles text-amber-400 text-xs"></i>Eventos</span>
-            <input type="checkbox" id="tab-visible-birthdays" onchange="setTabVisibility('birthdays', this.checked)" class="peer sr-only" checked>
-            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-          </label>
+
           <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
             <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
             <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
@@ -1315,8 +1510,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </div>
         </div>
 
+        <!-- COMPARTIR CON OTRA PERSONA -->
+        <div class="p-3 rounded-xl bg-gradient-to-br from-sky-950/40 to-teal-950/40 border border-sky-500/40 space-y-2">
+          <div class="flex items-center gap-2 text-sky-300 font-bold">
+            <i class="fa-solid fa-share-nodes text-sm"></i>
+            <span>Compartir con otra persona</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-tight">
+            Envía tus turnos, eventos, notas, bebé o salud a otra persona. Al cargarlo en su app, <strong>se combinará sin borrar lo que ya tenga</strong>.
+          </p>
+          <button onclick="openShareModal()" class="w-full py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
+            <i class="fa-solid fa-share-nodes"></i> Elegir qué compartir
+          </button>
+        </div>
+
         <div>
-          <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad:</span>
+          <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad Completa:</span>
           <button onclick="exportDataJSON()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
             <i class="fa-solid fa-download"></i> Descargar JSON
           </button>
@@ -1388,12 +1597,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
     let timeFormat = readStoredValue('cal_time_format', '24') === 'ampm' ? 'ampm' : '24';
     const TAB_VISIBILITY_KEY = 'cal_tab_visibility';
     let tabVisibility = (() => {
-      const defaults = { turns: true, birthdays: true, meds: true, baby: true };
+      const defaults = { turns: true, meds: true, baby: true };
       try {
         const saved = JSON.parse(readStoredValue(TAB_VISIBILITY_KEY, '{}'));
-        Object.keys(defaults).forEach(key => {
-          if (saved && saved[key] === false) defaults[key] = false;
-        });
+        if (saved && typeof saved === 'object') {
+          // Eventos queda siempre visible
+          if (saved.birthdays !== undefined) {
+            delete saved.birthdays;
+            try { localStorage.setItem(TAB_VISIBILITY_KEY, JSON.stringify(saved)); } catch(e){}
+          }
+          Object.keys(defaults).forEach(key => {
+            if (saved[key] === false) defaults[key] = false;
+          });
+        }
       } catch (error) {
         console.warn('No se pudo leer la visibilidad de los menús.', error);
       }
@@ -1401,6 +1617,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     })();
 
     function isTabVisible(view) {
+      if (view === 'birthdays') return true;
       return !Object.prototype.hasOwnProperty.call(tabVisibility, view) || tabVisibility[view] !== false;
     }
 
@@ -1775,7 +1992,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
       } else if (activeView === 'year') {
         renderYearView();
       } else if (activeView === 'summary') {
-        renderSummaryView();
+        if (notesEventsActiveSubTab === 'events') {
+          renderBirthdaysView();
+        } else {
+          renderSummaryView();
+        }
       } else if (activeView === 'birthdays') {
         renderBirthdaysView();
       } else if (activeView === 'turns') {
@@ -1876,7 +2097,46 @@ Check your Browserslist config to be sure that your targets are set up correctly
       updateNoteTimePreview();
     }
 
+    let notesEventsActiveSubTab = 'events';
+
+    function setNotesEventsSubTab(subTab) {
+      notesEventsActiveSubTab = subTab;
+      const notesPanel = document.getElementById('notes-stats-panel');
+      const eventsPanel = document.getElementById('events-list-panel');
+      const notesBtn = document.getElementById('notes-subtab-btn');
+      const eventsBtn = document.getElementById('tab-birthdays-btn');
+
+      if (subTab === 'events') {
+        if (eventsPanel) eventsPanel.classList.remove('hidden');
+        if (notesPanel) notesPanel.classList.add('hidden');
+        if (eventsBtn) {
+          eventsBtn.className = "py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 active:scale-95";
+        }
+        if (notesBtn) {
+          notesBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200 active:scale-95";
+        }
+        renderBirthdaysView();
+      } else {
+        if (notesPanel) notesPanel.classList.remove('hidden');
+        if (eventsPanel) eventsPanel.classList.add('hidden');
+        if (notesBtn) {
+          notesBtn.className = "py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-teal-500/20 active:scale-95";
+        }
+        if (eventsBtn) {
+          eventsBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200 active:scale-95";
+        }
+        renderSummaryView();
+      }
+    }
+
     function switchView(view) {
+      if (view === 'birthdays') {
+        view = 'summary';
+        notesEventsActiveSubTab = 'events';
+      } else if (view === 'summary') {
+        if (!notesEventsActiveSubTab) notesEventsActiveSubTab = 'events';
+      }
+
       activeView = view;
       if (view === 'month' || view === 'year') lastCalendarView = view;
       ['view-month', 'view-year', 'view-summary', 'view-turns', 'view-birthdays', 'view-meds', 'view-baby'].forEach(id => {
@@ -1888,15 +2148,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const ind = document.getElementById(`${prefix}-indicator`);
         const btn = document.getElementById(`${prefix}-btn`);
         if (ind) ind.className = "absolute bottom-0 left-0 right-0 h-1 bg-transparent";
-        if (btn) btn.className = "flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-slate-300";
+        if (btn && btn.parentElement && btn.parentElement.id === 'top-tab-header') {
+          btn.className = "flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-slate-300";
+        }
       });
 
-      let activeColorClass = view === 'month' || view === 'year' ? 'text-indigo-300' : 'text-teal-400';
-      let activeBgClass = view === 'month' || view === 'year' ? 'bg-indigo-400' : 'bg-teal-400';
-      if (view === 'birthdays') {
-        activeColorClass = 'text-amber-400';
-        activeBgClass = 'bg-amber-400';
-      } else if (view === 'turns') {
+      let activeColorClass = view === 'month' || view === 'year' ? 'text-indigo-300' : (view === 'summary' ? 'text-amber-400' : 'text-teal-400');
+      let activeBgClass = view === 'month' || view === 'year' ? 'bg-indigo-400' : (view === 'summary' ? 'bg-amber-400' : 'bg-teal-400');
+      if (view === 'turns') {
         activeColorClass = 'text-purple-300';
         activeBgClass = 'bg-purple-400';
       } else if (view === 'meds') {
@@ -1914,6 +2173,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
           activeViewEl.classList.remove('calendar-view-enter');
           void activeViewEl.offsetWidth;
           activeViewEl.classList.add('calendar-view-enter');
+        } else if (view === 'summary') {
+          setNotesEventsSubTab(notesEventsActiveSubTab);
         }
       }
 
@@ -1988,22 +2249,159 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     // LÓGICA MEDICAMENTOS (MiMedicina)
-    function openHealthRegistrationChooser() {
+    let currentHealthPresetDate = null;
+    function openHealthRegistrationChooser(presetDateKey = null) {
+      currentHealthPresetDate = presetDateKey;
       const chooser = document.getElementById('healthRegistrationChooser');
+      if (!chooser) return;
       chooser.classList.remove('hidden');
       chooser.classList.add('flex');
     }
 
-    function closeHealthRegistrationChooser() {
-      const chooser = document.getElementById('healthRegistrationChooser');
-      chooser.classList.add('hidden');
-      chooser.classList.remove('flex');
+    function openHealthRegistrationChooserFromDay() {
+      const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      openHealthRegistrationChooser(selectedDateKey);
     }
 
-    function openMedicationRegistration() {
+    function closeHealthRegistrationChooser() {
+      const chooser = document.getElementById('healthRegistrationChooser');
+      if (!chooser) return;
+      chooser.classList.add('hidden');
+      chooser.classList.remove('flex');
+      currentHealthPresetDate = null;
+    }
+
+    function openMedicationRegistration(presetDateKey = null) {
       closeHealthRegistrationChooser();
       switchMedRegistration('meds');
-      openMedModal();
+      openMedModal(null, presetDateKey);
+    }
+
+    function openNoteOrEventChooserFromDay() {
+      const chooser = document.getElementById('noteOrEventChooser');
+      if (chooser) {
+        chooser.classList.remove('hidden');
+        chooser.classList.add('flex');
+      }
+    }
+
+    function closeNoteOrEventChooser() {
+      const chooser = document.getElementById('noteOrEventChooser');
+      if (chooser) {
+        chooser.classList.add('hidden');
+        chooser.classList.remove('flex');
+      }
+    }
+
+    function chooseAddBirthdayFromModal() {
+      closeNoteOrEventChooser();
+      showCreateBirthdayFormInModal();
+    }
+
+    function chooseAddNoteFromModal() {
+      closeNoteOrEventChooser();
+      showCreateFormInModal();
+    }
+
+    function openBabyRegistrationChooserFromDay() {
+      const bt = getBabyTrackerDataSafe();
+      let babyName = 'el bebé';
+      if (bt && Array.isArray(bt.babies) && bt.babies.length > 0) {
+        const b = bt.babies.find(item => item.id === bt.activeBabyId) || bt.babies[0];
+        if (b && b.profile && b.profile.name) babyName = b.profile.name.trim();
+      }
+      const labelEl = document.getElementById('baby-chooser-name');
+      if (labelEl) labelEl.textContent = babyName;
+
+      const chooser = document.getElementById('babyRegistrationChooser');
+      if (chooser) {
+        chooser.classList.remove('hidden');
+        chooser.classList.add('flex');
+      }
+    }
+
+    function closeBabyRegistrationChooser() {
+      const chooser = document.getElementById('babyRegistrationChooser');
+      if (chooser) {
+        chooser.classList.add('hidden');
+        chooser.classList.remove('flex');
+      }
+    }
+
+    function babyChooserAction(action) {
+      const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      closeBabyRegistrationChooser();
+      closeDayDetailModal();
+
+      if (action === 'control') {
+        registerBabyControlFromChooser(selectedDateKey);
+      } else if (action === 'med') {
+        registerBabyMedFromChooser(selectedDateKey);
+      } else if (action === 'feeding') {
+        switchView('baby');
+        if (typeof window.setBtActiveTab === 'function') {
+          window.setBtActiveTab('comida');
+        }
+        setTimeout(() => {
+          const entryForm = document.getElementById('btFeedForm');
+          if (entryForm) {
+            entryForm.classList.remove('hidden');
+            entryForm.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 120);
+      } else if (action === 'diaper') {
+        switchView('baby');
+        if (typeof window.setBtActiveTab === 'function') {
+          window.setBtActiveTab('resumen');
+        }
+        setTimeout(() => {
+          if (typeof window.openBtQuickModal === 'function') {
+            window.openBtQuickModal();
+          }
+        }, 120);
+      } else if (action === 'tracker') {
+        switchView('baby');
+      }
+    }
+
+    function registerBabyControlFromChooser(presetDateKey = null) {
+      closeHealthRegistrationChooser();
+      closeDayDetailModal();
+      switchView('baby');
+      if (typeof window.setBtActiveTab === 'function') {
+        window.setBtActiveTab('salud');
+      }
+      setTimeout(() => {
+        const form = document.getElementById('btMedControlForm');
+        if (form) {
+          form.classList.remove('hidden');
+          if (presetDateKey) {
+            const dateInput = form.querySelector('input[name="date"]');
+            if (dateInput) dateInput.value = presetDateKey;
+          }
+          form.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 120);
+    }
+
+    function registerBabyMedFromChooser(presetDateKey = null) {
+      closeHealthRegistrationChooser();
+      closeDayDetailModal();
+      switchView('baby');
+      if (typeof window.setBtActiveTab === 'function') {
+        window.setBtActiveTab('salud');
+      }
+      setTimeout(() => {
+        const form = document.getElementById('btBabyMedForm');
+        if (form) {
+          form.classList.remove('hidden');
+          if (presetDateKey) {
+            const dateInput = form.querySelector('input[name="startDate"]');
+            if (dateInput) dateInput.value = presetDateKey;
+          }
+          form.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 120);
     }
 
     
@@ -2145,10 +2543,147 @@ Check your Browserslist config to be sure that your targets are set up correctly
       return createLocalDate(year, month - 1, day).toLocaleDateString('es-ES', options);
     }
 
+    const BT_CONTROL_SPECIALTIES = {
+      cita_medica: {
+        label: 'Cita médica (Pediatría / General)',
+        name: 'Cita médica',
+        short: 'Cita médica',
+        icon: 'fa-user-doctor',
+        badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+      },
+      examenes: {
+        label: 'Exámenes clínicos / Laboratorio',
+        name: 'Exámenes',
+        short: 'Exámenes',
+        icon: 'fa-calendar-check',
+        badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+      },
+      nutricionista: {
+        label: 'Nutricionista infantil',
+        name: 'Nutricionista',
+        short: 'Nutricionista',
+        icon: 'fa-apple-whole',
+        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      },
+      dentista: {
+        label: 'Dentista / Odontopediatría',
+        name: 'Dentista',
+        short: 'Dentista',
+        icon: 'fa-tooth',
+        badge: 'bg-teal-500/20 text-teal-300 border-teal-500/40'
+      },
+      traumatologo: {
+        label: 'Traumatólogo / Ortopedia',
+        name: 'Traumatólogo',
+        short: 'Traumatólogo',
+        icon: 'fa-bone',
+        badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+      },
+      otro: {
+        label: 'Otro control médico especializado',
+        name: 'Control médico',
+        short: 'Control médico',
+        icon: 'fa-stethoscope',
+        badge: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+      }
+    };
+    window.BT_CONTROL_SPECIALTIES = BT_CONTROL_SPECIALTIES;
+
+    function getBabyTrackerDataSafe() {
+      try {
+        if (typeof window.getBabyTrackerState === 'function') {
+          const st = window.getBabyTrackerState();
+          if (st && Array.isArray(st.babies)) return st;
+        }
+        const raw = localStorage.getItem('baby_tracker_multi_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.babies)) return parsed;
+        }
+      } catch (e) {
+        console.error('Error fetching baby tracker state', e);
+      }
+      return null;
+    }
+    window.getBabyTrackerDataSafe = getBabyTrackerDataSafe;
+
+    function getBabyDosesForDate(baby, dateKey) {
+      if (!baby || !baby.health || !Array.isArray(baby.health.medications)) return [];
+      const parts = dateKey.split('-').map(Number);
+      const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+      const doses = [];
+
+      baby.health.medications.forEach(med => {
+        if (!med.startDate || !med.duration) return;
+        const startParts = med.startDate.split('-').map(Number);
+        const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(end.getDate() + (Number(med.duration) || 1));
+
+        if (targetDate >= start && targetDate < end) {
+          const freqHours = Number(med.frequency) || 24;
+          const [startHour, startMin] = (med.time || '08:00').split(':').map(Number);
+          if (freqHours <= 24) {
+            const dosesPerDay = Math.floor(24 / freqHours);
+            for (let i = 0; i < dosesPerDay; i++) {
+              const totalHour = startHour + i * freqHours;
+              if (totalHour < 24) {
+                const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
+                const doseId = `${med.id}_${timeStr}`;
+                doses.push({ doseId, med, time: timeStr, dateKey });
+              }
+            }
+          } else {
+            const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
+            const intervalDays = Math.floor(freqHours / 24);
+            if (diffDays % intervalDays === 0) {
+              const doseId = `${med.id}_${med.time || '08:00'}`;
+              doses.push({ doseId, med, time: med.time || '08:00', dateKey });
+            }
+          }
+        }
+      });
+
+      return doses.sort((a, b) => a.time.localeCompare(b.time));
+    }
+    window.getBabyDosesForDate = getBabyDosesForDate;
+
     function getHealthControlsForDate(dateKey) {
-      return healthControls
+      const controls = healthControls
         .filter(control => control.date === dateKey)
-        .sort((a, b) => a.time.localeCompare(b.time));
+        .map(c => ({ ...c, isBaby: false }));
+
+      const bt = getBabyTrackerDataSafe();
+      if (bt && Array.isArray(bt.babies)) {
+        bt.babies.forEach((baby, bIdx) => {
+          const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : `Bebé ${bIdx + 1}`;
+          const bControls = (baby.health && Array.isArray(baby.health.medicalControls)) ? baby.health.medicalControls : [];
+          bControls.forEach(bc => {
+            if (bc && bc.date === dateKey) {
+              const spec = (typeof BT_CONTROL_SPECIALTIES !== 'undefined' && BT_CONTROL_SPECIALTIES[bc.type]) || { name: 'Control médico', short: 'Control' };
+              const specName = bc.type === 'otro' && bc.customType ? bc.customType : (spec.name || 'Control médico');
+              controls.push({
+                id: bc.id,
+                date: bc.date,
+                time: bc.time || '10:00',
+                person: `👶 ${bName}`,
+                name: `Control de ${bName}`,
+                doctor: bc.doctor || '',
+                location: bc.doctor || '',
+                notes: bc.notes || '',
+                type: [bc.type || 'cita_medica'],
+                customType: specName,
+                attended: bc.attended === true,
+                isBaby: true,
+                babyId: baby.id,
+                babyName: bName
+              });
+            }
+          });
+        });
+      }
+
+      return controls.sort((a, b) => a.time.localeCompare(b.time));
     }
 
     function formatHealthControlTypes(control) {
@@ -2333,7 +2868,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       renderMedicationStats();
     }
 
-    function openMedModal(editId = null) {
+    function openMedModal(editId = null, presetDateKey = null) {
       const modal = document.getElementById('medModal');
       const form = document.getElementById('medForm');
       form.reset();
@@ -2358,7 +2893,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       } else {
         document.getElementById('medModalTitle').innerHTML = '<i class="fa-solid fa-pills text-blue-400"></i> Registrar Medicamento';
         document.getElementById('medId').value = '';
-        const todayStr = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        const todayStr = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey))
+          ? presetDateKey
+          : formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
         document.getElementById('medStartDate').value = todayStr;
         document.getElementById('medTime').value = '08:00';
       }
@@ -2436,9 +2973,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function formatMedicationDoseDetails(medication) {
-      const prescribedDose = `${medication.doseVal} ${medication.doseUnit}`;
+      if (!medication) return '';
+      if (medication.dose && !medication.doseVal) {
+        return `Dosis: ${medication.dose}${medication.frequency ? ` · cada ${medication.frequency}h` : ''}`;
+      }
+      const val = medication.doseVal || medication.dose || '';
+      const unit = medication.doseUnit || '';
+      const prescribedDose = `${val} ${unit}`.trim() || 'Según indicación';
       const presentation = medication.formType ? ` · Frasco: ${medication.formType}` : '';
-      return `Dosis: ${prescribedDose}${presentation} · Toma: ${formatMedicationDose(medication)}`;
+      const takeCalc = formatMedicationDose(medication);
+      return `Dosis: ${prescribedDose}${presentation}${takeCalc ? ` · Toma: ${takeCalc}` : ''}`;
     }
 
     function calculateDoseHelper() {
@@ -2510,15 +3054,107 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function toggleDoseLog(dateKey, doseId) {
+      if (typeof doseId === 'string' && (doseId.startsWith('baby::') || doseId.startsWith('baby_'))) {
+        const bt = getBabyTrackerDataSafe();
+        let babyId = null;
+        let rawDoseId = null;
+        if (doseId.startsWith('baby::')) {
+          const parts = doseId.split('::');
+          babyId = parts[1];
+          rawDoseId = parts.slice(2).join('::');
+        } else if (bt && Array.isArray(bt.babies)) {
+          const stripped = doseId.slice(5);
+          for (const b of bt.babies) {
+            if (stripped.startsWith(b.id + '_')) {
+              babyId = b.id;
+              rawDoseId = stripped.slice(b.id.length + 1);
+              break;
+            }
+          }
+        }
+        if (babyId && rawDoseId) {
+          if (bt && Array.isArray(bt.babies)) {
+            const baby = bt.babies.find(b => b.id === babyId);
+            if (baby) {
+              if (!baby.health) baby.health = {};
+              if (!baby.health.medLogs) baby.health.medLogs = {};
+              const logKey = `${dateKey}_${rawDoseId}`;
+              baby.health.medLogs[logKey] = !baby.health.medLogs[logKey];
+              const isTaken = baby.health.medLogs[logKey];
+
+              try {
+                localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(bt));
+              } catch (e) {
+                console.error('Error saving baby tracker medLogs', e);
+              }
+
+              if (typeof window.setBabyTrackerState === 'function') {
+                window.setBabyTrackerState(bt);
+              } else if (typeof window.renderBabyTrackerView === 'function') {
+                window.renderBabyTrackerView();
+              }
+
+              const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : 'bebé';
+              showToast(isTaken ? 'Toma completada' : 'Toma pendiente', `Medicamento de ${bName} actualizado.`, 'fa-pills', isTaken ? 'text-emerald-400' : 'text-sky-400');
+              renderTodayMedView();
+              renderMedCalendar();
+              refreshPrimaryCalendarMarkers();
+              renderMonthCalendar();
+              renderModalNotesList();
+              return;
+            }
+          }
+        }
+      }
+
       const logKey = `${dateKey}_${doseId}`;
       medLogs[logKey] = !medLogs[logKey];
       persistMedicationData();
       
-      showToast(medLogs[logKey] ? 'Completado' : 'Pendiente', medLogs[logKey] ? 'Toma registrada como completada.' : 'Toma marcada como pendiente.', 'fa-pills', 'text-blue-400');
+      showToast(medLogs[logKey] ? 'Completado' : 'Pendiente', medLogs[logKey] ? 'Toma registrada como completada.' : 'Toma marcada como pendiente.', 'fa-pills', medLogs[logKey] ? 'text-emerald-400' : 'text-blue-400');
 
       renderTodayMedView();
       renderMedCalendar();
       refreshPrimaryCalendarMarkers();
+      renderMonthCalendar();
+      renderModalNotesList();
+    }
+
+    function toggleHealthControlAttended(controlId, isBaby = false, babyId = null) {
+      if (isBaby && babyId) {
+        const bt = getBabyTrackerDataSafe();
+        if (bt && Array.isArray(bt.babies)) {
+          const baby = bt.babies.find(b => b.id === babyId);
+          if (baby && baby.health && Array.isArray(baby.health.medicalControls)) {
+            const ctrl = baby.health.medicalControls.find(c => c.id === controlId);
+            if (ctrl) {
+              ctrl.attended = !ctrl.attended;
+              try {
+                localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(bt));
+              } catch (e) { console.error(e); }
+              if (typeof window.setBabyTrackerState === 'function') {
+                window.setBabyTrackerState(bt);
+              } else if (typeof window.renderBabyTrackerView === 'function') {
+                window.renderBabyTrackerView();
+              }
+              showToast(ctrl.attended ? 'Control realizado' : 'Control pendiente', 'Estado del control del bebé actualizado.', 'fa-house-medical', 'text-indigo-400');
+              renderModalNotesList();
+              refreshPrimaryCalendarMarkers();
+              return;
+            }
+          }
+        }
+      }
+
+      const control = healthControls.find(c => c.id === controlId);
+      if (control) {
+        control.attended = !control.attended;
+        persistHealthControls();
+        showToast(control.attended ? 'Control realizado' : 'Control pendiente', 'Estado del control actualizado.', 'fa-house-medical', 'text-indigo-400');
+        renderModalNotesList();
+        renderUpcomingHealthControls();
+        refreshPrimaryCalendarMarkers();
+      }
     }
 
     function getDosesForMedDate(dateKey) {
@@ -2544,7 +3180,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               const timeStr = `${String(h).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
               const doseId = `${med.id}_${timeStr}`;
 
-              doses.push({ doseId, med, time: timeStr });
+              doses.push({ doseId, med, time: timeStr, isBaby: false });
             }
           } else {
             const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
@@ -2552,11 +3188,38 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
             if (diffDays % intervalDays === 0) {
               const doseId = `${med.id}_${med.time}`;
-              doses.push({ doseId, med, time: med.time });
+              doses.push({ doseId, med, time: med.time, isBaby: false });
             }
           }
         }
       });
+
+      const bt = getBabyTrackerDataSafe();
+      if (bt && Array.isArray(bt.babies)) {
+        bt.babies.forEach((baby, bIdx) => {
+          const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : `Bebé ${bIdx + 1}`;
+          const bDoses = getBabyDosesForDate(baby, dateKey);
+          bDoses.forEach(bd => {
+            doses.push({
+              doseId: `baby::${baby.id}::${bd.doseId}`,
+              rawDoseId: bd.doseId,
+              med: {
+                id: bd.med.id,
+                name: `👶 ${bName}: ${bd.med.name}`,
+                doseVal: bd.med.dose,
+                dose: bd.med.dose,
+                doseUnit: '',
+                frequency: bd.med.frequency,
+                notes: bd.med.notes || ''
+              },
+              time: bd.time,
+              isBaby: true,
+              babyId: baby.id,
+              babyName: bName
+            });
+          });
+        });
+      }
 
       return doses.sort((a, b) => a.time.localeCompare(b.time));
     }
@@ -2707,19 +3370,34 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       container.innerHTML = doses.map(item => {
         const logKey = `${dateKey}_${item.doseId}`;
-        const isTaken = !!medLogs[logKey];
+        let isTaken = false;
+        if (item.isBaby) {
+          const bt = getBabyTrackerDataSafe();
+          if (bt && Array.isArray(bt.babies)) {
+            const b = bt.babies.find(baby => baby.id === item.babyId);
+            if (b && b.health && b.health.medLogs) {
+              isTaken = !!b.health.medLogs[`${dateKey}_${item.rawDoseId}`];
+            }
+          }
+        } else {
+          isTaken = !!medLogs[logKey];
+        }
         const doseDetails = formatMedicationDoseDetails(item.med);
         return `
-          <div class="p-2 rounded-lg border ${isTaken ? 'bg-emerald-950/20 border-emerald-800/30' : 'bg-slate-900 border-slate-800'} flex items-center justify-between text-xs">
-            <div class="flex min-w-0 flex-1 items-center gap-2">
-              <span class="font-mono font-bold text-slate-400">${formatTime(item.time)}</span>
-              <span class="min-w-0 flex-1">
-                <span class="block font-semibold ${isTaken ? 'line-through text-slate-500' : 'text-slate-100'}">${escapeHtml(item.med.name)}</span>
-                <span class="block break-words text-[10px] text-slate-400">${escapeHtml(doseDetails)}</span>
-              </span>
+          <div class="p-2.5 rounded-xl border ${isTaken ? 'bg-emerald-950/20 border-emerald-800/40' : (item.isBaby ? 'bg-slate-900 border-sky-900/50' : 'bg-slate-900 border-slate-800')} flex items-center justify-between text-xs gap-2">
+            <div class="flex min-w-0 flex-1 items-center gap-2.5">
+              <span class="font-mono font-bold ${item.isBaby ? 'text-sky-300' : 'text-slate-300'} shrink-0">${formatTime(item.time)}</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-semibold ${isTaken ? 'line-through text-slate-500' : 'text-slate-100'} truncate">${escapeHtml(item.med.name)}</span>
+                  ${item.isBaby ? '<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">BEBÉ</span>' : ''}
+                </div>
+                <span class="block break-words text-[10px] text-slate-400 mt-0.5">${escapeHtml(doseDetails)}</span>
+              </div>
             </div>
-            <button type="button" onclick="toggleDoseLog(${jsArg(dateKey)}, ${jsArg(item.doseId)})" aria-label="${isTaken ? 'Marcar toma como pendiente' : 'Marcar toma como tomada'}" title="${isTaken ? 'Marcar como pendiente' : 'Marcar como tomada'}" class="w-12 h-12 shrink-0 rounded-xl border ${isTaken ? 'border-emerald-700 bg-emerald-950/30 text-emerald-400' : 'border-slate-700 bg-slate-900 text-slate-400'} flex items-center justify-center">
-              <i class="fa-solid ${isTaken ? 'fa-circle-check text-xl' : 'fa-circle text-lg'}"></i>
+            <button type="button" onclick="toggleDoseLog(${jsArg(dateKey)}, ${jsArg(item.doseId)})" aria-label="${isTaken ? 'Marcar toma como pendiente' : 'Marcar toma como tomada'}" title="${isTaken ? 'Marcar como pendiente' : 'Marcar como tomada'}" class="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 font-bold text-xs transition-all active:scale-95 shrink-0 ${isTaken ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-300' : (item.isBaby ? 'border-sky-500 bg-sky-600 hover:bg-sky-500 text-white shadow' : 'border-blue-500 bg-blue-600 hover:bg-blue-500 text-white shadow')}">
+              <i class="fa-solid ${isTaken ? 'fa-circle-check text-emerald-400' : 'fa-circle text-white'}"></i>
+              <span>${isTaken ? 'Tomada' : 'Dar Toma'}</span>
             </button>
           </div>
         `;
@@ -4634,10 +5312,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
         container.appendChild(item);
       });
 
-      scheduledDoses.forEach(({ med, time, doseId }) => {
-        const isTaken = !!medLogs[`${selectedDateKey}_${doseId}`];
+      scheduledDoses.forEach(({ med, time, doseId, isBaby, rawDoseId, babyId }) => {
+        let isTaken = false;
+        if (isBaby) {
+          const bt = getBabyTrackerDataSafe();
+          if (bt && Array.isArray(bt.babies)) {
+            const b = bt.babies.find(item => item.id === babyId);
+            if (b && b.health && b.health.medLogs) {
+              isTaken = !!b.health.medLogs[`${selectedDateKey}_${rawDoseId}`];
+            }
+          }
+        } else {
+          isTaken = !!medLogs[`${selectedDateKey}_${doseId}`];
+        }
+
         const item = document.createElement('div');
-        item.className = 'bg-slate-900 p-2.5 rounded-lg border border-blue-800/60 flex items-center justify-between gap-2 shadow-sm cursor-pointer hover:border-blue-500/70 transition-colors';
+        item.className = `bg-slate-900 p-2.5 rounded-lg border ${isBaby ? 'border-sky-800/60 hover:border-sky-500/70' : 'border-blue-800/60 hover:border-blue-500/70'} flex items-center justify-between gap-2 shadow-sm cursor-pointer transition-colors`;
         item.setAttribute('role', 'button');
         item.setAttribute('tabindex', '0');
         item.setAttribute('aria-label', `Vista previa del medicamento ${med.name}`);
@@ -4646,10 +5336,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           text: med.name,
           noteTime: time,
           assignedDate: selectedDateKey,
-          previewType: 'Medicamento',
+          previewType: isBaby ? 'Medicamento de Bebé' : 'Medicamento',
           assignedMedication: med,
           medicationTaken: isTaken,
-          color: '#3B82F6'
+          color: isBaby ? '#0ea5e9' : '#3B82F6'
         });
         item.onclick = showMedicationPreview;
         item.onkeydown = event => {
@@ -4658,30 +5348,38 @@ Check your Browserslist config to be sure that your targets are set up correctly
             showMedicationPreview();
           }
         };
+
+        const doseDetails = med.doseVal ? `${med.doseVal} ${med.doseUnit || ''}` : (med.dose || '');
+        const freqText = med.frequency ? ` · cada ${med.frequency}h` : '';
+
         item.innerHTML = `
           <div class="flex items-center gap-2.5 flex-1 min-w-0">
-            <span class="w-3 h-3 rounded-full shrink-0 bg-blue-500"></span>
+            <span class="w-3 h-3 rounded-full shrink-0 ${isBaby ? 'bg-sky-400' : 'bg-blue-500'}"></span>
             <div class="flex flex-col min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(med.name)}</span>
-                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40 flex items-center gap-1">
-                  <i class="fa-solid fa-pills text-[9px]"></i> MEDICAMENTO
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded ${isBaby ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'} flex items-center gap-1">
+                  <i class="fa-solid fa-pills text-[9px]"></i> ${isBaby ? 'BEBÉ TOMA' : 'MEDICAMENTO'}
                 </span>
               </div>
-              <span class="text-[10px] text-blue-200 font-semibold mt-0.5">
-                <i class="fa-regular fa-clock text-[9px] mr-1"></i>${escapeHtml(formatTime(time))}
+              <span class="text-[10px] ${isBaby ? 'text-sky-200' : 'text-blue-200'} font-semibold mt-0.5 flex items-center gap-1">
+                <i class="fa-regular fa-clock text-[9px]"></i> ${escapeHtml(formatTime(time))}
+                ${doseDetails ? `<span class="text-slate-400 font-normal">(${escapeHtml(doseDetails)}${escapeHtml(freqText)})</span>` : ''}
               </span>
-              <p class="text-[10px] text-slate-400 mt-0.5">${escapeHtml(formatMedicationDoseDetails(med))}</p>
+              ${med.notes ? `<p class="text-[10px] text-slate-400 truncate mt-0.5">${escapeHtml(med.notes)}</p>` : ''}
             </div>
           </div>
-          <span class="text-[9px] font-bold ${isTaken ? 'text-emerald-400' : 'text-slate-400'}">${isTaken ? 'Tomado' : 'Pendiente'}</span>
+          <button type="button" onclick="event.stopPropagation(); toggleDoseLog(${jsArg(selectedDateKey)}, ${jsArg(doseId)})" class="shrink-0 px-2.5 py-1.5 rounded-lg border font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${isTaken ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent'}">
+            <i class="fa-solid ${isTaken ? 'fa-circle-check text-emerald-400' : 'fa-circle text-white'}"></i>
+            <span>${isTaken ? 'Tomada' : 'Dar Toma'}</span>
+          </button>
         `;
         container.appendChild(item);
       });
 
       scheduledControls.forEach(control => {
         const item = document.createElement('div');
-        item.className = 'bg-slate-900 p-2.5 rounded-lg border border-indigo-800/60 flex items-center justify-between gap-2 shadow-sm cursor-pointer hover:border-indigo-500/70 transition-colors';
+        item.className = `bg-slate-900 p-2.5 rounded-lg border ${control.isBaby ? 'border-purple-800/60 hover:border-purple-500/70' : 'border-indigo-800/60 hover:border-indigo-500/70'} flex items-center justify-between gap-2 shadow-sm cursor-pointer transition-colors`;
         item.setAttribute('role', 'button');
         item.setAttribute('tabindex', '0');
         item.setAttribute('aria-label', `Vista previa del control de salud de ${control.person || control.name}`);
@@ -4691,9 +5389,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
           noteTime: control.time,
           assignedDate: control.date,
           description: control.notes,
-          previewType: 'Control de salud',
+          previewType: control.isBaby ? 'Control de Bebé' : 'Control de salud',
           assignedHealthControl: control,
-          color: '#6366F1'
+          color: control.isBaby ? '#a855f7' : '#6366F1'
         });
         item.onclick = showControlPreview;
         item.onkeydown = event => {
@@ -4702,24 +5400,31 @@ Check your Browserslist config to be sure that your targets are set up correctly
             showControlPreview();
           }
         };
+
+        const isAttended = control.attended === true;
+        const typeLabel = control.customType || (control.type ? formatHealthControlTypes(control) : 'Control');
+
         item.innerHTML = `
           <div class="flex items-center gap-2.5 flex-1 min-w-0">
-            <span class="w-3 h-3 rounded-full shrink-0 bg-indigo-500"></span>
+            <span class="w-3 h-3 rounded-full shrink-0 ${control.isBaby ? 'bg-purple-400' : 'bg-indigo-500'}"></span>
             <div class="flex flex-col min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(control.person || control.name)}</span>
-                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1">
-                  <i class="fa-solid fa-house-medical text-[9px]"></i> CONTROL DE SALUD
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded ${control.isBaby ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'} flex items-center gap-1">
+                  <i class="fa-solid fa-house-medical text-[9px]"></i> ${escapeHtml(typeLabel)}
                 </span>
               </div>
-              <span class="text-[10px] text-indigo-200 font-semibold mt-0.5">
+              <span class="text-[10px] ${control.isBaby ? 'text-purple-200' : 'text-indigo-200'} font-semibold mt-0.5">
                 <i class="fa-regular fa-clock text-[9px] mr-1"></i>${escapeHtml(formatTime(control.time))}
-                ${control.type ? ` · ${escapeHtml(formatHealthControlTypes(control))}` : ''}
               </span>
-              ${control.location ? `<p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(control.location)}</p>` : ''}
-              ${control.notes ? `<p class="text-[10px] text-slate-400 mt-0.5">${escapeHtml(control.notes)}</p>` : ''}
+              ${control.location ? `<p class="text-[10px] text-slate-400 truncate mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(control.location)}</p>` : ''}
+              ${control.notes ? `<p class="text-[10px] text-slate-400 truncate mt-0.5">${escapeHtml(control.notes)}</p>` : ''}
             </div>
           </div>
+          <button type="button" onclick="event.stopPropagation(); toggleHealthControlAttended(${jsArg(control.id)}, ${control.isBaby ? 'true' : 'false'}, ${control.babyId ? jsArg(control.babyId) : 'null'})" class="shrink-0 px-2.5 py-1.5 rounded-lg border font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${isAttended ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' : 'bg-indigo-600 hover:bg-indigo-500 text-white border-transparent'}">
+            <i class="fa-solid ${isAttended ? 'fa-circle-check text-emerald-400' : 'fa-circle text-white'}"></i>
+            <span>${isAttended ? 'Realizado' : 'Marcar'}</span>
+          </button>
         `;
         container.appendChild(item);
       });
@@ -5876,7 +6581,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       processedBdays.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between gap-3 cursor-pointer hover:border-amber-500/50 transition-colors';
+        card.className = 'bg-gradient-to-br from-[#1e2733] to-[#161f2b] p-3.5 rounded-2xl border border-slate-700/70 shadow-lg flex items-center justify-between gap-2.5 cursor-pointer hover:border-amber-500/60 transition-all active:scale-[0.99] touch-manipulation';
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.setAttribute('aria-label', `Ver detalle de ${item.note.title || item.note.text}`);
@@ -5895,40 +6600,45 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const nextYear = item.nextBdayDate.getFullYear();
         const nextBdayStr = `${nextDay}/${nextMonth}/${nextYear}`;
 
-        let daysBadgeText = '';
+        let daysBadgeHTML = '';
         if (item.daysLeft === 0) {
-          daysBadgeText = '¡Es Hoy! 🎉';
-        } else if (item.daysLeft === 1) {
-          daysBadgeText = 'Falta 1 día';
+          daysBadgeHTML = '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm animate-pulse flex items-center gap-1"><i class="fa-solid fa-cake-candles"></i> ¡Es Hoy! 🎉</span>';
+        } else if (item.daysLeft <= 7) {
+          daysBadgeHTML = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1"><i class="fa-solid fa-hourglass-half text-[9px]"></i> Faltan ${item.daysLeft} d</span>`;
         } else {
-          daysBadgeText = `Faltan ${item.daysLeft} días`;
+          daysBadgeHTML = `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/90 text-slate-300 border border-slate-700 flex items-center gap-1"><i class="fa-regular fa-calendar text-[9px]"></i> Faltan ${item.daysLeft} d</span>`;
         }
 
         const dateAndAgeHTML = `
-          <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
-            <span class="text-[10px] text-amber-300 font-semibold">Próximo: ${nextBdayStr}</span>
-            ${item.ageToTurn !== null ? `<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">(Cumplirá ${item.ageToTurn} años)</span>` : ''}
-            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${item.daysLeft === 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 animate-pulse' : 'bg-slate-800 text-teal-400 border border-slate-700'}">${daysBadgeText}</span>
+          <div class="flex flex-wrap items-center gap-1.5 mt-1">
+            <span class="text-[11px] text-amber-200/90 font-medium flex items-center gap-1">
+              <i class="fa-regular fa-clock text-[9px] text-amber-400"></i> ${nextBdayStr}
+            </span>
+            ${item.ageToTurn !== null ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">${item.ageToTurn} años</span>` : ''}
+            ${daysBadgeHTML}
           </div>
         `;
 
         card.innerHTML = `
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <button type="button" data-note-id="${escapeHtml(item.note.id)}" onclick="event.stopPropagation(); toggleEventFavorite(this.dataset.noteId)" aria-label="${item.note.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}" title="${item.note.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}" class="w-8 h-8 shrink-0 rounded-lg bg-slate-800 hover:bg-slate-700 ${item.note.isFavorite ? 'text-amber-300' : 'text-slate-400'} border border-slate-700 transition-all">
-              <i class="${item.note.isFavorite ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" onclick="event.stopPropagation(); toggleEventFavorite(this.dataset.noteId)" aria-label="${item.note.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}" title="${item.note.isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}" class="w-9 h-9 shrink-0 rounded-xl bg-slate-800/90 hover:bg-slate-700 ${item.note.isFavorite ? 'text-amber-400 border-amber-500/50 bg-amber-500/10' : 'text-slate-400 border-slate-700'} border transition-all flex items-center justify-center shadow-inner active:scale-95">
+              <i class="${item.note.isFavorite ? 'fa-solid text-base' : 'fa-regular text-sm'} fa-star"></i>
             </button>
             <div class="flex flex-col min-w-0 flex-1">
-              <span class="font-extrabold text-sm text-slate-100 truncate">${escapeHtml(item.note.title || item.note.text)}</span>
-              ${item.note.description ? `<p class="text-xs text-slate-400 truncate">${escapeHtml(item.note.description)}</p>` : ''}
+              <div class="flex items-center gap-1.5">
+                <span class="font-black text-sm text-slate-100 truncate">${escapeHtml(item.note.title || item.note.text)}</span>
+                ${item.note.isFavorite ? '<i class="fa-solid fa-heart text-[10px] text-rose-400"></i>' : ''}
+              </div>
+              ${item.note.description ? `<p class="text-xs text-slate-400 truncate mt-0.5">${escapeHtml(item.note.description)}</p>` : ''}
               ${dateAndAgeHTML}
             </div>
           </div>
-          <div class="flex flex-col items-stretch gap-1 shrink-0">
-            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editBirthdayFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
-              Editar
+          <div class="flex flex-col items-stretch gap-1.5 shrink-0">
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); editBirthdayFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-[10px] font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
+              <i class="fa-solid fa-pen text-[9px]"></i> <span>Editar</span>
             </button>
-            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); deleteEventFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-red-300 border border-slate-700 rounded-lg text-[10px] font-bold transition-all active:scale-95">
-              Eliminar
+            <button type="button" data-note-id="${escapeHtml(item.note.id)}" data-date-key="${item.key}" onclick="event.stopPropagation(); deleteEventFromList(this)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-red-400 border border-slate-700 rounded-xl text-[10px] font-bold transition-all active:scale-95 flex items-center justify-center gap-1">
+              <i class="fa-solid fa-trash-can text-[9px]"></i> <span>Borrar</span>
             </button>
           </div>
         `;
@@ -6287,6 +6997,339 @@ Check your Browserslist config to be sure that your targets are set up correctly
       return map;
     }
 
+    // FUNCIONES DE COMPARTIR Y COMBINAR DATOS (SIN BORRAR EXISTENTES)
+    function openShareModal() {
+      const modal = document.getElementById('share-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeShareModal() {
+      const modal = document.getElementById('share-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function generateSharePayload(categories) {
+      const payload = {
+        app: 'Calendario',
+        type: 'shared_data',
+        version: 2,
+        sharedAt: new Date().toISOString(),
+        categories: Object.assign({}, categories),
+        calendar: {},
+        medications: [],
+        medicationLogs: {},
+        healthControls: [],
+        babyTracker: undefined
+      };
+
+      Object.entries(dayDataMap).forEach(([dateKey, notes]) => {
+        if (!Array.isArray(notes)) return;
+        const filtered = notes.filter(n => {
+          if (!n) return false;
+          if (n.isShift) return categories.turns;
+          if (n.isBirthday || n.isEvent || (Array.isArray(n.eventTypes) && n.eventTypes.length > 0)) return categories.events;
+          return categories.notes;
+        });
+        if (filtered.length > 0) {
+          payload.calendar[dateKey] = JSON.parse(JSON.stringify(filtered));
+        }
+      });
+
+      if (categories.health) {
+        payload.medications = JSON.parse(JSON.stringify(medications));
+        payload.medicationLogs = JSON.parse(JSON.stringify(medLogs));
+        payload.healthControls = JSON.parse(JSON.stringify(healthControls));
+      }
+
+      if (categories.baby) {
+        const bt = getBabyTrackerDataSafe();
+        if (bt) {
+          payload.babyTracker = JSON.parse(JSON.stringify(bt));
+        }
+      }
+
+      return payload;
+    }
+
+    async function executeShareData(mode = 'direct') {
+      const categories = {
+        turns: !!document.getElementById('share-opt-turns')?.checked,
+        events: !!document.getElementById('share-opt-events')?.checked,
+        notes: !!document.getElementById('share-opt-notes')?.checked,
+        health: !!document.getElementById('share-opt-health')?.checked,
+        baby: !!document.getElementById('share-opt-baby')?.checked
+      };
+
+      if (!categories.turns && !categories.events && !categories.notes && !categories.health && !categories.baby) {
+        showToast('Selecciona un apartado', 'Elige al menos una opción para compartir.', 'fa-circle-exclamation', 'text-amber-400');
+        return;
+      }
+
+      const payload = generateSharePayload(categories);
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const dateStr = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const fileName = `calendario_compartido_${dateStr}.json`;
+
+      if (mode === 'direct' && navigator.share) {
+        try {
+          const file = new File([jsonStr], fileName, { type: 'application/json' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: 'Calendario y Registros Compartidos',
+              text: 'Te comparto mis turnos, eventos, notas, salud y registros de bebé para cargarlos en tu app.',
+              files: [file]
+            });
+            closeShareModal();
+            showToast('Compartido con éxito', 'Se envió el archivo a la otra persona.', 'fa-paper-plane', 'text-sky-400');
+            return;
+          }
+        } catch (e) {
+          if (e.name !== 'AbortError') console.warn('Error con Web Share directo, usando descarga:', e);
+          else return;
+        }
+      }
+
+      // Descarga de archivo json como método estándar y confiable
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = fileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      closeShareModal();
+      showToast('Archivo listo para compartir', 'Envía este archivo a la otra persona. Al cargarlo, se combinará sin borrar sus datos.', 'fa-file-export', 'text-teal-400');
+    }
+
+    // FUSIÓN NO DESTRUCTIVA: COMBINA DATOS SIN BORRAR NADA DE LO EXISTENTE
+    function mergeImportedData(importedData) {
+      const isLegacy = isValidCalendarMap(importedData);
+      const incomingCalendar = isLegacy ? importedData : (importedData && importedData.calendar);
+      let addedNotesCount = 0;
+      let addedMedsCount = 0;
+      let addedControlsCount = 0;
+      let addedBabyCount = 0;
+
+      // 1. Fusionar calendario día a día
+      if (incomingCalendar && typeof incomingCalendar === 'object') {
+        sanitizeImportedCalendar(incomingCalendar);
+        Object.entries(incomingCalendar).forEach(([dateKey, incomingNotes]) => {
+          if (!Array.isArray(incomingNotes)) return;
+          if (!dayDataMap[dateKey]) dayDataMap[dateKey] = [];
+
+          incomingNotes.forEach(incNote => {
+            // Verificar duplicados para no repetir la misma nota exacta
+            const isDuplicate = dayDataMap[dateKey].some(ex => {
+              if (ex.id && incNote.id && ex.id === incNote.id) return true;
+              if (incNote.isShift && ex.isShift && ex.shiftType === incNote.shiftType && ex.shiftStart === incNote.shiftStart) return true;
+              if ((incNote.isBirthday || incNote.isEvent) && (ex.isBirthday || ex.isEvent)) {
+                return (ex.title || ex.text || '').trim().toLowerCase() === (incNote.title || incNote.text || '').trim().toLowerCase();
+              }
+              if (!incNote.isShift && !incNote.isBirthday && !ex.isShift && !ex.isBirthday) {
+                return (ex.title || ex.text || '').trim().toLowerCase() === (incNote.title || incNote.text || '').trim().toLowerCase();
+              }
+              return false;
+            });
+
+            if (!isDuplicate) {
+              const noteCopy = JSON.parse(JSON.stringify(incNote));
+              // Si el ID ya existe en otra fecha, generar uno único
+              if (!noteCopy.id || getNoteById(noteCopy.id)) {
+                noteCopy.id = generateId('note');
+              }
+              dayDataMap[dateKey].push(noteCopy);
+              addedNotesCount++;
+            }
+          });
+        });
+        syncBirthdayCalendarEvents();
+      }
+
+      // 2. Fusionar medicamentos adultos
+      if (importedData.medications && Array.isArray(importedData.medications)) {
+        importedData.medications.forEach(incMed => {
+          const exists = medications.some(m => m.id === incMed.id || (m.name.toLowerCase().trim() === incMed.name.toLowerCase().trim() && m.startDate === incMed.startDate));
+          if (!exists) {
+            medications.push(JSON.parse(JSON.stringify(incMed)));
+            addedMedsCount++;
+          }
+        });
+      }
+
+      // 3. Fusionar tomas de medicamentos
+      if (importedData.medicationLogs && typeof importedData.medicationLogs === 'object') {
+        Object.entries(importedData.medicationLogs).forEach(([k, val]) => {
+          if (val && !medLogs[k]) medLogs[k] = true;
+        });
+      }
+
+      // 4. Fusionar controles de salud adultos
+      if (importedData.healthControls && Array.isArray(importedData.healthControls)) {
+        importedData.healthControls.forEach(incCtrl => {
+          const exists = healthControls.some(c => c.id === incCtrl.id || (c.date === incCtrl.date && c.time === incCtrl.time && (c.person || '').toLowerCase() === (incCtrl.person || '').toLowerCase()));
+          if (!exists) {
+            healthControls.push(JSON.parse(JSON.stringify(incCtrl)));
+            addedControlsCount++;
+          }
+        });
+      }
+
+      // 5. Fusionar datos del bebé (Baby Tracker)
+      if (importedData.babyTracker && Array.isArray(importedData.babyTracker.babies)) {
+        let bt = getBabyTrackerDataSafe() || { activeBabyId: null, babies: [] };
+        if (!Array.isArray(bt.babies)) bt.babies = [];
+
+        importedData.babyTracker.babies.forEach(incBaby => {
+          const incName = (incBaby.profile && incBaby.profile.name) ? incBaby.profile.name.trim().toLowerCase() : '';
+          let matchBaby = bt.babies.find(b => b.id === incBaby.id);
+          if (!matchBaby && incName) {
+            matchBaby = bt.babies.find(b => b.profile && b.profile.name && b.profile.name.trim().toLowerCase() === incName);
+          }
+
+          if (matchBaby) {
+            if (!matchBaby.health) matchBaby.health = {};
+            if (!Array.isArray(matchBaby.health.medicalControls)) matchBaby.health.medicalControls = [];
+            if (!Array.isArray(matchBaby.health.medications)) matchBaby.health.medications = [];
+            if (!matchBaby.health.medLogs) matchBaby.health.medLogs = {};
+
+            // Fusionar controles del bebé
+            if (incBaby.health && Array.isArray(incBaby.health.medicalControls)) {
+              incBaby.health.medicalControls.forEach(ctrl => {
+                const exists = matchBaby.health.medicalControls.some(c => c.id === ctrl.id || (c.date === ctrl.date && c.type === ctrl.type && c.doctor === ctrl.doctor));
+                if (!exists) {
+                  matchBaby.health.medicalControls.push(JSON.parse(JSON.stringify(ctrl)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar medicamentos del bebé
+            if (incBaby.health && Array.isArray(incBaby.health.medications)) {
+              incBaby.health.medications.forEach(med => {
+                const exists = matchBaby.health.medications.some(m => m.id === med.id || (m.name.toLowerCase().trim() === med.name.toLowerCase().trim() && m.startDate === med.startDate));
+                if (!exists) {
+                  matchBaby.health.medications.push(JSON.parse(JSON.stringify(med)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar tomas de medicamentos del bebé
+            if (incBaby.health && incBaby.health.medLogs) {
+              Object.assign(matchBaby.health.medLogs, incBaby.health.medLogs);
+            }
+
+            // Fusionar alimentación, pañales, sueño y logs
+            ['feeding', 'diapers', 'sleep'].forEach(cat => {
+              if (incBaby[cat] && Array.isArray(incBaby[cat].entries)) {
+                if (!matchBaby[cat]) matchBaby[cat] = { entries: [] };
+                if (!Array.isArray(matchBaby[cat].entries)) matchBaby[cat].entries = [];
+                incBaby[cat].entries.forEach(e => {
+                  if (!matchBaby[cat].entries.some(x => x.id === e.id)) {
+                    matchBaby[cat].entries.push(JSON.parse(JSON.stringify(e)));
+                    addedBabyCount++;
+                  }
+                });
+              }
+            });
+
+            // Fusionar vacunas completadas
+            if (incBaby.health && Array.isArray(incBaby.health.vaccines) && Array.isArray(matchBaby.health.vaccines)) {
+              incBaby.health.vaccines.forEach(v => {
+                if (v && v.done) {
+                  const mv = matchBaby.health.vaccines.find(x => x.id === v.id || x.name === v.name);
+                  if (mv) mv.done = true;
+                }
+              });
+            }
+          } else {
+            // Bebé nuevo que no existía -> se añade completo sin alterar nada
+            bt.babies.push(JSON.parse(JSON.stringify(incBaby)));
+            if (!bt.activeBabyId) bt.activeBabyId = incBaby.id;
+            addedBabyCount++;
+          }
+        });
+
+        try {
+          localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(bt));
+        } catch (e) { console.error('Error guardando baby tracker fusionado', e); }
+
+        if (typeof window.setBabyTrackerState === 'function') {
+          window.setBabyTrackerState(bt);
+        } else if (typeof window.renderBabyTrackerView === 'function') {
+          window.renderBabyTrackerView();
+        }
+      }
+
+      saveToLocalStorage();
+      persistMedicationData();
+      persistHealthControls();
+      renderAll();
+      refreshPrimaryCalendarMarkers();
+
+      const totalAdded = addedNotesCount + addedMedsCount + addedControlsCount + addedBabyCount;
+      showToast('Datos Combinados', `Se agregaron ${totalAdded} elementos compartidos sin borrar tus registros actuales.`, 'fa-circle-check', 'text-teal-400');
+    }
+
+    let pendingImportData = null;
+
+    function openImportChoiceModal(importedData) {
+      pendingImportData = importedData;
+      const modal = document.getElementById('import-choice-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeImportChoiceModal() {
+      pendingImportData = null;
+      const modal = document.getElementById('import-choice-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function confirmImportChoice(mode) {
+      if (!pendingImportData) return;
+      const data = pendingImportData;
+      closeImportChoiceModal();
+      closeSettingsModal();
+
+      if (mode === 'merge') {
+        mergeImportedData(data);
+      } else {
+        // Modo reemplazo total (con copia de respaldo previa)
+        try { exportDataJSON({ auto: true }); } catch (backupError) { console.warn('Copia previa:', backupError); }
+        
+        const isLegacy = isValidCalendarMap(data);
+        const calendar = isLegacy ? data : data && data.calendar;
+        if (calendar) dayDataMap = calendar;
+        syncBirthdayCalendarEvents();
+        if (data.medications) medications = data.medications;
+        if (data.medicationLogs) medLogs = data.medicationLogs;
+        if (data.healthControls) healthControls = data.healthControls;
+        if (data.babyTracker && typeof window.setBabyTrackerState === 'function') {
+          window.setBabyTrackerState(data.babyTracker);
+        }
+        saveToLocalStorage();
+        persistMedicationData();
+        persistHealthControls();
+        renderAll();
+        showToast('Restauración Completa', 'Se reemplazaron todos los datos por la copia de seguridad.', 'fa-file-import', 'text-teal-400');
+      }
+    }
+
     function importDataJSON(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
@@ -6295,10 +7338,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       reader.onload = function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          // Compatibilidad con respaldos antiguos: el archivo era directamente el mapa del calendario.
           const isLegacyBackup = isValidCalendarMap(importedData);
           const calendar = isLegacyBackup ? importedData : importedData && importedData.calendar;
-          if (!isValidCalendarMap(calendar)) {
+          if (calendar && !isValidCalendarMap(calendar)) {
             throw new Error('La estructura del calendario no es válida.');
           }
 
@@ -6315,42 +7357,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
             throw new Error('Los registros de controles de salud no son válidos.');
           }
 
-          sanitizeImportedCalendar(calendar);
+          if (calendar) sanitizeImportedCalendar(calendar);
 
-          // Solo sustituye datos después de validar el archivo completo y confirmar con la persona.
-          const applyImport = () => {
-            dayDataMap = calendar;
-            syncBirthdayCalendarEvents();
-            if (hasMeds) medications = importedData.medications;
-            if (hasLogs) medLogs = importedData.medicationLogs;
-            if (hasHealthControls) healthControls = importedData.healthControls;
-            if (!isLegacyBackup && importedData.babyTracker && typeof window.setBabyTrackerState === 'function') {
-              window.setBabyTrackerState(importedData.babyTracker);
-            }
-            const savedCalendar = saveToLocalStorage();
-            const savedHealth = persistMedicationData();
-            const savedControls = persistHealthControls();
-            if (!savedCalendar || !savedHealth || !savedControls) {
-              showToast('Revisa el almacenamiento', 'La importación se leyó, pero el navegador no pudo guardar todos los datos.', 'fa-triangle-exclamation', 'text-amber-400');
-            } else {
-              renderAll();
-              closeSettingsModal();
-              showToast('Importación Exitosa', isLegacyBackup ? 'Calendario restaurado. Los datos de salud se conservaron.' : 'Respaldo completo restaurado.', 'fa-file-import', 'text-teal-400');
-            }
-          };
-
-          showConfirmModal(
-            'Importar respaldo',
-            'Se reemplazarán todos los datos actuales (calendario, salud y bebé) por los del archivo. Antes se descargará automáticamente una copia de tus datos actuales.',
-            () => {
-              try { exportDataJSON({ auto: true }); } catch (backupError) { console.warn('No se pudo generar la copia previa:', backupError); }
-              applyImport();
-            },
-            'Importar'
-          );
+          // Ofrecer al usuario elegir entre COMBINAR (sin borrar lo suyo) o REEMPLAZAR
+          openImportChoiceModal(importedData);
         } catch(err) {
-          console.error('Error al importar respaldo:', err);
-          showToast('Error de Importación', err.message || 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
+          console.error('Error al leer archivo para importar:', err);
+          showToast('Error de Lectura', err.message || 'No se pudo leer el archivo seleccionado.', 'fa-triangle-exclamation', 'text-red-400');
         } finally {
           event.target.value = '';
         }
@@ -6630,7 +7643,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
               { id: 'v13', name: 'Hexavalente Refuerzo', age: '18 meses', done: false },
               { id: 'v14', name: 'Varicela / Hepatitis A', age: '18 meses', done: false }
             ],
-            logs: []
+            logs: [],
+            medicalControls: [],
+            medications: [],
+            medLogs: {}
           },
           feeding: {
             milkGoalMl: 600,
@@ -6688,9 +7704,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
         const babies = parsed.babies.map((b, idx) => {
           const base = createEmptyBabyRecord(b && b.id ? b.id : ('baby_' + (idx + 1)), idx + 1);
+          const rawHealth = (b && b.health) || {};
+          const healthData = Object.assign({}, base.health, rawHealth);
+          healthData.medicalControls = Array.isArray(rawHealth.medicalControls) ? rawHealth.medicalControls : [];
+          healthData.medications = Array.isArray(rawHealth.medications) ? rawHealth.medications : [];
+          healthData.medLogs = rawHealth.medLogs && typeof rawHealth.medLogs === 'object' && !Array.isArray(rawHealth.medLogs) ? rawHealth.medLogs : {};
           return Object.assign({}, base, b, {
             profile: Object.assign({}, base.profile, (b && b.profile) || {}),
-            health: Object.assign({}, base.health, (b && b.health) || {}),
+            health: healthData,
             feeding: Object.assign({}, base.feeding, (b && b.feeding) || {}),
             development: Object.assign({}, base.development, (b && b.development) || {}),
             sleep: Object.assign({}, base.sleep, (b && b.sleep) || {}),
@@ -6719,6 +7740,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         try {
           localStorage.setItem(BT_STORAGE_KEY, JSON.stringify(btStore));
         } catch (e) {}
+        if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
+        if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
       }
 
       function getCurrentBaby() {
@@ -6802,6 +7825,67 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
       }
 
+      function calculateMoonSign(dateString, timeString = '12:00') {
+        if (!dateString) return null;
+        const parts = dateString.split('-').map(Number);
+        if (parts.length !== 3 || parts.some(p => !Number.isInteger(p))) return null;
+        let [year, month, day] = parts;
+        let hour = 12, min = 0;
+        if (timeString && timeString.includes(':')) {
+          const tParts = timeString.split(':').map(Number);
+          if (!isNaN(tParts[0])) hour = tParts[0];
+          if (!isNaN(tParts[1])) min = tParts[1];
+        }
+
+        if (month <= 2) {
+          year -= 1;
+          month += 12;
+        }
+        const A = Math.floor(year / 100);
+        const B = 2 - A + Math.floor(A / 4);
+        let jd = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+        jd += (hour + min / 60.0) / 24.0;
+
+        const T = (jd - 2451545.0) / 36525.0;
+        const toRad = deg => (deg * Math.PI) / 180.0;
+
+        const L_prime = 218.3164477 + 481267.88123421 * T;
+        const D = 297.8501921 + 445267.1114034 * T;
+        const M = 357.5291092 + 35999.0502909 * T;
+        const M_prime = 134.9633964 + 477198.8675055 * T;
+        const F = 93.2720950 + 483202.0175233 * T;
+
+        let l = L_prime
+          + 6.288774 * Math.sin(toRad(M_prime))
+          + 1.274027 * Math.sin(toRad(2 * D - M_prime))
+          + 0.658314 * Math.sin(toRad(2 * D))
+          + 0.213618 * Math.sin(toRad(2 * M_prime))
+          - 0.185116 * Math.sin(toRad(M))
+          - 0.114332 * Math.sin(toRad(2 * F))
+          + 0.058793 * Math.sin(toRad(2 * D - 2 * M_prime))
+          + 0.057066 * Math.sin(toRad(2 * D - M - M_prime))
+          + 0.053322 * Math.sin(toRad(2 * D + M_prime))
+          + 0.045758 * Math.sin(toRad(2 * D - M))
+          - 0.040923 * Math.sin(toRad(M - M_prime))
+          - 0.034720 * Math.sin(toRad(D))
+          - 0.030383 * Math.sin(toRad(M + M_prime));
+
+        l = ((l % 360) + 360) % 360;
+
+        const signs = [
+          '♈ Aries', '♉ Tauro', '♊ Géminis', '♋ Cáncer',
+          '♌ Leo', '♍ Virgo', '♎ Libra', '♏ Escorpio',
+          '♐ Sagitario', '♑ Capricornio', '♒ Acuario', '♓ Piscis'
+        ];
+        const signIndex = Math.floor(l / 30);
+        const degreesInSign = Math.floor(l % 30);
+        return {
+          sign: signs[signIndex] || '—',
+          degrees: degreesInSign,
+          longitude: Math.round(l * 100) / 100
+        };
+      }
+
       function getBtProfileComputed(btState) {
         if (!btState.profile.birthDate) {
           return {
@@ -6809,7 +7893,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             daysText: 'Edad y signos se calculan automáticamente',
             totalDaysBadge: 'Sin fecha',
             zodiac: '—',
-            chinese: '—'
+            chinese: '—',
+            moon: '—'
           };
         }
 
@@ -6863,12 +7948,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         ];
         const chinese = chineseAnimals[birth.getFullYear() % 12] || '—';
 
+        const autoMoon = calculateMoonSign(btState.profile.birthDate);
+        const moonDisplay = autoMoon ? `🌙 ${autoMoon.sign}` : '—';
+
         return {
           ageText: `${years} ${years === 1 ? 'año' : 'años'} • ${months} ${months === 1 ? 'mes' : 'meses'} • ${days} días`,
           daysText: `${totalDays} días desde su nacimiento`,
           totalDaysBadge: `${totalDays} días`,
           zodiac,
-          chinese
+          chinese,
+          moon: moonDisplay
         };
       }
 
@@ -6914,11 +8003,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       function renderBabiesSelectorBar() {
         const bar = document.getElementById('btBabiesSelectorBar');
-        const countBadge = document.getElementById('btBabiesCountBadge');
-        if (countBadge) {
-          countBadge.textContent = `${btStore.babies.length} ${btStore.babies.length === 1 ? 'Bebé' : 'Bebés'}`;
-        }
         if (!bar) return;
+
+        if (btStore.babies.length <= 1) {
+          bar.innerHTML = '';
+          bar.classList.add('hidden');
+          return;
+        }
+        bar.classList.remove('hidden');
 
         bar.innerHTML = btStore.babies.map((b, idx) => {
           const isSelected = b.id === btStore.activeBabyId;
@@ -6938,6 +8030,91 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <span>Otro bebé</span>
           </button>
         `;
+      }
+
+      const BT_CONTROL_SPECIALTIES = {
+        cita_medica: {
+          label: 'Cita médica (Pediatría / General)',
+          name: 'Cita médica',
+          short: 'Cita médica',
+          icon: 'fa-user-doctor',
+          badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+        },
+        examenes: {
+          label: 'Exámenes clínicos / Laboratorio',
+          name: 'Exámenes',
+          short: 'Exámenes',
+          icon: 'fa-calendar-check',
+          badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        },
+        nutricionista: {
+          label: 'Nutricionista infantil',
+          name: 'Nutricionista',
+          short: 'Nutricionista',
+          icon: 'fa-chart-pie',
+          badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+        },
+        dentista: {
+          label: 'Dentista / Odontopediatría',
+          name: 'Dentista',
+          short: 'Dentista',
+          icon: 'fa-circle-check',
+          badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+        },
+        traumatologo: {
+          label: 'Traumatólogo infantil',
+          name: 'Traumatólogo',
+          short: 'Traumatólogo',
+          icon: 'fa-house-medical',
+          badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+        },
+        otro: {
+          label: 'Otro especialista médico',
+          name: 'Otro especialista',
+          short: 'Otro',
+          icon: 'fa-user-doctor',
+          badge: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+        }
+      };
+
+      function getBabyDosesForDate(baby, dateKey) {
+        if (!baby || !baby.health || !Array.isArray(baby.health.medications)) return [];
+        const parts = dateKey.split('-').map(Number);
+        const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+        const doses = [];
+
+        baby.health.medications.forEach(med => {
+          if (!med.startDate || !med.duration) return;
+          const startParts = med.startDate.split('-').map(Number);
+          const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+          const end = new Date(start);
+          end.setDate(end.getDate() + (Number(med.duration) || 1));
+
+          if (targetDate >= start && targetDate < end) {
+            const freqHours = Number(med.frequency) || 24;
+            const [startHour, startMin] = (med.time || '08:00').split(':').map(Number);
+            if (freqHours <= 24) {
+              const dosesPerDay = Math.floor(24 / freqHours);
+              for (let i = 0; i < dosesPerDay; i++) {
+                const totalHour = startHour + i * freqHours;
+                if (totalHour < 24) {
+                  const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
+                  const doseId = `${med.id}_${timeStr}`;
+                  doses.push({ doseId, med, time: timeStr, dateKey });
+                }
+              }
+            } else {
+              const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
+              const intervalDays = Math.floor(freqHours / 24);
+              if (diffDays % intervalDays === 0) {
+                const doseId = `${med.id}_${med.time || '08:00'}`;
+                doses.push({ doseId, med, time: med.time || '08:00', dateKey });
+              }
+            }
+          }
+        });
+
+        return doses.sort((a, b) => a.time.localeCompare(b.time));
       }
 
       function renderBtProfileBanner() {
@@ -6965,7 +8142,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
         document.getElementById('btStatZodiac').textContent = computed.zodiac;
         document.getElementById('btStatChinese').textContent = computed.chinese;
-        document.getElementById('btStatMoon').textContent = btState.profile.moonSign || '—';
+        document.getElementById('btStatMoon').textContent = computed.moon || btState.profile.moonSign || '—';
         document.getElementById('btStatDev').textContent = `${dev.pct}%`;
       }
 
@@ -6984,8 +8161,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       function renderBtMainContent() {
-        renderBtProfileBanner();
         const container = document.getElementById('btMainContent');
+        const prevScroll = container ? container.scrollTop : 0;
+        renderBtProfileBanner();
         if (!container) return;
         if (btGrowthChart) {
           btGrowthChart.destroy();
@@ -7001,6 +8179,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
         else if (tab === 'fotos') renderBtFotos(container);
         else if (tab === 'crecimiento') renderBtCrecimiento(container);
         else if (tab === 'perfil') renderBtPerfil(container);
+
+        if (container && prevScroll > 0) {
+          container.scrollTop = prevScroll;
+        }
       }
 
       function renderBtInicio(container) {
@@ -7019,6 +8201,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const headDisp = btState.health.headCm !== null ? `${btState.health.headCm} cm` : 'Sin registrar';
         const milkGoal = btState.feeding.milkGoalMl || 600;
 
+        const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        const medControls = Array.isArray(btState.health.medicalControls) ? btState.health.medicalControls : [];
+        const upcomingControl = medControls.filter(c => !c.attended && c.date >= todayKey).sort((a,b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
+        let nextControlDisp = 'Sin controles';
+        if (upcomingControl) {
+          const spec = BT_CONTROL_SPECIALTIES[upcomingControl.type] || BT_CONTROL_SPECIALTIES.cita_medica;
+          const label = upcomingControl.type === 'otro' && upcomingControl.customType ? upcomingControl.customType : spec.short;
+          nextControlDisp = `${label} (${upcomingControl.date.slice(5)})`;
+        }
+
+        const todayDoses = getBabyDosesForDate(btState, todayKey);
+        let medsTodayDisp = 'Sin tomas';
+        if (todayDoses.length > 0) {
+          const takenCount = todayDoses.filter(d => !!(btState.health.medLogs && btState.health.medLogs[`${todayKey}_${d.doseId}`])).length;
+          medsTodayDisp = `${takenCount}/${todayDoses.length} tomadas`;
+        }
+
         container.innerHTML = `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <!-- Salud -->
@@ -7032,6 +8231,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <div class="flex justify-between"><span>⚖️ Peso:</span><strong class="text-slate-100">${weightDisp}</strong></div>
                   <div class="flex justify-between"><span>📏 Altura:</span><strong class="text-slate-100">${heightDisp}</strong></div>
                   <div class="flex justify-between"><span>💉 Vacunas:</span><strong class="text-slate-100">${vax.done}/${vax.total}</strong></div>
+                  <div class="flex justify-between"><span>🩺 Próx. control:</span><strong class="text-slate-100">${nextControlDisp}</strong></div>
+                  <div class="flex justify-between"><span>💊 Medicinas hoy:</span><strong class="text-slate-100">${medsTodayDisp}</strong></div>
                   <div class="flex justify-between"><span>🌡️ Temperatura:</span><strong class="text-slate-100">${tempDisp}</strong></div>
                 </div>
               </div>
@@ -7147,11 +8348,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const vax = getBtVaxStats(btState);
         const hasTemp = btState.health.temperatureC !== null;
         const isFever = hasTemp && btState.health.temperatureC >= 37.5;
+        const todayStr = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        const todayDoses = getBabyDosesForDate(btState, todayStr);
+        const medControls = Array.isArray(btState.health.medicalControls) ? btState.health.medicalControls : [];
+        const medications = Array.isArray(btState.health.medications) ? btState.health.medications : [];
+        if (!btState.health.medLogs) btState.health.medLogs = {};
+
+        const sortedControls = [...medControls].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
         container.innerHTML = `
+          <!-- 1. Signos Vitales y Biometría -->
           <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
             <div class="flex items-center justify-between">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🌡️ Registrar Signos y Biometría</h4>
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🌡️ Signos Vitales y Biometría</h4>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold ${!hasTemp ? 'bg-slate-800 text-slate-400 border border-slate-700' : (isFever ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40')}">
                 ${!hasTemp ? 'Sin registros' : (isFever ? 'Febrícula / Revisar' : 'Temperatura Normal')}
               </span>
@@ -7172,18 +8381,217 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 </div>
               </div>
               <div class="flex gap-2">
-                <input type="text" name="note" placeholder="Observación o suplemento (ej. Vitamina D, control sano)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+                <input type="text" name="note" placeholder="Observación o nota del control (ej. control sano, activo)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
                 <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">Guardar</button>
               </div>
             </form>
           </div>
 
+          <!-- 2. Controles Médicos del Bebé -->
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-user-doctor text-indigo-400 text-base"></i>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-100">Controles Médicos</h4>
+                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${medControls.length}</span>
+              </div>
+              <button type="button" id="btToggleControlBtn" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
+                <i class="fa-solid fa-plus"></i> Agendar Control
+              </button>
+            </div>
+
+            <!-- Formulario colapsable para nuevo control médico -->
+            <form id="btMedControlForm" class="hidden space-y-2.5 bg-slate-900/90 p-3 rounded-xl border border-indigo-500/40">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span class="text-xs font-bold text-indigo-300">Nuevo Control Médico</span>
+                <span class="text-[10px] text-slate-400 font-semibold">Cita, Exámenes, Especialistas</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Tipo de Control Médico</label>
+                <select name="type" id="btControlSpecialtySelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 font-bold focus:outline-none focus:border-indigo-400">
+                  <option value="cita_medica">🩺 Cita médica (Pediatría / Control Sano)</option>
+                  <option value="examenes">🔬 Exámenes (Laboratorio / Sangre / Imágenes)</option>
+                  <option value="nutricionista">🥗 Nutricionista</option>
+                  <option value="dentista">🦷 Dentista / Odontopediatría</option>
+                  <option value="traumatologo">🦴 Traumatólogo</option>
+                  <option value="otro">📋 Otro especialista médico...</option>
+                </select>
+              </div>
+              <div id="btCustomSpecialtyContainer" class="hidden">
+                <label class="block text-[10px] font-semibold text-indigo-300 mb-1">Especificar Especialidad</label>
+                <input type="text" name="customType" placeholder="Ej. Kinesiología, Oftalmología, Broncopulmonar..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha</label>
+                  <input type="date" name="date" required value="${todayStr}" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Hora</label>
+                  <input type="time" name="time" required value="10:00" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Profesional / Centro Médico (opcional)</label>
+                <input type="text" name="doctor" placeholder="Ej. Dra. Carmen Silva - Clínica o Centro de Salud" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Notas / Indicaciones previas</label>
+                <input type="text" name="notes" placeholder="Ej. Llevar exámenes de sangre y carnet infantil..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400">
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button type="button" id="btCancelControlBtn" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">Cancelar</button>
+                <button type="submit" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow">Guardar Control</button>
+              </div>
+            </form>
+
+            <!-- Lista de Controles Programados -->
+            <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              ${sortedControls.length > 0 ? sortedControls.map(c => {
+                const spec = BT_CONTROL_SPECIALTIES[c.type] || BT_CONTROL_SPECIALTIES.cita_medica;
+                const specLabel = c.type === 'otro' && c.customType ? c.customType : spec.name;
+                const attended = c.attended === true;
+                const isUpcoming = c.date >= todayStr;
+                return `
+                  <div class="p-2.5 rounded-lg border ${attended ? 'bg-emerald-950/20 border-emerald-800/40' : (isUpcoming ? 'bg-slate-900 border-indigo-900/50' : 'bg-slate-900/60 border-slate-800')} flex items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${spec.badge}">
+                        <i class="fa-solid ${spec.icon} text-sm"></i>
+                      </span>
+                      <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span class="font-bold text-slate-100 truncate">${escapeHtml(specLabel)}</span>
+                          ${spec.short.toLowerCase() !== specLabel.toLowerCase() ? `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold border ${spec.badge}">${escapeHtml(spec.short)}</span>` : ''}
+                          ${attended ? '<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✔ Realizado</span>' : ''}
+                        </div>
+                        <p class="text-[10px] text-indigo-200 mt-0.5">📅 ${escapeHtml(c.date)} · 🕒 ${escapeHtml(formatTime(c.time))}${c.doctor ? ` · 🩺 ${escapeHtml(c.doctor)}` : ''}</p>
+                        ${c.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5 truncate">${escapeHtml(c.notes)}</p>` : ''}
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button type="button" data-bt-toggle-medcontrol="${c.id}" class="px-2 py-1 rounded text-[10px] font-bold border transition-colors ${attended ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'}">
+                        ${attended ? 'Asistió' : 'Marcar'}
+                      </button>
+                      <button type="button" data-bt-del-medcontrol="${c.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                  </div>
+                `;
+              }).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">No hay controles médicos agendados aún.</p>'}
+            </div>
+          </div>
+
+          <!-- 3. Registro y Toma de Medicamentos del Bebé -->
+          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-pills text-blue-400 text-base"></i>
+                <h4 class="text-xs font-black uppercase tracking-wider text-slate-100">Medicamentos y Tomas</h4>
+                <span class="bg-blue-500/20 text-blue-300 border border-blue-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${medications.length}</span>
+              </div>
+              <button type="button" id="btToggleMedBtn" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
+                <i class="fa-solid fa-plus"></i> Registrar Medicamento
+              </button>
+            </div>
+
+            <!-- Tomas de hoy -->
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 space-y-2">
+              <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block flex items-center gap-1.5">
+                <i class="fa-solid fa-clock text-blue-400"></i> Tomas programadas para hoy
+              </span>
+              <div class="space-y-1.5">
+                ${todayDoses.length > 0 ? todayDoses.map(dose => {
+                  const logKey = `${todayStr}_${dose.doseId}`;
+                  const isTaken = !!(btState.health.medLogs && btState.health.medLogs[logKey]);
+                  return `
+                    <div class="p-2 rounded-lg border ${isTaken ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-950 border-slate-800'} flex items-center justify-between gap-2 text-xs">
+                      <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <span class="font-mono font-bold text-slate-300 text-xs w-12 shrink-0">${escapeHtml(formatTime(dose.time))}</span>
+                        <div class="min-w-0 flex-1">
+                          <span class="block font-bold ${isTaken ? 'line-through text-slate-500' : 'text-slate-100'} truncate">${escapeHtml(dose.med.name)}</span>
+                          <span class="block text-[10px] text-blue-300 font-semibold">${escapeHtml(dose.med.dose)} · cada ${dose.med.frequency}h</span>
+                        </div>
+                      </div>
+                      <button type="button" data-bt-toggle-babydose="${escapeHtml(logKey)}" class="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 font-bold text-[11px] transition-all active:scale-95 ${isTaken ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent shadow'}">
+                        <i class="fa-solid ${isTaken ? 'fa-circle-check' : 'fa-circle'}"></i>
+                        <span>${isTaken ? 'Tomada' : 'Dar Toma'}</span>
+                      </button>
+                    </div>
+                  `;
+                }).join('') : '<p class="text-center py-2.5 text-xs text-slate-500 italic">No hay tomas de medicamentos programadas para hoy.</p>'}
+              </div>
+            </div>
+
+            <!-- Formulario colapsable para nuevo medicamento del bebé -->
+            <form id="btBabyMedForm" class="hidden space-y-2.5 bg-slate-900/90 p-3 rounded-xl border border-blue-500/40">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span class="text-xs font-bold text-blue-300">Registrar Medicamento del Bebé</span>
+                <span class="text-[10px] text-slate-400 font-semibold">Dosis y Frecuencia</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="col-span-2">
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Nombre del Medicamento</label>
+                  <input type="text" name="name" required placeholder="Ej. Paracetamol gotas, Ibuprofeno jarabe, Vitamina D3, Amoxicilina..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Dosis indicada</label>
+                  <input type="text" name="dose" required placeholder="Ej. 10 gotas, 2.5 ml, 80 mg" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Frecuencia</label>
+                  <select name="frequency" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-bold">
+                    <option value="4">Cada 4 horas</option>
+                    <option value="6">Cada 6 horas</option>
+                    <option value="8" selected>Cada 8 horas</option>
+                    <option value="12">Cada 12 horas</option>
+                    <option value="24">Cada 24 horas (Diario)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">1ª Hora de toma</label>
+                  <input type="time" name="time" required value="08:00" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-mono">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Duración (días)</label>
+                  <input type="number" name="duration" min="1" max="180" value="7" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha de inicio</label>
+                  <input type="date" name="startDate" required value="${todayStr}" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Motivo / Indicaciones (opcional)</label>
+                  <input type="text" name="notes" placeholder="Ej. Para bajar fiebre > 38°C, dar junto con la leche..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+                </div>
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button type="button" id="btCancelMedBtn" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">Cancelar</button>
+                <button type="submit" class="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow">Guardar Tratamiento</button>
+              </div>
+            </form>
+
+            <!-- Lista de Tratamientos Activos -->
+            <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+              <span class="text-[10px] font-bold text-slate-400 block mb-1">Tratamientos activos (${medications.length})</span>
+              ${medications.length > 0 ? medications.map(m => `
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                  <div class="min-w-0 flex-1">
+                    <p class="font-bold text-slate-100 truncate">${escapeHtml(m.name)}</p>
+                    <p class="text-[10px] text-blue-300">Dosis: ${escapeHtml(m.dose)} · Cada ${m.frequency}h · Inicio: ${escapeHtml(m.startDate)} (${m.duration} días)</p>
+                    ${m.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5 truncate">${escapeHtml(m.notes)}</p>` : ''}
+                  </div>
+                  <button type="button" data-bt-del-babymed="${m.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+              `).join('') : '<p class="text-center py-2 text-xs text-slate-500 italic">No hay tratamientos registrados.</p>'}
+            </div>
+          </div>
+
+          <!-- 4. Vacunas -->
           <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
             <div class="flex items-center justify-between">
               <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">💉 Calendario de Vacunas (${vax.done}/${vax.total})</h4>
-              <span class="text-[10px] text-slate-400">Toca para marcar individualmente</span>
+              <span class="text-[10px] text-slate-400">Toca para marcar</span>
             </div>
-            <div class="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+            <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
               ${btState.health.vaccines.map(v => `
                 <div data-bt-toggle-vaccine="${v.id}" class="p-2 rounded-lg border ${v.done ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-900 border-slate-800'} flex items-center justify-between gap-2 cursor-pointer hover:border-sky-500/40 transition-colors">
                   <div class="flex items-center gap-2.5 min-w-0">
@@ -7199,9 +8607,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
             </div>
           </div>
 
+          <!-- 5. Historial general -->
           <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2">
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📋 Historial de Controles y Notas</h4>
-            <div class="space-y-1.5">
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📋 Historial de Registros de Salud</h4>
+            <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
               ${btState.health.logs.length > 0 ? btState.health.logs.map(l => `
                 <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
                   <div class="min-w-0">
@@ -7210,42 +8619,140 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   </div>
                   <button type="button" data-bt-del-health="${l.id}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
-              `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">Aún no hay controles ni signos registrados.</p>'}
+              `).join('') : '<p class="text-center py-3 text-xs text-slate-500 italic">Sin registros adicionales aún.</p>'}
             </div>
           </div>
         `;
 
-        const form = document.getElementById('btHealthForm');
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          const fd = new FormData(form);
-          const tempRaw = parseFloat(fd.get('temp'));
-          const weightRaw = parseFloat(fd.get('weight'));
-          const heightRaw = parseFloat(fd.get('height'));
-          const note = (fd.get('note') || '').trim() || 'Control registrado';
+        // Toggle control form
+        const toggleControlBtn = document.getElementById('btToggleControlBtn');
+        const controlForm = document.getElementById('btMedControlForm');
+        const cancelControlBtn = document.getElementById('btCancelControlBtn');
+        const specialtySelect = document.getElementById('btControlSpecialtySelect');
+        const customSpecialtyBox = document.getElementById('btCustomSpecialtyContainer');
 
-          if (!isNaN(tempRaw)) btState.health.temperatureC = Math.round(tempRaw * 10) / 10;
-          if (!isNaN(weightRaw)) btState.health.weightKg = Math.round(weightRaw * 10) / 10;
-          if (!isNaN(heightRaw)) btState.health.heightCm = Math.round(heightRaw * 10) / 10;
-
-          const summaryParts = [];
-          if (!isNaN(tempRaw)) summaryParts.push(`${btState.health.temperatureC}°C`);
-          if (!isNaN(weightRaw)) summaryParts.push(`${btState.health.weightKg} kg`);
-          if (!isNaN(heightRaw)) summaryParts.push(`${btState.health.heightCm} cm`);
-
-          btState.health.logs.unshift({
-            id: 'hl_' + Date.now(),
-            time: getNowTimeStr(),
-            type: 'Control',
-            value: summaryParts.join(' • ') || 'Registro',
-            note
+        if (toggleControlBtn && controlForm) {
+          toggleControlBtn.addEventListener('click', () => {
+            controlForm.classList.toggle('hidden');
+            if (!controlForm.classList.contains('hidden')) controlForm.scrollIntoView({ behavior: 'smooth' });
           });
-          saveBtState();
-          renderBtMainContent();
-          notifyBt('Salud del bebé', 'Signos vitales registrados');
-        });
-      }
+        }
+        if (cancelControlBtn && controlForm) {
+          cancelControlBtn.addEventListener('click', () => controlForm.classList.add('hidden'));
+        }
+        if (specialtySelect && customSpecialtyBox) {
+          specialtySelect.addEventListener('change', function() {
+            customSpecialtyBox.classList.toggle('hidden', this.value !== 'otro');
+          });
+        }
+        if (controlForm) {
+          controlForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fd = new FormData(controlForm);
+            const type = fd.get('type') || 'cita_medica';
+            const customType = (fd.get('customType') || '').trim();
+            const date = fd.get('date');
+            const time = fd.get('time') || '10:00';
+            const doctor = (fd.get('doctor') || '').trim();
+            const notes = (fd.get('notes') || '').trim();
 
+            if (!btState.health.medicalControls) btState.health.medicalControls = [];
+            btState.health.medicalControls.push({
+              id: 'bmc_' + Date.now(),
+              type,
+              customType,
+              date,
+              time,
+              doctor,
+              notes,
+              attended: false
+            });
+            saveBtState();
+            refreshPrimaryCalendarMarkers();
+            renderBtMainContent();
+            const specName = type === 'otro' && customType ? customType : (BT_CONTROL_SPECIALTIES[type]?.name || 'Control médico');
+            notifyBt('Control médico agendado', `${specName} para el ${date} (visible en el calendario)`);
+          });
+        }
+
+        // Toggle baby med form
+        const toggleMedBtn = document.getElementById('btToggleMedBtn');
+        const medForm = document.getElementById('btBabyMedForm');
+        const cancelMedBtn = document.getElementById('btCancelMedBtn');
+
+        if (toggleMedBtn && medForm) {
+          toggleMedBtn.addEventListener('click', () => {
+            medForm.classList.toggle('hidden');
+            if (!medForm.classList.contains('hidden')) medForm.scrollIntoView({ behavior: 'smooth' });
+          });
+        }
+        if (cancelMedBtn && medForm) {
+          cancelMedBtn.addEventListener('click', () => medForm.classList.add('hidden'));
+        }
+        if (medForm) {
+          medForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fd = new FormData(medForm);
+            const name = (fd.get('name') || '').trim();
+            const dose = (fd.get('dose') || '').trim();
+            const frequency = parseInt(fd.get('frequency'), 10) || 8;
+            const time = fd.get('time') || '08:00';
+            const duration = parseInt(fd.get('duration'), 10) || 7;
+            const startDate = fd.get('startDate') || todayStr;
+            const notes = (fd.get('notes') || '').trim();
+
+            if (!name || !dose) return;
+            if (!btState.health.medications) btState.health.medications = [];
+            btState.health.medications.push({
+              id: 'bmed_' + Date.now(),
+              name,
+              dose,
+              frequency,
+              time,
+              duration,
+              startDate,
+              notes
+            });
+            saveBtState();
+            refreshPrimaryCalendarMarkers();
+            renderBtMainContent();
+            notifyBt('Medicamento registrado', `${name} (${dose}) (tomas activas en el calendario)`);
+          });
+        }
+
+        // Signos vitales form
+        const healthForm = document.getElementById('btHealthForm');
+        if (healthForm) {
+          healthForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fd = new FormData(healthForm);
+            const tempRaw = parseFloat(fd.get('temp'));
+            const weightRaw = parseFloat(fd.get('weight'));
+            const heightRaw = parseFloat(fd.get('height'));
+            const note = (fd.get('note') || '').trim() || 'Control registrado';
+
+            if (!isNaN(tempRaw)) btState.health.temperatureC = Math.round(tempRaw * 10) / 10;
+            if (!isNaN(weightRaw)) btState.health.weightKg = Math.round(weightRaw * 10) / 10;
+            if (!isNaN(heightRaw)) btState.health.heightCm = Math.round(heightRaw * 10) / 10;
+
+            const summaryParts = [];
+            if (!isNaN(tempRaw)) summaryParts.push(`${btState.health.temperatureC}°C`);
+            if (!isNaN(weightRaw)) summaryParts.push(`${btState.health.weightKg} kg`);
+            if (!isNaN(heightRaw)) summaryParts.push(`${btState.health.heightCm} cm`);
+
+            btState.health.logs.unshift({
+              id: 'hl_' + Date.now(),
+              time: getNowTimeStr(),
+              type: 'Control',
+              value: summaryParts.join(' • ') || 'Registro',
+              note
+            });
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Salud del bebé', 'Signos vitales registrados');
+          });
+        }
+      }
       function renderBtAlimentacion(container) {
         const btState = getCurrentBaby();
         const feed = getBtFeedingStats(btState);
@@ -7971,11 +9478,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const btState = getCurrentBaby();
         const idx = btStore.babies.indexOf(btState);
         const label = getBabyDisplayName(btState, idx);
+        const computed = getBtProfileComputed(btState);
 
         container.innerHTML = `
           <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
             <div class="flex items-center justify-between gap-2">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">👤 Datos Individuales (${escapeHtml(label)})</h4>
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">👤 Datos del Bebé (${escapeHtml(label)})</h4>
               <button type="button" data-bt-add-baby="1" class="px-2.5 py-1 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 rounded-lg text-[10px] font-bold flex items-center gap-1">
                 <i class="fa-solid fa-plus"></i> Agregar otro bebé
               </button>
@@ -7988,7 +9496,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 </div>
                 <div>
                   <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha de Nacimiento</label>
-                  <input type="date" name="birthDate" value="${escapeHtml(btState.profile.birthDate)}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                  <input type="date" id="btBirthDateInput" name="birthDate" value="${escapeHtml(btState.profile.birthDate)}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
                 </div>
                 <div>
                   <label class="block text-[10px] font-semibold text-slate-300 mb-1">Avatar</label>
@@ -8001,16 +9509,34 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   </select>
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Signo Lunar (opcional)</label>
-                  <input type="text" name="moonSign" value="${escapeHtml(btState.profile.moonSign)}" placeholder="Ej. 🌙 Leo" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
-                </div>
-                <div>
                   <label class="block text-[10px] font-semibold text-slate-300 mb-1">Pediatra (opcional)</label>
                   <input type="text" name="pediatrician" value="${escapeHtml(btState.profile.pediatrician)}" placeholder="Nombre del pediatra" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
                 </div>
-                <div>
+                <div class="col-span-2">
                   <label class="block text-[10px] font-semibold text-slate-300 mb-1">Grupo Sanguíneo (opcional)</label>
                   <input type="text" name="bloodType" value="${escapeHtml(btState.profile.bloodType)}" placeholder="Ej. O+" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                </div>
+
+                <!-- Bloque de cartas astrales automáticas -->
+                <div class="col-span-2 bg-slate-900/90 p-3 rounded-xl border border-slate-700/70 text-xs space-y-1.5">
+                  <span class="text-[10px] font-bold text-slate-300 block flex items-center gap-1.5">
+                    <i class="fa-solid fa-star text-amber-400"></i> Cartas calculadas automáticamente según la fecha de nacimiento:
+                  </span>
+                  <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                      <span class="text-[9px] text-slate-400 block font-semibold mb-0.5">Zodiaco Solar</span>
+                      <strong id="btPreviewZodiac" class="text-xs text-amber-300 font-black">${escapeHtml(computed.zodiac)}</strong>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                      <span class="text-[9px] text-slate-400 block font-semibold mb-0.5">Horóscopo Chino</span>
+                      <strong id="btPreviewChinese" class="text-xs text-rose-300 font-black">${escapeHtml(computed.chinese)}</strong>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                      <span class="text-[9px] text-slate-400 block font-semibold mb-0.5">Carta Lunar (Luna)</span>
+                      <strong id="btPreviewMoon" class="text-xs text-sky-300 font-black">${escapeHtml(computed.moon)}</strong>
+                    </div>
+                  </div>
+                  <p class="text-[9px] text-slate-400 text-center">Al ingresar o cambiar la fecha de nacimiento, el horóscopo lunar se calcula automáticamente junto con el solar y chino.</p>
                 </div>
               </div>
               <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-700/60">
@@ -8033,7 +9559,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
           btState.profile.name = (fd.get('name') || '').trim();
           btState.profile.birthDate = fd.get('birthDate') || '';
           btState.profile.avatar = fd.get('avatar') || '👶';
-          btState.profile.moonSign = (fd.get('moonSign') || '').trim();
+          const autoM = calculateMoonSign(btState.profile.birthDate);
+          btState.profile.moonSign = autoM ? autoM.sign : '';
           btState.profile.pediatrician = (fd.get('pediatrician') || '').trim();
           btState.profile.bloodType = (fd.get('bloodType') || '').trim();
           saveBtState();
@@ -8041,10 +9568,25 @@ Check your Browserslist config to be sure that your targets are set up correctly
           notifyBt('Perfil guardado', btState.profile.name || 'Datos actualizados');
         });
 
+        const birthInput = document.getElementById('btBirthDateInput');
+        if (birthInput) {
+          const updatePreviews = function() {
+            const tempVal = birthInput.value;
+            const tempComp = getBtProfileComputed({ profile: { birthDate: tempVal } });
+            const zEl = document.getElementById('btPreviewZodiac');
+            const cEl = document.getElementById('btPreviewChinese');
+            const mEl = document.getElementById('btPreviewMoon');
+            if (zEl) zEl.textContent = tempComp.zodiac;
+            if (cEl) cEl.textContent = tempComp.chinese;
+            if (mEl) mEl.textContent = tempComp.moon;
+          };
+          birthInput.addEventListener('input', updatePreviews);
+          birthInput.addEventListener('change', updatePreviews);
+        }
+
         const delBtn = document.getElementById('btDeleteCurrentBabyBtn');
         if (delBtn) delBtn.addEventListener('click', deleteCurrentBaby);
       }
-
       function openBtQuickModal() {
         const btState = getCurrentBaby();
         const idx = btStore.babies.indexOf(btState);
@@ -8060,6 +9602,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <button type="button" data-bt-modal-quick="diaperWet" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-sky-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💧 Pañal Mojado</button>
             <button type="button" data-bt-modal-quick="diaperDirty" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💩 Pañal Sucio</button>
             <button type="button" data-bt-modal-quick="nap1h" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-purple-300 border border-slate-700 rounded-lg text-xs font-bold text-left">😴 +Siesta (1h)</button>
+            <button type="button" data-bt-modal-quick="goToMedControl" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-700/60 rounded-lg text-xs font-bold text-left">🩺 +Control Médico</button>
+            <button type="button" data-bt-modal-quick="goToMedication" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-blue-300 border border-blue-700/60 rounded-lg text-xs font-bold text-left">💊 +Medicamento</button>
           </div>
           <form id="btModalTempForm" class="flex gap-2 items-end border-t border-slate-700/60 pt-3">
             <div class="flex-1">
@@ -8236,6 +9780,46 @@ Check your Browserslist config to be sure that your targets are set up correctly
           renderBtMainContent();
           return;
         }
+        const toggleControlBtn = e.target.closest('[data-bt-toggle-medcontrol]');
+        if (toggleControlBtn) {
+          const id = toggleControlBtn.getAttribute('data-bt-toggle-medcontrol');
+          const ctrl = (btState.health.medicalControls || []).find(c => c.id === id);
+          if (ctrl) {
+            ctrl.attended = !ctrl.attended;
+            saveBtState();
+            renderBtMainContent();
+            notifyBt('Control médico', ctrl.attended ? 'Marcado como realizado' : 'Marcado como pendiente');
+          }
+          return;
+        }
+        const delControlBtn = e.target.closest('[data-bt-del-medcontrol]');
+        if (delControlBtn) {
+          const id = delControlBtn.getAttribute('data-bt-del-medcontrol');
+          btState.health.medicalControls = (btState.health.medicalControls || []).filter(c => c.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Control médico', 'Registro eliminado');
+          return;
+        }
+        const toggleDoseBtn = e.target.closest('[data-bt-toggle-babydose]');
+        if (toggleDoseBtn) {
+          const logKey = toggleDoseBtn.getAttribute('data-bt-toggle-babydose');
+          if (!btState.health.medLogs) btState.health.medLogs = {};
+          btState.health.medLogs[logKey] = !btState.health.medLogs[logKey];
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Medicamento', btState.health.medLogs[logKey] ? 'Toma registrada como completada' : 'Toma marcada como pendiente');
+          return;
+        }
+        const delMedBtn = e.target.closest('[data-bt-del-babymed]');
+        if (delMedBtn) {
+          const id = delMedBtn.getAttribute('data-bt-del-babymed');
+          btState.health.medications = (btState.health.medications || []).filter(m => m.id !== id);
+          saveBtState();
+          renderBtMainContent();
+          notifyBt('Medicamento', 'Tratamiento eliminado');
+          return;
+        }
         const delPhoto = e.target.closest('[data-bt-del-photo]');
         if (delPhoto) {
           const id = delPhoto.getAttribute('data-bt-del-photo');
@@ -8287,6 +9871,24 @@ Check your Browserslist config to be sure that your targets are set up correctly
           else if (act === 'diaperWet') btState.diapers.entries.push({ id: 'd_' + Date.now(), time, type: 'Mojado', icon: '💧', note: 'Registro rápido' });
           else if (act === 'diaperDirty') btState.diapers.entries.push({ id: 'd_' + Date.now(), time, type: 'Sucio', icon: '💩', note: 'Registro rápido' });
           else if (act === 'nap1h') btState.sleep.entries.push({ id: 's_' + Date.now(), type: 'Siesta', start: time, end: '', hours: 1.0, note: 'Siesta rápida' });
+          else if (act === 'goToMedControl') {
+            closeBtQuickModal();
+            setBtActiveTab('salud');
+            setTimeout(() => {
+              const f = document.getElementById('btMedControlForm');
+              if (f) { f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth' }); }
+            }, 100);
+            return;
+          }
+          else if (act === 'goToMedication') {
+            closeBtQuickModal();
+            setBtActiveTab('salud');
+            setTimeout(() => {
+              const f = document.getElementById('btBabyMedForm');
+              if (f) { f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth' }); }
+            }, 100);
+            return;
+          }
           saveBtState();
           closeBtQuickModal();
           renderBtMainContent();
@@ -8309,8 +9911,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const chineseCard = document.getElementById('btStatChineseCard');
         if (chineseCard) chineseCard.addEventListener('click', () => setBtActiveTab('perfil'));
 
-        const addBabyHeaderBtn = document.getElementById('btAddNewBabyBtn');
-        if (addBabyHeaderBtn) addBabyHeaderBtn.addEventListener('click', addNewBaby);
+
         const quickAddBtn = document.getElementById('btQuickAddHeaderBtn');
         if (quickAddBtn) quickAddBtn.addEventListener('click', openBtQuickModal);
         const closeBtn = document.getElementById('btCloseModalBtn');
@@ -8322,6 +9923,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         btSleepInterval = setInterval(updateBtSleepTimerDisplay, 1000);
       });
 
+      window.setBtActiveTab = setBtActiveTab;
+      window.openBtQuickModal = openBtQuickModal;
       window.renderBabyTrackerView = function() {
         renderBtMainContent();
       };
