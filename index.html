@@ -236,6 +236,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-file-signature::before{content:"📝"}
 .fa-plane-departure::before{content:"✈"}
 .fa-baby-symbol::before{content:"🚼"}
+.fa-chart-column::before{content:"📊"}
+.fa-cloud::before{content:"☁"}
+.fa-link::before{content:"🔗"}
+.fa-users::before{content:"👥"}
+.fa-wifi::before{content:"📶"}
 </style>
 </head>
 <body class="h-full flex flex-col font-sans overflow-x-hidden bg-slate-950 text-slate-100">
@@ -702,9 +707,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 <p id="btProfileDaysText" class="text-[10px] text-slate-400">Edad y signos se calculan automáticamente</p>
               </div>
             </div>
-            <button type="button" id="btBtnEditProfile" class="px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow active:scale-95">
-              <i class="fa-solid fa-pen mr-1"></i>Completar Perfil
-            </button>
+            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 shrink-0">
+              <button type="button" id="btCloudSyncBtn" onclick="openBabyCloudSyncModal()" class="px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95" title="Sincronizar apartado Bebé entre varios celulares">
+                <span id="btCloudSyncDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span id="btCloudSyncBtnLabel">☁️ Sincronizar</span>
+              </button>
+              <button type="button" id="btBtnEditProfile" class="px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow active:scale-95">
+                <i class="fa-solid fa-pen mr-1"></i>Completar Perfil
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-4 gap-1.5 text-center">
@@ -4490,6 +4501,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!vax) return;
       const isCustomVax = String(vax.id || '').startsWith('v_custom_');
       if (isCustomVax && !vax.done) {
+        if (typeof window.recordBtDeletedId === 'function') window.recordBtDeletedId(vax.id);
         btState.health.vaccines = btState.health.vaccines.filter(x => x.id !== vax.id);
         persistBabyTrackerStoreSafe(store);
         closeBabyVaccineQuickModal();
@@ -5222,6 +5234,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           if (bt && Array.isArray(bt.babies)) {
             const baby = bt.babies.find(b => b.id === babyId) || bt.babies[0];
             if (baby && baby.health && Array.isArray(baby.health.medicalControls)) {
+              if (typeof window.recordBtDeletedId === 'function') window.recordBtDeletedId(id);
               baby.health.medicalControls = baby.health.medicalControls.filter(c => c.id !== id);
               persistBabyTrackerStoreSafe(bt);
               renderUpcomingHealthControls();
@@ -5605,6 +5618,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             const ctrl = baby.health.medicalControls.find(c => c.id === controlId);
             if (ctrl) {
               ctrl.attended = !ctrl.attended;
+            ctrl.updatedAt = Date.now();
               try {
                 localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(bt));
               } catch (e) { console.error(e); }
@@ -10271,6 +10285,117 @@ Check your Browserslist config to be sure that your targets are set up correctly
   </script>
 
   <!-- MODAL REGISTRO DE VACUNA CON FECHA (Baby Tracker) -->
+  <!-- MODAL DE SINCRONIZACIÓN MULTI-CELULAR EN TIEMPO REAL (EXCLUSIVO APARTADO BEBÉ) -->
+  <div id="babyCloudSyncModal" class="fixed inset-0 z-[88] bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyCloudSyncModal()">
+    <section class="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-emerald-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3.5">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-cloud"></i>
+          </span>
+          <div>
+            <h3 class="font-extrabold text-sm text-emerald-300">Sincronización Familiar del Bebé</h3>
+            <p class="text-[10px] text-slate-400">Varios celulares viendo y editando el mismo registro en vivo</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeBabyCloudSyncModal()" aria-label="Cerrar" class="p-1.5 text-slate-400 hover:text-white rounded-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Banner de privacidad y estado actual -->
+      <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+            <span id="babyCloudSyncModalStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+            <span id="babyCloudSyncModalStatusText">Desconectado (Solo en este celular)</span>
+          </span>
+          <button type="button" id="babyCloudSyncNowBtn" onclick="triggerBabyCloudSyncNow()" class="hidden px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow active:scale-95">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i>Sincronizar ahora
+          </button>
+        </div>
+        <p id="babyCloudSyncLastTime" class="text-[10px] text-slate-400">
+          🔒 Solo se sincroniza el apartado <strong>Bebé</strong> (comidas, pañales, sueño en vivo, vacunas, controles, medicinas e inventario). Tus turnos y notas personales permanecen privados en tu celular.
+        </p>
+      </div>
+
+      <!-- OPCIÓN RÁPIDA: VINCULAR CON CÓDIGO DE INVITACIÓN (PARA EL 2° CELULAR) -->
+      <div class="p-3 rounded-xl bg-sky-950/30 border border-sky-500/40 space-y-2">
+        <label for="babyCloudSyncInviteInput" class="block text-[11px] font-extrabold text-sky-300">
+          📲 ¿Te enviaron un Código de Invitación Familiar?
+        </label>
+        <p class="text-[10px] text-slate-300">Pega aquí el código que copiaste del primer celular para conectarte automáticamente a la misma sala:</p>
+        <div class="flex gap-1.5">
+          <input type="text" id="babyCloudSyncInviteInput" placeholder="Pega aquí el código BSYNC-..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-sky-400">
+          <button type="button" onclick="applyBabyCloudSyncInviteCode()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95 shrink-0">
+            Vincular
+          </button>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN DE SALA COMPARTIDA (FIREBASE REALTIME DB) -->
+      <form id="babyCloudSyncForm" onsubmit="saveBabyCloudSyncConfig(event)" class="space-y-3 border-t border-slate-800 pt-3">
+        <div>
+          <label for="babyCloudSyncDbUrl" class="block text-[11px] font-semibold text-slate-300 mb-1">
+            🌐 URL de Base en la Nube (Firebase Realtime Database)
+          </label>
+          <input type="url" id="babyCloudSyncDbUrl" required placeholder="https://mi-proyecto-default-rtdb.firebaseio.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyCloudSyncRoomCode" class="block text-[11px] font-semibold text-slate-300 mb-1">
+              🔑 Código de Sala Familiar
+            </label>
+            <input type="text" id="babyCloudSyncRoomCode" required placeholder="Ej. martina-2026" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono font-bold focus:outline-none focus:border-emerald-400">
+          </div>
+          <div>
+            <label for="babyCloudSyncDeviceName" class="block text-[11px] font-semibold text-slate-300 mb-1">
+              👤 Nombre en este celular
+            </label>
+            <input type="text" id="babyCloudSyncDeviceName" placeholder="Ej. Papá, Mamá, Abuela..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-emerald-400">
+          </div>
+        </div>
+
+        <!-- Caja con código de invitación generado cuando ya está conectado -->
+        <div id="babyCloudSyncInviteShareBox" class="hidden p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">🔗 Código para invitar otro celular</span>
+            <button type="button" onclick="copyBabyCloudSyncInviteCode()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow active:scale-95 flex items-center gap-1">
+              <i class="fa-solid fa-copy"></i> Copiar código
+            </button>
+          </div>
+          <input type="text" id="babyCloudSyncGeneratedCode" readonly class="w-full bg-slate-950 text-emerald-200 border border-emerald-700/50 rounded-lg px-2.5 py-1.5 text-[10px] font-mono select-all focus:outline-none">
+          <p class="text-[10px] text-slate-400">Envía este código por WhatsApp a la otra persona; solo debe pegarlo arriba en su app y tocar <strong>Vincular</strong>.</p>
+        </div>
+
+        <!-- Guía rápida desplegable para crear la base gratuita en 1 minuto -->
+        <details class="bg-slate-900/70 rounded-xl border border-slate-800 p-2.5 text-[11px] text-slate-300">
+          <summary class="font-bold text-amber-300 cursor-pointer">💡 ¿Cómo obtener la URL gratuita en 1 minuto? (Solo se hace en 1 celular)</summary>
+          <ol class="list-decimal list-inside space-y-1 mt-2 text-[10px] text-slate-300 leading-relaxed">
+            <li>Entra a <strong>console.firebase.google.com</strong> con tu cuenta Google y crea un proyecto gratis.</li>
+            <li>En el menú izquierdo entra a <strong>Compilación &gt; Realtime Database</strong> y pulsa <strong>Crear base de datos</strong> (en <em>Modo de prueba</em>).</li>
+            <li>Copia la URL que aparece arriba (termina en <code>.firebaseio.com</code> o <code>.firebasedatabase.app</code>), pégala aquí e inventa un <strong>Código de Sala Familiar</strong>.</li>
+            <li>Una vez conectado, pulsa <strong>Copiar código</strong> y mándaselo por WhatsApp a los demás celulares.</li>
+          </ol>
+        </details>
+
+        <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+          <button type="button" id="babyCloudSyncDisconnectBtn" onclick="disconnectBabyCloudSync()" class="hidden py-2.5 px-3 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Desconectar
+          </button>
+          <button type="button" onclick="closeBabyCloudSyncModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Cerrar
+          </button>
+          <button type="submit" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-cloud"></i>
+            <span>Guardar y Conectar</span>
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
   <!-- BARRA FLOTANTE GLOBAL CUANDO EL CRONÓMETRO DE SUEÑO ESTÁ ACTIVO Y MINIMIZADO -->
   <div id="btLiveSleepFloatingBanner" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] hidden w-[94%] max-w-md bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-400/50 rounded-2xl px-3.5 py-2.5 shadow-2xl items-center justify-between gap-2">
     <button type="button" id="btOpenLiveSleepScreenFromBannerBtn" class="flex items-center gap-2.5 min-w-0 flex-1 text-left">
@@ -10583,10 +10708,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
         });
 
         const activeId = babies.some(b => b.id === parsed.activeBabyId) ? parsed.activeBabyId : babies[0].id;
+        const deletedIds = (parsed.deletedIds && typeof parsed.deletedIds === 'object' && !Array.isArray(parsed.deletedIds))
+          ? parsed.deletedIds
+          : {};
         return {
           activeTab: mapLegacyTabName(parsed.activeTab || 'cuidados'),
           growthChartMetric: parsed.growthChartMetric || 'all',
           activeBabyId: activeId,
+          lastUpdatedAt: Number(parsed.lastUpdatedAt) || 0,
+          deletedIds,
           babies
         };
       }
@@ -10609,8 +10739,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return createDefaultStore();
       }
 
-      function saveBtState() {
+      function recordBtDeletedId(itemId) {
+        if (!itemId) return;
+        if (!btStore.deletedIds || typeof btStore.deletedIds !== 'object') btStore.deletedIds = {};
+        btStore.deletedIds[itemId] = Date.now();
+      }
+      window.recordBtDeletedId = recordBtDeletedId;
+
+      function saveBtState(options = {}) {
         let saved = true;
+        btStore.lastUpdatedAt = Date.now();
         try {
           localStorage.setItem(BT_STORAGE_KEY, JSON.stringify(btStore));
         } catch (e) {
@@ -10622,6 +10760,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
         if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
         if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
+        if (!options.skipCloudPush && typeof scheduleBabyCloudPush === 'function') {
+          scheduleBabyCloudPush();
+        }
         return saved;
       }
 
@@ -13349,6 +13490,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           btState.profile.moonSign = autoM ? autoM.sign : '';
           btState.profile.pediatrician = (fd.get('pediatrician') || '').trim();
           btState.profile.bloodType = (fd.get('bloodType') || '').trim();
+          btState.profile.updatedAt = Date.now();
           saveBtState();
           setBtActiveTab('cuidados');
           notifyBt('Perfil guardado', btState.profile.name || 'Datos actualizados');
@@ -13541,7 +13683,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           note: userNote || 'Registrado con cronómetro en vivo'
         });
 
-        activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta' };
+        activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta', updatedAt: Date.now() };
         if (noteInput) noteInput.value = '';
         saveBtState();
         closeBtLiveSleepScreen();
@@ -13552,7 +13694,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       function cancelBtLiveSleep() {
         const activeTimerBaby = getRunningSleepBaby() || getCurrentBaby();
         if (activeTimerBaby) {
-          activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta' };
+          activeTimerBaby.sleepTimer = { running: false, startTime: null, startTimeStr: '', startDateKey: '', type: 'Siesta', updatedAt: Date.now() };
         }
         const noteInput = document.getElementById('btLiveSleepNoteInput');
         if (noteInput) noteInput.value = '';
@@ -13659,6 +13801,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const vaxItem = (btSt.health.vaccines || []).find(x => x.id === vId);
           if (vaxItem) {
             vaxItem.done = !vaxItem.done;
+            vaxItem.updatedAt = Date.now();
             if (vaxItem.done && !vaxItem.date) {
               vaxItem.date = btSelectedDateKey || getTodayDateKey();
             }
@@ -13817,6 +13960,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const btSt = getCurrentBaby();
           if (!btSt.feeding) btSt.feeding = { milkGoalMl: 600, entries: [], milkPickups: [], formulaCans: [], milkStockAdjustment: 0 };
           btSt.feeding.milkStockAdjustment = (Number(btSt.feeding.milkStockAdjustment) || 0) + delta;
+          btSt.feeding.milkStockAdjUpdatedAt = Date.now();
           saveBtState();
           renderBtMainContent();
           return;
@@ -13828,6 +13972,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const btSt = getCurrentBaby();
           if (!btSt.diapers) btSt.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
           btSt.diapers.stockAdjustment = (Number(btSt.diapers.stockAdjustment) || 0) + delta;
+          btSt.diapers.stockAdjUpdatedAt = Date.now();
           saveBtState();
           renderBtMainContent();
           return;
@@ -13974,6 +14119,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const m = btState.development.milestones.find(x => x.id === id);
           if (m) {
             m.done = !m.done;
+            m.updatedAt = Date.now();
             if (m.done && !m.date) m.date = btSelectedDateKey || getTodayDateKey();
             saveBtState();
             renderBtMainContent();
@@ -13984,6 +14130,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delMilestone = e.target.closest('[data-bt-del-milestone]');
         if (delMilestone) {
           const id = delMilestone.getAttribute('data-bt-del-milestone');
+          recordBtDeletedId(id);
           btState.development.milestones = btState.development.milestones.filter(x => x.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -13993,6 +14140,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delGrowth = e.target.closest('[data-bt-del-growth]');
         if (delGrowth) {
           const id = delGrowth.getAttribute('data-bt-del-growth');
+          recordBtDeletedId(id);
           btState.growth = btState.growth.filter(x => x.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14002,6 +14150,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delFeed = e.target.closest('[data-bt-del-feed]');
         if (delFeed) {
           const id = delFeed.getAttribute('data-bt-del-feed');
+          recordBtDeletedId(id);
           btState.feeding.entries = btState.feeding.entries.filter(x => x.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14011,6 +14160,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (delMilkPickup) {
           const id = delMilkPickup.getAttribute('data-bt-del-milkpickup');
           if (btState.feeding && Array.isArray(btState.feeding.milkPickups)) {
+            recordBtDeletedId(id);
             btState.feeding.milkPickups = btState.feeding.milkPickups.filter(x => x && x.id !== id);
             saveBtState();
             renderBtMainContent();
@@ -14025,6 +14175,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             const targetCan = btState.feeding.formulaCans.find(x => x && x.id === id);
             if (targetCan) {
               targetCan.status = 'finished';
+              targetCan.updatedAt = Date.now();
               targetCan.finishedDate = getTodayDateKey();
               saveBtState();
               renderBtMainContent();
@@ -14037,6 +14188,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (delCanBtn) {
           const id = delCanBtn.getAttribute('data-bt-del-can');
           if (btState.feeding && Array.isArray(btState.feeding.formulaCans)) {
+            recordBtDeletedId(id);
             btState.feeding.formulaCans = btState.feeding.formulaCans.filter(x => x && x.id !== id);
             saveBtState();
             renderBtMainContent();
@@ -14048,6 +14200,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (delDiaperPurchaseBtn) {
           const id = delDiaperPurchaseBtn.getAttribute('data-bt-del-diaperpurchase');
           if (btState.diapers && Array.isArray(btState.diapers.purchases)) {
+            recordBtDeletedId(id);
             btState.diapers.purchases = btState.diapers.purchases.filter(x => x && x.id !== id);
             saveBtState();
             renderBtMainContent();
@@ -14066,6 +14219,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delSleep = e.target.closest('[data-bt-del-sleep]');
         if (delSleep) {
           const id = delSleep.getAttribute('data-bt-del-sleep');
+          recordBtDeletedId(id);
           btState.sleep.entries = btState.sleep.entries.filter(x => x.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14074,6 +14228,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delDiaper = e.target.closest('[data-bt-del-diaper]');
         if (delDiaper) {
           const id = delDiaper.getAttribute('data-bt-del-diaper');
+          recordBtDeletedId(id);
           btState.diapers.entries = btState.diapers.entries.filter(x => x.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14086,6 +14241,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const ctrl = (btState.health.medicalControls || []).find(c => c.id === id);
           if (ctrl) {
             ctrl.attended = !ctrl.attended;
+            ctrl.updatedAt = Date.now();
             saveBtState();
             renderBtMainContent();
             notifyBt('Control médico', ctrl.attended ? 'Marcado como realizado' : 'Marcado como pendiente');
@@ -14095,6 +14251,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delControlBtn = e.target.closest('[data-bt-del-medcontrol]');
         if (delControlBtn) {
           const id = delControlBtn.getAttribute('data-bt-del-medcontrol');
+          recordBtDeletedId(id);
           btState.health.medicalControls = (btState.health.medicalControls || []).filter(c => c.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14115,6 +14272,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const delMedBtn = e.target.closest('[data-bt-del-babymed]');
         if (delMedBtn) {
           const id = delMedBtn.getAttribute('data-bt-del-babymed');
+          recordBtDeletedId(id);
           btState.health.medications = (btState.health.medications || []).filter(m => m.id !== id);
           saveBtState();
           renderBtMainContent();
@@ -14144,7 +14302,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             startTime: Date.now(),
             startTimeStr: getNowTimeStr(),
             startDateKey: dateKey,
-            type
+            type,
+            updatedAt: Date.now()
           };
           saveBtState();
           renderBtMainContent();
@@ -14173,6 +14332,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           if (b) {
             if (!b.diapers) b.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
             b.diapers.activeStockKey = e.target.value || '';
+            b.diapers.activeStockUpdatedAt = Date.now();
             saveBtState();
             renderBtMainContent();
           }
@@ -14222,17 +14382,544 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         // Si había un cronómetro de sueño en vivo activo al abrir la app, mostrar de inmediato la pantalla del cronómetro
         checkAndShowRunningSleepScreenOnResume();
+        updateBtCloudSyncUI();
+        if (btCloudConfig && btCloudConfig.enabled) {
+          startBabyCloudRealtimeListener();
+        }
       });
 
       document.addEventListener('visibilitychange', function() {
         if (document.visibilityState === 'visible') {
           checkAndShowRunningSleepScreenOnResume();
+          if (btCloudConfig && btCloudConfig.enabled) {
+            performBabyCloudSync(false);
+          }
         }
       });
 
       window.addEventListener('pageshow', function() {
         checkAndShowRunningSleepScreenOnResume();
       });
+
+
+      // =========================================================================
+      // MOTOR DE SINCRONIZACIÓN MULTI-CELULAR EN TIEMPO REAL (EXCLUSIVO BEBÉ)
+      // =========================================================================
+      const BT_CLOUD_CONFIG_KEY = 'cal_baby_cloud_sync_v1';
+      let btCloudConfig = loadBtCloudConfig();
+      let btCloudPushTimeout = null;
+      let btCloudPollInterval = null;
+      let btCloudEventSource = null;
+      let btCloudIsSyncing = false;
+      let btLastSyncedIso = '';
+
+      function loadBtCloudConfig() {
+        try {
+          const raw = localStorage.getItem(BT_CLOUD_CONFIG_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.dbUrl && parsed.roomCode) return parsed;
+          }
+        } catch (e) {}
+        return { enabled: false, dbUrl: '', roomCode: '', deviceName: '' };
+      }
+
+      function saveBtCloudConfigState(cfg) {
+        btCloudConfig = cfg;
+        try {
+          localStorage.setItem(BT_CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+        } catch (e) {}
+        updateBtCloudSyncUI();
+      }
+
+      function normalizeFirebaseDbUrl(url) {
+        return String(url || '').trim().replace(/\/+$/, '').replace(/\.json$/i, '');
+      }
+
+      function sanitizeRoomCode(code) {
+        return String(code || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      }
+
+      function getBtCloudEndpointUrl() {
+        if (!btCloudConfig || !btCloudConfig.enabled || !btCloudConfig.dbUrl || !btCloudConfig.roomCode) return '';
+        const base = normalizeFirebaseDbUrl(btCloudConfig.dbUrl);
+        const room = sanitizeRoomCode(btCloudConfig.roomCode);
+        if (!base || !room) return '';
+        return `${base}/calendario_bebe_sync/${encodeURIComponent(room)}.json`;
+      }
+
+      function generateBtInviteToken(dbUrl, roomCode) {
+        const cleanUrl = normalizeFirebaseDbUrl(dbUrl);
+        const cleanRoom = sanitizeRoomCode(roomCode);
+        if (!cleanUrl || !cleanRoom) return '';
+        try {
+          const payload = JSON.stringify({ u: cleanUrl, r: cleanRoom });
+          return 'BSYNC-' + btoa(unescape(encodeURIComponent(payload)));
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function parseBtInviteToken(token) {
+        const raw = String(token || '').trim();
+        if (!raw.startsWith('BSYNC-')) return null;
+        try {
+          const jsonStr = decodeURIComponent(escape(atob(raw.slice(6))));
+          const obj = JSON.parse(jsonStr);
+          if (obj && obj.u && obj.r) {
+            return { dbUrl: normalizeFirebaseDbUrl(obj.u), roomCode: sanitizeRoomCode(obj.r) };
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      function mergeArrayByIdWithDeletes(localArr, remoteArr, deletedMap) {
+        const map = new Map();
+        const del = deletedMap || {};
+        (Array.isArray(localArr) ? localArr : []).forEach(item => {
+          if (!item || !item.id || del[item.id]) return;
+          map.set(item.id, item);
+        });
+        (Array.isArray(remoteArr) ? remoteArr : []).forEach(rItem => {
+          if (!rItem || !rItem.id || del[rItem.id]) return;
+          const lItem = map.get(rItem.id);
+          if (!lItem) {
+            map.set(rItem.id, JSON.parse(JSON.stringify(rItem)));
+          } else {
+            const lTime = Number(lItem.updatedAt) || 0;
+            const rTime = Number(rItem.updatedAt) || 0;
+            if (rTime >= lTime) {
+              map.set(rItem.id, JSON.parse(JSON.stringify(rItem)));
+            }
+          }
+        });
+        return Array.from(map.values());
+      }
+
+      function mergeBabyStoresForCloudSync(localRaw, remoteRaw) {
+        const local = normalizeStore(localRaw);
+        const remote = normalizeStore(remoteRaw);
+
+        const mergedDeleted = Object.assign({}, local.deletedIds || {}, remote.deletedIds || {});
+        const babyMap = new Map();
+
+        local.babies.forEach(b => {
+          if (b && b.id && !mergedDeleted[b.id]) {
+            babyMap.set(b.id, JSON.parse(JSON.stringify(b)));
+          }
+        });
+
+        remote.babies.forEach((rb, rIdx) => {
+          if (!rb || !rb.id || mergedDeleted[rb.id]) return;
+          let lb = babyMap.get(rb.id);
+          if (!lb && rb.profile && rb.profile.name) {
+            const rName = rb.profile.name.trim().toLowerCase();
+            if (rName) {
+              lb = Array.from(babyMap.values()).find(x => x.profile && x.profile.name && x.profile.name.trim().toLowerCase() === rName);
+            }
+          }
+          // Si el bebé local aún está en blanco ("baby_1" sin nombre) y el remoto es "baby_1", fusionar sobre baby_1
+          if (!lb && rb.id === 'baby_1' && babyMap.has('baby_1')) {
+            lb = babyMap.get('baby_1');
+          }
+
+          if (!lb) {
+            babyMap.set(rb.id, JSON.parse(JSON.stringify(rb)));
+            return;
+          }
+
+          // 1. Perfil
+          const lProfTime = Number(lb.profile && lb.profile.updatedAt) || 0;
+          const rProfTime = Number(rb.profile && rb.profile.updatedAt) || 0;
+          if (rProfTime > lProfTime || (!lb.profile.name && rb.profile && rb.profile.name)) {
+            lb.profile = Object.assign({}, lb.profile, rb.profile);
+          }
+
+          // 2. Cronómetro de sueño en vivo
+          const lSleepT = Number(lb.sleepTimer && lb.sleepTimer.updatedAt) || Number(lb.sleepTimer && lb.sleepTimer.startTime) || 0;
+          const rSleepT = Number(rb.sleepTimer && rb.sleepTimer.updatedAt) || Number(rb.sleepTimer && rb.sleepTimer.startTime) || 0;
+          if (rSleepT > lSleepT) {
+            lb.sleepTimer = Object.assign({}, rb.sleepTimer);
+          }
+
+          // 3. Alimentación, Retiros, Tarros y Ajuste de Leche
+          if (!lb.feeding) lb.feeding = { milkGoalMl: 600, entries: [], milkPickups: [], formulaCans: [], milkStockAdjustment: 0 };
+          const rf = rb.feeding || {};
+          lb.feeding.entries = mergeArrayByIdWithDeletes(lb.feeding.entries, rf.entries, mergedDeleted);
+          lb.feeding.milkPickups = mergeArrayByIdWithDeletes(lb.feeding.milkPickups, rf.milkPickups, mergedDeleted);
+          lb.feeding.formulaCans = mergeArrayByIdWithDeletes(lb.feeding.formulaCans, rf.formulaCans, mergedDeleted);
+          if ((Number(rf.milkStockAdjUpdatedAt) || 0) > (Number(lb.feeding.milkStockAdjUpdatedAt) || 0)) {
+            lb.feeding.milkStockAdjustment = Number(rf.milkStockAdjustment) || 0;
+            lb.feeding.milkStockAdjUpdatedAt = rf.milkStockAdjUpdatedAt;
+          }
+
+          // 4. Pañales, Compras, Stock activo y Ajuste
+          if (!lb.diapers) lb.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+          const rd = rb.diapers || {};
+          lb.diapers.entries = mergeArrayByIdWithDeletes(lb.diapers.entries, rd.entries, mergedDeleted);
+          lb.diapers.purchases = mergeArrayByIdWithDeletes(lb.diapers.purchases, rd.purchases, mergedDeleted);
+          if ((Number(rd.stockAdjUpdatedAt) || 0) > (Number(lb.diapers.stockAdjUpdatedAt) || 0)) {
+            lb.diapers.stockAdjustment = Number(rd.stockAdjustment) || 0;
+            lb.diapers.stockAdjUpdatedAt = rd.stockAdjUpdatedAt;
+          }
+          if ((Number(rd.activeStockUpdatedAt) || 0) > (Number(lb.diapers.activeStockUpdatedAt) || 0)) {
+            lb.diapers.activeStockKey = rd.activeStockKey || '';
+            lb.diapers.activeStockUpdatedAt = rd.activeStockUpdatedAt;
+          }
+
+          // 5. Sueño
+          if (!lb.sleep) lb.sleep = { entries: [] };
+          const rs = rb.sleep || {};
+          lb.sleep.entries = mergeArrayByIdWithDeletes(lb.sleep.entries, rs.entries, mergedDeleted);
+
+          // 6. Salud: Vacunas, Controles, Medicamentos, Tomas (medLogs) y Logs
+          if (!lb.health) lb.health = { vaccines: [], medicalControls: [], medications: [], medLogs: {}, logs: [] };
+          const rh = rb.health || {};
+          lb.health.medicalControls = mergeArrayByIdWithDeletes(lb.health.medicalControls, rh.medicalControls, mergedDeleted);
+          lb.health.medications = mergeArrayByIdWithDeletes(lb.health.medications, rh.medications, mergedDeleted);
+          lb.health.logs = mergeArrayByIdWithDeletes(lb.health.logs, rh.logs, mergedDeleted);
+
+          // Vacunas (base + personalizadas)
+          const vaxMap = new Map();
+          (Array.isArray(lb.health.vaccines) ? lb.health.vaccines : []).forEach(v => {
+            if (v && v.id && !mergedDeleted[v.id]) vaxMap.set(v.id, v);
+          });
+          (Array.isArray(rh.vaccines) ? rh.vaccines : []).forEach(rv => {
+            if (!rv || !rv.id || mergedDeleted[rv.id]) return;
+            const lv = vaxMap.get(rv.id);
+            if (!lv) {
+              vaxMap.set(rv.id, JSON.parse(JSON.stringify(rv)));
+            } else {
+              const lVt = Number(lv.updatedAt) || (lv.done ? 1 : 0);
+              const rVt = Number(rv.updatedAt) || (rv.done ? 1 : 0);
+              if (rVt > lVt || (rVt === lVt && rv.done && !lv.done)) {
+                vaxMap.set(rv.id, Object.assign({}, lv, rv));
+              }
+            }
+          });
+          lb.health.vaccines = Array.from(vaxMap.values());
+
+          // Tomas de medicamentos (medLogs)
+          if (!lb.health.medLogs) lb.health.medLogs = {};
+          if (rh.medLogs && typeof rh.medLogs === 'object') {
+            Object.entries(rh.medLogs).forEach(([k, val]) => {
+              if (val) lb.health.medLogs[k] = true;
+            });
+          }
+
+          // 7. Curva de Crecimiento e Hitos
+          lb.growth = mergeArrayByIdWithDeletes(lb.growth, rb.growth, mergedDeleted);
+          if (lb.growth.length > 0) {
+            const lastG = lb.growth[lb.growth.length - 1];
+            lb.health.weightKg = lastG.weight;
+            lb.health.heightCm = lastG.height;
+            lb.health.headCm = lastG.head;
+          }
+
+          if (!lb.development) lb.development = { milestones: [] };
+          const rdM = (rb.development && Array.isArray(rb.development.milestones)) ? rb.development.milestones : [];
+          lb.development.milestones = mergeArrayByIdWithDeletes(lb.development.milestones, rdM, mergedDeleted);
+        });
+
+        const mergedBabies = Array.from(babyMap.values());
+        if (mergedBabies.length === 0) {
+          mergedBabies.push(createEmptyBabyRecord('baby_1', 1));
+        }
+
+        return normalizeStore({
+          activeTab: local.activeTab || 'cuidados',
+          growthChartMetric: local.growthChartMetric || 'all',
+          activeBabyId: mergedBabies.some(b => b.id === local.activeBabyId) ? local.activeBabyId : mergedBabies[0].id,
+          lastUpdatedAt: Math.max(Number(local.lastUpdatedAt) || 0, Number(remote.lastUpdatedAt) || 0, Date.now()),
+          deletedIds: mergedDeleted,
+          babies: mergedBabies
+        });
+      }
+
+      function updateBtCloudSyncUI(statusState = null, detailText = null) {
+        const dot = document.getElementById('btCloudSyncDot');
+        const btnLabel = document.getElementById('btCloudSyncBtnLabel');
+        const modalDot = document.getElementById('babyCloudSyncModalStatusDot');
+        const modalStatus = document.getElementById('babyCloudSyncModalStatusText');
+        const modalLastTime = document.getElementById('babyCloudSyncLastTime');
+        const syncNowBtn = document.getElementById('babyCloudSyncNowBtn');
+        const discBtn = document.getElementById('babyCloudSyncDisconnectBtn');
+        const shareBox = document.getElementById('babyCloudSyncInviteShareBox');
+        const genCodeInput = document.getElementById('babyCloudSyncGeneratedCode');
+
+        const isEnabled = !!(btCloudConfig && btCloudConfig.enabled && btCloudConfig.dbUrl && btCloudConfig.roomCode);
+        const state = statusState || (isEnabled ? 'online' : 'offline');
+
+        const dotClass = state === 'syncing'
+          ? 'w-2 h-2 rounded-full bg-amber-400 animate-ping'
+          : (state === 'online'
+            ? 'w-2 h-2 rounded-full bg-emerald-400'
+            : (state === 'error' ? 'w-2 h-2 rounded-full bg-rose-400' : 'w-2 h-2 rounded-full bg-slate-500'));
+
+        if (dot) dot.className = dotClass;
+        if (modalDot) modalDot.className = dotClass.replace('w-2 h-2', 'w-2.5 h-2.5');
+
+        if (btnLabel) {
+          btnLabel.textContent = isEnabled
+            ? (state === 'syncing' ? '🔄 Sincronizando...' : `☁️ Sala: ${btCloudConfig.roomCode}`)
+            : '☁️ Sincronizar';
+        }
+
+        if (modalStatus) {
+          if (!isEnabled) {
+            modalStatus.textContent = 'Desconectado (Solo guardado en este celular)';
+          } else if (state === 'syncing') {
+            modalStatus.textContent = `Sincronizando sala "${btCloudConfig.roomCode}"...`;
+          } else if (state === 'error') {
+            modalStatus.textContent = `Sin conexión temporal con la sala "${btCloudConfig.roomCode}"`;
+          } else {
+            modalStatus.textContent = `Conectado en vivo · Sala "${btCloudConfig.roomCode}"`;
+          }
+        }
+
+        if (modalLastTime && detailText) {
+          modalLastTime.textContent = detailText;
+        }
+
+        if (syncNowBtn) syncNowBtn.classList.toggle('hidden', !isEnabled);
+        if (discBtn) discBtn.classList.toggle('hidden', !isEnabled);
+        if (shareBox) {
+          shareBox.classList.toggle('hidden', !isEnabled);
+          if (isEnabled && genCodeInput) {
+            genCodeInput.value = generateBtInviteToken(btCloudConfig.dbUrl, btCloudConfig.roomCode);
+          }
+        }
+      }
+
+      async function performBabyCloudSync(pushAfterMerge = true) {
+        const endpoint = getBtCloudEndpointUrl();
+        if (!endpoint || btCloudIsSyncing) return false;
+        btCloudIsSyncing = true;
+        updateBtCloudSyncUI('syncing');
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const remotePayload = await res.json();
+
+          if (remotePayload && remotePayload.babyTracker) {
+            btStore = mergeBabyStoresForCloudSync(btStore, remotePayload.babyTracker);
+            saveBtState({ skipCloudPush: true });
+            renderBtMainContent();
+            updateBtSleepTimerDisplay();
+          }
+
+          if (pushAfterMerge || !remotePayload || !remotePayload.babyTracker) {
+            const payloadToPush = {
+              app: 'Calendario_BabySync',
+              roomCode: sanitizeRoomCode(btCloudConfig.roomCode),
+              updatedAt: Date.now(),
+              updatedBy: btCloudConfig.deviceName || 'Familiar',
+              babyTracker: btStore
+            };
+            const putRes = await fetch(endpoint, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payloadToPush)
+            });
+            if (!putRes.ok) throw new Error(`PUT HTTP ${putRes.status}`);
+          }
+
+          const nowStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          btLastSyncedIso = nowStr;
+          const byWho = (remotePayload && remotePayload.updatedBy) ? ` · Últ. edición: ${remotePayload.updatedBy}` : '';
+          updateBtCloudSyncUI('online', `✔ Sincronizado a las ${nowStr}${byWho}. Todos los celulares conectados ven la misma información del bebé.`);
+          btCloudIsSyncing = false;
+          return true;
+        } catch (err) {
+          console.warn('Error en sincronización en la nube del bebé:', err);
+          updateBtCloudSyncUI('error', '⚠️ No se pudo conectar con la base de datos. Verifica tu internet o que la base de Firebase esté en Modo de Prueba (lectura/escritura habilitada).');
+          btCloudIsSyncing = false;
+          return false;
+        }
+      }
+
+      function scheduleBabyCloudPush() {
+        if (!getBtCloudEndpointUrl()) return;
+        if (btCloudPushTimeout) clearTimeout(btCloudPushTimeout);
+        btCloudPushTimeout = setTimeout(() => {
+          performBabyCloudSync(true);
+        }, 500);
+      }
+
+      function startBabyCloudRealtimeListener() {
+        stopBabyCloudRealtimeListener();
+        const endpoint = getBtCloudEndpointUrl();
+        if (!endpoint) {
+          updateBtCloudSyncUI('offline');
+          return;
+        }
+
+        performBabyCloudSync(true);
+
+        // 1. Server-Sent Events (SSE) nativo de Firebase para actualización instantánea (< 1s)
+        if (typeof EventSource !== 'undefined') {
+          try {
+            btCloudEventSource = new EventSource(endpoint);
+            btCloudEventSource.addEventListener('put', function(ev) {
+              try {
+                const parsed = JSON.parse(ev.data);
+                const remoteData = parsed && parsed.data;
+                if (remoteData && remoteData.babyTracker && Number(remoteData.updatedAt) > Number(btStore.lastUpdatedAt || 0)) {
+                  btStore = mergeBabyStoresForCloudSync(btStore, remoteData.babyTracker);
+                  saveBtState({ skipCloudPush: true });
+                  renderBtMainContent();
+                  updateBtSleepTimerDisplay();
+                  const nowStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                  updateBtCloudSyncUI('online', `✔ Actualizado en vivo (${nowStr}) por ${remoteData.updatedBy || 'otro celular'}.`);
+                }
+              } catch (e) {}
+            });
+          } catch (e) {}
+        }
+
+        // 2. Respaldo por polling ligero cada 8 segundos (ideal para WebView / APK móvil)
+        btCloudPollInterval = setInterval(() => {
+          if (document.visibilityState === 'visible') {
+            performBabyCloudSync(false);
+          }
+        }, 8000);
+      }
+
+      function stopBabyCloudRealtimeListener() {
+        if (btCloudEventSource) {
+          try { btCloudEventSource.close(); } catch (e) {}
+          btCloudEventSource = null;
+        }
+        if (btCloudPollInterval) {
+          clearInterval(btCloudPollInterval);
+          btCloudPollInterval = null;
+        }
+      }
+
+      function openBabyCloudSyncModal() {
+        const modal = document.getElementById('babyCloudSyncModal');
+        if (!modal) return;
+        const urlInput = document.getElementById('babyCloudSyncDbUrl');
+        const roomInput = document.getElementById('babyCloudSyncRoomCode');
+        const devInput = document.getElementById('babyCloudSyncDeviceName');
+        const invInput = document.getElementById('babyCloudSyncInviteInput');
+
+        if (urlInput) urlInput.value = btCloudConfig.dbUrl || '';
+        if (roomInput) roomInput.value = btCloudConfig.roomCode || '';
+        if (devInput) devInput.value = btCloudConfig.deviceName || '';
+        if (invInput) invInput.value = '';
+
+        updateBtCloudSyncUI();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function closeBabyCloudSyncModal() {
+        const modal = document.getElementById('babyCloudSyncModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
+
+      async function saveBabyCloudSyncConfig(e) {
+        if (e) e.preventDefault();
+        const dbUrl = normalizeFirebaseDbUrl(document.getElementById('babyCloudSyncDbUrl')?.value || '');
+        const roomCode = sanitizeRoomCode(document.getElementById('babyCloudSyncRoomCode')?.value || '');
+        const deviceName = (document.getElementById('babyCloudSyncDeviceName')?.value || '').trim() || 'Familiar';
+
+        if (!dbUrl || !/^https:\/\//i.test(dbUrl)) {
+          showToast('URL no válida', 'Ingresa una URL HTTPS válida de Firebase Realtime Database.', 'fa-triangle-exclamation', 'text-amber-400');
+          return;
+        }
+        if (!roomCode) {
+          showToast('Código requerido', 'Ingresa un Código de Sala Familiar (ej. martina-2026).', 'fa-triangle-exclamation', 'text-amber-400');
+          return;
+        }
+
+        saveBtCloudConfigState({
+          enabled: true,
+          dbUrl,
+          roomCode,
+          deviceName
+        });
+
+        startBabyCloudRealtimeListener();
+        showToast('Sincronización Activada', `Conectado a la sala familiar "${roomCode}".`, 'fa-cloud', 'text-emerald-400');
+      }
+
+      function applyBabyCloudSyncInviteCode() {
+        const rawCode = document.getElementById('babyCloudSyncInviteInput')?.value || '';
+        const parsed = parseBtInviteToken(rawCode);
+        if (!parsed) {
+          showToast('Código inválido', 'El código debe comenzar con BSYNC-. Pídele al primer celular que lo copie desde este menú.', 'fa-triangle-exclamation', 'text-amber-400');
+          return;
+        }
+
+        const urlInput = document.getElementById('babyCloudSyncDbUrl');
+        const roomInput = document.getElementById('babyCloudSyncRoomCode');
+        if (urlInput) urlInput.value = parsed.dbUrl;
+        if (roomInput) roomInput.value = parsed.roomCode;
+
+        const deviceName = (document.getElementById('babyCloudSyncDeviceName')?.value || '').trim() || 'Familiar';
+        saveBtCloudConfigState({
+          enabled: true,
+          dbUrl: parsed.dbUrl,
+          roomCode: parsed.roomCode,
+          deviceName
+        });
+
+        startBabyCloudRealtimeListener();
+        showToast('¡Celular Vinculado!', `Conectado a la sala familiar "${parsed.roomCode}".`, 'fa-link', 'text-emerald-400');
+      }
+
+      function copyBabyCloudSyncInviteCode() {
+        const code = generateBtInviteToken(btCloudConfig.dbUrl, btCloudConfig.roomCode);
+        if (!code) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(() => {
+            showToast('Código Copiado', 'Envíalo por WhatsApp para vincular el otro celular.', 'fa-copy', 'text-emerald-400');
+          }).catch(() => {});
+        } else {
+          const input = document.getElementById('babyCloudSyncGeneratedCode');
+          if (input) {
+            input.select();
+            document.execCommand('copy');
+            showToast('Código Copiado', 'Envíalo por WhatsApp para vincular el otro celular.', 'fa-copy', 'text-emerald-400');
+          }
+        }
+      }
+
+      function disconnectBabyCloudSync() {
+        stopBabyCloudRealtimeListener();
+        saveBtCloudConfigState({
+          enabled: false,
+          dbUrl: btCloudConfig.dbUrl || '',
+          roomCode: btCloudConfig.roomCode || '',
+          deviceName: btCloudConfig.deviceName || ''
+        });
+        showToast('Sincronización Desconectada', 'Los cambios del bebé ahora se guardan solo en este celular.', 'fa-cloud', 'text-amber-400');
+      }
+
+      function triggerBabyCloudSyncNow() {
+        performBabyCloudSync(true).then(ok => {
+          if (ok) showToast('Sincronizado', 'Los datos del bebé están al día en todos los celulares.', 'fa-circle-check', 'text-emerald-400');
+        });
+      }
+
+      window.openBabyCloudSyncModal = openBabyCloudSyncModal;
+      window.closeBabyCloudSyncModal = closeBabyCloudSyncModal;
+      window.saveBabyCloudSyncConfig = saveBabyCloudSyncConfig;
+      window.applyBabyCloudSyncInviteCode = applyBabyCloudSyncInviteCode;
+      window.copyBabyCloudSyncInviteCode = copyBabyCloudSyncInviteCode;
+      window.disconnectBabyCloudSync = disconnectBabyCloudSync;
+      window.triggerBabyCloudSyncNow = triggerBabyCloudSyncNow;
+      window.scheduleBabyCloudPush = scheduleBabyCloudPush;
 
       window.setBtActiveTab = setBtActiveTab;
       window.openBtQuickModal = openBtQuickModal;
@@ -14307,6 +14994,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'babyMilkPickupModal': { label: 'Retiro de leche', close: () => window.closeBabyMilkPickupModal && window.closeBabyMilkPickupModal() },
         'babyFormulaCanModal': { label: 'Contador de tarro de leche', close: () => window.closeBabyFormulaCanModal && window.closeBabyFormulaCanModal() },
         'babyDiaperPurchaseModal': { label: 'Stock de pañales', close: () => window.closeBabyDiaperPurchaseModal && window.closeBabyDiaperPurchaseModal() },
+        'babyCloudSyncModal': { label: 'Sincronización familiar del bebé', close: () => window.closeBabyCloudSyncModal && window.closeBabyCloudSyncModal() },
         'btLiveSleepScreenModal': { label: 'Cronómetro de sueño en vivo', close: () => window.closeBtLiveSleepScreen && window.closeBtLiveSleepScreen() },
         'generic-confirm-modal': { label: 'Confirmar acción', close: () => window.closeGenericConfirm && window.closeGenericConfirm(false) }
       };
@@ -14402,9 +15090,31 @@ Check your Browserslist config to be sure that your targets are set up correctly
         requestAnimationFrame(() => { labelScheduled = false; labelIconButtons(); });
       }
 
+      // Soporte para botón/gesto "Atrás" en Android APK (cierra el modal activo o vuelve al calendario sin cerrar la app)
+      function setupAndroidBackButton() {
+        try {
+          if (window.history && typeof window.history.pushState === 'function') {
+            window.history.pushState({ appRoot: true }, '');
+            window.addEventListener('popstate', function () {
+              const modal = topModal();
+              if (modal && MODALS[modal.id]) {
+                MODALS[modal.id].close(modal);
+                try { window.history.pushState({ appRoot: true }, ''); } catch (e) {}
+                return;
+              }
+              if (typeof activeView !== 'undefined' && activeView !== 'month') {
+                if (typeof switchView === 'function') switchView('month');
+                try { window.history.pushState({ appRoot: true }, ''); } catch (e) {}
+              }
+            });
+          }
+        } catch (e) {}
+      }
+
       function init() {
         Object.keys(MODALS).forEach(setupModal);
         labelIconButtons();
+        setupAndroidBackButton();
         new MutationObserver(scheduleLabeling).observe(document.body, { childList: true, subtree: true });
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
