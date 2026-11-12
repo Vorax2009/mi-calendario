@@ -224,6 +224,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-tooth::before{content:"🦷"}
 .fa-box-open::before{content:"📦"}
 .fa-jar::before{content:"🥫"}
+.fa-boxes-stacked::before{content:"🥫"}
+.fa-chart-line::before{content:"📈"}
+.fa-chart-simple::before{content:"📊"}
+.fa-check::before{content:"✔"}
+.fa-clock-rotate-left::before{content:"🕘"}
+.fa-layer-group::before{content:"🗂"}
+.fa-moon::before{content:"🌙"}
+.fa-syringe::before{content:"💉"}
+.fa-champagne-glasses::before{content:"🥂"}
+.fa-file-signature::before{content:"📝"}
+.fa-plane-departure::before{content:"✈"}
+.fa-baby-symbol::before{content:"🚼"}
 </style>
 </head>
 <body class="h-full flex flex-col font-sans overflow-x-hidden bg-slate-950 text-slate-100">
@@ -672,17 +684,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       <!-- VISTA 6: CONTROL DEL BEBÉ (BABY TRACKER ARMONIZADO) -->
       <div id="view-baby" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
         
-        <!-- HEADER DEL MÓDULO BEBÉ (Idéntico a Notas, Turnos, Eventos y MiMedicina) -->
-        <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-baby text-sky-400 text-base"></i>
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">BABY TRACKER</h3>
-          </div>
-          <button type="button" id="btQuickAddHeaderBtn" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
-            <i class="fa-solid fa-plus"></i> Registro
-          </button>
-        </div>
-
         <!-- SELECTOR DE BEBÉS REGISTRADOS -->
         <div id="btBabiesSelectorBar" class="flex items-center gap-1.5 overflow-x-auto bg-slate-900/90 p-1.5 rounded-xl border border-slate-700/80 text-xs"></div>
 
@@ -1546,7 +1547,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         <div>
           <label for="babyDiaperPurchaseModalBrand" class="block text-[11px] font-semibold text-slate-300 mb-1">🏷️ Marca / Modelo <span class="text-slate-500 font-normal">(Opcional)</span></label>
-          <input type="text" id="babyDiaperPurchaseModalBrand" placeholder="Ej. Huggies Natural Care, Pampers, Babysec..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400">
+          <input type="text" id="babyDiaperPurchaseModalBrand" list="babyDiaperBrandList" autocomplete="off" placeholder="Ej. Huggies Natural Care, Pampers, Babysec..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-teal-400">
+          <datalist id="babyDiaperBrandList"></datalist>
+          <div id="babyDiaperBrandChips" class="hidden flex flex-wrap gap-1.5 mt-2"></div>
         </div>
 
         <div>
@@ -1584,6 +1587,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div>
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
           <input type="text" id="babyDiaperModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
+        </div>
+
+        <div>
+          <label for="babyDiaperModalStock" class="block text-[11px] font-semibold text-slate-300 mb-1">🚼 ¿Qué pañal usó? (se descuenta de ese stock)</label>
+          <select id="babyDiaperModalStock" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-teal-400"></select>
         </div>
 
         <div>
@@ -3927,6 +3935,219 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
+
+    // ===== PAÑALES: stock específico por nombre/marca y talla =====
+    function btDiaperKey(brand, size) {
+      return String(brand || 'Pañales').trim().toLowerCase() + '|' + String(size || 'M').trim().toUpperCase();
+    }
+    function btDiaperGroups(btState) {
+      const dia = (btState && btState.diapers) || {};
+      const map = {};
+      const order = [];
+      const ensure = (key, brand, size) => {
+        if (!map[key]) {
+          map[key] = { key, brand: brand || 'Pañales', size: size || 'M', added: 0, used: 0, available: 0 };
+          order.push(key);
+        }
+        return map[key];
+      };
+      (Array.isArray(dia.purchases) ? dia.purchases : []).forEach(p => {
+        if (!p) return;
+        const g = ensure(btDiaperKey(p.brand, p.size), String(p.brand || 'Pañales').trim() || 'Pañales', p.size);
+        g.added += Number(p.quantity) || ((Number(p.packs) || 1) * (Number(p.unitsPerPack) || 40));
+      });
+      let unassigned = 0;
+      (Array.isArray(dia.entries) ? dia.entries : []).forEach(en => {
+        if (!en) return;
+        if (en.stockKey) ensure(en.stockKey, en.brand, en.size).used += 1;
+        else unassigned += 1;
+      });
+      const groups = order.map(k => { const g = map[k]; g.available = g.added - g.used; return g; });
+      return { groups, unassigned };
+    }
+    function btDiaperDefaultKey(btState) {
+      const info = btDiaperGroups(btState);
+      const act = btState && btState.diapers && btState.diapers.activeStockKey;
+      const a = info.groups.find(g => g.key === act);
+      if (a && a.available > 0) return a.key;
+      const f = info.groups.find(g => g.available > 0);
+      if (f) return f.key;
+      return a ? a.key : '';
+    }
+    function btDiaperStockFields(btState, key) {
+      if (!key) return {};
+      const g = btDiaperGroups(btState).groups.find(x => x.key === key);
+      return g ? { stockKey: g.key, brand: g.brand, size: g.size } : {};
+    }
+    function btDiaperOptionsHtml(btState, selectedKey) {
+      const info = btDiaperGroups(btState);
+      const opts = info.groups.map(g =>
+        `<option value="${escapeHtml(g.key)}"${g.key === selectedKey ? ' selected' : ''}>${escapeHtml(g.brand)} · Talla ${escapeHtml(g.size)} — ${Math.max(0, g.available)} disp.</option>`
+      ).join('');
+      return opts + `<option value=""${!selectedKey ? ' selected' : ''}>Sin descontar de un stock específico</option>`;
+    }
+    function btDiaperEntryChipHtml(dp) {
+      if (!dp || !dp.brand) return '';
+      return `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">${escapeHtml(dp.brand)} · T${escapeHtml(dp.size || '')}</span>`;
+    }
+    function btDiaperStockByGroupHtml(btState) {
+      const info = btDiaperGroups(btState);
+      if (!info.groups.length) return '';
+      return `
+        <div class="space-y-1.5">
+          <h6 class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Disponibles por nombre y talla</h6>
+          ${info.groups.map(g => `
+            <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-950/80 border ${g.available <= 15 ? 'border-rose-500/50' : 'border-teal-500/30'}">
+              <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                <span class="text-xs font-bold text-slate-100 truncate">${escapeHtml(g.brand)}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Talla ${escapeHtml(g.size)}</span>
+              </div>
+              <strong class="text-sm font-black shrink-0 ${g.available <= 15 ? 'text-rose-400' : 'text-teal-300'}">${Math.max(0, g.available)} u.</strong>
+            </div>
+          `).join('')}
+          ${info.unassigned > 0 ? `<p class="text-[10px] text-slate-500">Hay ${info.unassigned} cambio(s) antiguos sin pañal asignado; se descuentan solo del total.</p>` : ''}
+        </div>`;
+    }
+    // Bloque "Stock y Control de Pañales" (se muestra en Cuidados > Pañal > Stock)
+    function btDiaperStockBlockHtml(btState, c) {
+      const { currentDiaperStock, diaperDaysAutonomy, effectiveDailyRate, estimatedDepletionDateStr, todayStr, activeDayKey } = c;
+      return `
+              <div class="p-3 rounded-2xl bg-slate-900/90 border border-teal-500/35 space-y-2.5">
+                  <div class="flex items-center justify-between flex-wrap gap-1.5">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Stock y Control de Pañales</span>
+                    <span class="text-[10px] text-slate-400">Se descuenta automáticamente con cada cambio registrado</span>
+                  </div>
+
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" onclick="openBabyDiaperPurchaseModal('${todayStr}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
+                      <i class="fa-solid fa-plus"></i> Agregar Paquete
+                    </button>
+                    <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95">
+                      🚼 Registrar cambio (-1)
+                    </button>
+                  </div>
+
+                  <div class="bg-slate-950/80 p-3 rounded-xl border ${currentDiaperStock <= 15 ? 'border-rose-500/50 bg-rose-950/25' : 'border-teal-500/40'} text-center">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Total de pañales disponibles</span>
+                    <strong class="text-2xl font-black ${currentDiaperStock <= 15 ? 'text-rose-400' : 'text-teal-300'}">${currentDiaperStock} u.</strong>
+                  </div>
+
+                  ${btDiaperStockByGroupHtml(btState)}
+
+                  <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">⏳ Alcanzan para</span>
+                      <strong class="text-base font-black text-sky-300">${diaperDaysAutonomy} ${diaperDaysAutonomy === 1 ? 'día' : 'días'}</strong>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-amber-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">📊 Consumo Diario</span>
+                      <strong class="text-base font-black text-amber-300">~${effectiveDailyRate}/día</strong>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-purple-500/30">
+                      <span class="text-[10px] text-slate-400 font-semibold block">🏁 Duran hasta</span>
+                      <strong class="text-xs font-black text-purple-300 capitalize block mt-1">${estimatedDepletionDateStr ? escapeHtml(formatHealthControlDate(estimatedDepletionDateStr, { day: 'numeric', month: 'short' })) : 'Sin stock'}</strong>
+                    </div>
+                  </div>
+
+                  <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[11px] font-bold text-slate-300">Ajuste rápido de unidades:</span>
+                      <button type="button" data-bt-diaper-stock-adj="-5" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-5</button>
+                      <button type="button" data-bt-diaper-stock-adj="-1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-1</button>
+                      <button type="button" data-bt-diaper-stock-adj="1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+1</button>
+                      <button type="button" data-bt-diaper-stock-adj="10" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+10</button>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <button type="button" data-bt-quick-diaper="Mojado" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[10px] border border-slate-700 active:scale-95">💧 +Pipí</button>
+                      <button type="button" data-bt-quick-diaper="Sucio" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-[10px] border border-slate-700 active:scale-95">💩 +Popó</button>
+                      <button type="button" data-bt-quick-diaper="Ambos" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 font-bold text-[10px] border border-slate-700 active:scale-95">✨ +Ambos</button>
+                    </div>
+                  </div>
+                </div>
+      `;
+    }
+
+    function btDiaperSummaryHtml(btState, periodUsed, periodPurchases) {
+      const info = btDiaperGroups(btState);
+      const rows = {};
+      const row = (key, brand, size) => rows[key] || (rows[key] = { key, brand, size, used: 0, wet: 0, dirty: 0, both: 0, added: 0 });
+      (periodUsed || []).forEach(d => {
+        if (!d) return;
+        const r = d.stockKey ? row(d.stockKey, d.brand || 'Pañales', d.size || '') : row('__none', 'Sin pañal asignado', '');
+        r.used += 1;
+        if (d.type === 'Mojado') r.wet += 1; else if (d.type === 'Sucio') r.dirty += 1; else if (d.type === 'Ambos') r.both += 1;
+      });
+      (periodPurchases || []).forEach(p => {
+        if (!p) return;
+        const r = row(btDiaperKey(p.brand, p.size), String(p.brand || 'Pañales').trim() || 'Pañales', p.size || 'M');
+        r.added += Number(p.quantity) || ((Number(p.packs) || 1) * (Number(p.unitsPerPack) || 40));
+      });
+      const list = Object.values(rows).sort((a, b) => (b.used - a.used) || (b.added - a.added));
+      if (!list.length) return '';
+      return `
+        <div class="space-y-1.5 pt-1">
+          <h6 class="text-[10px] font-black uppercase tracking-wider text-sky-300">📊 Resumen por pañal y talla</h6>
+          ${list.map(r => {
+            const g = info.groups.find(x => x.key === r.key);
+            return `
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-sky-500/25 text-xs space-y-1">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="font-bold text-slate-100">${escapeHtml(r.brand)}</span>
+                    ${r.size ? `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Talla ${escapeHtml(r.size)}</span>` : ''}
+                  </div>
+                  ${g ? `<span class="text-[10px] font-black ${g.available <= 15 ? 'text-rose-300' : 'text-emerald-300'}">📦 ${Math.max(0, g.available)} disp.</span>` : ''}
+                </div>
+                <p class="text-[10px] text-slate-400">🚼 Usados <strong class="text-slate-200">${r.used}</strong> · 💧 ${r.wet} · 💩 ${r.dirty} · ✨ ${r.both}${r.added ? ` · 📥 +${r.added} ingresados` : ''}</p>
+              </div>`;
+          }).join('')}
+        </div>`;
+    }
+
+
+    // Nombres de pañales ya creados (para ingresarlos rápido): marca + talla, con los datos del último ingreso
+    function btDiaperSavedNames(btState) {
+      const purchases = (btState && btState.diapers && Array.isArray(btState.diapers.purchases)) ? btState.diapers.purchases.filter(Boolean) : [];
+      const sorted = purchases.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.id || '').localeCompare(String(a.id || '')));
+      const seen = {};
+      const out = [];
+      sorted.forEach(p => {
+        const brand = String(p.brand || '').trim();
+        if (!brand || brand === 'Pañales') return;
+        const key = btDiaperKey(brand, p.size);
+        if (seen[key]) return;
+        seen[key] = true;
+        out.push({ brand, size: p.size || 'M', unitsPerPack: Number(p.unitsPerPack) || 40 });
+      });
+      return out;
+    }
+    function renderBabyDiaperBrandChips() {
+      const box = document.getElementById('babyDiaperBrandChips');
+      const list = document.getElementById('babyDiaperBrandList');
+      const { baby } = getActiveBabyObjectSafe();
+      const names = btDiaperSavedNames(baby);
+      if (list) list.innerHTML = Array.from(new Set(names.map(n => n.brand))).map(b => `<option value="${escapeHtml(b)}"></option>`).join('');
+      if (!box) return;
+      if (!names.length) { box.innerHTML = ''; box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+      box.innerHTML = `
+        <span class="w-full text-[10px] font-bold text-teal-300">⚡ Pañales guardados (toca para usar):</span>
+        ${names.map(n => `
+          <button type="button" data-brand="${escapeHtml(n.brand)}" data-size="${escapeHtml(n.size)}" data-units="${n.unitsPerPack}" onclick="applyBabyDiaperSavedName(this)" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-teal-200 border border-teal-500/40 text-[10px] font-bold active:scale-95">
+            🚼 ${escapeHtml(n.brand)} · ${escapeHtml(n.size)} · ${n.unitsPerPack}/paq.
+          </button>`).join('')}`;
+    }
+    function applyBabyDiaperSavedName(btn) {
+      if (!btn) return;
+      const brandInput = document.getElementById('babyDiaperPurchaseModalBrand');
+      const sizeSelect = document.getElementById('babyDiaperPurchaseModalSize');
+      const unitsInput = document.getElementById('babyDiaperPurchaseModalUnitsPerPack');
+      if (brandInput) brandInput.value = btn.getAttribute('data-brand') || '';
+      if (sizeSelect) sizeSelect.value = btn.getAttribute('data-size') || 'M';
+      if (unitsInput) unitsInput.value = btn.getAttribute('data-units') || 40;
+      updateDiaperPurchaseTotalPreview();
+    }
+
     function openBabyDiaperPurchaseModal(presetDateKey = null, editId = null) {
       closeBabyRegistrationChooser();
       const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
@@ -3972,6 +4193,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (unitsInput) unitsInput.value = 40;
       }
       updateDiaperPurchaseTotalPreview();
+      renderBabyDiaperBrandChips();
 
       if (modal) {
         modal.classList.remove('hidden');
@@ -4020,6 +4242,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const existingIdx = editId ? btState.diapers.purchases.findIndex(p => p && p.id === editId) : -1;
       if (existingIdx >= 0) {
+        const oldP = btState.diapers.purchases[existingIdx];
+        const oldKey = btDiaperKey(oldP.brand, oldP.size);
+        const newKey = btDiaperKey(record.brand, record.size);
+        const otherSame = btState.diapers.purchases.some((x, i) => i !== existingIdx && x && btDiaperKey(x.brand, x.size) === oldKey);
+        if (oldKey !== newKey && !otherSame && Array.isArray(btState.diapers.entries)) {
+          btState.diapers.entries.forEach(en => {
+            if (en && en.stockKey === oldKey) { en.stockKey = newKey; en.brand = record.brand; en.size = record.size; }
+          });
+          if (btState.diapers.activeStockKey === oldKey) btState.diapers.activeStockKey = newKey;
+        }
         btState.diapers.purchases[existingIdx] = record;
       } else {
         btState.diapers.purchases.push(record);
@@ -4035,7 +4267,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     // 4. MODAL INDIVIDUAL: PAÑAL DEL BEBÉ
     function openBabyDiaperModal(presetDateKey = null) {
       closeBabyRegistrationChooser();
-      const { name: babyName } = getActiveBabyObjectSafe();
+      const { name: babyName, baby: diaperBabyState } = getActiveBabyObjectSafe();
 
       const modal = document.getElementById('babyDiaperModal');
       const form = document.getElementById('babyDiaperModalForm');
@@ -4058,6 +4290,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const typeSelect = document.getElementById('babyDiaperModalType');
       if (typeSelect) typeSelect.value = 'Mojado';
+
+      const stockSelect = document.getElementById('babyDiaperModalStock');
+      if (stockSelect) stockSelect.innerHTML = btDiaperOptionsHtml(diaperBabyState, btDiaperDefaultKey(diaperBabyState));
 
       if (modal) {
         modal.classList.remove('hidden');
@@ -4089,14 +4324,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       if (!btState.diapers) btState.diapers = { entries: [] };
       if (!Array.isArray(btState.diapers.entries)) btState.diapers.entries = [];
+      const chosenStockKey = document.getElementById('babyDiaperModalStock')?.value || '';
       btState.diapers.entries.push({
         id: 'd_' + Date.now(),
         date: entryDate,
         time,
         type,
         icon,
-        note
+        note,
+        ...btDiaperStockFields(btState, chosenStockKey)
       });
+      if (chosenStockKey) btState.diapers.activeStockKey = chosenStockKey;
 
       persistBabyTrackerStoreSafe(store);
       closeBabyDiaperModal();
@@ -11057,7 +11295,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       let btCuidadosPickupStatsDate = new Date();
       let btCuidadosCanStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btCuidadosCanStatsDate = new Date();
-      let btCuidadosDiaperSubTab = 'today'; // 'today' | 'stats'
+      let btCuidadosDiaperSubTab = 'today'; // 'today' | 'stock' | 'stats'
       let btCuidadosDiaperStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btCuidadosDiaperStatsDate = new Date();
       let btCuidadosSleepSubTab = 'today'; // 'today' | 'stats'
@@ -11127,9 +11365,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <p class="text-[10px] text-slate-400">Tomas del día, comidas sólidas y estadísticas por mes, año e histórico</p>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <button type="button" data-bt-goto-inv="leche" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95" title="Ver Stock, Retiro y Contador de Leche">
-                    📦 Stock Leche
-                  </button>
                   <button type="button" onclick="openBabyFeedingModal('${activeDayKey}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
                     <i class="fa-solid fa-plus"></i> Nueva Comida
                   </button>
@@ -11218,7 +11453,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <!-- KPIs del periodo -->
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                     <div class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Total Tomas</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🍼 Total Tomas</span>
                       <strong class="text-sm font-black text-amber-300">${periodFeed.length}</strong>
                     </div>
                     <div class="bg-slate-900/90 p-2.5 rounded-xl border border-sky-500/30">
@@ -11336,58 +11571,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <div class="flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h5 class="text-xs font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-baby"></i> Control y Estadísticas de Pañales
+                    <i class="fa-solid fa-baby-symbol"></i> Control y Estadísticas de Pañales
                   </h5>
-                  <p class="text-[10px] text-slate-400">Stock disponible, control de paquetes, cambios del día y estadísticas</p>
+                  <p class="text-[10px] text-slate-400">Stock, cambios del día y estadísticas por mes, año e histórico</p>
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <button type="button" onclick="openBabyDiaperPurchaseModal('${activeDayKey}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95">
-                    <i class="fa-solid fa-box-open"></i> +Paquete
-                  </button>
                   <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
                     <i class="fa-solid fa-plus"></i> Nuevo Pañal
-                  </button>
-                </div>
-              </div>
-
-              <!-- BLOQUE INTEGRADO: STOCK Y CONTROL DE PAÑALES -->
-              <div class="p-3 rounded-2xl bg-slate-900/90 border border-teal-500/35 space-y-2.5">
-                <div class="flex items-center justify-between flex-wrap gap-1.5">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
-                    📦 Stock y Control de Pañales
-                  </span>
-                  <span class="text-[10px] text-slate-400">Se descuenta automáticamente con cada pañal registrado</span>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                  <div class="bg-slate-950/80 p-2 rounded-xl border ${currentDiaperStock <= 15 ? 'border-rose-500/50 bg-rose-950/25' : 'border-teal-500/40'}">
-                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Disponibles Hoy</span>
-                    <strong class="text-sm font-black ${currentDiaperStock <= 15 ? 'text-rose-400' : 'text-teal-300'}">${currentDiaperStock} u.</strong>
-                  </div>
-                  <div class="bg-slate-950/80 p-2 rounded-xl border border-sky-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">⏳ Alcanzan para</span>
-                    <strong class="text-sm font-black text-sky-300">${diaperDaysAutonomy} ${diaperDaysAutonomy === 1 ? 'día' : 'días'}</strong>
-                  </div>
-                  <div class="bg-slate-950/80 p-2 rounded-xl border border-amber-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">📊 Consumo Diario</span>
-                    <strong class="text-sm font-black text-amber-300">~${effectiveDailyRate}/día</strong>
-                  </div>
-                  <div class="bg-slate-950/80 p-2 rounded-xl border border-purple-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">🏁 Duran hasta</span>
-                    <strong class="text-xs font-black text-purple-300 capitalize block mt-0.5">${estimatedDepletionDateStr ? escapeHtml(formatHealthControlDate(estimatedDepletionDateStr, { day: 'numeric', month: 'short' })) : 'Sin stock'}</strong>
-                  </div>
-                </div>
-
-                <div class="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-800/80">
-                  <div class="flex items-center gap-1">
-                    <span class="text-[10px] font-bold text-slate-400 mr-1">Ajuste rápido:</span>
-                    <button type="button" data-bt-diaper-stock-adj="-5" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-5</button>
-                    <button type="button" data-bt-diaper-stock-adj="-1" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-1</button>
-                    <button type="button" data-bt-diaper-stock-adj="1" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+1</button>
-                    <button type="button" data-bt-diaper-stock-adj="10" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+10</button>
-                  </div>
-                  <button type="button" onclick="openBabyDiaperPurchaseModal('${activeDayKey}')" class="px-2.5 py-1 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold active:scale-95">
-                    📦 Agregar paquete de pañales
                   </button>
                 </div>
               </div>
@@ -11397,6 +11587,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 <button type="button" data-bt-diaper-subtab="today" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosDiaperSubTab === 'today' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Hoy (${todayDiapers.length})
                 </button>
+                <button type="button" data-bt-diaper-subtab="stock" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosDiaperSubTab === 'stock' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
+                  📦 Stock
+                </button>
                 <button type="button" data-bt-diaper-subtab="stats" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btCuidadosDiaperSubTab === 'stats' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Historial y Estadísticas (${diaperEntries.length})
                 </button>
@@ -11404,6 +11597,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
               ${btCuidadosDiaperSubTab === 'today' ? `
                 <div class="space-y-3">
+                  <!-- Pañal en uso (descuenta del stock específico) -->
+                  <div class="bg-slate-900/80 p-2.5 rounded-xl border border-teal-500/30 space-y-1">
+                    <label class="text-[10px] font-bold text-teal-300 block">🚼 Pañal en uso (se descuenta de este stock)</label>
+                    ${btDiaperGroups(btState).groups.length > 0 ? `
+                      <select data-bt-diaper-active class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-teal-400">
+                        ${btDiaperOptionsHtml(btState, btDiaperDefaultKey(btState))}
+                      </select>
+                    ` : `<p class="text-[10px] text-slate-400">Agrega un paquete en Inventario (nombre y talla) para elegir qué pañal se usa.</p>`}
+                  </div>
+
                   <!-- Botones rápidos de pañal -->
                   <div class="grid grid-cols-3 gap-1.5">
                     <button type="button" data-bt-quick-diaper="Mojado" class="py-2 px-2 bg-slate-900 hover:bg-slate-800 text-sky-300 border border-slate-700 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 active:scale-95">💧 +Pipí (Mojado)</button>
@@ -11414,7 +11617,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <!-- KPIs de Hoy -->
                   <div class="grid grid-cols-4 gap-2 text-center">
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-teal-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Total Hoy</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🚼 Total Hoy</span>
                       <strong class="text-sm font-black text-teal-300">${todayDiapers.length}</strong>
                     </div>
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-sky-500/30">
@@ -11439,7 +11642,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                           <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                               <span class="font-bold text-slate-100">Pañal ${escapeHtml(dp.type)}</span>
-                              <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Pañal</span>
+                              ${btDiaperEntryChipHtml(dp) || '<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Pañal</span>'}
                             </div>
                             <p class="text-[10px] text-slate-400 mt-0.5">🕒 ${escapeHtml(fmtBtTime(dp.time || '12:00'))}${dp.note ? ` · ${escapeHtml(dp.note)}` : ''}</p>
                           </div>
@@ -11454,6 +11657,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     `}
                   </div>
                 </div>
+              ` : (btCuidadosDiaperSubTab === 'stock' ? `
+                ${btDiaperStockBlockHtml(btState, { currentDiaperStock, diaperDaysAutonomy, effectiveDailyRate, estimatedDepletionDateStr, todayStr, activeDayKey })}
               ` : `
                 <div class="space-y-3">
                   <!-- Selector Mes / Año / Histórico -->
@@ -11494,6 +11699,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     </div>
                   </div>
 
+                  ${btDiaperSummaryHtml(btState, periodDiapers, periodPurchases)}
+
                   ${periodPurchases.length > 0 ? `
                     <div class="space-y-1.5 pt-1">
                       <h6 class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Paquetes Ingresados en este Periodo (${periodPurchases.length})</h6>
@@ -11532,7 +11739,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                           <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                               <span class="font-bold text-slate-100">Pañal ${escapeHtml(dp.type)}</span>
-                              <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Pañal</span>
+                              ${btDiaperEntryChipHtml(dp) || '<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Pañal</span>'}
                             </div>
                             <p class="text-[10px] text-slate-400 mt-0.5 capitalize">📅 ${escapeHtml(formatHealthControlDate(dp._date))} · 🕒 ${escapeHtml(fmtBtTime(dp.time || '12:00'))}${dp.note ? ` · ${escapeHtml(dp.note)}` : ''}</p>
                           </div>
@@ -11542,7 +11749,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     `).join('') : '<p class="text-center py-4 text-slate-500 text-xs italic">No hay cambios de pañal registrados en este periodo.</p>'}
                   </div>
                 </div>
-              `}
+              `)}
             </div>
           `;
         };
@@ -11692,11 +11899,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
                   <div class="grid grid-cols-4 gap-2 text-center">
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-indigo-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Total Horas</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">😴 Total Horas</span>
                       <strong class="text-sm font-black text-indigo-300">${pHours} h</strong>
                     </div>
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Sesiones</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🔢 Sesiones</span>
                       <strong class="text-sm font-black text-slate-200">${periodSleep.length}</strong>
                     </div>
                     <div class="bg-slate-900/90 p-2 rounded-xl border border-sky-500/30">
@@ -12359,7 +12566,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <!-- KPIs del periodo -->
                   <div class="grid grid-cols-3 gap-2 text-center">
                     <div class="bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Registrados</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🩺 Registrados</span>
                       <strong class="text-base font-black text-indigo-300">${periodControls.length}</strong>
                     </div>
                     <div class="bg-emerald-950/25 p-2.5 rounded-xl border border-emerald-500/30">
@@ -12576,7 +12783,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
                   <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
                     <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Total Tomas</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">💊 Total Tomas</span>
                       <strong class="text-sm font-black text-blue-300">${medTotals.taken + medTotals.missed + medTotals.upcoming}</strong>
                     </div>
                     <div class="bg-emerald-950/25 p-2.5 rounded-xl border border-emerald-500/30">
@@ -12592,7 +12799,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                       <strong class="text-sm font-black text-amber-300">${medTotals.upcoming}</strong>
                     </div>
                     <div class="col-span-2 sm:col-span-1 bg-slate-900/90 p-2.5 rounded-xl border border-teal-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">Adherencia</span>
+                      <span class="text-[10px] text-slate-400 font-semibold block">🎯 Adherencia</span>
                       <strong class="text-sm font-black text-teal-300">${adhPct}</strong>
                     </div>
                   </div>
@@ -13276,156 +13483,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
           return `
             <div class="space-y-3">
-              <!-- TARJETA UNIFICADA: CONTROL Y ESTADÍSTICAS DE PAÑALES (CON STOCK Y CONTROL INCORPORADO) -->
-              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-teal-500/40 shadow-lg space-y-3">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                  <div>
-                    <h5 class="text-xs font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
-                      <i class="fa-solid fa-baby"></i> Control y Estadísticas de Pañales
-                    </h5>
-                    <p class="text-[10px] text-slate-400">Stock y control de pañales integrado con estadísticas por mes, año e histórico</p>
-                  </div>
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <button type="button" onclick="openBabyDiaperModal('${activeDayKey}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/40 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95">
-                      🚼 Registrar cambio (-1)
-                    </button>
-                    <button type="button" onclick="openBabyDiaperPurchaseModal('${todayStr}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
-                      <i class="fa-solid fa-plus"></i> Agregar Paquete
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Sub-bloque: Stock y Control de Pañales -->
-                <div class="p-3 rounded-2xl bg-slate-900/90 border border-teal-500/35 space-y-2.5">
-                  <div class="flex items-center justify-between flex-wrap gap-1.5">
-                    <span class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Stock y Control de Pañales</span>
-                    <span class="text-[10px] text-slate-400">Se descuenta automáticamente con cada cambio registrado</span>
-                  </div>
-
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border ${currentDiaperStock <= 15 ? 'border-rose-500/50 bg-rose-950/25' : 'border-teal-500/40'}">
-                      <span class="text-[10px] text-slate-400 font-semibold block">🚼 Disponibles Hoy</span>
-                      <strong class="text-base font-black ${currentDiaperStock <= 15 ? 'text-rose-400' : 'text-teal-300'}">${currentDiaperStock} u.</strong>
-                    </div>
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">⏳ Alcanzan para</span>
-                      <strong class="text-base font-black text-sky-300">${diaperDaysAutonomy} ${diaperDaysAutonomy === 1 ? 'día' : 'días'}</strong>
-                    </div>
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-amber-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">📊 Consumo Diario</span>
-                      <strong class="text-base font-black text-amber-300">~${effectiveDailyRate}/día</strong>
-                    </div>
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-purple-500/30">
-                      <span class="text-[10px] text-slate-400 font-semibold block">🏁 Duran hasta</span>
-                      <strong class="text-xs font-black text-purple-300 capitalize block mt-1">${estimatedDepletionDateStr ? escapeHtml(formatHealthControlDate(estimatedDepletionDateStr, { day: 'numeric', month: 'short' })) : 'Sin stock'}</strong>
-                    </div>
-                  </div>
-
-                  <div class="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[11px] font-bold text-slate-300">Ajuste rápido de unidades:</span>
-                      <button type="button" data-bt-diaper-stock-adj="-5" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-5</button>
-                      <button type="button" data-bt-diaper-stock-adj="-1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold text-[10px] border border-slate-700 active:scale-95">-1</button>
-                      <button type="button" data-bt-diaper-stock-adj="1" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+1</button>
-                      <button type="button" data-bt-diaper-stock-adj="10" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-[10px] border border-slate-700 active:scale-95">+10</button>
-                    </div>
-                    <div class="flex items-center gap-1">
-                      <button type="button" data-bt-quick-diaper="Mojado" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[10px] border border-slate-700 active:scale-95">💧 +Pipí</button>
-                      <button type="button" data-bt-quick-diaper="Sucio" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-[10px] border border-slate-700 active:scale-95">💩 +Popó</button>
-                      <button type="button" data-bt-quick-diaper="Ambos" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 font-bold text-[10px] border border-slate-700 active:scale-95">✨ +Ambos</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Sub-bloque: Estadísticas de Pañales (Ingresos vs Uso por Mes / Año / Histórico) -->
-                <div class="pt-1 space-y-2.5">
-                  <div>
-                    <h6 class="text-[11px] font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
-                      <i class="fa-solid fa-chart-pie"></i> Estadísticas e Historial de Pañales (Ingresos vs Uso)
-                    </h6>
-                    <p class="text-[10px] text-slate-400">Balance de paquetes comprados y pañales utilizados por periodo</p>
-                  </div>
-                </div>
-
-                <!-- Selector Mes / Año / Histórico -->
-                <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
-                  <button type="button" data-bt-inv-diaper-mode="month" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'month' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Mes</button>
-                  <button type="button" data-bt-inv-diaper-mode="year" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'year' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Año</button>
-                  <button type="button" data-bt-inv-diaper-mode="history" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'history' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Histórico</button>
-                </div>
-
-                ${btInvDiaperStatsMode !== 'history' ? `
-                  <div class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1.5">
-                    <button type="button" data-bt-inv-diaper-delta="-1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h4 class="text-xs font-bold uppercase text-slate-200">${escapeHtml(diaperInvPeriodTitle)}</h4>
-                    <button type="button" data-bt-inv-diaper-delta="1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
-                  </div>
-                ` : ''}
-
-                <!-- KPIs del Periodo -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-emerald-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">📦 Ingresados</span>
-                    <strong class="text-sm font-black text-emerald-300">+${periodAddedUnits} u. <span class="text-[9px] text-slate-400 font-normal">(${periodPacksCount} paq.)</span></strong>
-                  </div>
-                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-rose-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Utilizados</span>
-                    <strong class="text-sm font-black text-rose-300">-${periodUsed.length} u.</strong>
-                  </div>
-                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-sky-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">💧 Pipí / 💩 Popó</span>
-                    <strong class="text-sm font-black text-sky-300">${periodWet} / ${periodDirty}</strong>
-                  </div>
-                  <div class="bg-slate-900/90 p-2.5 rounded-xl border border-purple-500/30">
-                    <span class="text-[10px] text-slate-400 font-semibold block">✨ Ambos</span>
-                    <strong class="text-sm font-black text-purple-300">${periodBoth}</strong>
-                  </div>
-                </div>
-
-                <!-- Lista de compras / ingresos de paquetes de pañales -->
-                <div class="space-y-2 pt-1">
-                  <div class="flex items-center justify-between">
-                    <h6 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Historial de Paquetes Ingresados (${periodPurchases.length})</h6>
-                  </div>
-                  ${periodPurchases.length > 0 ? periodPurchases.map(p => {
-                    const packs = Number(p.packs) || 1;
-                    const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
-                    return `
-                      <div class="p-3 rounded-xl bg-slate-900 border border-teal-500/30 flex items-center justify-between gap-2.5 text-xs">
-                        <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                          <span class="w-8 h-8 rounded-xl bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">📦</span>
-                          <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                              <span class="font-extrabold text-slate-100">${escapeHtml(p.brand || 'Pañales')}</span>
-                              <span class="text-[10px] px-2 py-0.5 rounded-md font-black bg-sky-500/20 text-sky-300 border border-sky-500/40">Talla ${escapeHtml(p.size || 'M')}</span>
-                              <span class="text-[10px] px-2 py-0.5 rounded-md font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">+${units} u. (${packs} paq.)</span>
-                            </div>
-                            <p class="text-[11px] text-teal-200 font-semibold mt-1 capitalize">
-                              📅 Ingresado el: ${escapeHtml(formatHealthControlDate(p._date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))}
-                            </p>
-                            ${p.notes ? `<p class="text-[10px] text-slate-400 italic mt-0.5">"${escapeHtml(p.notes)}"</p>` : ''}
-                          </div>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 shrink-0">
-                          <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300 rounded" title="Editar paquete">
-                            <i class="fa-solid fa-pen"></i>
-                          </button>
-                          <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400 rounded" title="Eliminar paquete">
-                            <i class="fa-solid fa-trash-can"></i>
-                          </button>
-                        </div>
-                      </div>
-                    `;
-                  }).join('') : `
-                    <div class="text-center py-5 bg-slate-900/50 rounded-xl border border-slate-800 space-y-1.5">
-                      <span class="text-2xl block">🚼</span>
-                      <p class="text-xs text-slate-400">No hay paquetes de pañales registrados en este periodo.</p>
-                      <button type="button" onclick="openBabyDiaperPurchaseModal('${todayStr}')" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 shadow">
-                        <i class="fa-solid fa-plus"></i> Agregar primer paquete
-                      </button>
-                    </div>
-                  `}
-                </div>
+              <!-- Sub-bloque: Stock y Control de Pañales -->
+                <div class="bg-[#1e2733] p-4 rounded-2xl border border-teal-500/40 shadow-lg space-y-2 text-center">
+                <span class="text-2xl block">🚼</span>
+                <p class="text-xs text-slate-300">El stock y control de pañales ahora está en Cuidados &gt; Pañal &gt; Stock.</p>
+                <button type="button" data-bt-goto-diaper-stock class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold active:scale-95">Ir al Stock de Pañales</button>
               </div>
             </div>
           `;
@@ -14341,6 +14403,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
           return;
         }
 
+        if (e.target.closest('[data-bt-goto-diaper-stock]')) {
+          btCuidadosSubTab = 'panal';
+          btCuidadosDiaperSubTab = 'stock';
+          setBtActiveTab('cuidados');
+          return;
+        }
         const diaperSubTabBtn = e.target.closest('[data-bt-diaper-subtab]');
         if (diaperSubTabBtn) {
           btCuidadosDiaperSubTab = diaperSubTabBtn.getAttribute('data-bt-diaper-subtab') || 'today';
@@ -14423,7 +14491,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
             time: getNowTimeStr(),
             type,
             icon,
-            note: 'Registro rápido'
+            note: 'Registro rápido',
+            ...btDiaperStockFields(btState, btDiaperDefaultKey(btState))
           });
           saveBtState();
           renderBtMainContent();
@@ -14654,8 +14723,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
           if (act === 'milk150') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'milk', amountMl: 150, label: 'Biberón de leche (150 ml)' });
           else if (act === 'water100') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'water', amountMl: 100, label: 'Vaso de agua (100 ml)' });
           else if (act === 'solidMeal') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'solid', amountMl: 0, label: 'Comida sólida completa' });
-          else if (act === 'diaperWet') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Mojado', icon: '💧', note: 'Registro rápido' });
-          else if (act === 'diaperDirty') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Sucio', icon: '💩', note: 'Registro rápido' });
+          else if (act === 'diaperWet') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Mojado', icon: '💧', note: 'Registro rápido', ...btDiaperStockFields(btState, btDiaperDefaultKey(btState)) });
+          else if (act === 'diaperDirty') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Sucio', icon: '💩', note: 'Registro rápido', ...btDiaperStockFields(btState, btDiaperDefaultKey(btState)) });
           else if (act === 'nap1h') btState.sleep.entries.push({ id: 's_' + Date.now(), date: dateKey, type: 'Siesta', start: time, end: '', hours: 1.0, note: 'Siesta rápida' });
           else if (act === 'goToMedControl') {
             closeBtQuickModal();
@@ -14684,6 +14753,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
       });
 
       document.addEventListener('change', function(e) {
+        if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-bt-diaper-active')) {
+          const b = getCurrentBaby();
+          if (b) {
+            if (!b.diapers) b.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+            b.diapers.activeStockKey = e.target.value || '';
+            saveBtState();
+            renderBtMainContent();
+          }
+          return;
+        }
         if (e.target && e.target.id === 'btDateNavigatorInput') {
           const val = e.target.value;
           if (val && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
@@ -14965,6 +15044,36 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
       else init();
+    })();
+  </script>
+
+  <script>
+    // Envío de formularios a prueba de visores: algunos visores (iframe sandbox sin "allow-forms")
+    // bloquean el envío nativo y los botones "Guardar" no hacen nada. Aquí se valida y se dispara
+    // el evento submit manualmente, así los formularios funcionan igual en cualquier entorno.
+    (function () {
+      function fireSubmit(form) {
+        if (!form) return;
+        if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+      document.addEventListener('click', function (e) {
+        const btn = e.target && e.target.closest ? e.target.closest('button, input[type="submit"]') : null;
+        if (!btn || !btn.form) return;
+        const type = (btn.getAttribute('type') || 'submit').toLowerCase();
+        if (type !== 'submit') return;
+        e.preventDefault();
+        fireSubmit(btn.form);
+      }, true);
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        const t = e.target;
+        if (!t || t.tagName !== 'INPUT' || !t.form) return;
+        const ty = (t.type || '').toLowerCase();
+        if (['button', 'submit', 'reset', 'checkbox', 'radio', 'file', 'image'].indexOf(ty) !== -1) return;
+        e.preventDefault();
+        fireSubmit(t.form);
+      }, true);
     })();
   </script>
 
