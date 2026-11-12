@@ -559,7 +559,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </div>
 
       <!-- CONTENEDOR AUXILIAR DE COMPATIBILIDAD -->
-      <div id="view-birthdays" class="hidden"><div id="tab-birthdays-indicator" class="hidden"></div></div>
 
       <!-- VISTA 5: CONTROL DE MEDICAMENTOS (MiMedicina) -->
       <div id="view-meds" class="hidden flex-1 flex flex-col py-2 space-y-4 view-transition">
@@ -731,7 +730,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <!-- SUB-PESTAÑAS ARMONIZADAS -->
         <!-- SUB-PESTAÑAS UNIFICADAS -->
         <div id="btTabsContainer" class="flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
-          <button type="button" data-bt-tab="cuidados" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap">🍼 Cuidados</button>
+          <button type="button" data-bt-tab="cuidados" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap">🤲 Cuidados</button>
           <button type="button" data-bt-tab="salud" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🩺 Salud y Vacunas</button>
           <button type="button" data-bt-tab="inventario" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📦 Inventario</button>
         </div>
@@ -1062,34 +1061,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
-  <!-- MODAL SELECTOR UNIFICADO: NOTA O EVENTO DESDE EL DÍA -->
-  <div id="noteOrEventChooser" class="fixed inset-0 z-[75] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeNoteOrEventChooser()">
-    <section class="w-full max-w-sm rounded-2xl border border-slate-700 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
-        <h3 class="font-bold text-sm flex items-center gap-2">
-          <i class="fa-solid fa-bookmark text-amber-400"></i>
-          <span>¿Qué deseas agregar?</span>
-        </h3>
-        <button type="button" onclick="closeNoteOrEventChooser()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="grid grid-cols-2 gap-2.5">
-        <button type="button" onclick="chooseAddBirthdayFromModal()" class="p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 hover:to-amber-600/40 border border-amber-500/50 text-left font-bold text-xs flex flex-col gap-1.5 shadow transition-all active:scale-95 text-amber-200">
-          <span class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center text-sm shadow">
-            <i class="fa-solid fa-cake-candles"></i>
-          </span>
-          Eventos
-        </button>
-        <button type="button" onclick="chooseAddNoteFromModal()" class="p-3 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-600/30 hover:from-teal-500/30 hover:to-teal-600/40 border border-teal-500/50 text-left font-bold text-xs flex flex-col gap-1.5 shadow transition-all active:scale-95 text-teal-200">
-          <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center text-sm shadow">
-            <i class="fa-solid fa-note-sticky"></i>
-          </span>
-          Nota
-        </button>
-      </div>
-    </section>
-  </div>
 
   <!-- MODAL SELECTOR DE REGISTRO DE BEBÉ DESDE EL DÍA -->
   <div id="babyRegistrationChooser" class="fixed inset-0 z-[75] bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeBabyRegistrationChooser()">
@@ -1148,6 +1119,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </div>
 
       <form id="babyControlModalForm" onsubmit="saveBabyControlFromModal(event)" class="space-y-3">
+        <input type="hidden" id="babyControlModalEditId" value="">
         <div>
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
           <input type="text" id="babyControlModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
@@ -1221,6 +1193,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </div>
 
       <form id="babyMedModalForm" onsubmit="saveBabyMedFromModal(event)" class="space-y-3">
+        <input type="hidden" id="babyMedModalEditId" value="">
         <div>
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Bebé</label>
           <input type="text" id="babyMedModalBabyName" readonly class="w-full bg-slate-900/80 text-sky-300 border border-slate-700 rounded-lg px-3 py-2 text-xs font-bold focus:outline-none cursor-default">
@@ -1745,6 +1718,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
 
         <div class="flex gap-2 pt-2 border-t border-slate-800">
+          <button type="button" id="babyVaccineQuickUnmarkBtn" onclick="unmarkBabyVaccineFromQuickModal()" class="hidden py-2.5 px-3 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 rounded-xl text-xs font-bold transition-all active:scale-95">
+            Marcar Pendiente
+          </button>
           <button type="button" onclick="closeBabyVaccineQuickModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
             Cancelar
           </button>
@@ -2965,7 +2941,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
         if (touchTargetId === 'header') {
-          const views = ['calendar', 'summary', 'turns', 'birthdays', 'meds', 'baby'].filter(isTabVisible);
+          const views = ['calendar', 'summary', 'turns', 'meds', 'baby'].filter(isTabVisible);
           const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
           const currentIndex = views.indexOf(currentView);
           if (diffX < 0) {
@@ -3141,12 +3117,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       activeView = view;
       if (view === 'month' || view === 'year') lastCalendarView = view;
-      ['view-month', 'view-year', 'view-summary', 'view-turns', 'view-birthdays', 'view-meds', 'view-baby'].forEach(id => {
+      ['view-month', 'view-year', 'view-summary', 'view-turns', 'view-meds', 'view-baby'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['tab-calendar', 'tab-summary', 'tab-turns', 'tab-birthdays', 'tab-meds', 'tab-baby'].forEach(prefix => {
+      ['tab-calendar', 'tab-summary', 'tab-turns', 'tab-meds', 'tab-baby'].forEach(prefix => {
         const ind = document.getElementById(`${prefix}-indicator`);
         const btn = document.getElementById(`${prefix}-btn`);
         if (ind) ind.className = "absolute bottom-0 left-0 right-0 h-1 bg-transparent";
@@ -3279,27 +3255,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       openMedModal(null, presetDateKey);
     }
 
-    function openNoteOrEventChooserFromDay() {
-      showCreateFormInModal();
-    }
 
-    function closeNoteOrEventChooser() {
-      const chooser = document.getElementById('noteOrEventChooser');
-      if (chooser) {
-        chooser.classList.add('hidden');
-        chooser.classList.remove('flex');
-      }
-    }
-
-    function chooseAddBirthdayFromModal() {
-      closeNoteOrEventChooser();
-      showCreateBirthdayFormInModal();
-    }
-
-    function chooseAddNoteFromModal() {
-      closeNoteOrEventChooser();
-      showCreateFormInModal();
-    }
 
     function openBabyRegistrationChooserFromDay() {
       const bt = getBabyTrackerDataSafe();
@@ -3326,23 +3282,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
-    function babyChooserAction(action) {
-      const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-      closeBabyRegistrationChooser();
-      closeDayDetailModal();
-
-      if (action === 'control') {
-        openBabyControlModal(selectedDateKey);
-      } else if (action === 'med') {
-        openBabyMedModal(selectedDateKey);
-      } else if (action === 'feeding') {
-        openBabyFeedingModal(selectedDateKey);
-      } else if (action === 'diaper') {
-        openBabyDiaperModal(selectedDateKey);
-      } else if (action === 'tracker') {
-        switchView('baby');
-      }
-    }
 
     function getActiveBabyObjectSafe() {
       const store = getBabyTrackerDataSafe();
@@ -3370,33 +3309,58 @@ Check your Browserslist config to be sure that your targets are set up correctly
       return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
-    // 1. MODAL INDIVIDUAL: AGENDAR CONTROL MÉDICO DEL BEBÉ
-    function openBabyControlModal(presetDateKey = null) {
+    // 1. MODAL INDIVIDUAL: AGENDAR O EDITAR CONTROL MÉDICO DEL BEBÉ
+    function openBabyControlModal(presetDateKey = null, editId = null) {
       closeBabyRegistrationChooser();
       closeHealthRegistrationChooser();
-      const { name: babyName } = getActiveBabyObjectSafe();
+      const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
 
       const modal = document.getElementById('babyControlModal');
       const form = document.getElementById('babyControlModalForm');
       if (form) form.reset();
 
+      const editInput = document.getElementById('babyControlModalEditId');
+      if (editInput) editInput.value = editId || '';
+
       const nameInput = document.getElementById('babyControlModalBabyName');
       if (nameInput) nameInput.value = `👶 ${babyName}`;
 
+      const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const defaultDate = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
+
+      const existing = (editId && btState && btState.health && Array.isArray(btState.health.medicalControls))
+        ? btState.health.medicalControls.find(c => c && c.id === editId)
+        : null;
+
       const titleSpan = document.getElementById('babyControlModalTitle');
-      if (titleSpan) titleSpan.textContent = `Agendar Control para ${babyName}`;
-
-      const dateInput = document.getElementById('babyControlModalDate');
-      if (dateInput) {
-        const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-        dateInput.value = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
-      }
-
-      const timeInput = document.getElementById('babyControlModalTime');
-      if (timeInput) timeInput.value = '10:00';
-
+      const typeSelect = document.getElementById('babyControlModalSpecialty');
       const customBox = document.getElementById('babyControlModalCustomContainer');
-      if (customBox) customBox.classList.add('hidden');
+      const customText = document.getElementById('babyControlModalCustomText');
+      const dateInput = document.getElementById('babyControlModalDate');
+      const timeInput = document.getElementById('babyControlModalTime');
+      const doctorInput = document.getElementById('babyControlModalDoctor');
+      const notesText = document.getElementById('babyControlModalNotes');
+
+      if (existing) {
+        if (titleSpan) titleSpan.textContent = `Editar Control de ${babyName}`;
+        if (typeSelect) typeSelect.value = existing.type || 'cita_medica';
+        const isOther = (existing.type === 'otro');
+        if (customBox) customBox.classList.toggle('hidden', !isOther);
+        if (customText) customText.value = existing.customType || '';
+        if (dateInput) dateInput.value = existing.date || defaultDate;
+        if (timeInput) timeInput.value = existing.time || '10:00';
+        if (doctorInput) doctorInput.value = existing.doctor || '';
+        if (notesText) notesText.value = existing.notes || '';
+      } else {
+        if (titleSpan) titleSpan.textContent = `Agendar Control para ${babyName}`;
+        if (typeSelect) typeSelect.value = 'cita_medica';
+        if (customBox) customBox.classList.add('hidden');
+        if (customText) customText.value = '';
+        if (dateInput) dateInput.value = defaultDate;
+        if (timeInput) timeInput.value = '10:00';
+        if (doctorInput) doctorInput.value = '';
+        if (notesText) notesText.value = '';
+      }
 
       if (modal) {
         modal.classList.remove('hidden');
@@ -3431,6 +3395,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
 
+      const editId = document.getElementById('babyControlModalEditId')?.value || '';
       const typeSelect = document.getElementById('babyControlModalSpecialty');
       const customText = document.getElementById('babyControlModalCustomText');
       const dateInput = document.getElementById('babyControlModalDate');
@@ -3447,21 +3412,37 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       if (!btState.health) btState.health = {};
       if (!Array.isArray(btState.health.medicalControls)) btState.health.medicalControls = [];
-      btState.health.medicalControls.push({
-        id: 'bmc_' + Date.now(),
-        type,
-        customType,
-        date,
-        time,
-        doctor,
-        notes,
-        attended: false
-      });
+
+      const existingIdx = editId ? btState.health.medicalControls.findIndex(c => c && c.id === editId) : -1;
+      if (existingIdx >= 0) {
+        btState.health.medicalControls[existingIdx] = {
+          ...btState.health.medicalControls[existingIdx],
+          type,
+          customType,
+          date,
+          time,
+          doctor,
+          notes
+        };
+      } else {
+        btState.health.medicalControls.push({
+          id: 'bmc_' + Date.now(),
+          type,
+          customType,
+          date,
+          time,
+          doctor,
+          notes,
+          attended: false
+        });
+      }
 
       persistBabyTrackerStoreSafe(store);
       closeBabyControlModal();
       renderAll();
-      openDayDetailModal();
+      if (!document.getElementById('day-detail-modal')?.classList.contains('hidden')) {
+        renderModalNotesList();
+      }
 
       const specNames = {
         cita_medica: 'Cita médica',
@@ -3471,39 +3452,57 @@ Check your Browserslist config to be sure that your targets are set up correctly
         traumatologo: 'Traumatólogo'
       };
       const specLabel = type === 'otro' && customType ? customType : (specNames[type] || 'Control médico');
-      showToast('Control Agendado', `${specLabel} para ${bName} agendado para el ${date}.`, 'fa-calendar-check', 'text-indigo-400');
+      showToast(existingIdx >= 0 ? 'Control Actualizado' : 'Control Agendado', `${specLabel} para ${bName} (${date}).`, 'fa-calendar-check', 'text-indigo-400');
     }
 
     // 2. MODAL INDIVIDUAL: MEDICAMENTO DEL BEBÉ
-    function openBabyMedModal(presetDateKey = null) {
+    function openBabyMedModal(presetDateKey = null, editId = null) {
       closeBabyRegistrationChooser();
       closeHealthRegistrationChooser();
-      const { name: babyName } = getActiveBabyObjectSafe();
+      const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
 
       const modal = document.getElementById('babyMedModal');
       const form = document.getElementById('babyMedModalForm');
       if (form) form.reset();
 
+      const editInput = document.getElementById('babyMedModalEditId');
+      if (editInput) editInput.value = editId || '';
+
       const nameInput = document.getElementById('babyMedModalBabyName');
       if (nameInput) nameInput.value = `👶 ${babyName}`;
 
+      const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const defaultDate = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
+
+      const existing = (editId && btState && btState.health && Array.isArray(btState.health.medications))
+        ? btState.health.medications.find(m => m && m.id === editId)
+        : null;
+
       const titleSpan = document.getElementById('babyMedModalTitle');
-      if (titleSpan) titleSpan.textContent = `Medicamento para ${babyName}`;
-
-      const dateInput = document.getElementById('babyMedModalStartDate');
-      if (dateInput) {
-        const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-        dateInput.value = (typeof presetDateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(presetDateKey)) ? presetDateKey : fallbackDate;
-      }
-
-      const timeInput = document.getElementById('babyMedModalTime');
-      if (timeInput) timeInput.value = '08:00';
-
+      const medNameInput = document.getElementById('babyMedModalName');
+      const doseInput = document.getElementById('babyMedModalDose');
       const freqSelect = document.getElementById('babyMedModalFrequency');
-      if (freqSelect) freqSelect.value = '8';
-
+      const timeInput = document.getElementById('babyMedModalTime');
       const durInput = document.getElementById('babyMedModalDuration');
-      if (durInput) durInput.value = '7';
+      const dateInput = document.getElementById('babyMedModalStartDate');
+      const notesInput = document.getElementById('babyMedModalNotes');
+
+      if (existing) {
+        if (titleSpan) titleSpan.textContent = `Editar Medicamento de ${babyName}`;
+        if (medNameInput) medNameInput.value = existing.name || '';
+        if (doseInput) doseInput.value = existing.dose || '';
+        if (freqSelect) freqSelect.value = String(existing.frequency || 8);
+        if (timeInput) timeInput.value = existing.time || '08:00';
+        if (durInput) durInput.value = String(existing.duration || 7);
+        if (dateInput) dateInput.value = existing.startDate || defaultDate;
+        if (notesInput) notesInput.value = existing.notes || '';
+      } else {
+        if (titleSpan) titleSpan.textContent = `Medicamento para ${babyName}`;
+        if (dateInput) dateInput.value = defaultDate;
+        if (timeInput) timeInput.value = '08:00';
+        if (freqSelect) freqSelect.value = '8';
+        if (durInput) durInput.value = '7';
+      }
 
       if (modal) {
         modal.classList.remove('hidden');
@@ -3527,6 +3526,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
 
+      const editId = document.getElementById('babyMedModalEditId')?.value || '';
       const name = (document.getElementById('babyMedModalName')?.value || '').trim();
       const dose = (document.getElementById('babyMedModalDose')?.value || '').trim();
       const frequency = parseInt(document.getElementById('babyMedModalFrequency')?.value, 10) || 8;
@@ -3539,23 +3539,40 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       if (!btState.health) btState.health = {};
       if (!Array.isArray(btState.health.medications)) btState.health.medications = [];
-      btState.health.medications.push({
-        id: 'bmed_' + Date.now(),
-        name,
-        dose,
-        frequency,
-        time,
-        duration,
-        startDate,
-        notes
-      });
+
+      const existingIdx = editId ? btState.health.medications.findIndex(m => m && m.id === editId) : -1;
+      if (existingIdx >= 0) {
+        btState.health.medications[existingIdx] = {
+          ...btState.health.medications[existingIdx],
+          name,
+          dose,
+          frequency,
+          time,
+          duration,
+          startDate,
+          notes
+        };
+      } else {
+        btState.health.medications.push({
+          id: 'bmed_' + Date.now(),
+          name,
+          dose,
+          frequency,
+          time,
+          duration,
+          startDate,
+          notes
+        });
+      }
 
       persistBabyTrackerStoreSafe(store);
       closeBabyMedModal();
       renderAll();
-      openDayDetailModal();
+      if (!document.getElementById('day-detail-modal')?.classList.contains('hidden')) {
+        renderModalNotesList();
+      }
 
-      showToast('Medicamento Registrado', `${name} (${dose}) para ${bName} guardado con éxito.`, 'fa-pills', 'text-blue-400');
+      showToast(existingIdx >= 0 ? 'Medicamento Actualizado' : 'Medicamento Registrado', `${name} (${dose}) para ${bName} guardado con éxito.`, 'fa-pills', 'text-blue-400');
     }
 
     // 3. MODAL INDIVIDUAL: ALIMENTACIÓN DEL BEBÉ
@@ -4371,8 +4388,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       openBabyRegistrationChooserFromDay();
     }
 
-    // 5A. MODAL INDIVIDUAL: VACUNAS CON FECHA
-    function openBabyVaccineQuickModal(presetDateKey = null) {
+    // 5A. MODAL INDIVIDUAL UNIFICADO: VACUNAS CON FECHA
+    function openBabyVaccineQuickModal(presetDateKey = null, presetVaccineId = null) {
       closeBabyOthersChooser();
       closeBabyRegistrationChooser();
       const { baby: btState, name: babyName } = getActiveBabyObjectSafe();
@@ -4397,7 +4414,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
         });
         optionsHtml += `<option value="__custom__">➕ Agregar nueva vacuna personalizada...</option>`;
         selectEl.innerHTML = optionsHtml;
-        if (firstPendingId) selectEl.value = firstPendingId;
+        if (presetVaccineId && vaccines.some(v => v.id === presetVaccineId)) {
+          selectEl.value = presetVaccineId;
+        } else if (firstPendingId) {
+          selectEl.value = firstPendingId;
+        }
       }
 
       const fallbackDate = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
@@ -4429,6 +4450,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const dateInput = document.getElementById('babyVaccineQuickDate');
       const locInput = document.getElementById('babyVaccineQuickLocation');
       const notesInput = document.getElementById('babyVaccineQuickNotes');
+      const unmarkBtn = document.getElementById('babyVaccineQuickUnmarkBtn');
+      const titleEl = document.getElementById('babyVaccineQuickModalTitle');
 
       if (!selectEl) return;
       const val = selectEl.value;
@@ -4441,14 +4464,47 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const vax = btState?.health?.vaccines?.find(x => x.id === val);
         const fallbackDate = defaultDateOverride || formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
         if (vax) {
+          const isCustomVax = String(vax.id || '').startsWith('v_custom_');
           if (dateInput) dateInput.value = vax.date || fallbackDate;
           if (locInput) locInput.value = vax.location || '';
           if (notesInput) notesInput.value = vax.notes || '';
+          if (unmarkBtn) {
+            unmarkBtn.classList.toggle('hidden', !vax.done && !isCustomVax);
+            unmarkBtn.textContent = isCustomVax && !vax.done ? 'Eliminar Vacuna' : (isCustomVax ? 'Desmarcar / Eliminar' : 'Marcar Pendiente');
+          }
+          if (titleEl) titleEl.textContent = vax.done ? 'Editar Vacunación' : 'Registrar Vacuna con Fecha';
         }
       } else {
         if (locInput) locInput.value = '';
         if (notesInput) notesInput.value = '';
+        if (unmarkBtn) unmarkBtn.classList.add('hidden');
+        if (titleEl) titleEl.textContent = 'Nueva Vacuna Personalizada';
       }
+    }
+
+    function unmarkBabyVaccineFromQuickModal() {
+      const selectEl = document.getElementById('babyVaccineQuickSelect');
+      if (!selectEl || selectEl.value === '__custom__') return;
+      const { store, baby: btState } = getActiveBabyObjectSafe();
+      const vax = btState?.health?.vaccines?.find(x => x.id === selectEl.value);
+      if (!vax) return;
+      const isCustomVax = String(vax.id || '').startsWith('v_custom_');
+      if (isCustomVax && !vax.done) {
+        btState.health.vaccines = btState.health.vaccines.filter(x => x.id !== vax.id);
+        persistBabyTrackerStoreSafe(store);
+        closeBabyVaccineQuickModal();
+        renderAll();
+        showToast('Vacuna eliminada', `${vax.name} fue eliminada de la lista.`, 'fa-trash-can', 'text-amber-400');
+        return;
+      }
+      vax.done = false;
+      vax.date = '';
+      vax.location = '';
+      vax.notes = '';
+      persistBabyTrackerStoreSafe(store);
+      closeBabyVaccineQuickModal();
+      renderAll();
+      showToast('Vacuna desmarcada', `${vax.name} marcada como pendiente.`, 'fa-syringe', 'text-amber-400');
     }
 
     function saveBabyVaccineFromQuickModal(e) {
@@ -4796,47 +4852,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       showToast('Sueño Registrado', `${type} (${hours} h) guardado para ${bName}.`, 'fa-moon', 'text-indigo-400');
     }
 
-    function registerBabyControlFromChooser(presetDateKey = null) {
-      closeHealthRegistrationChooser();
-      closeDayDetailModal();
-      switchView('baby');
-      if (typeof window.setBtActiveTab === 'function') {
-        window.setBtActiveTab('salud');
-      }
-      setTimeout(() => {
-        const form = document.getElementById('btMedControlForm');
-        if (form) {
-          form.classList.remove('hidden');
-          if (presetDateKey) {
-            const dateInput = form.querySelector('input[name="date"]');
-            if (dateInput) dateInput.value = presetDateKey;
-          }
-          form.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 120);
-    }
-
-    function registerBabyMedFromChooser(presetDateKey = null) {
-      closeHealthRegistrationChooser();
-      closeDayDetailModal();
-      switchView('baby');
-      if (typeof window.setBtActiveTab === 'function') {
-        window.setBtActiveTab('salud');
-      }
-      setTimeout(() => {
-        const form = document.getElementById('btBabyMedForm');
-        if (form) {
-          form.classList.remove('hidden');
-          if (presetDateKey) {
-            const dateInput = form.querySelector('input[name="startDate"]');
-            if (dateInput) dateInput.value = presetDateKey;
-          }
-          form.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 120);
-    }
-
-    
     function handleHealthControlTypeOtherChange() {
       const checkbox = document.getElementById('healthControlTypeOtherCheckbox');
       const container = document.getElementById('healthControlOtherTypeContainer');
@@ -4895,10 +4910,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       document.getElementById('healthControlPerson').focus();
-    }
-
-    function openHealthControlFromDay() {
-      openHealthControlForm(null, formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()));
     }
 
     function closeHealthControlForm() {
@@ -5057,10 +5068,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const [startHour, startMin] = (med.time || '08:00').split(':').map(Number);
           if (freqHours <= 24) {
             const dosesPerDay = Math.floor(24 / freqHours);
+            const seenTimes = new Set();
             for (let i = 0; i < dosesPerDay; i++) {
-              const totalHour = startHour + i * freqHours;
-              if (totalHour < 24) {
-                const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
+              const totalHour = (startHour + i * freqHours) % 24;
+              const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
+              if (!seenTimes.has(timeStr)) {
+                seenTimes.add(timeStr);
                 const doseId = `${med.id}_${timeStr}`;
                 doses.push({ doseId, med, time: timeStr, dateKey });
               }
@@ -5128,12 +5141,44 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }).join(' y ');
     }
 
+    function getAllUnifiedHealthControls() {
+      const list = healthControls.map(c => ({ ...c, isBaby: false }));
+      const bt = getBabyTrackerDataSafe();
+      if (bt && Array.isArray(bt.babies)) {
+        bt.babies.forEach((baby, bIdx) => {
+          const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : `Bebé ${bIdx + 1}`;
+          const bControls = (baby.health && Array.isArray(baby.health.medicalControls)) ? baby.health.medicalControls : [];
+          bControls.forEach(bc => {
+            if (!bc || !bc.date) return;
+            const spec = (typeof BT_CONTROL_SPECIALTIES !== 'undefined' && BT_CONTROL_SPECIALTIES[bc.type]) || { name: 'Control médico', short: 'Control' };
+            const specName = bc.type === 'otro' && bc.customType ? bc.customType : (spec.name || 'Control médico');
+            const mappedType = bc.type === 'examenes' ? 'exam' : (bc.type === 'cita_medica' ? 'appointment' : 'other');
+            list.push({
+              id: bc.id,
+              date: bc.date,
+              time: bc.time || '10:00',
+              person: `👶 ${bName}`,
+              name: `Control de ${bName}`,
+              location: bc.doctor || '',
+              notes: bc.notes || '',
+              type: [mappedType],
+              customType: specName,
+              attended: bc.attended === true,
+              isBaby: true,
+              babyId: baby.id
+            });
+          });
+        });
+      }
+      return list;
+    }
+
     function renderUpcomingHealthControls() {
       const container = document.getElementById('upcomingHealthControlsList');
       if (!container) return;
       const today = new Date();
       const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
-      const upcomingControls = healthControls
+      const upcomingControls = getAllUnifiedHealthControls()
         .filter(control => control.date >= todayKey)
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
@@ -5145,22 +5190,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
       container.innerHTML = upcomingControls.map(control => {
         const attended = control.attended === true;
         const label = escapeHtml(control.person || control.name);
+        const typeDesc = control.isBaby ? escapeHtml(control.customType || 'Control pediátrico') : escapeHtml(formatHealthControlTypes(control));
         return `
         <div class="p-3 rounded-xl border ${attended ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-indigo-800/50 bg-indigo-950/20'}">
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <h4 class="font-bold text-xs text-slate-100"><i class="fa-solid fa-user mr-1 text-indigo-300"></i>${label}</h4>
-              ${control.type ? `<p class="mt-1 text-[11px] text-indigo-300">${escapeHtml(formatHealthControlTypes(control))}</p>` : ''}
+              <h4 class="font-bold text-xs text-slate-100"><i class="fa-solid ${control.isBaby ? 'fa-baby text-sky-300' : 'fa-user text-indigo-300'} mr-1"></i>${label}</h4>
+              ${typeDesc ? `<p class="mt-1 text-[11px] text-indigo-300">${typeDesc}</p>` : ''}
               <p class="mt-1 text-[11px] text-indigo-200">${escapeHtml(formatHealthControlDate(control.date))} · ${escapeHtml(formatTime(control.time))}</p>
               ${control.location ? `<p class="mt-1 text-[11px] text-slate-300"><i class="fa-solid fa-location-dot mr-1 text-indigo-300"></i>${escapeHtml(control.location)}</p>` : ''}
               ${control.notes ? `<p class="mt-1 text-[11px] text-slate-400 whitespace-pre-wrap">${escapeHtml(control.notes)}</p>` : ''}
             </div>
             <div class="flex shrink-0 items-center">
-              <button type="button" onclick="openHealthControlForm(${jsArg(control.id)})" aria-label="Editar control de ${label}" class="p-2 text-slate-500 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button>
-              <button type="button" onclick="deleteHealthControl(${jsArg(control.id)})" aria-label="Eliminar control de ${label}" class="p-2 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+              <button type="button" onclick="${control.isBaby ? `openBabyControlModal(${jsArg(control.date)}, ${jsArg(control.id)})` : `openHealthControlForm(${jsArg(control.id)})`}" aria-label="Editar control de ${label}" class="p-2 text-slate-500 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" onclick="deleteHealthControl(${jsArg(control.id)}, ${control.isBaby ? 'true' : 'false'}, ${jsArg(control.babyId || '')})" aria-label="Eliminar control de ${label}" class="p-2 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
             </div>
           </div>
-          <button type="button" onclick="toggleHealthControlAttended(${jsArg(control.id)})" aria-pressed="${attended}" class="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold border transition-all active:scale-95 ${attended ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-indigo-500/10 border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/20'}">
+          <button type="button" onclick="toggleHealthControlAttended(${jsArg(control.id)}, ${control.isBaby ? 'true' : 'false'}, ${jsArg(control.babyId || '')})" aria-pressed="${attended}" class="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold border transition-all active:scale-95 ${attended ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-indigo-500/10 border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/20'}">
             <i class="fa-solid ${attended ? 'fa-circle-check' : 'fa-circle'}"></i>
             <span>${attended ? 'Asistió al control' : 'Marcar como asistido'}</span>
           </button>
@@ -5169,7 +5215,24 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }).join('');
     }
 
-    function deleteHealthControl(id) {
+    function deleteHealthControl(id, isBaby = false, babyId = '') {
+      if (isBaby) {
+        showConfirmModal('Eliminar control del bebé', '¿Deseas eliminar este control médico del bebé?', () => {
+          const bt = getBabyTrackerDataSafe();
+          if (bt && Array.isArray(bt.babies)) {
+            const baby = bt.babies.find(b => b.id === babyId) || bt.babies[0];
+            if (baby && baby.health && Array.isArray(baby.health.medicalControls)) {
+              baby.health.medicalControls = baby.health.medicalControls.filter(c => c.id !== id);
+              persistBabyTrackerStoreSafe(bt);
+              renderUpcomingHealthControls();
+              renderHealthControlStats();
+              refreshPrimaryCalendarMarkers();
+              showToast('Control eliminado', 'El control médico del bebé fue eliminado.', 'fa-trash-can', 'text-amber-400');
+            }
+          }
+        }, 'Eliminar');
+        return;
+      }
       const controlIndex = healthControls.findIndex(control => control.id === id);
       if (controlIndex < 0) return;
       showConfirmModal('Eliminar control', '¿Deseas eliminar este control de salud?', () => {
@@ -5873,12 +5936,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
           : String(selectedYear);
       }
 
-      let periodControls = healthControls;
+      const allUnifiedControls = getAllUnifiedHealthControls();
+      let periodControls = allUnifiedControls;
       if (healthControlStatsMode === 'month') {
         const monthKey = formatDateKey(selectedYear, selectedMonth, 1).slice(0, 7);
-        periodControls = healthControls.filter(control => control.date.slice(0, 7) === monthKey);
+        periodControls = allUnifiedControls.filter(control => control.date.slice(0, 7) === monthKey);
       } else if (healthControlStatsMode === 'year') {
-        periodControls = healthControls.filter(control => Number(control.date.slice(0, 4)) === selectedYear);
+        periodControls = allUnifiedControls.filter(control => Number(control.date.slice(0, 4)) === selectedYear);
       }
       const upcomingControls = periodControls.filter(control => control.date >= todayKey);
       const hasControlType = (control, type) => {
@@ -6080,8 +6144,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
       } else {
         let earliest = null;
         let latest = null;
-        medications.forEach(med => {
-          const [year, month, day] = String(med.startDate).split('-').map(Number);
+        const btForRange = getBabyTrackerDataSafe();
+        const allMedsForRange = [...medications];
+        if (btForRange && Array.isArray(btForRange.babies)) {
+          btForRange.babies.forEach(b => {
+            if (b && b.health && Array.isArray(b.health.medications)) {
+              allMedsForRange.push(...b.health.medications);
+            }
+          });
+        }
+        allMedsForRange.forEach(med => {
+          const [year, month, day] = String(med.startDate || '').split('-').map(Number);
           if (!year || !month || !day) return;
           const start = new Date(year, month - 1, day);
           const end = new Date(year, month - 1, day + Math.max(Number(med.duration) || 1, 1) - 1);
@@ -6092,18 +6165,27 @@ Check your Browserslist config to be sure that your targets are set up correctly
         rangeEnd = latest || rangeStart;
       }
 
+      const btForStats = getBabyTrackerDataSafe();
       const groups = new Map();
       const cursor = new Date(rangeStart);
       let guard = 0;
       while (cursor <= rangeEnd && guard < 4000) {
         const dateKey = formatDateKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
-        getDosesForMedDate(dateKey).forEach(({ med, doseId, time }) => {
+        getDosesForMedDate(dateKey).forEach(item => {
+          const { med, doseId, time } = item;
           const [hours, minutes] = time.split(':').map(Number);
           const scheduled = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate(), hours, minutes);
-          const taken = !!medLogs[`${dateKey}_${doseId}`];
+          let taken = false;
+          if (item.isBaby) {
+            const b = (btForStats && Array.isArray(btForStats.babies)) ? btForStats.babies.find(x => x.id === item.babyId) : null;
+            taken = !!(b && b.health && b.health.medLogs && b.health.medLogs[`${dateKey}_${item.rawDoseId}`]);
+          } else {
+            taken = !!medLogs[`${dateKey}_${doseId}`];
+          }
           const status = taken ? 'taken' : (scheduled <= now ? 'missed' : 'upcoming');
-          if (!groups.has(med.id)) groups.set(med.id, { med, taken: 0, missed: 0, upcoming: 0, items: [] });
-          const group = groups.get(med.id);
+          const groupKey = item.isBaby ? `baby::${item.babyId}::${med.id}` : med.id;
+          if (!groups.has(groupKey)) groups.set(groupKey, { med, taken: 0, missed: 0, upcoming: 0, items: [] });
+          const group = groups.get(groupKey);
           group[status] += 1;
           group.items.push({ dateKey, time, status });
         });
@@ -7191,7 +7273,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         document.getElementById('new-note-birthtime').value = editNote.birthTime || '';
         document.getElementById('new-note-anniversary-date').value = birthdayDateToInputValue(editNote.anniversaryDate || (isAnniversary ? selectedDateKey : ''));
         
-        if (document.getElementById('birthday-reminder-option')) document.getElementById('birthday-reminder-option').value = editNote.reminder || 'same_day';
         document.getElementById('is-shift-checkbox').checked = !!editNote.isShift;
         document.getElementById('new-shift-type').value = editNote.shiftType || 'Mañana';
         document.getElementById('new-shift-start').value = editNote.shiftStart || '';
@@ -7260,6 +7341,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function showCreateShiftFormInModal() {
       // Primero limpiar y configurar campos antes de llamar a showCreateFormInModal
+      hideTitleSuggestions();
+      setLockExistingTagFields(false);
       document.getElementById('editing-note-id').value = '';
       document.getElementById('new-note-title').value = '';
       document.getElementById('new-note-textarea').value = '';
@@ -7318,7 +7401,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       document.getElementById('new-note-birthdate').value = '';
       document.getElementById('new-note-birthtime').value = '';
       document.getElementById('new-note-anniversary-date').value = '';
-      if (document.getElementById('birthday-reminder-option')) document.getElementById('birthday-reminder-option').value = 'same_day';
       document.getElementById('is-shift-checkbox').checked = false;
       selectNoteColor('#14B8A6');
 
@@ -7335,7 +7417,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (bottomActions) bottomActions.classList.add('hidden');
 
       // Configurar el modo de evento (preseleccionar según pestaña activa)
-      const defaultAnniversary = activeView === 'birthdays' && birthdayFilterTab === 'anniversaries';
+      const defaultAnniversary = (activeView === 'summary' || activeView === 'birthdays') && notesEventsActiveSubTab === 'events' && birthdayFilterTab === 'anniversaries';
       if (document.getElementById('is-note-checkbox')) document.getElementById('is-note-checkbox').checked = false;
       document.getElementById('is-birthday-checkbox').checked = !defaultAnniversary;
       document.getElementById('is-anniversary-checkbox').checked = defaultAnniversary;
@@ -7705,6 +7787,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const abbrevInput = document.getElementById('new-note-abbrev');
       const isEditing = !!document.getElementById('editing-note-id').value;
 
+      setLockExistingTagFields(false);
       if (isNote) {
         document.getElementById('is-event-form').value = 'false';
         document.getElementById('modal-title-text').textContent = isEditing ? "Editar Nota" : "Nueva Nota";
@@ -8118,7 +8201,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 if (groupId && n.repeatGroupId === groupId) return false;
                 if (ownerId && (n.birthdayOwnerId === ownerId || n.id === ownerId)) return false;
                 if (existingNote.isBirthday && n.isBirthday && n.title === existingNote.title) return false;
-                if ((existingNote.isEvent || existingNote.anniversaryDate) && (n.title === existingNote.title)) return false;
+                if ((existingNote.isEvent || existingNote.anniversaryDate) && (n.isEvent || n.anniversaryDate) && !n.isBirthday && (n.title === existingNote.title)) return false;
                 return true;
               });
             }
@@ -8171,7 +8254,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           week: '#38BDF8',
           month: '#10B981'
         };
-        noteObj.reminder = document.getElementById('birthday-reminder-option')?.value || 'same_day';
+        noteObj.reminder = editNote?.reminder || 'same_day';
         noteObj.color = selectedColor;
       }
 
@@ -8401,7 +8484,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               if (groupId && n.repeatGroupId && n.repeatGroupId === groupId) return false;
               if (ownerId && (n.birthdayOwnerId === ownerId || n.id === ownerId)) return false;
               if (targetNote.isBirthday && n.isBirthday && (n.title || n.text || '').trim().toLowerCase() === (targetNote.title || targetNote.text || '').trim().toLowerCase()) return false;
-              if ((targetNote.isEvent || targetNote.anniversaryDate) && (n.title || n.text || '').trim().toLowerCase() === (targetNote.title || targetNote.text || '').trim().toLowerCase()) return false;
+              if ((targetNote.isEvent || targetNote.anniversaryDate) && (n.isEvent || n.anniversaryDate) && !n.isBirthday && (n.title || n.text || '').trim().toLowerCase() === (targetNote.title || targetNote.text || '').trim().toLowerCase()) return false;
               return true;
             });
           }
@@ -8471,22 +8554,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         btn.className = "py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all";
       });
       document.getElementById(`summary-mode-${mode}`).className = "py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow";
-      renderSummaryView();
-    }
-
-    function setNotesSubTab(tab) {
-      notesSubTab = 'stats';
-      renderSummaryView();
-    }
-
-    function setNotesTab(tab) {
-      if (tab !== 'next') return;
-      notesTab = 'next';
-      renderNearbyNotes();
-    }
-
-    function setSummaryCategory(cat) {
-      summaryCategory = cat;
       renderSummaryView();
     }
 
@@ -8581,79 +8648,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const detailsContainer = document.createElement('div');
         detailsContainer.className = 'hidden bg-slate-950/70 border-t border-slate-800 p-2 space-y-1.5';
 
-        if (summaryCategory === 'turns') {
-          const shiftTypesMap = {};
-          data.items.forEach(item => {
-            const st = item.note.shiftType || 'General';
-            if (!shiftTypesMap[st]) {
-              shiftTypesMap[st] = { count: 0, hours: 0, mins: 0, list: [] };
-            }
-            shiftTypesMap[st].count += 1;
-            shiftTypesMap[st].hours += (item.note.hours || 0);
-            shiftTypesMap[st].mins += (item.note.mins || 0);
-            shiftTypesMap[st].list.push(item);
-          });
-
-          Object.keys(shiftTypesMap).forEach(sType => {
-            const sData = shiftTypesMap[sType];
-            const sMins = sData.hours * 60 + sData.mins;
-            const sH = Math.floor(sMins / 60);
-            const sM = sMins % 60;
-
-            const shiftSubGroup = document.createElement('div');
-            shiftSubGroup.className = 'rounded border border-slate-800/80 bg-slate-900/60 overflow-hidden';
-
-            const shiftSubHeader = document.createElement('div');
-            shiftSubHeader.className = 'flex items-center justify-between p-2 text-[11px] font-bold text-slate-300 cursor-pointer hover:bg-slate-800/40 select-none';
-            shiftSubHeader.innerHTML = `
-              <div class="flex items-center gap-1.5">
-                <i class="fa-solid fa-chevron-right text-[9px] text-slate-400 transition-transform duration-200 sub-chevron-icon"></i>
-                <span class="px-2 py-0.5 rounded bg-purple-900/40 border border-purple-700/50 text-purple-300 flex items-center gap-1">
-                  <i class="fa-solid fa-briefcase text-[9px]"></i> ${escapeHtml(sType)}
-                </span>
-                <span class="text-slate-400 text-[10px]">(${sData.count} vez${sData.count > 1 ? 'es' : ''})</span>
-              </div>
-              <span class="font-mono text-teal-400 text-[10px]">${sH}h ${sM}m</span>
-            `;
-
-            const shiftDatesList = document.createElement('div');
-            shiftDatesList.className = 'hidden p-2 space-y-1 bg-slate-950 border-t border-slate-800/60';
-
-            sData.list.forEach(i => {
-              const dateRow = document.createElement('div');
-              dateRow.className = 'flex items-center justify-between text-[11px] p-1.5 rounded bg-slate-900/80 border border-slate-800 hover:border-slate-700 cursor-pointer';
-              dateRow.onclick = (e) => {
-                e.stopPropagation();
-                jumpToSpecificDate(i.dateObj.getFullYear(), i.dateObj.getMonth(), i.dateObj.getDate());
-              };
-
-              const d = i.dateObj.getDate();
-              const m = i.dateObj.getMonth() + 1;
-              const yStr = i.dateObj.getFullYear();
-
-              dateRow.innerHTML = `
-                <span class="font-bold text-slate-200 flex items-center gap-1">
-                  <i class="fa-regular fa-calendar text-slate-400"></i> ${d}/${m}/${yStr}
-                </span>
-                <span class="text-purple-300 font-mono text-[10px]">${i.note.shiftStatus ? escapeHtml(i.note.shiftType) : `<i class="fa-regular fa-clock"></i> ${escapeHtml(formatTime(i.note.shiftStart))} - ${escapeHtml(formatTime(i.note.shiftEnd))} (${i.note.hours || 0}h ${i.note.mins || 0}m)`}</span>
-              `;
-              shiftDatesList.appendChild(dateRow);
-            });
-
-            shiftSubHeader.onclick = (e) => {
-              e.stopPropagation();
-              const isHidden = shiftDatesList.classList.contains('hidden');
-              shiftDatesList.classList.toggle('hidden', !isHidden);
-              const subIcon = shiftSubHeader.querySelector('.sub-chevron-icon');
-              if (subIcon) subIcon.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
-            };
-
-            shiftSubGroup.appendChild(shiftSubHeader);
-            shiftSubGroup.appendChild(shiftDatesList);
-            detailsContainer.appendChild(shiftSubGroup);
-          });
-
-        } else {
           data.items.forEach(i => {
             const dateRow = document.createElement('div');
             dateRow.className = 'p-2 rounded bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-pointer text-[11px]';
@@ -8675,7 +8669,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
             `;
             detailsContainer.appendChild(dateRow);
           });
-        }
 
         mainHeader.onclick = () => {
           const isHidden = detailsContainer.classList.contains('hidden');
@@ -8712,7 +8705,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       container.innerHTML = '';
 
       const isTurnsTab = summaryCategory === 'turns';
-      if (titleEl) titleEl.textContent = isTurnsTab ? 'TURNOS CERCANOS' : 'NOTAS CERCANAS';
+      if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-clock text-teal-400"></i><span>${isTurnsTab ? 'TURNOS CERCANOS' : 'NOTAS CERCANAS'}</span>`;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -9863,12 +9856,74 @@ Check your Browserslist config to be sure that your targets are set up correctly
               });
             }
 
-            // Fusionar vacunas completadas
-            if (incBaby.health && Array.isArray(incBaby.health.vaccines) && Array.isArray(matchBaby.health.vaccines)) {
+            // Fusionar vacunas completadas y vacunas personalizadas
+            if (incBaby.health && Array.isArray(incBaby.health.vaccines)) {
+              if (!Array.isArray(matchBaby.health.vaccines)) matchBaby.health.vaccines = [];
               incBaby.health.vaccines.forEach(v => {
-                if (v && v.done) {
-                  const mv = matchBaby.health.vaccines.find(x => x.id === v.id || x.name === v.name);
-                  if (mv) mv.done = true;
+                if (!v) return;
+                const mv = matchBaby.health.vaccines.find(x => x.id === v.id || x.name === v.name);
+                if (mv) {
+                  if (v.done) {
+                    mv.done = true;
+                    if (v.date) mv.date = v.date;
+                    if (v.location) mv.location = v.location;
+                    if (v.notes) mv.notes = v.notes;
+                  }
+                } else {
+                  matchBaby.health.vaccines.push(JSON.parse(JSON.stringify(v)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar registros de salud rápidos (temperatura, vacunas, etc.)
+            if (incBaby.health && Array.isArray(incBaby.health.logs)) {
+              if (!Array.isArray(matchBaby.health.logs)) matchBaby.health.logs = [];
+              incBaby.health.logs.forEach(lg => {
+                if (lg && !matchBaby.health.logs.some(x => x && x.id === lg.id)) {
+                  matchBaby.health.logs.push(JSON.parse(JSON.stringify(lg)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar mediciones de la curva de crecimiento
+            if (Array.isArray(incBaby.growth)) {
+              if (!Array.isArray(matchBaby.growth)) matchBaby.growth = [];
+              incBaby.growth.forEach(g => {
+                if (g && !matchBaby.growth.some(x => x && (x.id === g.id || (x.date === g.date && x.label === g.label)))) {
+                  matchBaby.growth.push(JSON.parse(JSON.stringify(g)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar hitos del desarrollo
+            if (incBaby.development && Array.isArray(incBaby.development.milestones)) {
+              if (!matchBaby.development) matchBaby.development = { milestones: [] };
+              if (!Array.isArray(matchBaby.development.milestones)) matchBaby.development.milestones = [];
+              incBaby.development.milestones.forEach(m => {
+                if (!m) return;
+                const existingM = matchBaby.development.milestones.find(x => x && (x.id === m.id || x.title === m.title));
+                if (existingM) {
+                  if (m.done) {
+                    existingM.done = true;
+                    if (m.date) existingM.date = m.date;
+                  }
+                } else {
+                  matchBaby.development.milestones.push(JSON.parse(JSON.stringify(m)));
+                  addedBabyCount++;
+                }
+              });
+            }
+
+            // Fusionar fotos y recuerdos
+            if (Array.isArray(incBaby.photos)) {
+              if (!Array.isArray(matchBaby.photos)) matchBaby.photos = [];
+              incBaby.photos.forEach(p => {
+                if (p && !matchBaby.photos.some(x => x && x.id === p.id)) {
+                  matchBaby.photos.push(JSON.parse(JSON.stringify(p)));
+                  addedBabyCount++;
                 }
               });
             }
@@ -10093,6 +10148,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const todayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
       const nowMs = now.getTime();
       const doses = getDosesForMedDate(todayKey);
+      const btForReminders = getBabyTrackerDataSafe();
 
       doses.forEach(item => {
         const [hour, minute] = item.time.split(':').map(Number);
@@ -10100,7 +10156,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const logKey = `${todayKey}_${item.doseId}`;
         const reminderKey = `cal_med_reminder_${logKey}`;
 
-        if (medLogs[logKey] || shownMedicationReminders.has(reminderKey) || nowMs < dueTime || nowMs - dueTime > 90000) return;
+        let alreadyTaken = false;
+        if (item.isBaby) {
+          const b = (btForReminders && Array.isArray(btForReminders.babies)) ? btForReminders.babies.find(x => x.id === item.babyId) : null;
+          alreadyTaken = !!(b && b.health && b.health.medLogs && b.health.medLogs[`${todayKey}_${item.rawDoseId}`]);
+        } else {
+          alreadyTaken = !!medLogs[logKey];
+        }
+
+        if (alreadyTaken || shownMedicationReminders.has(reminderKey) || nowMs < dueTime || nowMs - dueTime > 90000) return;
 
         try {
           if (localStorage.getItem(reminderKey) === '1') {
@@ -10113,9 +10177,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
         shownMedicationReminders.add(reminderKey);
 
+        const baseDose = [item.med.doseVal || item.med.dose || '', item.med.doseUnit || ''].filter(Boolean).join(' ').trim() || 'Según indicación';
         const doseDetails = item.med.calculatedDoseStr
-          ? `${item.med.doseVal} ${item.med.doseUnit} (${item.med.calculatedDoseStr})`
-          : `${item.med.doseVal} ${item.med.doseUnit}`;
+          ? `${baseDose} (${item.med.calculatedDoseStr})`
+          : baseDose;
         showToast('Hora del medicamento', `${item.med.name}: ${doseDetails}`, 'fa-pills', 'text-blue-400');
 
         if ('Notification' in window && Notification.permission === 'granted') {
@@ -10206,80 +10271,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
   </script>
 
   <!-- MODAL REGISTRO DE VACUNA CON FECHA (Baby Tracker) -->
-  <div id="btVaccineModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-[85]">
-    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl border border-slate-700/70 space-y-3 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
-        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-          <i class="fa-solid fa-syringe text-emerald-400"></i>
-          <span id="btVaccineModalTitle">Registrar Vacunación</span>
-        </h3>
-        <button type="button" id="btCloseVaccineModalBtn" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
-      </div>
-      
-      <form id="btVaccineForm" class="space-y-3">
-        <input type="hidden" id="btVaccineId">
-        
-        <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
-          <p id="btVaccineName" class="font-bold text-xs text-slate-100"></p>
-          <p id="btVaccineAge" class="text-[10px] text-slate-400"></p>
-        </div>
-
-        <div>
-          <label for="btVaccineDate" class="block text-[11px] font-semibold text-slate-300 mb-1">
-            📅 Fecha de Aplicación de la Vacuna:
-          </label>
-          <input type="date" id="btVaccineDate" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-400">
-        </div>
-
-        <div>
-          <label for="btVaccineLocation" class="block text-[11px] font-semibold text-slate-300 mb-1">
-            🏥 Lugar / Centro de Salud (opcional):
-          </label>
-          <input type="text" id="btVaccineLocation" placeholder="Ej. CESFAM, Vacunatorio, Clínica..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-400">
-        </div>
-
-        <div>
-          <label for="btVaccineNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">
-            📝 Lote / Observaciones (opcional):
-          </label>
-          <input type="text" id="btVaccineNotes" placeholder="Ej. Lote #123, sin fiebre posterior..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-400">
-        </div>
-
-        <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-700/60">
-          <button type="button" id="btUnmarkVaccineBtn" class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold transition-all active:scale-95">
-            Desmarcar
-          </button>
-          <div class="flex gap-2 flex-1 justify-end">
-            <button type="button" id="btCancelVaccineModalBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">
-              Cancelar
-            </button>
-            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">
-              Guardar Vacuna
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL REGISTRO RÁPIDO BABY TRACKER (Armonizado con modales de index.html) -->
-  <div id="btQuickModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-[85]">
-    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl border border-slate-700/70 space-y-3 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
-        <h3 id="btModalTitle" class="font-bold text-sm text-slate-100 flex items-center gap-2">
-          <i class="fa-solid fa-baby text-sky-400"></i>
-          <span>Registro Rápido del Bebé</span>
-        </h3>
-        <button type="button" id="btCloseModalBtn" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
-      </div>
-      <div id="btModalBody" class="space-y-3"></div>
-    </div>
-  </div>
-
   <!-- BARRA FLOTANTE GLOBAL CUANDO EL CRONÓMETRO DE SUEÑO ESTÁ ACTIVO Y MINIMIZADO -->
   <div id="btLiveSleepFloatingBanner" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] hidden w-[94%] max-w-md bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-400/50 rounded-2xl px-3.5 py-2.5 shadow-2xl items-center justify-between gap-2">
     <button type="button" id="btOpenLiveSleepScreenFromBannerBtn" class="flex items-center gap-2.5 min-w-0 flex-1 text-left">
@@ -10518,10 +10509,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
             : [];
           healthData.medLogs = rawHealth.medLogs && typeof rawHealth.medLogs === 'object' && !Array.isArray(rawHealth.medLogs) ? rawHealth.medLogs : {};
 
-          // Asegurar que cada vacuna tenga campos date, location, notes
+          // Asegurar que cada vacuna tenga campos date, location, notes y conservar vacunas personalizadas
           if (Array.isArray(rawHealth.vaccines)) {
-            healthData.vaccines = base.health.vaccines.map(baseVax => {
-              const userVax = rawHealth.vaccines.find(x => x.id === baseVax.id || x.name === baseVax.name);
+            const mergedVaccines = base.health.vaccines.map(baseVax => {
+              const userVax = rawHealth.vaccines.find(x => x && (x.id === baseVax.id || x.name === baseVax.name));
               if (userVax) {
                 return {
                   ...baseVax,
@@ -10533,6 +10524,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
               }
               return baseVax;
             });
+            rawHealth.vaccines.forEach(userVax => {
+              if (userVax && userVax.id && !mergedVaccines.some(v => v.id === userVax.id || v.name === userVax.name)) {
+                mergedVaccines.push({
+                  id: userVax.id,
+                  name: userVax.name || 'Vacuna',
+                  age: userVax.age || 'Extra',
+                  done: !!userVax.done,
+                  date: userVax.date || '',
+                  location: userVax.location || '',
+                  notes: userVax.notes || ''
+                });
+              }
+            });
+            healthData.vaccines = mergedVaccines;
           }
 
           const sanitizeListWithDate = (list) => {
@@ -10618,62 +10623,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
         if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
         return saved;
-      }
-
-      function btCompressImage(source, maxDim, quality) {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          let objectUrl = null;
-          const cleanup = () => { if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; } };
-          img.onload = () => {
-            try {
-              const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight, 1));
-              const w = Math.max(1, Math.round(img.naturalWidth * scale));
-              const h = Math.max(1, Math.round(img.naturalHeight * scale));
-              const canvas = document.createElement('canvas');
-              canvas.width = w;
-              canvas.height = h;
-              const ctx = canvas.getContext('2d');
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(0, 0, w, h);
-              ctx.drawImage(img, 0, 0, w, h);
-              let q = quality;
-              let out = canvas.toDataURL('image/jpeg', q);
-              while (out.length > 250000 && q > 0.4) {
-                q -= 0.1;
-                out = canvas.toDataURL('image/jpeg', q);
-              }
-              resolve(out);
-            } catch (err) {
-              reject(err);
-            } finally {
-              cleanup();
-            }
-          };
-          img.onerror = () => { cleanup(); reject(new Error('Imagen no válida')); };
-          if (typeof source === 'string') {
-            img.src = source;
-          } else {
-            objectUrl = URL.createObjectURL(source);
-            img.src = objectUrl;
-          }
-        });
-      }
-
-      function btShrinkExistingPhotos() {
-        const jobs = [];
-        btStore.babies.forEach(b => (Array.isArray(b.photos) ? b.photos : []).forEach(photo => {
-          if (photo && typeof photo.dataUrl === 'string' && photo.dataUrl.startsWith('data:image/') && photo.dataUrl.length > 350000) jobs.push(photo);
-        }));
-        if (jobs.length === 0) return;
-        jobs.reduce((chain, photo) => chain.then(() =>
-          btCompressImage(photo.dataUrl, 800, 0.7)
-            .then(small => { if (small.length < photo.dataUrl.length) photo.dataUrl = small; })
-            .catch(() => {})
-        ), Promise.resolve()).then(() => {
-          saveBtState();
-          renderBtMainContent();
-        });
       }
 
       function getCurrentBaby() {
@@ -10876,7 +10825,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const chineseAnimals = [
           '🐒 Mono', '🐓 Gallo', '🐕 Perro', '🐖 Cerdo',
           '🐀 Rata', '🐂 Buey', '🐅 Tigre', '🐇 Conejo',
-          '🐉 Dragón', '🐉 Serpiente', '🐎 Caballo', '🐐 Cabra'
+          '🐉 Dragón', '🐍 Serpiente', '🐎 Caballo', '🐐 Cabra'
         ];
         const chinese = chineseAnimals[birth.getFullYear() % 12] || '—';
         const autoMoon = calculateMoonSign(btState.profile.birthDate);
@@ -10890,44 +10839,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
           chinese,
           moon: moonDisplay
         };
-      }
-
-      function getBtFeedingStatsForDate(btState, dateKey) {
-        let milkMl = 0, waterMl = 0, solidMeals = 0, lastTime = '--:--';
-        const entries = (btState.feeding.entries || []).filter(item => ensureEntryDate(item) === dateKey);
-        entries.forEach(item => {
-          if (item.kind === 'milk') milkMl += Number(item.amountMl) || 0;
-          if (item.kind === 'water') waterMl += Number(item.amountMl) || 0;
-          if (item.kind === 'solid') solidMeals += 1;
-          if (item.time) lastTime = item.time;
-        });
-        return { milkMl, waterMl, solidMeals, lastTime, entries };
-      }
-
-      function getBtSleepStatsForDate(btState, dateKey) {
-        let nightHours = 0, napsCount = 0, totalHours = 0;
-        const entries = (btState.sleep.entries || []).filter(item => ensureEntryDate(item) === dateKey);
-        entries.forEach(item => {
-          const h = Number(item.hours) || 0;
-          totalHours += h;
-          if (item.type === 'Nocturno') nightHours += h;
-          else napsCount += 1;
-        });
-        return {
-          nightHours: Math.round(nightHours * 10) / 10,
-          napsCount,
-          totalHours: Math.round(totalHours * 10) / 10,
-          entries
-        };
-      }
-
-      function getBtDiaperStatsForDate(btState, dateKey) {
-        const entries = (btState.diapers.entries || []).filter(item => ensureEntryDate(item) === dateKey);
-        const wet = entries.filter(d => d.type === 'Mojado').length;
-        const dirty = entries.filter(d => d.type === 'Sucio').length;
-        const both = entries.filter(d => d.type === 'Ambos').length;
-        const lastDiaper = entries[entries.length - 1];
-        return { total: entries.length, wet, dirty, both, lastTime: lastDiaper ? lastDiaper.time : '--:--', entries };
       }
 
       function getBtDevStats(btState) {
@@ -10975,90 +10886,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         `;
       }
 
-      const BT_CONTROL_SPECIALTIES = {
-        cita_medica: {
-          label: 'Cita médica (Pediatría / General)',
-          name: 'Cita médica',
-          short: 'Cita médica',
-          icon: 'fa-user-doctor',
-          badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
-        },
-        examenes: {
-          label: 'Exámenes clínicos / Laboratorio',
-          name: 'Exámenes',
-          short: 'Exámenes',
-          icon: 'fa-calendar-check',
-          badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-        },
-        nutricionista: {
-          label: 'Nutricionista infantil',
-          name: 'Nutricionista',
-          short: 'Nutricionista',
-          icon: 'fa-chart-pie',
-          badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-        },
-        dentista: {
-          label: 'Dentista / Odontopediatría',
-          name: 'Dentista',
-          short: 'Dentista',
-          icon: 'fa-circle-check',
-          badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-        },
-        traumatologo: {
-          label: 'Traumatólogo infantil',
-          name: 'Traumatólogo',
-          short: 'Traumatólogo',
-          icon: 'fa-house-medical',
-          badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-        },
-        otro: {
-          label: 'Otro especialista médico',
-          name: 'Otro especialista',
-          short: 'Otro',
-          icon: 'fa-user-doctor',
-          badge: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-        }
-      };
-
-      function getBabyDosesForDate(baby, dateKey) {
-        if (!baby || !baby.health || !Array.isArray(baby.health.medications)) return [];
-        const parts = dateKey.split('-').map(Number);
-        const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
-        const doses = [];
-
-        baby.health.medications.forEach(med => {
-          if (!med.startDate || !med.duration) return;
-          const startParts = med.startDate.split('-').map(Number);
-          const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
-          const end = new Date(start);
-          end.setDate(end.getDate() + (Number(med.duration) || 1));
-
-          if (targetDate >= start && targetDate < end) {
-            const freqHours = Number(med.frequency) || 24;
-            const [startHour, startMin] = (med.time || '08:00').split(':').map(Number);
-            if (freqHours <= 24) {
-              const dosesPerDay = Math.floor(24 / freqHours);
-              for (let i = 0; i < dosesPerDay; i++) {
-                const totalHour = startHour + i * freqHours;
-                if (totalHour < 24) {
-                  const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
-                  const doseId = `${med.id}_${timeStr}`;
-                  doses.push({ doseId, med, time: timeStr, dateKey });
-                }
-              }
-            } else {
-              const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
-              const intervalDays = Math.floor(freqHours / 24);
-              if (diffDays % intervalDays === 0) {
-                const doseId = `${med.id}_${med.time || '08:00'}`;
-                doses.push({ doseId, med, time: med.time || '08:00', dateKey });
-              }
-            }
-          }
-        });
-
-        return doses.sort((a, b) => a.time.localeCompare(b.time));
-      }
+      const BT_CONTROL_SPECIALTIES = window.BT_CONTROL_SPECIALTIES;
+      const getBabyDosesForDate = window.getBabyDosesForDate;
 
       function renderBtProfileBanner() {
         const btState = getCurrentBaby();
@@ -11103,48 +10932,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         renderBtMainContent();
       }
 
-      function renderBtDateNavigator(allowHistory = true) {
-        const isToday = btSelectedDateKey === getTodayDateKey();
-        const parts = btSelectedDateKey.split('-').map(Number);
-        const dObj = new Date(parts[0], parts[1] - 1, parts[2]);
-        const formattedDateLabel = dObj.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-
-        return `
-          <div class="bg-gradient-to-r from-[#17202c] via-[#1e2733] to-[#17202c] p-2.5 rounded-2xl border border-slate-700/70 shadow flex items-center justify-between gap-2 select-none">
-            <button type="button" data-bt-date-delta="-1" class="py-1.5 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1 shadow-sm" title="Día anterior">
-              <i class="fa-solid fa-chevron-left text-[11px]"></i>
-              <span class="hidden sm:inline text-[10px]">Anterior</span>
-            </button>
-            
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xs shrink-0">
-                <i class="fa-regular fa-calendar"></i>
-              </span>
-              <div class="flex flex-col items-center min-w-0">
-                <span class="text-xs font-black text-slate-100 capitalize tracking-wide truncate">${escapeHtml(formattedDateLabel)}</span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <input type="date" id="btDateNavigatorInput" value="${btSelectedDateKey}" class="bg-slate-900 text-slate-300 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-mono font-bold focus:outline-none focus:border-sky-400 cursor-pointer">
-                  ${isToday ? '<span class="text-[9px] bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-1.5 py-0.2 rounded">Hoy</span>' : '<button type="button" data-bt-goto-today="1" class="text-[9px] bg-sky-600 hover:bg-sky-500 text-white font-bold px-1.5 py-0.5 rounded shadow active:scale-95">Ir a Hoy</button>'}
-                </div>
-              </div>
-            </div>
-
-            <button type="button" data-bt-date-delta="1" class="py-1.5 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1 shadow-sm" title="Día siguiente">
-              <span class="hidden sm:inline text-[10px]">Siguiente</span>
-              <i class="fa-solid fa-chevron-right text-[11px]"></i>
-            </button>
-          </div>
-        `;
-      }
-
-      function changeBtSelectedDate(delta) {
-        const parts = btSelectedDateKey.split('-').map(Number);
-        const cur = new Date(parts[0], parts[1] - 1, parts[2]);
-        cur.setDate(cur.getDate() + delta);
-        btSelectedDateKey = formatDateKey(cur.getFullYear(), cur.getMonth(), cur.getDate());
-        renderBtMainContent();
-      }
-
       function renderBtMainContent() {
         const container = document.getElementById('btMainContent');
         const prevScroll = container ? container.scrollTop : 0;
@@ -11173,118 +10960,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (container && prevScroll > 0) {
           container.scrollTop = prevScroll;
         }
-      }
-
-      function renderBtInicio(container) {
-        const btState = getCurrentBaby();
-        const vax = getBtVaxStats(btState);
-        const dev = getBtDevStats(btState);
-        const dateKey = btSelectedDateKey;
-        const feed = getBtFeedingStatsForDate(btState, dateKey);
-        const slp = getBtSleepStatsForDate(btState, dateKey);
-        const diaper = getBtDiaperStatsForDate(btState, dateKey);
-        const isToday = dateKey === getTodayDateKey();
-
-        const weightDisp = btState.health.weightKg !== null ? `${btState.health.weightKg} kg` : 'Sin registrar';
-        const heightDisp = btState.health.heightCm !== null ? `${btState.health.heightCm} cm` : 'Sin registrar';
-        const tempDisp = btState.health.temperatureC !== null ? `${btState.health.temperatureC}°C` : 'Sin registrar';
-        const milkGoal = btState.feeding.milkGoalMl || 600;
-
-        const medControls = Array.isArray(btState.health.medicalControls) ? btState.health.medicalControls : [];
-        const upcomingControl = medControls.filter(c => !c.attended && c.date >= dateKey).sort((a,b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
-        let nextControlDisp = 'Sin controles';
-        if (upcomingControl) {
-          const spec = BT_CONTROL_SPECIALTIES[upcomingControl.type] || BT_CONTROL_SPECIALTIES.cita_medica;
-          const label = upcomingControl.type === 'otro' && upcomingControl.customType ? upcomingControl.customType : spec.short;
-          nextControlDisp = `${label} (${upcomingControl.date.slice(5)})`;
-        }
-
-        const dateDoses = getBabyDosesForDate(btState, dateKey);
-        let medsTodayDisp = 'Sin tomas';
-        if (dateDoses.length > 0) {
-          const takenCount = dateDoses.filter(d => !!(btState.health.medLogs && btState.health.medLogs[`${dateKey}_${d.doseId}`])).length;
-          medsTodayDisp = `${takenCount}/${dateDoses.length} tomadas`;
-        }
-
-        container.innerHTML = `
-          ${renderBtDateNavigator(true)}
-
-          ${!isToday ? `
-            <div class="bg-amber-500/15 border border-amber-500/40 p-2.5 rounded-xl text-xs text-amber-300 flex items-center justify-between gap-2 shadow-sm">
-              <span class="flex items-center gap-1.5 font-bold"><i class="fa-solid fa-clock-rotate-left"></i> Viendo datos históricos de este día</span>
-              <button type="button" data-bt-goto-today="1" class="text-[10px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded shadow active:scale-95">Volver a Hoy</button>
-            </div>
-          ` : ''}
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div data-bt-goto="cuidados" class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🍼 Cuidados del Día</span>
-                  <span class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${Math.round((feed.milkMl / milkGoal) * 100)}% meta leche</span>
-                </div>
-                <div class="space-y-1.5 text-xs text-slate-400">
-                  <div class="flex justify-between"><span>🍼 Leche:</span><strong class="text-slate-100">${feed.milkMl} ml</strong></div>
-                  <div class="flex justify-between"><span>💧 Agua:</span><strong class="text-slate-100">${feed.waterMl} ml</strong></div>
-                  <div class="flex justify-between"><span>🍎 Comidas:</span><strong class="text-slate-100">${feed.solidMeals} sólida(s)</strong></div>
-                  <div class="flex justify-between"><span>🚼 Pañales:</span><strong class="text-slate-100">${diaper.total} (${diaper.wet}💧 / ${diaper.dirty}💩)</strong></div>
-                  <div class="flex justify-between"><span>😴 Sueño:</span><strong class="text-slate-100">${slp.totalHours}h (${slp.napsCount} siestas)</strong></div>
-                </div>
-              </div>
-              <div class="grid grid-cols-3 gap-1 mt-3 pt-2 border-t border-slate-700/60">
-                <button type="button" data-bt-quick-feed="milk" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">+120ml 🍼</button>
-                <button type="button" data-bt-quick-diaper="Mojado" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg text-[10px] font-bold">+Pipí 💧</button>
-                <button type="button" data-bt-goto="cuidados" class="py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold shadow">Ver todos →</button>
-              </div>
-            </div>
-
-            <div data-bt-goto="salud" class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">🩺 Salud y Vacunas</span>
-                  <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${vax.done}/${vax.total} vacunas</span>
-                </div>
-                <div class="space-y-1.5 text-xs text-slate-400">
-                  <div class="flex justify-between"><span>💉 Vacunas:</span><strong class="text-emerald-300 font-bold">${vax.done} aplicadas (${vax.total - vax.done} pendientes)</strong></div>
-                  <div class="flex justify-between"><span>🩺 Próx. control:</span><strong class="text-slate-100">${nextControlDisp}</strong></div>
-                  <div class="flex justify-between"><span>💊 Medicinas:</span><strong class="text-slate-100">${medsTodayDisp}</strong></div>
-                  <div class="flex justify-between"><span>🌡️ Temperatura:</span><strong class="text-slate-100">${tempDisp}</strong></div>
-                  <div class="flex justify-between"><span>⚖️ Peso / Altura:</span><strong class="text-slate-100">${weightDisp} · ${heightDisp}</strong></div>
-                </div>
-              </div>
-              <div class="flex gap-1.5 mt-3 pt-2 border-t border-slate-700/60">
-                <button type="button" data-bt-quick-action="temp" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">🌡️ +Temp</button>
-                <button type="button" data-bt-goto="salud" class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold shadow">Ver Salud →</button>
-              </div>
-            </div>
-
-            <div data-bt-goto="crecimiento" class="col-span-1 sm:col-span-2 bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 shadow-lg flex flex-col justify-between cursor-pointer hover:border-sky-500/50 transition-colors">
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">📈 Crecimiento, Hitos y Recuerdos</span>
-                  <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${dev.pct}% hitos</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                  <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 block font-semibold">Curva de Crecimiento</span>
-                    <strong class="text-sm font-black text-sky-300">${btState.growth.length} mediciones</strong>
-                  </div>
-                  <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 block font-semibold">Hitos Logrados</span>
-                    <strong class="text-sm font-black text-emerald-400">${dev.done} / ${dev.total}</strong>
-                  </div>
-                  <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 block font-semibold">Álbum de Recuerdos</span>
-                    <strong class="text-sm font-black text-amber-300">${btState.photos.length} fotos</strong>
-                  </div>
-                </div>
-              </div>
-              <div class="flex justify-end mt-3 pt-2 border-t border-slate-700/60">
-                <button type="button" data-bt-goto="crecimiento" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold">Abrir Curva y Recuerdos →</button>
-              </div>
-            </div>
-          </div>
-        `;
       }
 
       let btCuidadosSubTab = 'comida'; // 'comida' | 'panal' | 'sueno' | 'hitos'
@@ -12531,7 +12206,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
                               ${c.notes ? `<p class="mt-0.5 text-[11px] text-slate-400 italic">${escapeHtml(c.notes)}</p>` : ''}
                             </div>
                           </div>
-                          <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400 shrink-0"><i class="fa-solid fa-trash-can"></i></button>
+                          <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="openBabyControlModal('${escapeHtml(c.date)}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400" title="Eliminar control"><i class="fa-solid fa-trash-can"></i></button>
+                          </div>
                         </div>
                         <button type="button" data-bt-toggle-medcontrol="${escapeHtml(c.id)}" class="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-bold border transition-all active:scale-95 ${attended ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-indigo-500/15 border-indigo-500/40 text-indigo-200 hover:bg-indigo-500/25'}">
                           <i class="fa-solid ${attended ? 'fa-circle-check' : 'fa-circle'}"></i>
@@ -12604,7 +12282,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
                             <button type="button" data-bt-toggle-medcontrol="${escapeHtml(c.id)}" class="px-2 py-1 rounded text-[10px] font-bold border transition-colors ${attended ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'}">
                               ${attended ? 'Asistió' : 'Marcar'}
                             </button>
-                            <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                            <button type="button" onclick="openBabyControlModal('${escapeHtml(c.date)}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400" title="Eliminar control"><i class="fa-solid fa-trash-can"></i></button>
                           </div>
                         </div>
                       `;
@@ -12749,7 +12428,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
                           <i class="fa-solid fa-prescription-bottle-medical text-blue-400 text-xs"></i>
                           <span>${escapeHtml(m.name)}</span>
                         </h4>
-                        <button type="button" data-bt-del-babymed="${escapeHtml(m.id)}" class="p-1.5 text-slate-400 hover:text-red-400 rounded"><i class="fa-solid fa-trash-can"></i></button>
+                        <div class="flex items-center gap-1">
+                          <button type="button" onclick="openBabyMedModal('${escapeHtml(m.startDate)}', '${escapeHtml(m.id)}')" class="p-1.5 text-slate-400 hover:text-blue-300 rounded" title="Editar tratamiento"><i class="fa-solid fa-pen"></i></button>
+                          <button type="button" data-bt-del-babymed="${escapeHtml(m.id)}" class="p-1.5 text-slate-400 hover:text-red-400 rounded" title="Eliminar tratamiento"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
                       </div>
                       <div class="text-[11px] text-slate-400 space-y-0.5">
                         <p><strong class="text-slate-300">Dosis:</strong> ${escapeHtml(m.dose)}</p>
@@ -12938,10 +12620,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
             </div>
 
             <div class="grid grid-cols-4 gap-1.5">
-              <button type="button" data-bt-salud-tab="vacunas" class="py-2 px-1.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 ${btSaludSubTab === 'vacunas' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400/50' : 'bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-300 border border-emerald-500/30'}">
-                <i class="fa-solid fa-syringe text-[10px]"></i>
-                <span>Vacuna</span>
-              </button>
               <button type="button" data-bt-salud-tab="control" class="py-2 px-1.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 ${btSaludSubTab === 'control' ? 'bg-indigo-600 text-white shadow-md ring-1 ring-indigo-400/50' : 'bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-300 border border-indigo-500/30'}">
                 <i class="fa-solid fa-calendar-check text-[10px]"></i>
                 <span>Control</span>
@@ -12953,6 +12631,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <button type="button" data-bt-salud-tab="curva" class="py-2 px-1.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 ${btSaludSubTab === 'curva' ? 'bg-sky-600 text-white shadow-md ring-1 ring-sky-400/50' : 'bg-sky-600/15 hover:bg-sky-600/25 text-sky-300 border border-sky-500/30'}">
                 <i class="fa-solid fa-chart-line text-[10px]"></i>
                 <span>Curva</span>
+              </button>
+              <button type="button" data-bt-salud-tab="vacunas" class="py-2 px-1.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 ${btSaludSubTab === 'vacunas' ? 'bg-emerald-600 text-white shadow-md ring-1 ring-emerald-400/50' : 'bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-300 border border-emerald-500/30'}">
+                <i class="fa-solid fa-syringe text-[10px]"></i>
+                <span>Vacuna</span>
               </button>
             </div>
           </div>
@@ -12969,44 +12651,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       function openBtVaccineModal(vaccineId) {
-        const btState = getCurrentBaby();
-        const vax = btState.health.vaccines.find(x => x.id === vaccineId);
-        if (!vax) return;
-
-        const modal = document.getElementById('btVaccineModal');
-        const form = document.getElementById('btVaccineForm');
-        form.reset();
-
-        document.getElementById('btVaccineId').value = vax.id;
-        document.getElementById('btVaccineName').textContent = vax.name;
-        document.getElementById('btVaccineAge').textContent = `Edad recomendada: ${vax.age}`;
-
-        const dateInput = document.getElementById('btVaccineDate');
-        dateInput.value = vax.date || btSelectedDateKey || getTodayDateKey();
-
-        document.getElementById('btVaccineLocation').value = vax.location || '';
-        document.getElementById('btVaccineNotes').value = vax.notes || '';
-
-        const unmarkBtn = document.getElementById('btUnmarkVaccineBtn');
-        if (unmarkBtn) {
-          unmarkBtn.classList.toggle('hidden', !vax.done);
+        if (typeof window.openBabyVaccineQuickModal === 'function') {
+          window.openBabyVaccineQuickModal(btSelectedDateKey || getTodayDateKey(), vaccineId);
         }
-
-        const titleEl = document.getElementById('btVaccineModalTitle');
-        if (titleEl) {
-          titleEl.textContent = vax.done ? 'Editar Vacunación' : 'Registrar Fecha de Vacunación';
-        }
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        dateInput.focus();
       }
-
       function closeBtVaccineModal() {
-        const modal = document.getElementById('btVaccineModal');
-        if (modal) {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
+        if (typeof window.closeBabyVaccineQuickModal === 'function') {
+          window.closeBabyVaccineQuickModal();
         }
       }
       window.closeBtVaccineModal = closeBtVaccineModal;
@@ -13302,39 +12953,56 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   </div>
                 `}
 
-                ${periodCans.length > 0 ? `
+                ${formulaCans.length > 0 ? `
                   <div class="pt-2 border-t border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between">
-                      <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Historial de Tarros Abiertos (${periodCans.length})</span>
+                    <div class="flex items-center justify-between flex-wrap gap-1">
+                      <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Historial de Tarros Abiertos (${periodCans.length}/${formulaCans.length})</span>
                       <span class="text-[10px] text-slate-400">Promedio: <strong class="text-sky-300">${avgCanDurationDays} días/tarro</strong></span>
                     </div>
-                    <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                      ${periodCans.map(c => {
-                        const m = c._metrics;
-                        const isAct = c.status === 'active';
-                        return `
-                          <div class="p-2.5 rounded-xl bg-slate-900 border ${isAct ? 'border-sky-500/40' : 'border-slate-800'} flex items-center justify-between gap-2 text-xs">
-                            <div class="min-w-0 flex-1">
-                              <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="font-bold text-slate-100">${escapeHtml(c.brand)} (${escapeHtml(c.weightGrams || 800)}g)</span>
-                                ${isAct
-                                  ? `<span class="text-[9px] px-1.5 py-0.2 rounded font-black bg-sky-500/20 text-sky-300 border border-sky-500/40">En uso · Día ${m.elapsedDays}/${m.expectedDays}</span>`
-                                  : `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Duró ${m.lastedDays} ${m.lastedDays === 1 ? 'día' : 'días'}</span>`
-                                }
-                              </div>
-                              <p class="text-[10px] text-slate-400 mt-0.5 capitalize">
-                                📅 Abierto: ${escapeHtml(formatHealthControlDate(m.openIso, { day: 'numeric', month: 'short', year: 'numeric' }))}
-                                · 🏁 ${isAct ? `Dura hasta: ${escapeHtml(formatHealthControlDate(m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}` : `Terminó: ${escapeHtml(formatHealthControlDate(m.finIso || m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}`}
-                              </p>
-                            </div>
-                            <div class="flex items-center gap-1 shrink-0">
-                              <button type="button" onclick="openBabyFormulaCanModal('${m.openIso}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-sky-300"><i class="fa-solid fa-pen"></i></button>
-                              <button type="button" data-bt-del-can="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
-                          </div>
-                        `;
-                      }).join('')}
+
+                    <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+                      <button type="button" data-bt-can-mode="month" class="flex-1 py-1 rounded-lg font-bold transition-all ${btCuidadosCanStatsMode === 'month' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Mes</button>
+                      <button type="button" data-bt-can-mode="year" class="flex-1 py-1 rounded-lg font-bold transition-all ${btCuidadosCanStatsMode === 'year' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Año</button>
+                      <button type="button" data-bt-can-mode="history" class="flex-1 py-1 rounded-lg font-bold transition-all ${btCuidadosCanStatsMode === 'history' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Histórico</button>
                     </div>
+
+                    ${btCuidadosCanStatsMode !== 'history' ? `
+                      <div class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1">
+                        <button type="button" data-bt-can-period-delta="-1" class="min-h-7 min-w-7 text-sky-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h4 class="text-xs font-bold uppercase text-slate-200">${escapeHtml(canPeriodTitle)}</h4>
+                        <button type="button" data-bt-can-period-delta="1" class="min-h-7 min-w-7 text-sky-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+                      </div>
+                    ` : ''}
+
+                    ${periodCans.length > 0 ? `
+                      <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                        ${periodCans.map(c => {
+                          const m = c._metrics;
+                          const isAct = c.status === 'active';
+                          return `
+                            <div class="p-2.5 rounded-xl bg-slate-900 border ${isAct ? 'border-sky-500/40' : 'border-slate-800'} flex items-center justify-between gap-2 text-xs">
+                              <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                  <span class="font-bold text-slate-100">${escapeHtml(c.brand)} (${escapeHtml(c.weightGrams || 800)}g)</span>
+                                  ${isAct
+                                    ? `<span class="text-[9px] px-1.5 py-0.2 rounded font-black bg-sky-500/20 text-sky-300 border border-sky-500/40">En uso · Día ${m.elapsedDays}/${m.expectedDays}</span>`
+                                    : `<span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Duró ${m.lastedDays} ${m.lastedDays === 1 ? 'día' : 'días'}</span>`
+                                  }
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-0.5 capitalize">
+                                  📅 Abierto: ${escapeHtml(formatHealthControlDate(m.openIso, { day: 'numeric', month: 'short', year: 'numeric' }))}
+                                  · 🏁 ${isAct ? `Dura hasta: ${escapeHtml(formatHealthControlDate(m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}` : `Terminó: ${escapeHtml(formatHealthControlDate(m.finIso || m.endIso, { day: 'numeric', month: 'short', year: 'numeric' }))}`}
+                                </p>
+                              </div>
+                              <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" onclick="openBabyFormulaCanModal('${m.openIso}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-sky-300"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" data-bt-del-can="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                              </div>
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                    ` : '<p class="text-center py-3 text-slate-500 text-xs italic">No hay tarros abiertos en este periodo.</p>'}
                   </div>
                 ` : ''}
               </div>
@@ -13483,11 +13151,85 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
           return `
             <div class="space-y-3">
-              <!-- Sub-bloque: Stock y Control de Pañales -->
-                <div class="bg-[#1e2733] p-4 rounded-2xl border border-teal-500/40 shadow-lg space-y-2 text-center">
-                <span class="text-2xl block">🚼</span>
-                <p class="text-xs text-slate-300">El stock y control de pañales ahora está en Cuidados &gt; Pañal &gt; Stock.</p>
-                <button type="button" data-bt-goto-diaper-stock class="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-[10px] font-bold active:scale-95">Ir al Stock de Pañales</button>
+              ${btDiaperStockBlockHtml(btState, { currentDiaperStock, diaperDaysAutonomy, effectiveDailyRate, estimatedDepletionDateStr, todayStr, activeDayKey })}
+
+              <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-teal-500/40 shadow-lg space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h5 class="text-xs font-black uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                      <i class="fa-solid fa-chart-column"></i> Historial de Ingresos y Consumo de Pañales
+                    </h5>
+                    <p class="text-[10px] text-slate-400">Paquetes comprados y pañales utilizados por mes, año e histórico</p>
+                  </div>
+                </div>
+
+                <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
+                  <button type="button" data-bt-inv-diaper-mode="month" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'month' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Mes</button>
+                  <button type="button" data-bt-inv-diaper-mode="year" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'year' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Año</button>
+                  <button type="button" data-bt-inv-diaper-mode="history" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${btInvDiaperStatsMode === 'history' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">Histórico</button>
+                </div>
+
+                ${btInvDiaperStatsMode !== 'history' ? `
+                  <div class="flex items-center justify-between bg-slate-900/70 rounded-lg border border-slate-800 px-2 py-1.5">
+                    <button type="button" data-bt-inv-diaper-delta="-1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h4 class="text-xs font-bold uppercase text-slate-200">${escapeHtml(diaperInvPeriodTitle)}</h4>
+                    <button type="button" data-bt-inv-diaper-delta="1" class="min-h-8 min-w-8 text-teal-300 hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                ` : ''}
+
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                  <div class="bg-slate-900/90 p-2 rounded-xl border border-emerald-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">📦 Ingresados</span>
+                    <strong class="text-sm font-black text-emerald-300">+${periodAddedUnits} u. <span class="text-[9px] text-slate-400 font-normal">(${periodPacksCount} paq.)</span></strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2 rounded-xl border border-teal-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">🚼 Usados</span>
+                    <strong class="text-sm font-black text-teal-300">${periodUsed.length}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2 rounded-xl border border-sky-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">💧 Mojados</span>
+                    <strong class="text-sm font-black text-sky-300">${periodWet}</strong>
+                  </div>
+                  <div class="bg-slate-900/90 p-2 rounded-xl border border-amber-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">💩 Sucios</span>
+                    <strong class="text-sm font-black text-amber-300">${periodDirty}</strong>
+                  </div>
+                  <div class="col-span-2 sm:col-span-1 bg-slate-900/90 p-2 rounded-xl border border-purple-500/30">
+                    <span class="text-[10px] text-slate-400 font-semibold block">✨ Ambos</span>
+                    <strong class="text-sm font-black text-purple-300">${periodBoth}</strong>
+                  </div>
+                </div>
+
+                ${btDiaperSummaryHtml(btState, periodUsed, periodPurchases)}
+
+                ${periodPurchases.length > 0 ? `
+                  <div class="space-y-1.5 pt-1">
+                    <h6 class="text-[10px] font-black uppercase tracking-wider text-teal-300">📦 Paquetes Ingresados en este Periodo (${periodPurchases.length})</h6>
+                    ${periodPurchases.map(p => {
+                      const packs = Number(p.packs) || 1;
+                      const units = Number(p.quantity) || (packs * (Number(p.unitsPerPack) || 40));
+                      return `
+                        <div class="p-2.5 rounded-xl bg-slate-900 border border-teal-500/30 flex items-center justify-between gap-2 text-xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">📦</span>
+                            <div class="min-w-0 flex-1">
+                              <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-slate-100">${escapeHtml(p.brand || 'Pañales')}</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Talla ${escapeHtml(p.size || 'M')}</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">+${units} u. (${packs} paq.)</span>
+                              </div>
+                              <p class="text-[10px] text-slate-400 mt-0.5 capitalize">📅 ${escapeHtml(formatHealthControlDate(p._date))}${p.notes ? ` · ${escapeHtml(p.notes)}` : ''}</p>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : '<p class="text-center py-3 text-slate-500 text-xs italic">No hay paquetes de pañales registrados en este periodo.</p>'}
               </div>
             </div>
           `;
@@ -13518,252 +13260,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
           ${btInventarioSubTab === 'leche' ? renderLecheInventoryPanel() : renderPanalesInventoryPanel()}
         `;
-      }
-
-      function renderBtCrecimientoChartSection(btState) {
-        const metric = btStore.growthChartMetric || 'all';
-        return `
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">➕ Añadir Medición de Crecimiento</h4>
-            <form id="btGrowthForm" class="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end">
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Edad / Mes</label>
-                <input type="text" name="label" placeholder="Ej. 1m, 2m, 6m..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Peso (kg)</label>
-                <input type="number" step="0.1" name="weight" value="${btState.health.weightKg !== null ? btState.health.weightKg : ''}" placeholder="Ej. 4.2" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Altura (cm)</label>
-                <input type="number" step="0.5" name="height" value="${btState.health.heightCm !== null ? btState.health.heightCm : ''}" placeholder="Ej. 54" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-300 mb-1">Perímetro (cm)</label>
-                <input type="number" step="0.1" name="head" value="${btState.health.headCm !== null ? btState.health.headCm : ''}" placeholder="Ej. 37" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
-              </div>
-              <button type="submit" class="col-span-2 sm:col-span-1 py-1.5 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar</button>
-            </form>
-          </div>
-
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
-            <div class="flex items-center justify-between flex-wrap gap-2">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📈 Curva de Crecimiento (${btState.growth.length})</h4>
-              <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px]">
-                <button type="button" data-bt-growth-metric="all" class="px-2 py-1 rounded-md font-bold ${metric === 'all' ? 'bg-sky-600 text-white shadow' : 'text-slate-400'}">Todas</button>
-                <button type="button" data-bt-growth-metric="weight" class="px-2 py-1 rounded-md font-bold ${metric === 'weight' ? 'bg-sky-600 text-white shadow' : 'text-slate-400'}">Peso (kg)</button>
-                <button type="button" data-bt-growth-metric="height" class="px-2 py-1 rounded-md font-bold ${metric === 'height' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400'}">Altura (cm)</button>
-                <button type="button" data-bt-growth-metric="head" class="px-2 py-1 rounded-md font-bold ${metric === 'head' ? 'bg-purple-600 text-white shadow' : 'text-slate-400'}">Perímetro (cm)</button>
-              </div>
-            </div>
-            ${btState.growth.length > 0 ? `
-              <div class="relative h-56 w-full">
-                <canvas id="btGrowthCanvas"></canvas>
-              </div>
-              <div class="space-y-1.5 pt-2 border-t border-slate-700/60">
-                ${btState.growth.slice().reverse().map(g => `
-                  <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-200">${escapeHtml(g.label)}</span>
-                    <span class="text-slate-400">⚖️ ${escapeHtml(g.weight)} kg • 📏 ${escapeHtml(g.height)} cm • 🧠 ${escapeHtml(g.head)} cm</span>
-                    <button type="button" data-bt-del-growth="${g.id}" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
-                  </div>
-                `).join('')}
-              </div>
-            ` : '<p class="text-center py-6 text-xs text-slate-500 italic">Agrega la primera medición arriba para generar la curva de crecimiento.</p>'}
-          </div>
-        `;
-      }
-
-      function renderBtMilestonesSection(btState) {
-        const dev = getBtDevStats(btState);
-        return `
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
-            <div class="flex items-center justify-between">
-              <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">🧸 Hitos del Desarrollo</h4>
-              <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]">${dev.pct}% (${dev.done}/${dev.total})</span>
-            </div>
-            <div class="h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-              <div class="h-full bg-gradient-to-r from-sky-400 to-emerald-400" style="width:${dev.pct}%"></div>
-            </div>
-            <form id="btMilestoneForm" class="flex flex-wrap gap-2">
-              <input type="text" name="title" placeholder="Añadir nuevo hito (ej. Dice mamá, Gatea)..." required class="flex-1 min-w-[160px] bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-              <select name="category" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-sky-400 font-bold">
-                <option value="Motricidad Gruesa">Motricidad Gruesa</option>
-                <option value="Motricidad Fina">Motricidad Fina</option>
-                <option value="Lenguaje">Lenguaje</option>
-                <option value="Cognitivo">Cognitivo</option>
-                <option value="Socioemocional">Socioemocional</option>
-              </select>
-              <button type="submit" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow active:scale-95">Añadir</button>
-            </form>
-          </div>
-
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-1.5">
-            ${btState.development.milestones.length > 0 ? btState.development.milestones.map(m => `
-              <div class="p-2.5 rounded-lg border ${m.done ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-900 border-slate-800'} flex items-center justify-between gap-2">
-                <div data-bt-toggle-milestone="${m.id}" class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
-                  <span class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold shrink-0 ${m.done ? 'bg-emerald-500 text-slate-950' : 'border border-slate-600 text-transparent'}">✓</span>
-                  <div class="min-w-0">
-                    <p class="text-xs font-bold text-slate-100 truncate">${escapeHtml(m.title)}</p>
-                    <p class="text-[10px] text-slate-400">${escapeHtml(m.category)}${m.date ? ` · 📅 ${escapeHtml(m.date)}` : ''}</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <span data-bt-toggle-milestone="${m.id}" class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${m.done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${m.done ? 'Logrado' : 'Pendiente'}</span>
-                  <button type="button" data-bt-del-milestone="${m.id}" class="p-1 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
-                </div>
-              </div>
-            `).join('') : '<p class="text-center py-4 text-xs text-slate-500 italic">Añade hitos de desarrollo arriba para llevar el seguimiento.</p>'}
-          </div>
-        `;
-      }
-
-      function renderBtPhotosSection(btState) {
-        return `
-          <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-2.5">
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-200">📸 Nuevo Recuerdo o Foto</h4>
-            <form id="btPhotoForm" class="space-y-2.5">
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Título</label>
-                  <input type="text" name="title" placeholder="Ej. Primera sonrisa..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
-                </div>
-                <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Fecha</label>
-                  <input type="text" name="date" value="${btSelectedDateKey}" placeholder="Ej. 10 Nov 2026" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-2 items-end">
-                <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 mb-1">Ícono o Foto</label>
-                  <div class="flex gap-1.5">
-                    <select name="emoji" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-100">
-                      <option value="📸">📸</option>
-                      <option value="🌟">🌟</option>
-                      <option value="🎀">🎀</option>
-                      <option value="🎂">🎂</option>
-                      <option value="🏖️">🏖️</option>
-                      <option value="🧸">🧸</option>
-                    </select>
-                    <input type="file" id="btPhotoFileInput" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-slate-300">
-                  </div>
-                </div>
-                <button type="submit" class="py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar en Álbum</button>
-              </div>
-            </form>
-          </div>
-
-          ${btState.photos.length > 0 ? `
-            <div class="grid grid-cols-2 gap-2.5">
-              ${btState.photos.map(p => `
-                <div class="bg-[#1e2733] rounded-xl border border-slate-700/60 overflow-hidden shadow-lg flex flex-col">
-                  <div class="h-28 flex items-center justify-center text-4xl relative overflow-hidden" style="background: ${escapeHtml(p.bg || 'linear-gradient(135deg,#0284c7,#1e3a8a)')}">
-                    ${typeof p.dataUrl === 'string' && p.dataUrl.startsWith('data:image/') ? `<img src="${escapeHtml(p.dataUrl)}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover">` : `<span>${escapeHtml(p.emoji || '📸')}</span>`}
-                  </div>
-                  <div class="p-2.5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <p class="text-xs font-bold text-slate-100 truncate">${escapeHtml(p.title)}</p>
-                      <p class="text-[10px] text-slate-400">📅 ${escapeHtml(p.date)}</p>
-                    </div>
-                    <div class="flex justify-end mt-2">
-                      <button type="button" data-bt-del-photo="${p.id}" class="text-[10px] text-slate-400 hover:text-red-400 font-bold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
-                    </div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          ` : '<div class="bg-[#1e2733] p-6 rounded-xl border border-slate-700/60 text-center text-xs text-slate-500 italic">Aún no hay recuerdos ni fotos en el álbum.</div>'}
-        `;
-      }
-
-      function attachBtGrowthListeners(btState, sub) {
-        if (sub === 'chart') {
-          const form = document.getElementById('btGrowthForm');
-          if (form) {
-            form.addEventListener('submit', function(e) {
-              e.preventDefault();
-              const fd = new FormData(form);
-              const label = (fd.get('label') || '').trim();
-              const weight = parseFloat(fd.get('weight'));
-              const height = parseFloat(fd.get('height'));
-              const head = parseFloat(fd.get('head'));
-              if (!label || isNaN(weight) || isNaN(height) || isNaN(head)) return;
-
-              btState.growth.push({
-                id: 'g_' + Date.now(),
-                date: btSelectedDateKey || getTodayDateKey(),
-                label,
-                weight: Math.round(weight * 10) / 10,
-                height: Math.round(height * 10) / 10,
-                head: Math.round(head * 10) / 10
-              });
-              btState.health.weightKg = Math.round(weight * 10) / 10;
-              btState.health.heightCm = Math.round(height * 10) / 10;
-              btState.health.headCm = Math.round(head * 10) / 10;
-              saveBtState();
-              renderBtMainContent();
-              notifyBt('Crecimiento', 'Medición agregada a la curva');
-            });
-          }
-        } else if (sub === 'milestones') {
-          const form = document.getElementById('btMilestoneForm');
-          if (form) {
-            form.addEventListener('submit', function(e) {
-              e.preventDefault();
-              const fd = new FormData(form);
-              const title = (fd.get('title') || '').trim();
-              const category = fd.get('category') || 'General';
-              if (!title) return;
-              btState.development.milestones.push({ id: 'm_' + Date.now(), title, category, done: true, date: btSelectedDateKey || getTodayDateKey() });
-              saveBtState();
-              renderBtMainContent();
-              notifyBt('Desarrollo', 'Hito añadido a la lista');
-            });
-          }
-        } else if (sub === 'photos') {
-          const form = document.getElementById('btPhotoForm');
-          if (form) {
-            form.addEventListener('submit', function(e) {
-              e.preventDefault();
-              const fd = new FormData(form);
-              const title = (fd.get('title') || '').trim();
-              const date = (fd.get('date') || '').trim() || btSelectedDateKey;
-              const emoji = fd.get('emoji') || '📸';
-              const fileInput = document.getElementById('btPhotoFileInput');
-              const file = fileInput && fileInput.files && fileInput.files[0];
-
-              const finishSave = (dataUrl) => {
-                btState.photos.unshift({
-                  id: 'p_' + Date.now(),
-                  title,
-                  date,
-                  emoji,
-                  bg: 'linear-gradient(135deg,#0284c7,#2563eb)',
-                  dataUrl: dataUrl || ''
-                });
-                if (!saveBtState()) {
-                  btState.photos.shift();
-                  renderBtMainContent();
-                  return;
-                }
-                renderBtMainContent();
-                notifyBt('Galería', 'Nuevo recuerdo guardado');
-              };
-
-              if (file) {
-                if (!/^image\//.test(file.type)) {
-                  notifyBt('Galería', 'El archivo elegido no es una imagen');
-                  return;
-                }
-                btCompressImage(file, 800, 0.7)
-                  .then(finishSave)
-                  .catch(() => notifyBt('Galería', 'No se pudo procesar la foto'));
-              } else {
-                finishSave('');
-              }
-            });
-          }
-        }
       }
 
       function renderBtPerfil(container) {
@@ -14082,60 +13578,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       function openBtQuickModal() {
-        const btState = getCurrentBaby();
-        const idx = btStore.babies.indexOf(btState);
-        const modal = document.getElementById('btQuickModal');
-        const body = document.getElementById('btModalBody');
-        if (!modal || !body) return;
-        body.innerHTML = `
-          <p class="text-xs text-slate-400">Registro rápido para <strong class="text-sky-300">${escapeHtml(getBabyDisplayName(btState, idx))}</strong> (${btSelectedDateKey}):</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" data-bt-modal-quick="milk150" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-sky-300 border border-slate-700 rounded-lg text-xs font-bold text-left">🍼 +150 ml Leche</button>
-            <button type="button" data-bt-modal-quick="water100" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-teal-300 border border-slate-700 rounded-lg text-xs font-bold text-left">💧 +100 ml Agua</button>
-            <button type="button" data-bt-modal-quick="solidMeal" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold text-left">🍎 +Comida Sólida</button>
-            <button type="button" data-bt-modal-quick="diaperWet" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-sky-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💧 Pañal Pipí</button>
-            <button type="button" data-bt-modal-quick="diaperDirty" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-200 border border-slate-700 rounded-lg text-xs font-bold text-left">💩 Pañal Popó</button>
-            <button type="button" data-bt-modal-quick="nap1h" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-purple-300 border border-slate-700 rounded-lg text-xs font-bold text-left">😴 +Siesta (1h)</button>
-            <button type="button" data-bt-modal-quick="goToMedControl" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-700/60 rounded-lg text-xs font-bold text-left">🩺 +Control Médico</button>
-            <button type="button" data-bt-modal-quick="goToMedication" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-blue-300 border border-blue-700/60 rounded-lg text-xs font-bold text-left">💊 +Medicamento</button>
-          </div>
-          <form id="btModalTempForm" class="flex gap-2 items-end border-t border-slate-700/60 pt-3">
-            <div class="flex-1">
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">🌡️ Registrar Temperatura (°C)</label>
-              <input type="number" step="0.1" name="temp" value="${btState.health.temperatureC !== null ? btState.health.temperatureC : ''}" placeholder="Ej. 36.5" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
-            </div>
-            <button type="submit" class="py-1.5 px-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold shadow">Guardar</button>
-          </form>
-        `;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-
-        const tempForm = document.getElementById('btModalTempForm');
-        tempForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          const val = parseFloat(new FormData(tempForm).get('temp'));
-          if (isNaN(val)) return;
-          btState.health.temperatureC = Math.round(val * 10) / 10;
-          btState.health.logs.unshift({
-            id: 'hl_' + Date.now(),
-            date: btSelectedDateKey,
-            time: getNowTimeStr(),
-            type: 'Temperatura',
-            value: `${btState.health.temperatureC}°C`,
-            note: 'Registro rápido'
-          });
-          saveBtState();
-          closeBtQuickModal();
-          renderBtMainContent();
-          notifyBt('Temperatura', `${btState.health.temperatureC}°C registrados (${btSelectedDateKey})`);
-        });
+        if (typeof window.openBabyRegistrationChooserFromDay === 'function') {
+          window.openBabyRegistrationChooserFromDay();
+        }
       }
-
       function closeBtQuickModal() {
-        const modal = document.getElementById('btQuickModal');
-        if (modal) {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
+        if (typeof window.closeBabyRegistrationChooser === 'function') {
+          window.closeBabyRegistrationChooser();
         }
       }
 
@@ -14716,40 +14165,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
           return;
         }
 
-        const modalQuick = e.target.closest('[data-bt-modal-quick]');
-        if (modalQuick) {
-          const act = modalQuick.getAttribute('data-bt-modal-quick');
-          const time = getNowTimeStr();
-          if (act === 'milk150') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'milk', amountMl: 150, label: 'Biberón de leche (150 ml)' });
-          else if (act === 'water100') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'water', amountMl: 100, label: 'Vaso de agua (100 ml)' });
-          else if (act === 'solidMeal') btState.feeding.entries.push({ id: 'f_' + Date.now(), date: dateKey, time, kind: 'solid', amountMl: 0, label: 'Comida sólida completa' });
-          else if (act === 'diaperWet') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Mojado', icon: '💧', note: 'Registro rápido', ...btDiaperStockFields(btState, btDiaperDefaultKey(btState)) });
-          else if (act === 'diaperDirty') btState.diapers.entries.push({ id: 'd_' + Date.now(), date: dateKey, time, type: 'Sucio', icon: '💩', note: 'Registro rápido', ...btDiaperStockFields(btState, btDiaperDefaultKey(btState)) });
-          else if (act === 'nap1h') btState.sleep.entries.push({ id: 's_' + Date.now(), date: dateKey, type: 'Siesta', start: time, end: '', hours: 1.0, note: 'Siesta rápida' });
-          else if (act === 'goToMedControl') {
-            closeBtQuickModal();
-            setBtActiveTab('salud');
-            setTimeout(() => {
-              const f = document.getElementById('btMedControlForm');
-              if (f) { f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth' }); }
-            }, 100);
-            return;
-          }
-          else if (act === 'goToMedication') {
-            closeBtQuickModal();
-            setBtActiveTab('salud');
-            setTimeout(() => {
-              const f = document.getElementById('btBabyMedForm');
-              if (f) { f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth' }); }
-            }, 100);
-            return;
-          }
-          saveBtState();
-          closeBtQuickModal();
-          renderBtMainContent();
-          notifyBt('Registro rápido', `Guardado correctamente (${dateKey})`);
-          return;
-        }
       });
 
       document.addEventListener('change', function(e) {
@@ -14786,64 +14201,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const chineseCard = document.getElementById('btStatChineseCard');
         if (chineseCard) chineseCard.addEventListener('click', () => setBtActiveTab('perfil'));
 
-        const quickAddBtn = document.getElementById('btQuickAddHeaderBtn');
-        if (quickAddBtn) quickAddBtn.addEventListener('click', openBtQuickModal);
-        const closeBtn = document.getElementById('btCloseModalBtn');
-        if (closeBtn) closeBtn.addEventListener('click', closeBtQuickModal);
-        const qModal = document.getElementById('btQuickModal');
-        if (qModal) qModal.addEventListener('click', function(e) { if (e.target === this) closeBtQuickModal(); });
-
-        // Modal de Vacunas
-        const closeVaxBtn = document.getElementById('btCloseVaccineModalBtn');
-        if (closeVaxBtn) closeVaxBtn.addEventListener('click', closeBtVaccineModal);
-        const cancelVaxBtn = document.getElementById('btCancelVaccineModalBtn');
-        if (cancelVaxBtn) cancelVaxBtn.addEventListener('click', closeBtVaccineModal);
-        const vaxModal = document.getElementById('btVaccineModal');
-        if (vaxModal) vaxModal.addEventListener('click', function(e) { if (e.target === this) closeBtVaccineModal(); });
-
-        const vaxForm = document.getElementById('btVaccineForm');
-        if (vaxForm) {
-          vaxForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('btVaccineId').value;
-            const date = document.getElementById('btVaccineDate').value;
-            const location = (document.getElementById('btVaccineLocation').value || '').trim();
-            const notes = (document.getElementById('btVaccineNotes').value || '').trim();
-
-            const btState = getCurrentBaby();
-            const vax = btState.health.vaccines.find(x => x.id === id);
-            if (vax) {
-              vax.done = true;
-              vax.date = date;
-              vax.location = location;
-              vax.notes = notes;
-              saveBtState();
-              closeBtVaccineModal();
-              renderBtMainContent();
-              notifyBt('Vacunación guardada', `${vax.name}: Aplicada el ${date}`);
-            }
-          });
-        }
-
-        const unmarkVaxBtn = document.getElementById('btUnmarkVaccineBtn');
-        if (unmarkVaxBtn) {
-          unmarkVaxBtn.addEventListener('click', function() {
-            const id = document.getElementById('btVaccineId').value;
-            const btState = getCurrentBaby();
-            const vax = btState.health.vaccines.find(x => x.id === id);
-            if (vax) {
-              vax.done = false;
-              vax.date = '';
-              vax.location = '';
-              vax.notes = '';
-              saveBtState();
-              closeBtVaccineModal();
-              renderBtMainContent();
-              notifyBt('Vacuna desmarcada', `${vax.name} marcada como pendiente`);
-            }
-          });
-        }
-
         const liveStopSaveBtn = document.getElementById('btLiveSleepStopSaveBtn');
         if (liveStopSaveBtn) liveStopSaveBtn.addEventListener('click', () => stopAndSaveBtLiveSleep());
         const liveMinimizeBtn = document.getElementById('btLiveSleepMinimizeBtn');
@@ -14876,8 +14233,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
       window.addEventListener('pageshow', function() {
         checkAndShowRunningSleepScreenOnResume();
       });
-
-      setTimeout(btShrinkExistingPhotos, 2500);
 
       window.setBtActiveTab = setBtActiveTab;
       window.openBtQuickModal = openBtQuickModal;
@@ -14937,8 +14292,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'medModal': { label: 'Medicamento', close: () => window.closeMedModal && window.closeMedModal() },
         'delete-confirm-modal': { label: 'Confirmar eliminación', close: () => window.closeDeleteConfirmModal && window.closeDeleteConfirmModal() },
         'settings-modal': { label: 'Ajustes y respaldos', close: () => window.closeSettingsModal && window.closeSettingsModal() },
-        'btQuickModal': { label: 'Registro rápido del bebé', close: (el) => el.click() },
-        'btVaccineModal': { label: 'Registro de vacuna', close: () => window.closeBtVaccineModal && window.closeBtVaccineModal() },
+        'share-modal': { label: 'Compartir datos', close: () => window.closeShareModal && window.closeShareModal() },
+        'import-choice-modal': { label: 'Importar respaldo', close: () => window.closeImportChoiceModal && window.closeImportChoiceModal() },
+        'babyRegistrationChooser': { label: 'Registrar en bebé', close: () => window.closeBabyRegistrationChooser && window.closeBabyRegistrationChooser() },
+        'babyOthersChooser': { label: 'Otros registros del bebé', close: () => window.closeBabyOthersChooser && window.closeBabyOthersChooser() },
+        'babyControlModal': { label: 'Control médico del bebé', close: () => window.closeBabyControlModal && window.closeBabyControlModal() },
+        'babyMedModal': { label: 'Medicamento del bebé', close: () => window.closeBabyMedModal && window.closeBabyMedModal() },
+        'babyFeedingModal': { label: 'Alimentación del bebé', close: () => window.closeBabyFeedingModal && window.closeBabyFeedingModal() },
+        'babyDiaperModal': { label: 'Cambio de pañal del bebé', close: () => window.closeBabyDiaperModal && window.closeBabyDiaperModal() },
+        'babyVaccineQuickModal': { label: 'Vacuna del bebé', close: () => window.closeBabyVaccineQuickModal && window.closeBabyVaccineQuickModal() },
+        'babyGrowthQuickModal': { label: 'Medición de crecimiento', close: () => window.closeBabyGrowthQuickModal && window.closeBabyGrowthQuickModal() },
+        'babyMilestoneQuickModal': { label: 'Hito del desarrollo', close: () => window.closeBabyMilestoneQuickModal && window.closeBabyMilestoneQuickModal() },
+        'babySleepQuickModal': { label: 'Sueño del bebé', close: () => window.closeBabySleepQuickModal && window.closeBabySleepQuickModal() },
         'babyMilkPickupModal': { label: 'Retiro de leche', close: () => window.closeBabyMilkPickupModal && window.closeBabyMilkPickupModal() },
         'babyFormulaCanModal': { label: 'Contador de tarro de leche', close: () => window.closeBabyFormulaCanModal && window.closeBabyFormulaCanModal() },
         'babyDiaperPurchaseModal': { label: 'Stock de pañales', close: () => window.closeBabyDiaperPurchaseModal && window.closeBabyDiaperPurchaseModal() },
