@@ -303,17 +303,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-turns-btn" onclick="switchView('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
+        <button id="tab-turns-btn" onclick="openViewOrPaywall('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
           <i class="fa-solid fa-user-doctor text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">TURNOS</span>
           <div id="tab-turns-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-meds-btn" onclick="switchView('meds')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400">
+        <button id="tab-meds-btn" onclick="openViewOrPaywall('meds')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400">
           <i class="fa-solid fa-pills text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">SALUD</span>
           <div id="tab-meds-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-baby-btn" onclick="switchView('baby')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-sky-400">
+        <button id="tab-baby-btn" onclick="openViewOrPaywall('baby')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-sky-400">
           <i class="fa-solid fa-baby text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">BEBÉ</span>
           <div id="tab-baby-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
@@ -2337,6 +2337,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </div>
         </div>
 
+        <!-- MODO PRUEBA PREMIUM: se oculta poniendo PLAN_TEST_UI = false -->
+        <div id="planTestModeBox" class="hidden">
+          <div class="bg-slate-800 border border-amber-500/40 rounded-lg">
+            <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+              <span class="min-w-0">
+                <span class="flex items-center gap-2 text-slate-200 font-semibold"><i class="fa-solid fa-lock text-amber-300 text-xs"></i>Modo prueba: plan Gratis</span>
+                <span class="block text-[10px] text-slate-400 leading-tight mt-0.5">Bloquea Turnos, Salud y Bebé para ver cómo se vería sin Premium.</span>
+              </span>
+              <input type="checkbox" id="planTestFreeToggle" onchange="setPlanTestFree(this.checked)" class="peer sr-only">
+              <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- COMPARTIR CON OTRA PERSONA -->
         <div class="p-3 rounded-xl bg-gradient-to-br from-sky-950/40 to-teal-950/40 border border-sky-500/40 space-y-2">
           <div class="flex items-center gap-2 text-sky-300 font-bold">
@@ -2389,6 +2403,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
     let selectedDate = new Date();
     let selectedColor = '#14B8A6';
     let activeView = 'month';
+
+    // ===== PLAN FREE / PREMIUM =====
+    // Free: Calendario, Eventos y Notas. Premium: Turnos, Salud y Bebé.
+    // Mientras PREMIUM_ENFORCED sea false, nadie ve bloqueos y la app funciona igual que hoy.
+    // Para probar los bloqueos: pon PREMIUM_ENFORCED = true (queda bloqueado hasta setPremium(true)).
+    const PREMIUM_ENFORCED = false;
+    const PREMIUM_VIEWS = ['turns', 'meds', 'baby'];
+    const PREMIUM_VIEW_NAMES = { turns: 'Turnos', meds: 'Salud', baby: 'Bebé' };
+    const PREMIUM_STORAGE_KEY = 'appPlanPremium';
+    // Modo prueba: muestra en Ajustes un interruptor para simular el plan Gratis sin consola.
+    // Antes de publicar en Play Store pon PLAN_TEST_UI = false (se oculta y se desactiva).
+    const PLAN_TEST_UI = true;
+    const PLAN_TEST_KEY = 'appPlanTestFree';
     let lastCalendarView = 'month';
     let turnsSubTab = 'upcoming';
     let turnsStatsMode = 'month';
@@ -2451,6 +2478,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function applyTabVisibility() {
+      applyPlanLocks();
       Object.keys(tabVisibility).forEach(key => {
         const button = document.getElementById(`tab-${key}-btn`);
         if (button) button.style.display = isTabVisible(key) ? '' : 'none';
@@ -3123,7 +3151,110 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
+    // ----- Plan Premium: comprobaciones, candados y aviso -----
+    // Aviso: esto solo controla la interfaz. Cuando cobres de verdad, el permiso real
+    // debe venir del servidor (compra verificada en Google Play + reglas de Firestore).
+    function isPlanTestFree() {
+      if (!PLAN_TEST_UI) return false;
+      try { return localStorage.getItem(PLAN_TEST_KEY) === '1'; } catch (error) { return false; }
+    }
+
+    function setPlanTestFree(on) {
+      try { localStorage.setItem(PLAN_TEST_KEY, on ? '1' : '0'); } catch (error) {
+        console.warn('No se pudo guardar el modo prueba.', error);
+      }
+      applyPlanLocks();
+      if (!canUseView(activeView)) switchView('month');
+      showToast(on ? 'Modo prueba: plan Gratis' : 'Modo prueba apagado',
+        on ? 'Turnos, Salud y Bebé quedan bloqueados.' : 'Todo está desbloqueado.',
+        'fa-circle-info', on ? 'text-amber-400' : 'text-teal-400');
+    }
+
+    function isPremium() {
+      if (isPlanTestFree()) return false;
+      if (!PREMIUM_ENFORCED) return true;
+      try { return localStorage.getItem(PREMIUM_STORAGE_KEY) === '1'; } catch (error) { return false; }
+    }
+
+    function canUseView(view) {
+      return !PREMIUM_VIEWS.includes(view) || isPremium();
+    }
+
+    function setPremium(value) {
+      try { localStorage.setItem(PREMIUM_STORAGE_KEY, value ? '1' : '0'); } catch (error) {
+        console.warn('No se pudo guardar el plan.', error);
+      }
+      applyPlanLocks();
+      if (!canUseView(activeView)) switchView('month');
+    }
+
+    function applyPlanLocks() {
+      const locked = !isPremium();
+      const testBox = document.getElementById('planTestModeBox');
+      if (testBox) testBox.classList.toggle('hidden', !PLAN_TEST_UI);
+      const testToggle = document.getElementById('planTestFreeToggle');
+      if (testToggle) testToggle.checked = isPlanTestFree();
+      PREMIUM_VIEWS.forEach(view => {
+        const btn = document.getElementById(`tab-${view}-btn`);
+        if (!btn) return;
+        const old = btn.querySelector('.plan-lock-badge');
+        if (old) old.remove();
+        if (locked) {
+          const badge = document.createElement('span');
+          badge.className = 'plan-lock-badge absolute top-1 right-1 text-[9px] leading-none text-amber-300';
+          badge.setAttribute('aria-hidden', 'true');
+          badge.innerHTML = '<i class="fa-solid fa-lock"></i>';
+          btn.appendChild(badge);
+          btn.setAttribute('aria-label', `${PREMIUM_VIEW_NAMES[view]} (Premium)`);
+        } else {
+          btn.removeAttribute('aria-label');
+        }
+      });
+    }
+
+    function requirePremium(view) {
+      if (canUseView(view)) return true;
+      openPremiumPaywall(view);
+      return false;
+    }
+
+    function openViewOrPaywall(view) {
+      if (requirePremium(view)) switchView(view);
+    }
+
+    function openPremiumPaywall(view) {
+      const modal = document.getElementById('premiumPaywallModal');
+      if (!modal) return;
+      const name = PREMIUM_VIEW_NAMES[view] || 'Esta función';
+      const title = document.getElementById('premiumPaywallFeature');
+      if (title) title.textContent = `${name} es parte de Premium`;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      const closeBtn = document.getElementById('premiumPaywallCloseBtn');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closePremiumPaywall() {
+      const modal = document.getElementById('premiumPaywallModal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function startPremiumPurchase() {
+      // Pendiente: aquí se conectará la compra de Google Play (Play Billing / RevenueCat).
+      showToast('Premium próximamente', 'La compra estará disponible en la versión de Play Store.', 'fa-circle-info', 'text-amber-400');
+      closePremiumPaywall();
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      const modal = document.getElementById('premiumPaywallModal');
+      if (modal && !modal.classList.contains('hidden')) closePremiumPaywall();
+    });
+
     function switchView(view) {
+      if (!canUseView(view)) view = 'month';
       if (view === 'birthdays') {
         view = 'summary';
         notesEventsActiveSubTab = 'events';
@@ -3253,6 +3384,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function openHealthRegistrationChooserFromDay() {
+      if (!requirePremium('meds')) return;
       const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       openHealthRegistrationChooser(selectedDateKey);
     }
@@ -3274,6 +3406,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
 
     function openBabyRegistrationChooserFromDay() {
+      if (!requirePremium('baby')) return;
       const bt = getBabyTrackerDataSafe();
       let babyName = 'el bebé';
       if (bt && Array.isArray(bt.babies) && bt.babies.length > 0) {
@@ -7405,6 +7538,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function showCreateShiftFormInModal() {
+      if (!requirePremium('turns')) return;
       // Primero limpiar y configurar campos antes de llamar a showCreateFormInModal
       hideTitleSuggestions();
       setLockExistingTagFields(false);
@@ -10444,6 +10578,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </button>
         </div>
       </form>
+    </section>
+  </div>
+
+  <!-- MODAL: FUNCIÓN PREMIUM -->
+  <div id="premiumPaywallModal" class="fixed inset-0 z-[95] bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closePremiumPaywall()">
+    <section role="dialog" aria-modal="true" aria-labelledby="premiumPaywallFeature" class="w-full max-w-sm rounded-2xl border border-amber-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center text-sm"><i class="fa-solid fa-lock"></i></span>
+        <h3 id="premiumPaywallFeature" class="font-extrabold text-sm text-amber-300">Función Premium</h3>
+      </div>
+      <p class="text-xs text-slate-300">Premium incluye <strong>Turnos</strong>, <strong>Salud</strong> y <strong>Bebé</strong>, con sincronización entre celulares.</p>
+      <p class="text-[11px] text-slate-400">Calendario, Eventos y Notas siguen siendo gratis.</p>
+      <div class="flex gap-2 pt-1">
+        <button type="button" id="premiumPaywallCloseBtn" onclick="closePremiumPaywall()" class="flex-1 min-h-11 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold active:scale-95">Ahora no</button>
+        <button type="button" onclick="startPremiumPurchase()" class="flex-1 min-h-11 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-black shadow active:scale-95">Ver Premium</button>
+      </div>
     </section>
   </div>
 
