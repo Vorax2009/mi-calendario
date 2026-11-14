@@ -1,15 +1,40 @@
 {
-  "name": "Calendario, Turnos, Etiquetas y Cumpleaños",
-  "short_name": "Calendario",
-  "description": "Calendario personal con turnos, notas, eventos, salud y seguimiento del bebé. Funciona sin conexión.",
-  "lang": "es",
+  "id": "/mi-calendario/",
+  "name": "Mi Calendario: Turnos, Salud y Bebé",
+  "short_name": "Mi Calendario",
+  "description": "Calendario personal con turnos laborales, notas, cumpleaños, control de medicamentos y seguimiento del bebé.",
+  "lang": "es-CL",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "orientation": "portrait",
+  "background_color": "#020617",
   "theme_color": "#0f172a",
+  "categories": [
+    "productivity",
+    "medical",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "mi-calendario-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "mi-calendario-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "./mi-calendario-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./mi-calendario-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }

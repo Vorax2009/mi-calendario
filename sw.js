@@ -1,59 +1,72 @@
-// Service worker de Calendario: permite abrir la app sin internet.
-// Todo (estilos, scripts y gráficas) ya va dentro de index.html, así que solo se guardan estos archivos.
-const CACHE = 'calendario-v4';
-const SHELL = [
+const CACHE_NAME = 'mi-calendario-pwa-v2026-11-14';
+const APP_SHELL = [
   './',
   './index.html',
+  './privacy.html',
   './manifest.webmanifest',
   './icon.svg',
   './mi-calendario-icon-192.png',
   './mi-calendario-icon-512.png'
 ];
-const NETWORK_TIMEOUT_MS = 4000;
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE)
-      // Cada archivo por separado: si alguno no existe, la instalación no falla.
-      .then(cache => Promise.all(SHELL.map(url => cache.add(url).catch(() => null))))
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
       .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : Promise.resolve()))
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
-// Red primero (para recibir actualizaciones) con límite de espera;
-// si no hay internet o va muy lento, se usa lo guardado.
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
 
-  event.respondWith((async () => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), NETWORK_TIMEOUT_MS);
-    try {
-      const response = await fetch(request, { signal: controller.signal });
-      clearTimeout(timer);
-      if (response && response.ok) {
-        const copy = response.clone();
-        caches.open(CACHE).then(cache => cache.put(request, copy)).catch(() => null);
-      }
-      return response;
-    } catch (error) {
-      clearTimeout(timer);
-      const cached = await caches.match(request, { ignoreSearch: true });
-      if (cached) return cached;
-      if (request.mode === 'navigate') {
-        const shell = await caches.match('./index.html') || await caches.match('./');
-        if (shell) return shell;
-      }
-      return Response.error();
-    }
-  })());
+  const url = new URL(req.url);
+
+  // Dejar pasar peticiones en tiempo real de Firebase o APIs externas con fallback limpio
+  if (url.hostname.includes('firebaseio.com') || url.hostname.includes('googleapis.com') || url.hostname.includes('gstatic.com') || url.hostname.includes('nager.at')) {
+    return;
+  }
+
+  // Navegación HTML: Network-first con fallback a caché para evitar errores offline en revisión de Play Store
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Recursos estáticos del mismo origen: Stale-While-Revalidate
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        const networkFetch = fetch(req)
+          .then((res) => {
+            if (res && res.status === 200) {
+              const copy = res.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || networkFetch;
+      })
+    );
+  }
 });

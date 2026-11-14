@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad y Aviso Médico — Mi Calendario</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --card: #0f172a;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #14b8a6;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 24px 16px 48px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 6px;
+      color: #f8fafc;
+    }
+    .meta {
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .card-medical {
+      background: rgba(69, 26, 3, 0.35);
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 8px;
+      color: var(--accent);
+    }
+    .card-medical h2 {
+      color: var(--amber);
+    }
+    p, ul {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    code {
+      background: #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #5eead4;
+      font-size: 0.85em;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Política de Privacidad y Aviso Médico</h1>
+      <div class="meta">Aplicación: <strong>Mi Calendario (Calendario, Turnos, Salud y Bebé)</strong> &middot; Paquete Android: <code>cl.vorax2009.micalendario</code> &middot; Última actualización: 14 de noviembre de 2026</div>
+    </header>
+
+    <section class="card card-medical">
+      <h2>Descargo de Responsabilidad Médica (Salud y Bebé)</h2>
+      <p>
+        <strong>Mi Calendario</strong> (incluyendo sus módulos <strong>Salud / MiMedicina</strong> y <strong>Bebé</strong>) es una herramienta informativa y de organización personal. <strong>No es un dispositivo médico</strong> y no diagnostica, trata, cura ni previene ninguna enfermedad o condición médica.
+      </p>
+      <p>
+        Los cálculos de dosis en gotas o mililitros, los recordatorios de vacunas (esquema PNI MINSAL) y los gráficos de crecimiento son referenciales y se generan exclusivamente a partir de los datos ingresados por el propio usuario. Consulta siempre a un médico, pediatra o profesional de la salud calificado antes de tomar decisiones médicas o administrar medicamentos.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>1. Datos que registra la aplicación y almacenamiento local</h2>
+      <p>
+        De forma predeterminada, toda la información que ingresas en la aplicación se almacena <strong>exclusivamente de manera local en tu dispositivo</strong> utilizando el almacenamiento del navegador (<code>localStorage</code>):
+      </p>
+      <ul>
+        <li>Eventos, notas, etiquetas, cumpleaños y aniversarios del calendario.</li>
+        <li>Turnos laborales, ciclos rotativos y estadísticas de horas trabajadas.</li>
+        <li>Registros personales de medicamentos, controles médicos y signos vitales.</li>
+        <li>Registros de cuidado del bebé (alimentación, pañales, sueño, vacunas, controles pediátricos, crecimiento e inventario).</li>
+      </ul>
+      <p>
+        El desarrollador no opera servidores propios de recolección de datos personales, no incluye SDKs publicitarios ni vende o cede datos a terceros.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>2. Sincronización familiar opcional (Firebase Realtime Database)</h2>
+      <p>
+        El módulo <strong>Bebé</strong> incluye una función opcional de sincronización familiar en tiempo real. Si el usuario decide activarla mediante un código de sala familiar, los registros del módulo Bebé se sincronizan a través de Google Firebase Realtime Database utilizando conexión cifrada HTTPS (TLS) únicamente para compartir el estado entre los cuidadores autorizados con dicho código.
+      </p>
+      <p>
+        Tus turnos laborales, notas personales del calendario y medicamentos del módulo general no se envían a la sala familiar a menos que decidas exportarlos o compartirlos manualmente mediante un archivo de respaldo JSON.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>3. Permisos y servicios externos</h2>
+      <ul>
+        <li><strong>Notificaciones locales:</strong> Se utilizan únicamente si el usuario las autoriza en su dispositivo para recordar eventos, turnos o tomas de medicamentos.</li>
+        <li><strong>Consulta opcional de feriados:</strong> La aplicación calcula los feriados localmente y puede consultar la API pública de feriados (<code>date.nager.at</code>) según el país seleccionado sin enviar identificadores personales.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>4. Control, exportación y eliminación de datos</h2>
+      <p>
+        El usuario mantiene el control total sobre sus datos en todo momento:
+      </p>
+      <ul>
+        <li><strong>Exportación:</strong> Puedes descargar una copia completa de tus datos en formato JSON desde <em>Ajustes y Respaldos &rarr; Descargar JSON</em>.</li>
+        <li><strong>Eliminación total:</strong> Puedes borrar de forma inmediata y permanente todos los registros guardados en el dispositivo desde <em>Ajustes y Respaldos &rarr; Zona de Peligro &rarr; Borrar Todos los Datos</em>, o desinstalando la aplicación.</li>
+        <li><strong>Desconexión de sincronización familiar:</strong> Puedes desvincular o eliminar los datos de la sala familiar desde el panel de sincronización del módulo Bebé.</li>
+      </ul>
+    </section>
+
+    <a class="back-link" href="https://vorax2009.github.io/mi-calendario/">&larr; Volver a Mi Calendario</a>
+  </div>
+</body>
+</html>

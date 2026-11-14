@@ -2494,6 +2494,81 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
         </div>
+
+        <!-- AVISO MÉDICO Y POLÍTICA DE PRIVACIDAD (CUMPLIMIENTO GOOGLE PLAY STORE) -->
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-2">
+          <div class="flex items-center gap-2 text-teal-300 font-bold">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <span>Privacidad y Aviso Médico</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            <strong>Aviso médico:</strong> Esta aplicación es una herramienta informativa y de organización personal; <strong>no es un dispositivo médico</strong> y no diagnostica, trata, cura ni previene ninguna condición médica. Consulta siempre a un profesional de la salud.
+          </p>
+          <button type="button" onclick="openPrivacyPolicyModal()" class="w-full min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
+            <i class="fa-solid fa-file-shield"></i> Ver Política de Privacidad y Uso de Datos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: POLÍTICA DE PRIVACIDAD Y AVISO MÉDICO (GOOGLE PLAY COMPLIANCE) -->
+  <div id="privacy-medical-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 z-[60] transition-opacity" onclick="if(event.target===this) closePrivacyPolicyModal()">
+    <div role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title" class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-md w-full max-h-[92vh] max-h-[92dvh] overflow-hidden shadow-2xl flex flex-col font-sans border border-slate-700">
+      <div class="flex items-center justify-between border-b border-slate-700/70 px-4 pt-4 pb-2.5 shrink-0">
+        <h3 id="privacy-modal-title" class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-teal-400"></i>
+          <span>Política de Privacidad y Aviso Médico</span>
+        </h3>
+        <button type="button" onclick="closePrivacyPolicyModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3.5 space-y-3 text-xs text-slate-300 leading-relaxed">
+        <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/40 space-y-1">
+          <div class="font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-user-doctor"></i>
+            <span>Descargo de Responsabilidad Médica</span>
+          </div>
+          <p class="text-[11px] text-amber-100/90">
+            Mi Calendario (incluyendo los módulos <strong>Salud / MiMedicina</strong> y <strong>Bebé</strong>) es una herramienta de registro y organización personal. <strong>No es un dispositivo médico</strong> y no ofrece consejo médico, diagnóstico, tratamiento, cura ni prevención de ninguna enfermedad o condición de salud. Los cálculos de dosis, recordatorios de vacunas (esquema PNI) y curvas de crecimiento son referenciales y basados en los datos ingresados por el usuario. Consulta siempre al pediatra o profesional de la salud antes de tomar decisiones médicas o administrar medicamentos.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 space-y-1.5">
+          <div class="font-bold text-sky-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-database"></i>
+            <span>1. Almacenamiento Local y Privacidad</span>
+          </div>
+          <p class="text-[11px]">
+            Todos tus eventos, notas, turnos laborales, registros de medicamentos y controles del bebé se almacenan de forma predeterminada <strong>exclusivamente en tu dispositivo</strong> mediante almacenamiento local (<code class="text-teal-300">localStorage</code>). La aplicación no recopila datos analíticos ocultos, no utiliza rastreadores publicitarios ni vende información personal a terceros.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 space-y-1.5">
+          <div class="font-bold text-sky-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-cloud"></i>
+            <span>2. Sincronización Familiar Opcional</span>
+          </div>
+          <p class="text-[11px]">
+            Si activas voluntariamente la <strong>Sincronización en vivo del Bebé</strong> o compartes respaldos JSON, los datos seleccionados del módulo Bebé se sincronizan a través de la base de datos Firebase Realtime Database configurada por el grupo familiar mediante tu código de sala. Puedes desconectar la sala o eliminar tus datos en cualquier momento.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 space-y-1.5">
+          <div class="font-bold text-sky-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>3. Control y Eliminación de Datos</span>
+          </div>
+          <p class="text-[11px]">
+            Tienes control total sobre tu información: puedes exportar una copia en formato JSON o eliminar permanentemente todos los registros almacenados en el dispositivo desde <strong>Ajustes y Respaldos &rarr; Borrar Todos los Datos</strong>. También puedes consultar la versión web pública en <a href="https://vorax2009.github.io/mi-calendario/privacy.html" target="_blank" rel="noopener" class="text-teal-300 underline font-semibold">privacy.html</a>.
+          </p>
+        </div>
+      </div>
+      <div class="p-3 border-t border-slate-700/70 bg-slate-900/40 shrink-0">
+        <button type="button" onclick="closePrivacyPolicyModal()" class="w-full min-h-11 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-xs tracking-wider transition-all">
+          ENTENDIDO
+        </button>
       </div>
     </div>
   </div>
@@ -2601,7 +2676,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     const PREMIUM_STORAGE_KEY = 'appPlanPremium';
     // Modo prueba: muestra en Ajustes un interruptor para simular el plan Gratis sin consola.
     // Antes de publicar en Play Store pon PLAN_TEST_UI = false (se oculta y se desactiva).
-    const PLAN_TEST_UI = true;
+    const PLAN_TEST_UI = false;
     const PLAN_TEST_KEY = 'appPlanTestFree';
     let lastCalendarView = 'month';
     let turnsSubTab = 'upcoming';
@@ -10830,6 +10905,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
       document.getElementById('settings-modal').classList.remove('flex');
     }
 
+    function openPrivacyPolicyModal() {
+      const m = document.getElementById('privacy-medical-modal');
+      if (!m) return;
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closePrivacyPolicyModal() {
+      const m = document.getElementById('privacy-medical-modal');
+      if (!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
     function exportDataJSON(options = {}) {
       const isAutoBackup = options && options.auto === true;
       if (!isAutoBackup) {
@@ -16394,6 +16483,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'medModal': { label: 'Medicamento', close: () => window.closeMedModal && window.closeMedModal() },
         'delete-confirm-modal': { label: 'Confirmar eliminación', close: () => window.closeDeleteConfirmModal && window.closeDeleteConfirmModal() },
         'settings-modal': { label: 'Ajustes y respaldos', close: () => window.closeSettingsModal && window.closeSettingsModal() },
+        'privacy-medical-modal': { label: 'Política de privacidad y aviso médico', close: () => window.closePrivacyPolicyModal && window.closePrivacyPolicyModal() },
         'holidays-modal': { label: 'Feriados del calendario', close: () => window.closeHolidaysModal && window.closeHolidaysModal() },
         'share-modal': { label: 'Compartir datos', close: () => window.closeShareModal && window.closeShareModal() },
         'import-choice-modal': { label: 'Importar respaldo', close: () => window.closeImportChoiceModal && window.closeImportChoiceModal() },
