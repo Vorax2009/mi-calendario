@@ -293,7 +293,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <span id="tab-calendar-label" class="block max-w-full truncate uppercase text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">CALENDARIO</span>
           <div id="tab-calendar-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-400"></div>
         </button>
-        <button id="tab-summary-btn" onclick="switchView('summary')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
+        <button id="tab-summary-btn" onclick="switchView('summary', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
           <i class="fa-solid fa-cake-candles text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
@@ -347,7 +347,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
 
         <!-- DAYS OF THE WEEK HEADER (Lunes a Domingo) -->
-        <div class="grid grid-cols-7 gap-px text-center text-xs md:text-sm font-bold bg-slate-800 border-x border-slate-700/60">
+        <div id="weekdays-header" class="grid grid-cols-7 gap-px text-center text-xs md:text-sm font-bold bg-slate-800 border-x border-slate-700/60">
           <div class="py-2 bg-[#1e293b] text-slate-300">LUN</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">MAR</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">MIÉ</div>
@@ -702,8 +702,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div class="bg-[#1e2733] p-3.5 rounded-xl border border-slate-700/60 shadow-lg space-y-3">
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
-              <button type="button" id="btProfileAvatar" title="Editar perfil del bebé" class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-2xl shadow-md shrink-0 active:scale-95 transition-transform">
-                👶
+              <button type="button" id="btProfileAvatar" title="Editar perfil del bebé" class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-2xl shadow-md shrink-0 active:scale-95 transition-transform" style="font-size:1.25rem">
+                👶🎀
               </button>
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -734,13 +734,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <strong id="btStatChinese" class="block text-[11px] sm:text-xs font-extrabold text-slate-100 truncate leading-tight" title="Horóscopo Chino">—</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Chino</span>
             </button>
-            <button type="button" id="btStatMoonCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-1.5 sm:p-2 rounded-lg border border-slate-800 transition-colors">
-              <strong id="btStatMoon" class="block text-[11px] sm:text-xs font-extrabold text-slate-100 truncate leading-tight" title="Horóscopo Lunar">—</strong>
-              <span class="text-[10px] text-slate-400 font-semibold">Luna</span>
+            <button type="button" id="btStatHeightCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors" title="Registrar talla y peso">
+              <strong id="btStatHeight" class="block text-xs font-extrabold text-sky-300 truncate">—</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">📏 Talla</span>
             </button>
-            <button type="button" id="btStatDevCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors">
-              <strong id="btStatDev" class="block text-xs font-extrabold text-emerald-400 truncate">0%</strong>
-              <span class="text-[10px] text-slate-400 font-semibold">Desarrollo</span>
+            <button type="button" id="btStatWeightCard" class="bg-slate-900/90 hover:bg-slate-800/80 p-2 rounded-lg border border-slate-800 transition-colors" title="Registrar talla y peso">
+              <strong id="btStatWeight" class="block text-xs font-extrabold text-emerald-400 truncate">—</strong>
+              <span class="text-[10px] text-slate-400 font-semibold">⚖️ Peso</span>
             </button>
           </div>
         </div>
@@ -750,7 +750,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div id="btTabsContainer" class="flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
           <button type="button" data-bt-tab="cuidados" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold bg-sky-600 text-white transition-all shadow whitespace-nowrap">🤲 Cuidados</button>
           <button type="button" data-bt-tab="salud" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">🩺 Salud y Vacunas</button>
-          <button type="button" data-bt-tab="inventario" class="bt-subtab flex-1 py-1.5 px-1.5 rounded-lg font-bold text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap">📦 Inventario</button>
         </div>
 
         <!-- CONTENIDO DINÁMICO DEL BEBÉ -->
@@ -2345,27 +2344,35 @@ Check your Browserslist config to be sure that your targets are set up correctly
   </div>
 
   <!-- MODAL: AJUSTES Y RESPALDOS -->
-  <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-50 transition-opacity">
-    <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
-        <h3 class="font-extrabold text-sm text-slate-200 flex items-center gap-2">
-          <i class="fa-solid fa-gear text-teal-400"></i> Ajustes y Respaldos
+  <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-opacity" onclick="if(event.target===this) closeSettingsModal()">
+    <div role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-sm w-full max-h-[92vh] max-h-[92dvh] overflow-hidden shadow-2xl flex flex-col font-sans border border-slate-700">
+      <div class="flex items-center justify-between border-b border-slate-700/70 px-4 pt-4 pb-2.5 shrink-0">
+        <h3 id="settings-modal-title" class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-gear text-teal-400"></i> <span>Ajustes y Respaldos</span>
         </h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-sm"></i>
+        <button type="button" onclick="closeSettingsModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="space-y-3 text-xs">
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-3 pb-5 space-y-3 text-xs">
         <div>
-          <label for="time-format-setting" class="font-semibold text-slate-300 block mb-1">Formato de hora:</label>
-          <select id="time-format-setting" onchange="setTimeFormat(this.value)" class="w-full bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-2 py-2 focus:outline-none focus:border-teal-400">
+          <label for="time-format-setting" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Formato de hora:</label>
+          <select id="time-format-setting" onchange="setTimeFormat(this.value)" class="w-full min-h-11 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-teal-400">
             <option value="24">24 horas (14:30)</option>
             <option value="ampm">AM/PM (2:30 PM)</option>
           </select>
         </div>
 
-        <div class="p-2.5 rounded-xl bg-rose-950/25 border border-rose-500/30 space-y-2">
+        <div>
+          <label for="week-start-setting" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">La semana empieza el:</label>
+          <select id="week-start-setting" onchange="setWeekStart(this.value)" class="w-full min-h-11 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-teal-400">
+            <option value="1">Lunes</option>
+            <option value="0">Domingo</option>
+          </select>
+        </div>
+
+        <div class="p-3 rounded-xl bg-rose-950/25 border border-rose-500/30 space-y-2">
           <div class="flex items-center justify-between">
             <label for="holiday-country-setting" class="font-bold text-rose-200 flex items-center gap-1.5">
               <i class="fa-solid fa-flag-checkered text-rose-400"></i>
@@ -2377,7 +2384,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <span class="relative w-8 h-4 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-3 after:h-3 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
             </label>
           </div>
-          <select id="holiday-country-setting" onchange="setHolidayCountryMode(this.value)" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-rose-400">
+          <select id="holiday-country-setting" onchange="setHolidayCountryMode(this.value)" class="w-full min-h-11 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-rose-400">
             <option value="AUTO">🌐 Automático (según país donde se ejecuta)</option>
             <option value="CL">🇨🇱 Chile</option>
             <option value="AR">🇦🇷 Argentina</option>
@@ -2415,20 +2422,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </div>
 
         <div>
-          <span class="font-semibold text-slate-300 block mb-1">Menús visibles:</span>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Menús visibles:</span>
           <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
-          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
             <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-300 text-xs"></i>Turnos</span>
             <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
             <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
           </label>
 
-          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
             <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
             <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
             <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
           </label>
-          <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
             <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé</span>
             <input type="checkbox" id="tab-visible-baby" onchange="setTabVisibility('baby', this.checked)" class="peer sr-only" checked>
             <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
@@ -2439,7 +2446,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <!-- MODO PRUEBA PREMIUM: se oculta poniendo PLAN_TEST_UI = false -->
         <div id="planTestModeBox" class="hidden">
           <div class="bg-slate-800 border border-amber-500/40 rounded-lg">
-            <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+            <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
               <span class="min-w-0">
                 <span class="flex items-center gap-2 text-slate-200 font-semibold"><i class="fa-solid fa-lock text-amber-300 text-xs"></i>Modo prueba: plan Gratis</span>
                 <span class="block text-[10px] text-slate-400 leading-tight mt-0.5">Bloquea Turnos, Salud y Bebé para ver cómo se vería sin Premium.</span>
@@ -2459,7 +2466,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <p class="text-[11px] text-slate-300 leading-tight">
             Envía tus turnos, eventos, notas, bebé o salud a otra persona. Al cargarlo en su app, <strong>se combinará sin borrar lo que ya tenga</strong>.
           </p>
-          <button onclick="openShareModal()" class="w-full py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
+          <button onclick="openShareModal()" class="w-full min-h-11 py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
             <i class="fa-solid fa-share-nodes"></i> Elegir qué compartir
           </button>
         </div>
@@ -2467,23 +2474,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div id="storage-status" class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1.5"></div>
 
         <div>
-          <span class="font-semibold text-slate-300 block mb-1">Exportar Copia de Seguridad Completa:</span>
-          <button onclick="exportDataJSON()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Exportar Copia de Seguridad Completa:</span>
+          <button onclick="exportDataJSON()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
             <i class="fa-solid fa-download"></i> Descargar JSON
           </button>
         </div>
 
         <div>
-          <span class="font-semibold text-slate-300 block mb-1">Importar Copia de Seguridad:</span>
-          <label class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Importar Copia de Seguridad:</span>
+          <label class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
             <i class="fa-solid fa-upload"></i> Seleccionar Archivo JSON
             <input type="file" accept=".json,.txt,application/json,text/plain" onchange="importDataJSON(event)" class="hidden">
           </label>
         </div>
 
         <div class="pt-2 border-t border-slate-700/60">
-          <span class="font-semibold text-red-400 block mb-1">Zona de Peligro:</span>
-          <button onclick="confirmResetAllData()" class="w-full py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+          <span class="text-[10px] font-black uppercase tracking-wider text-red-400 block px-1 mb-1.5">Zona de Peligro:</span>
+          <button onclick="confirmResetAllData()" class="w-full min-h-11 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
         </div>
@@ -2632,6 +2639,32 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     let timeFormat = readStoredValue('cal_time_format', '24') === 'ampm' ? 'ampm' : '24';
+    let weekStart = readStoredValue('cal_week_start', '1') === '0' ? 0 : 1; // 0 = domingo, 1 = lunes
+    const WEEKDAY_LABELS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+    const WEEKDAY_LETTERS = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+    function renderWeekdayHeader() {
+      const header = document.getElementById('weekdays-header');
+      if (!header) return;
+      header.innerHTML = '';
+      for (let k = 0; k < 7; k++) {
+        const dow = (weekStart + k) % 7;
+        const isWeekend = dow === 0 || dow === 6;
+        const el = document.createElement('div');
+        el.className = isWeekend ? 'py-2 bg-[#C81E1E] text-white font-black' : 'py-2 bg-[#1e293b] text-slate-300';
+        el.textContent = WEEKDAY_LABELS[dow];
+        header.appendChild(el);
+      }
+    }
+    function setWeekStart(value) {
+      weekStart = String(value) === '0' ? 0 : 1;
+      try {
+        localStorage.setItem('cal_week_start', String(weekStart));
+      } catch (error) {
+        console.error('No se pudo guardar el inicio de semana.', error);
+        showToast('No se pudo guardar', 'El cambio se aplicará hasta cerrar esta página.', 'fa-triangle-exclamation', 'text-red-400');
+      }
+      renderAll();
+    }
     const TAB_VISIBILITY_KEY = 'cal_tab_visibility';
     let tabVisibility = (() => {
       const defaults = { turns: true, meds: true, baby: true };
@@ -3401,7 +3434,29 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function openViewOrPaywall(view) {
-      if (requirePremium(view)) switchView(view);
+      if (requirePremium(view)) switchView(view, true);
+    }
+
+    // Al entrar a otra pestaña principal, sus sub-menús vuelven al primero de la fila
+    function resetViewSubTabs(view) {
+      try {
+        if (view === 'summary') {
+          notesEventsActiveSubTab = 'events';
+          birthdayFilterTab = 'upcoming';
+          if (document.getElementById('bday-tab-upcoming')) setBirthdayFilterTab('upcoming');
+        } else if (view === 'turns') {
+          setTurnsSubTab('upcoming');
+          setTurnsStatsMode('month');
+        } else if (view === 'meds') {
+          activeHealthControlSubTab = 'hoy';
+          activeMedicationSubTab = 'today';
+          switchMedRegistration('control');
+        } else if (view === 'baby') {
+          if (typeof window.resetBtAllToFirst === 'function') window.resetBtAllToFirst();
+        }
+      } catch (error) {
+        console.error('No se pudieron reiniciar los sub-menús de', view, error);
+      }
     }
 
     function openPremiumPaywall(view) {
@@ -3435,8 +3490,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (modal && !modal.classList.contains('hidden')) closePremiumPaywall();
     });
 
-    function switchView(view) {
+    function switchView(view, resetSubTabs) {
       if (!canUseView(view)) view = 'month';
+      if (resetSubTabs === true && view !== activeView) resetViewSubTabs(view);
       if (view === 'birthdays') {
         view = 'summary';
         notesEventsActiveSubTab = 'events';
@@ -7837,13 +7893,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       document.getElementById('month-year-title').textContent = `${monthNames[month]} ${year}`;
 
+      renderWeekdayHeader();
       const calendarGrid = document.getElementById('calendar-grid');
       if (!calendarGrid) return;
       calendarGrid.innerHTML = '';
 
       const firstDayOfMonth = createLocalDate(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      let startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
+      let startDayOfWeek = (firstDayOfMonth.getDay() - weekStart + 7) % 7;
 
       const prevMonthLastDate = new Date(year, month, 0).getDate();
       const totalSlots = Math.ceil((startDayOfWeek + daysInMonth) / 7) * 7;
@@ -7930,9 +7987,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
         dayHeader.className = `absolute top-0.5 right-1 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'text-amber-400 font-black' : (dayHoliday && isCurrentMonth ? 'text-rose-400 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600'))}`;
         
         if (isToday) {
-          dayHeader.innerHTML = `${dayHoliday ? '<span class="px-1 py-0.2 rounded bg-rose-600 text-white text-[7px] font-black uppercase leading-tight shadow-sm">FER</span>' : ''}<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
+          dayHeader.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
         } else if (dayHoliday && isCurrentMonth) {
-          dayHeader.innerHTML = `<span class="px-1 py-0.2 rounded bg-rose-600 text-white text-[7px] font-black uppercase leading-tight shadow-sm">FER</span><span>${dayNum}</span>`;
+          dayHeader.innerHTML = `<span>${dayNum}</span>`;
         } else {
           dayHeader.textContent = dayNum;
         }
@@ -8062,31 +8119,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
               blocksContainer.appendChild(block);
             });
 
-            if (dayHoliday) {
-              const holidayStrip = document.createElement('div');
-              holidayStrip.className = 'w-full bg-rose-600 text-white text-[8px] font-extrabold px-1 py-0.5 truncate text-center leading-tight pointer-events-none shrink-0';
-              holidayStrip.textContent = dayHoliday.shortName || dayHoliday.name;
-              blocksContainer.appendChild(holidayStrip);
-            }
-
             cell.appendChild(blocksContainer);
-          } else if (dayHoliday) {
-            const holidayBlock = document.createElement('div');
-            holidayBlock.className = 'mt-auto w-full bg-rose-600/25 border-t border-rose-500/40 px-1 py-1 flex flex-col items-center justify-center text-center pointer-events-none';
-            holidayBlock.innerHTML = `
-              <span class="text-[7px] font-black uppercase tracking-tighter text-rose-300 leading-tight">${dayHoliday.irrenunciable ? 'FERIADO IRREN.' : 'FERIADO'}</span>
-              <span class="text-[8px] font-bold text-rose-100 truncate max-w-full leading-tight">${escapeHtml(dayHoliday.shortName || dayHoliday.name)}</span>
-            `;
-            cell.appendChild(holidayBlock);
           }
-        } else if (isCurrentMonth && dayHoliday) {
-          const holidayBlock = document.createElement('div');
-          holidayBlock.className = 'mt-auto w-full bg-rose-600/25 border-t border-rose-500/40 px-1 py-1 flex flex-col items-center justify-center text-center pointer-events-none';
-          holidayBlock.innerHTML = `
-            <span class="text-[7px] font-black uppercase tracking-tighter text-rose-300 leading-tight">${dayHoliday.irrenunciable ? 'FERIADO IRREN.' : 'FERIADO'}</span>
-            <span class="text-[8px] font-bold text-rose-100 truncate max-w-full leading-tight">${escapeHtml(dayHoliday.shortName || dayHoliday.name)}</span>
-          `;
-          cell.appendChild(holidayBlock);
         }
 
         if (isCurrentMonth) {
@@ -8167,14 +8201,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const miniGrid = document.createElement('div');
         miniGrid.className = 'grid grid-cols-7 gap-1 text-[9px] text-center flex-1';
 
-        ['L', 'M', 'X', 'J', 'V', 'S', 'D'].forEach((d, idx) => {
+        [0, 1, 2, 3, 4, 5, 6].map(k => (weekStart + k) % 7).map(dow => WEEKDAY_LETTERS[dow]).forEach((d, idx) => {
+          const dowIdx = (weekStart + idx) % 7;
           const dLabel = document.createElement('div');
-          dLabel.className = `font-bold ${idx === 5 || idx === 6 ? 'text-red-400' : 'text-slate-400'}`;
+          dLabel.className = `font-bold ${dowIdx === 0 || dowIdx === 6 ? 'text-red-400' : 'text-slate-400'}`;
           dLabel.textContent = d;
           miniGrid.appendChild(dLabel);
         });
 
-        const firstDay = (createLocalDate(year, m, 1).getDay() + 6) % 7;
+        const firstDay = (createLocalDate(year, m, 1).getDay() - weekStart + 7) % 7;
         const daysInM = new Date(year, m + 1, 0).getDate();
 
         for (let i = 0; i < firstDay; i++) {
@@ -10779,11 +10814,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function openSettingsModal() {
       document.getElementById('time-format-setting').value = timeFormat;
+      const weekStartSel = document.getElementById('week-start-setting');
+      if (weekStartSel) weekStartSel.value = String(weekStart);
       syncHolidayUIControls();
       applyTabVisibility();
       updateStorageStatus();
       document.getElementById('settings-modal').classList.remove('hidden');
       document.getElementById('settings-modal').classList.add('flex');
+      const settingsBody = document.querySelector('#settings-modal .overflow-y-auto');
+      if (settingsBody) settingsBody.scrollTop = 0;
     }
 
     function closeSettingsModal() {
@@ -11785,7 +11824,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           profile: {
             name: '',
             placeholderLabel: 'Bebé ' + (indexNum || 1),
-            avatar: '👶',
+            avatar: '👶🎀',
             birthDate: '',
             moonSign: '',
             bloodType: '',
@@ -12020,7 +12059,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const t = tab.toLowerCase();
         if (t === 'inicio' || t === 'resumen' || t === 'cuidados' || t === 'alimentacion' || t === 'comida' || t === 'panales' || t === 'sueno') return 'cuidados';
         if (t === 'salud') return 'salud';
-        if (t === 'inventario' || t === 'crecimiento' || t === 'desarrollo' || t === 'fotos' || t === 'curva') return 'inventario';
+        if (t === 'crecimiento' || t === 'curva') return 'salud';
+        if (t === 'inventario' || t === 'desarrollo' || t === 'fotos') return 'cuidados';
         if (t === 'perfil') return 'perfil';
         return 'cuidados';
       }
@@ -12333,7 +12373,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         const avatarEl = document.getElementById('btProfileAvatar');
         if (!avatarEl) return;
-        avatarEl.textContent = btState.profile.avatar || '👶';
+        if (!btState.profile.avatarBabyGirlMigrated) {
+          if (!btState.profile.avatar || btState.profile.avatar === '👶' || btState.profile.avatar === '👧') btState.profile.avatar = '👶🎀';
+          btState.profile.avatarBabyGirlMigrated = true;
+          saveBtState();
+        }
+        avatarEl.textContent = btState.profile.avatar || '👶🎀';
+        avatarEl.style.fontSize = (btState.profile.avatar || '').length > 2 ? '1.25rem' : '';
         document.getElementById('btProfileName').textContent = btState.profile.name
           ? btState.profile.name
           : `${getBabyDisplayName(btState, idx)} (Sin nombre)`;
@@ -12349,9 +12395,27 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
         document.getElementById('btStatZodiac').textContent = computed.zodiac;
         document.getElementById('btStatChinese').textContent = computed.chinese;
-        document.getElementById('btStatMoon').textContent = computed.moon || btState.profile.moonSign || '—';
-        document.getElementById('btStatDev').textContent = `${dev.pct}%`;
+        const hCm = btState.health && btState.health.heightCm;
+        const wKg = btState.health && btState.health.weightKg;
+        document.getElementById('btStatHeight').textContent = (hCm || hCm === 0) && hCm !== null ? `${hCm} cm` : '—';
+        document.getElementById('btStatWeight').textContent = (wKg || wKg === 0) && wKg !== null ? `${wKg} kg` : '—';
       }
+
+      function resetBtSubTabsToFirst() {
+        btCuidadosSubTab = 'comida';
+        btCuidadosFeedSubTab = 'today';
+        btCuidadosDiaperSubTab = 'today';
+        btCuidadosSleepSubTab = 'today';
+        btSaludSubTab = 'control';
+        btSaludControlSubTab = 'upcoming';
+        btSaludMedSubTab = 'today';
+        btInventarioSubTab = 'leche';
+      }
+
+      window.resetBtAllToFirst = function () {
+        resetBtSubTabsToFirst();
+        btStore.activeTab = 'cuidados';
+      };
 
       function setBtActiveTab(tabName) {
         btStore.activeTab = mapLegacyTabName(tabName);
@@ -12398,7 +12462,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
 
       let btCuidadosSubTab = 'comida'; // 'comida' | 'panal' | 'sueno' | 'hitos'
-      let btCuidadosFeedSubTab = 'today'; // 'today' | 'stats' | 'pickup' | 'can'
+      let btCuidadosFeedSubTab = 'today'; // 'today' | 'stock' | 'stats'
       let btCuidadosFeedStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btCuidadosFeedStatsDate = new Date();
       let btCuidadosPickupStatsMode = 'month'; // 'month' | 'year' | 'history'
@@ -12463,7 +12527,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
             else if (f.kind === 'solid') pSolids += 1;
           });
 
-          const activeFeedTab = (btCuidadosFeedSubTab === 'stats') ? 'stats' : 'today';
+          const activeFeedTab = (btCuidadosFeedSubTab === 'stats' || btCuidadosFeedSubTab === 'stock') ? btCuidadosFeedSubTab : 'today';
+          let milkStockHtml = '';
+          if (activeFeedTab === 'stock') {
+            const milkTmp = document.createElement('div');
+            renderBtInventario(milkTmp, { milkOnly: true });
+            milkStockHtml = milkTmp.innerHTML;
+          }
 
           return `
             <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-amber-500/40 shadow-lg space-y-3">
@@ -12485,6 +12555,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center text-xs">
                 <button type="button" data-bt-feed-subtab="today" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${activeFeedTab === 'today' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Hoy (${todayFeed.length})
+                </button>
+                <button type="button" data-bt-feed-subtab="stock" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${activeFeedTab === 'stock' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
+                  📦 Stock
                 </button>
                 <button type="button" data-bt-feed-subtab="stats" class="flex-1 py-1.5 rounded-lg font-bold transition-all ${activeFeedTab === 'stats' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}">
                   Historial y Estadísticas (${feedEntries.length})
@@ -12543,6 +12616,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     `}
                   </div>
                 </div>
+              ` : (activeFeedTab === 'stock' ? `
+                ${milkStockHtml}
               ` : `
                 <div class="space-y-3">
                   <!-- Selector Mes / Año / Histórico -->
@@ -12602,7 +12677,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     }).join('') : '<p class="text-center py-4 text-slate-500 text-xs italic">No hay registros de comida en este periodo.</p>'}
                   </div>
                 </div>
-              `}
+              `)}
             </div>
           `;
         };
@@ -12714,7 +12789,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                       <select data-bt-diaper-active class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-teal-400">
                         ${btDiaperOptionsHtml(btState, btDiaperDefaultKey(btState))}
                       </select>
-                    ` : `<p class="text-[10px] text-slate-400">Agrega un paquete en Inventario (nombre y talla) para elegir qué pañal se usa.</p>`}
+                    ` : `<p class="text-[10px] text-slate-400">Agrega un paquete en la pestaña Stock (nombre y talla) para elegir qué pañal se usa.</p>`}
                   </div>
 
                   <!-- Botones rápidos de pañal -->
@@ -13167,7 +13242,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         updateBtSleepTimerDisplay();
       }
 
-      let btSaludSubTab = 'vacunas'; // 'vacunas' | 'control' | 'medicina' | 'curva'
+      let btSaludSubTab = 'control'; // 'control' | 'medicina' | 'curva' | 'vacunas' (el primero de la fila es 'control')
       let btSaludControlSubTab = 'upcoming'; // 'upcoming' | 'history'
       let btSaludControlStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btSaludControlStatsDate = new Date();
@@ -13179,6 +13254,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       function initBtGrowthChart(btState, canvasId = 'btGrowthCanvas') {
         const canvas = document.getElementById(canvasId);
         if (!canvas || !btState || !Array.isArray(btState.growth) || btState.growth.length === 0) return;
+        // Mediciones ordenadas por fecha (las sin fecha conservan su orden de ingreso)
+        const growthData = btState.growth.slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+        let scrolledToEnd = false;
 
         const metric = btStore.growthChartMetric || 'all';
         const seriesDefs = {
@@ -13190,8 +13268,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const draw = () => {
           if (!canvas.isConnected) return;
           const parent = canvas.parentElement;
-          const cssWidth = Math.max(260, (parent && parent.clientWidth) ? parent.clientWidth : 340);
-          const cssHeight = Math.max(195, (parent && parent.clientHeight) ? parent.clientHeight : 220);
+          const parentW = (parent && parent.clientWidth) ? parent.clientWidth - 16 : 340;
+          // Ancho mínimo por medición para que se vean todos los meses; si no caben, el gráfico se desplaza horizontalmente
+          const MIN_PER_POINT = 62;
+          const cssWidth = Math.max(260, parentW, growthData.length * MIN_PER_POINT + 60);
+          const cssHeight = Math.max(195, (parent && parent.clientHeight) ? parent.clientHeight - 16 : 220);
           const dpr = window.devicePixelRatio || 1;
 
           canvas.width = Math.round(cssWidth * dpr);
@@ -13257,7 +13338,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             ['height', 'head', 'weight'].forEach(k => {
               const def = seriesDefs[k];
               const band = bands[k];
-              const pts = btState.growth
+              const pts = growthData
                 .map((g, idx) => ({
                   idx,
                   label: g.label || (`M${idx + 1}`),
@@ -13317,16 +13398,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
             });
 
             // Etiquetas del eje X
-            const totalN = btState.growth.length;
-            const maxLabels = cssWidth < 360 ? 6 : 10;
-            const step = Math.max(1, Math.ceil(totalN / maxLabels));
-            btState.growth.forEach((g, idx) => {
-              if (idx % step !== 0 && idx !== totalN - 1) return;
+            const totalN = growthData.length;
+            growthData.forEach((g, idx) => {
               const x = totalN === 1
                 ? padLeft + plotW / 2
                 : padLeft + (idx / (totalN - 1)) * plotW;
               const lbl = g.label || (`M${idx + 1}`);
-              const shortLbl = String(lbl).length > 8 ? String(lbl).slice(0, 7) + '…' : String(lbl);
+              const shortLbl = String(lbl).length > 10 ? String(lbl).slice(0, 9) + '…' : String(lbl);
               ctx.font = 'bold 10px Inter, system-ui, sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'top';
@@ -13340,7 +13418,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
           // Modo individual: Peso (kg), Altura (cm) o Perímetro (cm)
           const metricMeta = seriesDefs[metric] || seriesDefs.weight;
-          const dataPoints = btState.growth
+          const dataPoints = growthData
             .map((g, idx) => ({
               label: g.label || (`M${idx + 1}`),
               date: g.date || '',
@@ -13457,14 +13535,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
             ctx.fillStyle = '#f8fafc';
             ctx.fillText(valText, pt.x, Math.max(12, pt.y - 7));
 
-            const maxLabels = cssWidth < 360 ? 6 : 10;
-            const step = Math.max(1, Math.ceil(coords.length / maxLabels));
-            if (idx % step === 0 || idx === coords.length - 1) {
+            {
               ctx.font = 'bold 10px Inter, system-ui, sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'top';
               ctx.fillStyle = '#cbd5e1';
-              const shortLbl = String(pt.label).length > 8 ? String(pt.label).slice(0, 7) + '…' : String(pt.label);
+              const shortLbl = String(pt.label).length > 10 ? String(pt.label).slice(0, 9) + '…' : String(pt.label);
               ctx.fillText(shortLbl, pt.x, padTop + plotH + 8);
             }
           });
@@ -13473,6 +13549,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
         };
 
         draw();
+        const chartParent = canvas.parentElement;
+        if (chartParent && !scrolledToEnd) {
+          chartParent.scrollLeft = chartParent.scrollWidth;
+          scrolledToEnd = true;
+        }
         const onResize = () => draw();
         window.addEventListener('resize', onResize);
         btGrowthChart = {
@@ -14007,7 +14088,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   </div>
                 </div>
 
-                <div class="relative h-56 w-full bg-slate-950/60 rounded-xl border border-slate-800/80 p-2">
+                <div class="relative h-56 w-full bg-slate-950/60 rounded-xl border border-slate-800/80 p-2 overflow-x-auto overflow-y-hidden">
                   <canvas id="btGrowthCanvas"></canvas>
                 </div>
 
@@ -14103,7 +14184,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       let btInvDiaperStatsMode = 'month'; // 'month' | 'year' | 'history'
       let btInvDiaperStatsDate = new Date();
 
-      function renderBtInventario(container) {
+      function renderBtInventario(container, opts) {
         const btState = getCurrentBaby();
         const todayStr = getTodayDateKey();
         const activeDayKey = btSelectedDateKey || todayStr;
@@ -14672,6 +14753,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           `;
         };
 
+        if (opts && opts.milkOnly) {
+          container.innerHTML = renderLecheInventoryPanel();
+          return;
+        }
         container.innerHTML = `
           <!-- Selector superior del módulo INVENTARIO: Leche vs Pañales -->
           <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 shadow-lg space-y-2.5">
@@ -14726,6 +14811,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 <div>
                   <label class="block text-[10px] font-semibold text-slate-300 mb-1">Avatar</label>
                   <select name="avatar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100">
+                    <option value="👶🎀" ${btState.profile.avatar === '👶🎀' ? 'selected' : ''}>👶🎀 Bebé niña</option>
                     <option value="👶" ${btState.profile.avatar === '👶' ? 'selected' : ''}>👶 Bebé</option>
                     <option value="👧" ${btState.profile.avatar === '👧' ? 'selected' : ''}>👧 Niña</option>
                     <option value="🧒" ${btState.profile.avatar === '🧒' ? 'selected' : ''}>🧒 Niño</option>
@@ -14781,7 +14867,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const fd = new FormData(form);
           btState.profile.name = (fd.get('name') || '').trim();
           btState.profile.birthDate = fd.get('birthDate') || '';
-          btState.profile.avatar = fd.get('avatar') || '👶';
+          btState.profile.avatar = fd.get('avatar') || '👶🎀';
           const autoM = calculateMoonSign(btState.profile.birthDate);
           btState.profile.moonSign = autoM ? autoM.sign : '';
           btState.profile.pediatrician = (fd.get('pediatrician') || '').trim();
@@ -14884,7 +14970,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         const idx = btStore.babies.indexOf(activeTimerBaby);
         const babyName = getBabyDisplayName(activeTimerBaby, idx >= 0 ? idx : 0);
-        const avatar = (activeTimerBaby.profile && activeTimerBaby.profile.avatar) || '👶';
+        const avatar = (activeTimerBaby.profile && activeTimerBaby.profile.avatar) || '👶🎀';
         const isNight = st.type === 'Nocturno';
         const startTimeStr = st.startTimeStr || formatTimeFromTimestamp(st.startTime);
         const startDateStr = st.startDateKey || formatDateKeyFromTimestamp(st.startTime);
@@ -15062,7 +15148,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         const tabBtn = e.target.closest('[data-bt-tab]');
         if (tabBtn) {
-          setBtActiveTab(tabBtn.getAttribute('data-bt-tab'));
+          const nextTab = mapLegacyTabName(tabBtn.getAttribute('data-bt-tab'));
+          if (nextTab !== mapLegacyTabName(btStore.activeTab || 'cuidados')) resetBtSubTabsToFirst();
+          setBtActiveTab(nextTab);
           return;
         }
 
@@ -15250,8 +15338,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         const gotoInvBtn = e.target.closest('[data-bt-goto-inv]');
         if (gotoInvBtn) {
-          btInventarioSubTab = gotoInvBtn.getAttribute('data-bt-goto-inv') || 'leche';
-          setBtActiveTab('inventario');
+          const gotoInvTarget = gotoInvBtn.getAttribute('data-bt-goto-inv') || 'leche';
+          btCuidadosSubTab = gotoInvTarget === 'panales' ? 'panal' : 'comida';
+          if (gotoInvTarget === 'panales') btCuidadosDiaperSubTab = 'stock';
+          else btCuidadosFeedSubTab = 'stock';
+          setBtActiveTab('cuidados');
           return;
         }
 
@@ -15653,10 +15744,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (editBtn) editBtn.addEventListener('click', () => setBtActiveTab('perfil'));
         const avatarEl = document.getElementById('btProfileAvatar');
         if (avatarEl) avatarEl.addEventListener('click', () => setBtActiveTab('perfil'));
-        const devCard = document.getElementById('btStatDevCard');
-        if (devCard) devCard.addEventListener('click', () => { btCuidadosSubTab = 'hitos'; setBtActiveTab('cuidados'); });
-        const moonCard = document.getElementById('btStatMoonCard');
-        if (moonCard) moonCard.addEventListener('click', () => setBtActiveTab('perfil'));
+        const heightCard = document.getElementById('btStatHeightCard');
+        if (heightCard) heightCard.addEventListener('click', () => openBabyGrowthQuickModal());
+        const weightCard = document.getElementById('btStatWeightCard');
+        if (weightCard) weightCard.addEventListener('click', () => openBabyGrowthQuickModal());
         const zodiacCard = document.getElementById('btStatZodiacCard');
         if (zodiacCard) zodiacCard.addEventListener('click', () => setBtActiveTab('perfil'));
         const chineseCard = document.getElementById('btStatChineseCard');
