@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-calendario-pwa-v2026-11-14-v3';
+const CACHE_NAME = 'mi-calendario-pwa-v2026-11-14-v4';
 const OFFLINE_URL = './index.html';
 const APP_SHELL = [
   './',
@@ -83,8 +83,72 @@ self.addEventListener('sync', (event) => {
 });
 
 // Periodic Background Sync handler para actualización de caché y feriados
+
+// Sincronización de alarmas en IndexedDB para el Service Worker
+function openAlarmsIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('mi_calendario_alarms_db', 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('alarms')) db.createObjectStore('alarms', { keyPath: 'id' });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function checkDueAlarmsInSW() {
+  try {
+    const db = await openAlarmsIDB();
+    const tx = db.transaction('alarms', 'readonly');
+    const store = tx.objectStore('alarms');
+    const all = await new Promise((res, rej) => {
+      const r = store.getAll();
+      r.onsuccess = () => res(r.result || []);
+      r.onerror = () => rej(r.error);
+    });
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const dow = now.getDay();
+
+    for (const alarm of all) {
+      if (!alarm || !alarm.enabled || !alarm.time) continue;
+      const [hh, mm] = String(alarm.time).split(':').map(Number);
+      if (!Number.isInteger(hh) || !Number.isInteger(mm)) continue;
+      const alarmMin = hh * 60 + mm;
+      const matchesDay =
+        alarm.repeat === 'daily' ||
+        (alarm.repeat === 'weekdays' && dow >= 1 && dow <= 5) ||
+        (alarm.repeat === 'once' && alarm.date === todayKey);
+      if (!matchesDay) continue;
+      if (nowMin >= alarmMin && nowMin - alarmMin <= 30) {
+        await self.registration.showNotification(alarm.title || 'Alarma Mi Calendario', {
+          body: `Recordatorio programado (${alarm.time})`,
+          icon: './mi-calendario-icon-192.png',
+          badge: './mi-calendario-icon-192.png',
+          tag: `sw-alarm-${alarm.id}-${todayKey}`,
+          renotify: true,
+          requireInteraction: true,
+          silent: false,
+          vibrate: [500, 250, 500, 250, 800],
+          data: { url: './' }
+        });
+      }
+    }
+  } catch (e) {}
+}
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CHECK_ALARMS_NOW') {
+    event.waitUntil(checkDueAlarmsInSW());
+  }
+});
+
 self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'update-calendario-cache') {
+  if (event.tag === 'check-alarms') {
+    event.waitUntil(checkDueAlarmsInSW());
+  } else if (event.tag === 'update-calendario-cache') {
     event.waitUntil(
       caches.open(CACHE_NAME).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest']))
     );
@@ -106,6 +170,9 @@ self.addEventListener('push', (event) => {
       body: data.body,
       icon: data.icon || './mi-calendario-icon-192.png',
       badge: './mi-calendario-icon-192.png',
+      silent: false,
+      requireInteraction: true,
+      vibrate: [500, 250, 500],
       data: { url: data.url || './' }
     })
   );

@@ -528,9 +528,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <i class="fa-solid fa-user-doctor text-purple-400 text-base"></i>
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">AGENDA DE TURNOS</h3>
           </div>
-          <button type="button" onclick="openDirectShiftModal()" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
-            <i class="fa-solid fa-plus"></i> Añadir
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="triggerImportShifts()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow" title="Importar turnos desde .ics o .csv">
+              <i class="fa-solid fa-file-import"></i> Importar
+            </button>
+            <button type="button" onclick="openDirectShiftModal()" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
+              <i class="fa-solid fa-plus"></i> Añadir
+            </button>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <button id="turns-subtab-upcoming" type="button" onclick="setTurnsSubTab('upcoming')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-purple-500 text-white">
@@ -2391,37 +2396,44 @@ Check your Browserslist config to be sure that your targets are set up correctly
         </button>
       </div>
 
-      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-3 pb-5 space-y-3 text-xs">
-        <div>
-          <label for="time-format-setting" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Formato de hora:</label>
-          <select id="time-format-setting" onchange="setTimeFormat(this.value)" class="w-full min-h-11 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-teal-400">
-            <option value="24">24 horas (14:30)</option>
-            <option value="ampm">AM/PM (2:30 PM)</option>
-          </select>
-        </div>
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-3 pb-5 space-y-3.5 text-xs">
 
-        <div>
-          <label for="week-start-setting" class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">La semana empieza el:</label>
-          <select id="week-start-setting" onchange="setWeekStart(this.value)" class="w-full min-h-11 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-teal-400">
-            <option value="1">Lunes</option>
-            <option value="0">Domingo</option>
-          </select>
-        </div>
+        <!-- 1. PREFERENCIAS GENERALES -->
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/80 space-y-3">
+          <span class="text-[10px] font-black uppercase tracking-wider text-teal-300 block">Preferencias del Calendario</span>
 
-        <div class="p-3 rounded-xl bg-rose-950/25 border border-rose-500/30 space-y-2">
-          <div class="flex items-center justify-between">
-            <label for="holiday-country-setting" class="font-bold text-rose-200 flex items-center gap-1.5">
-              <i class="fa-solid fa-flag-checkered text-rose-400"></i>
-              <span>Feriados por país:</span>
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <span class="text-[10px] text-slate-300">Mostrar</span>
-              <input type="checkbox" id="holiday-enabled-setting" onchange="setHolidaysEnabled(this.checked)" class="peer sr-only" checked>
-              <span class="relative w-8 h-4 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-3 after:h-3 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-            </label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="time-format-setting" class="text-[10px] font-bold text-slate-400 block mb-1">Formato de hora</label>
+              <select id="time-format-setting" onchange="setTimeFormat(this.value)" class="w-full min-h-10 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-2.5 text-xs font-semibold focus:outline-none focus:border-teal-400">
+                <option value="24">24 horas</option>
+                <option value="ampm">AM / PM</option>
+              </select>
+            </div>
+            <div>
+              <label for="week-start-setting" class="text-[10px] font-bold text-slate-400 block mb-1">Inicio de semana</label>
+              <select id="week-start-setting" onchange="setWeekStart(this.value)" class="w-full min-h-10 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-2.5 text-xs font-semibold focus:outline-none focus:border-teal-400">
+                <option value="1">Lunes</option>
+                <option value="0">Domingo</option>
+              </select>
+            </div>
           </div>
-          <select id="holiday-country-setting" onchange="setHolidayCountryMode(this.value)" class="w-full min-h-11 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-3 text-xs font-semibold focus:outline-none focus:border-rose-400">
-            <option value="AUTO">🌐 Automático (según país donde se ejecuta)</option>
+
+          <!-- Feriados -->
+          <div class="p-2.5 rounded-lg bg-rose-950/25 border border-rose-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="holiday-country-setting" class="font-bold text-rose-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-flag-checkered text-rose-400"></i>
+                <span>Feriados por país</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <span class="text-[10px] text-slate-300">Mostrar</span>
+                <input type="checkbox" id="holiday-enabled-setting" onchange="setHolidaysEnabled(this.checked)" class="peer sr-only" checked>
+                <span class="relative w-8 h-4 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-3 after:h-3 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+              </label>
+            </div>
+            <select id="holiday-country-setting" onchange="setHolidayCountryMode(this.value)" class="w-full min-h-10 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2.5 text-xs font-semibold focus:outline-none focus:border-rose-400">
+              <option value="AUTO">🌐 Automático (según país donde se ejecuta)</option>
             <option value="CL">🇨🇱 Chile</option>
             <option value="AR">🇦🇷 Argentina</option>
             <option value="PE">🇵🇪 Perú</option>
@@ -2450,112 +2462,117 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <option value="FR">🇫🇷 Francia</option>
             <option value="DE">🇩🇪 Alemania</option>
             <option value="GB">🇬🇧 Reino Unido</option>
-          </select>
-          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
-            <span id="holiday-detected-status" class="truncate">País activo: Detectando...</span>
-            <button type="button" onclick="closeSettingsModal(); openHolidaysModal();" class="text-rose-300 hover:text-rose-200 font-bold underline shrink-0 ml-2">Ver lista de feriados</button>
+            </select>
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <span id="holiday-detected-status" class="truncate">País activo: Detectando...</span>
+              <button type="button" onclick="closeSettingsModal(); openHolidaysModal();" class="text-rose-300 hover:text-rose-200 font-bold underline shrink-0 ml-2">Ver feriados</button>
+            </div>
           </div>
+
+          <!-- Menús visibles -->
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Pestañas visibles</span>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
+              <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
+                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-300 text-xs"></i>Turnos</span>
+                <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
+                <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+              </label>
+              <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
+                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
+                <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
+                <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+              </label>
+              <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
+                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé</span>
+                <input type="checkbox" id="tab-visible-baby" onchange="setTabVisibility('baby', this.checked)" class="peer sr-only" checked>
+                <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+              </label>
+            </div>
+          </div>
+
+          <button type="button" onclick="closeSettingsModal(); openAlarmsModal();" class="w-full min-h-10 py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-bell"></i> Alarmas y Notificaciones
+          </button>
         </div>
 
-        <div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Menús visibles:</span>
-          <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
-          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
-            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-300 text-xs"></i>Turnos</span>
-            <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
-            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-          </label>
-
-          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
-            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
-            <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
-            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-          </label>
-          <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
-            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé</span>
-            <input type="checkbox" id="tab-visible-baby" onchange="setTabVisibility('baby', this.checked)" class="peer sr-only" checked>
-            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-          </label>
-          </div>
-        </div>
-
-        <!-- MODO PRUEBA PREMIUM: se oculta poniendo PLAN_TEST_UI = false -->
-        <div id="planTestModeBox" class="hidden">
-          <div class="bg-slate-800 border border-amber-500/40 rounded-lg">
-            <label class="flex items-center justify-between gap-3 px-3 min-h-11 py-2 cursor-pointer">
-              <span class="min-w-0">
-                <span class="flex items-center gap-2 text-slate-200 font-semibold"><i class="fa-solid fa-lock text-amber-300 text-xs"></i>Modo prueba: plan Gratis</span>
-                <span class="block text-[10px] text-slate-400 leading-tight mt-0.5">Bloquea Turnos, Salud y Bebé para ver cómo se vería sin Premium.</span>
-              </span>
-              <input type="checkbox" id="planTestFreeToggle" onchange="setPlanTestFree(this.checked)" class="peer sr-only">
-              <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-teal-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- COMPARTIR CON OTRA PERSONA -->
+        <!-- 2. COMPARTIR -->
         <div class="p-3 rounded-xl bg-gradient-to-br from-sky-950/40 to-teal-950/40 border border-sky-500/40 space-y-2">
           <div class="flex items-center gap-2 text-sky-300 font-bold">
             <i class="fa-solid fa-share-nodes text-sm"></i>
             <span>Compartir con otra persona</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-tight">
-            Envía tus turnos, eventos, notas, bebé o salud a otra persona. Al cargarlo en su app, <strong>se combinará sin borrar lo que ya tenga</strong>.
+            Envía tus turnos, eventos, notas, bebé o salud. Al cargarlo en su app, <strong>se combina sin borrar lo que ya tenga</strong>.
           </p>
-          <button onclick="openShareModal()" class="w-full min-h-11 py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
+          <button onclick="openShareModal()" class="w-full min-h-10 py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
             <i class="fa-solid fa-share-nodes"></i> Elegir qué compartir
           </button>
         </div>
 
-        <div id="storage-status" class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1.5"></div>
+        <!-- 3. RESPALDOS, EXPORTACIÓN E IMPORTACIÓN -->
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/80 space-y-3">
+          <span class="text-[10px] font-black uppercase tracking-wider text-sky-300 block">Respaldos y Sincronización</span>
+          <div id="storage-status" class="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800 space-y-1"></div>
 
-        <div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Alarmas y Notificaciones del Celular:</span>
-          <button type="button" onclick="closeSettingsModal(); openAlarmsModal();" class="w-full min-h-11 py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
-            <i class="fa-solid fa-bell"></i> Configurar Alarmas y Avisos
-          </button>
-        </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Exportar</span>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="exportDataJSON()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
+                <i class="fa-solid fa-download"></i> JSON
+              </button>
+              <button type="button" onclick="exportDataPDF()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+              </button>
+              <button type="button" onclick="backupToGoogleDrive()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
+                <i class="fa-brands fa-google-drive"></i> Google Drive
+              </button>
+              <button type="button" onclick="exportAllToGoogleCalendarICS()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
+                <i class="fa-solid fa-calendar-plus"></i> Google Cal
+              </button>
+            </div>
+          </div>
 
-        <div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Exportar Copia de Seguridad y Reporte:</span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button onclick="exportDataJSON()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
-              <i class="fa-solid fa-download"></i> Descargar JSON
-            </button>
-            <button type="button" onclick="exportDataPDF()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
-              <i class="fa-solid fa-file-pdf"></i> Exportar PDF
-            </button>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Importar</span>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1 transition-all cursor-pointer text-[11px]">
+                <i class="fa-solid fa-upload"></i> JSON
+                <input type="file" accept=".json,.txt,application/json,text/plain" onchange="importDataJSON(event)" class="hidden">
+              </label>
+              <button type="button" onclick="triggerImportCalendarICS()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1 transition-all text-[11px]">
+                <i class="fa-solid fa-calendar-days"></i> .ics
+              </button>
+              <button type="button" onclick="triggerImportShifts()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1 transition-all text-[11px]">
+                <i class="fa-solid fa-user-doctor"></i> Turnos
+              </button>
+            </div>
+            <input type="file" id="import-ics-file-input" accept=".ics,text/calendar" class="hidden" onchange="handleImportICSFile(event, false)">
+            <input type="file" id="import-shifts-file-input" accept=".ics,.csv,text/calendar,text/csv" class="hidden" onchange="handleImportShiftsFile(event)">
           </div>
         </div>
 
-        <div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Importar Copia de Seguridad:</span>
-          <label class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer">
-            <i class="fa-solid fa-upload"></i> Seleccionar Archivo JSON
-            <input type="file" accept=".json,.txt,application/json,text/plain" onchange="importDataJSON(event)" class="hidden">
-          </label>
-        </div>
-
-        <div class="pt-2 border-t border-slate-700/60">
-          <span class="text-[10px] font-black uppercase tracking-wider text-red-400 block px-1 mb-1.5">Zona de Peligro:</span>
-          <button onclick="confirmResetAllData()" class="w-full min-h-11 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
-            <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
-          </button>
-        </div>
-
-        <!-- AVISO MÉDICO Y POLÍTICA DE PRIVACIDAD (CUMPLIMIENTO GOOGLE PLAY STORE) -->
+        <!-- 4. PRIVACIDAD Y AVISO MÉDICO -->
         <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-2">
           <div class="flex items-center gap-2 text-teal-300 font-bold">
             <i class="fa-solid fa-shield-halved text-sm"></i>
             <span>Privacidad y Aviso Médico</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            <strong>Aviso médico:</strong> Esta aplicación es una herramienta informativa y de organización personal; <strong>no es un dispositivo médico</strong> y no diagnostica, trata, cura ni previene ninguna condición médica. Consulta siempre a un profesional de la salud.
+            <strong>Aviso médico:</strong> Esta aplicación es una herramienta informativa y de organización personal; <strong>no es un dispositivo médico</strong> y no diagnostica, trata, cura ni previene ninguna condición médica.
           </p>
           <button type="button" onclick="openPrivacyPolicyModal()" class="w-full min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
-            <i class="fa-solid fa-file-shield"></i> Ver Política de Privacidad y Uso de Datos
+            <i class="fa-solid fa-file-shield"></i> Ver Política de Privacidad
           </button>
         </div>
+
+        <!-- 5. ZONA DE PELIGRO -->
+        <div class="pt-1">
+          <button onclick="confirmResetAllData()" class="w-full min-h-10 py-2 bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2587,8 +2604,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <i class="fa-solid fa-volume-high"></i> Probar Alarma
             </button>
           </div>
-          <p class="text-[10px] text-slate-400 leading-relaxed">
-            Las alarmas con sonido y vibración funcionan con la app abierta o en segundo plano. Para que suene aunque cierres la app por completo, toca el botón <strong>.ics</strong> en cada alarma para guardarla en el calendario/reloj del teléfono.
+          <p class="text-[10px] text-amber-200/90 leading-relaxed bg-amber-950/30 border border-amber-500/30 rounded-lg p-2">
+            <strong>Importante en Android:</strong> Cuando cierras la app o apagas la pantalla, el sistema detiene las apps web. Para que una alarma suene <strong>con el celular bloqueado o la app cerrada</strong>, toca <strong>.ics</strong> en tu alarma para guardarla en el Calendario/Reloj nativo de tu teléfono. Al desbloquear o volver a abrir la app, también se dispararán los avisos pendientes de los últimos 60 minutos.
           </p>
         </div>
 
@@ -3405,6 +3422,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
       syncBirthdayCalendarEvents();
       detectCountryFromEnvironmentAsync();
       if (typeof updateAlarmsBadge === 'function') updateAlarmsBadge();
+      if (typeof syncAlarmsToIndexedDB === 'function') syncAlarmsToIndexedDB(getCustomAlarms());
+      if (typeof syncAlarmsToNativeAndroid === 'function') syncAlarmsToNativeAndroid(getCustomAlarms());
+      try {
+        const workerCode = 'setInterval(() => postMessage(1), 15000);';
+        const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+        const alarmWorker = new Worker(URL.createObjectURL(workerBlob));
+        alarmWorker.onmessage = () => {
+          checkMedicationReminders();
+          if (typeof checkCustomAlarms === 'function') checkCustomAlarms();
+          if (typeof checkShiftAndControlReminders === 'function') checkShiftAndControlReminders();
+        };
+      } catch (e) {}
       checkNotificationsOnLaunch();
       checkMedicationReminders();
       if (typeof checkCustomAlarms === 'function') checkCustomAlarms();
@@ -3671,10 +3700,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function applyPlanLocks() {
       const locked = !isPremium();
-      const testBox = document.getElementById('planTestModeBox');
-      if (testBox) testBox.classList.toggle('hidden', !PLAN_TEST_UI);
-      const testToggle = document.getElementById('planTestFreeToggle');
-      if (testToggle) testToggle.checked = isPlanTestFree();
       PREMIUM_VIEWS.forEach(view => {
         const btn = document.getElementById(`tab-${view}-btn`);
         if (!btn) return;
@@ -11496,6 +11521,264 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
+    async function backupToGoogleDrive() {
+      try {
+        const now = new Date();
+        const dateKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+        const backup = {
+          app: 'Calendario',
+          version: 2,
+          exportedAt: now.toISOString(),
+          calendar: dayDataMap,
+          medications,
+          medicationLogs: medLogs,
+          healthControls,
+          babyTracker: typeof window.getBabyTrackerState === 'function' ? window.getBabyTrackerState() : undefined
+        };
+        const fileName = `backup_mi_calendario_${dateKey}.json`;
+        const jsonText = JSON.stringify(backup, null, 2);
+        const file = new File([jsonText], fileName, { type: 'application/json' });
+
+        try { localStorage.setItem(LAST_BACKUP_KEY, String(Date.now())); } catch (e) {}
+        updateStorageStatus();
+
+        if (window.isSecureContext && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: 'Copia de seguridad Mi Calendario',
+              text: 'Selecciona Google Drive para guardar tu respaldo.',
+              files: [file]
+            });
+            showToast('Respaldo compartido', 'Elige Google Drive para completar la copia.', 'fa-cloud-arrow-up', 'text-sky-400');
+            return;
+          } catch (shareErr) {
+            if (shareErr && shareErr.name === 'AbortError') return;
+          }
+        }
+
+        const blob = new Blob([jsonText], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
+        showToast('Respaldo listo', 'Se descargó el JSON y se abrió Google Drive para subirlo.', 'fa-cloud-arrow-up', 'text-sky-400');
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        console.warn('Error en respaldo Drive:', err);
+        showToast('Error al respaldar', 'No se pudo preparar la copia para Google Drive.', 'fa-circle-exclamation', 'text-red-400');
+      }
+    }
+
+    function exportAllToGoogleCalendarICS() {
+      try {
+        const lines = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Mi Calendario//Google Calendar Export//ES',
+          'CALSCALE:GREGORIAN',
+          'METHOD:PUBLISH'
+        ];
+        let count = 0;
+
+        Object.entries(dayDataMap || {}).forEach(([dateKey, items]) => {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey) || !Array.isArray(items)) return;
+          const [y, m, d] = dateKey.split('-');
+          items.forEach((item, idx) => {
+            if (!item) return;
+            const summary = (item.title || item.text || (item.isShift ? 'Turno' : 'Evento')).replace(/[\r\n]+/g, ' ');
+            let dtStart = `${y}${m}${d}`;
+            let dtEnd = `${y}${m}${d}`;
+            let isAllDay = true;
+            if (item.isShift && item.shiftStart) {
+              const [sh, sm] = String(item.shiftStart).split(':');
+              if (sh && sm) {
+                isAllDay = false;
+                dtStart = `${y}${m}${d}T${sh.padStart(2, '0')}${sm.padStart(2, '0')}00`;
+                const [eh, em] = String(item.shiftEnd || item.shiftStart).split(':');
+                dtEnd = `${y}${m}${d}T${(eh || sh).padStart(2, '0')}${(em || sm).padStart(2, '0')}00`;
+              }
+            }
+            lines.push('BEGIN:VEVENT');
+            lines.push(`UID:${item.id || `${dateKey}-${idx}`}@micalendario`);
+            lines.push(isAllDay ? `DTSTART;VALUE=DATE:${dtStart}` : `DTSTART:${dtStart}`);
+            lines.push(isAllDay ? `DTEND;VALUE=DATE:${dtEnd}` : `DTEND:${dtEnd}`);
+            lines.push(`SUMMARY:${summary}`);
+            if (item.description) lines.push(`DESCRIPTION:${String(item.description).replace(/[\r\n]+/g, ' ')}`);
+            lines.push('END:VEVENT');
+            count++;
+          });
+        });
+
+        (Array.isArray(healthControls) ? healthControls : []).forEach((ctrl, idx) => {
+          if (!ctrl || !ctrl.date || !/^\d{4}-\d{2}-\d{2}$/.test(ctrl.date)) return;
+          const [y, m, d] = ctrl.date.split('-');
+          const [hh, mm] = String(ctrl.time || '09:00').split(':');
+          lines.push('BEGIN:VEVENT');
+          lines.push(`UID:ctrl-${ctrl.id || idx}@micalendario`);
+          lines.push(`DTSTART:${y}${m}${d}T${(hh || '09').padStart(2, '0')}${(mm || '00').padStart(2, '0')}00`);
+          lines.push(`DTEND:${y}${m}${d}T${(hh || '09').padStart(2, '0')}${(mm || '00').padStart(2, '0')}00`);
+          lines.push(`SUMMARY:Control Salud - ${String(ctrl.customType || (Array.isArray(ctrl.type) ? ctrl.type.join(', ') : ctrl.type) || 'Control').replace(/[\r\n]+/g, ' ')}`);
+          lines.push('END:VEVENT');
+          count++;
+        });
+
+        lines.push('END:VCALENDAR');
+        if (count === 0) {
+          showToast('Sin eventos', 'No hay eventos, turnos ni controles para exportar.', 'fa-circle-info', 'text-amber-400');
+          return;
+        }
+        const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mi_calendario_google_${formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())}.ics`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('Exportado para Google Calendar', `${count} registro(s) listos en .ics. Ábrelo con Google Calendar.`, 'fa-calendar-plus', 'text-emerald-400');
+      } catch (e) {
+        console.error('Error exportando Google Calendar:', e);
+        showToast('Error al exportar', 'No se pudo generar el archivo .ics.', 'fa-circle-exclamation', 'text-red-400');
+      }
+    }
+
+    function parseICSDateAndTime(rawVal) {
+      if (!rawVal) return null;
+      const clean = String(rawVal).trim();
+      const m = clean.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/);
+      if (!m) return null;
+      return {
+        dateKey: `${m[1]}-${m[2]}-${m[3]}`,
+        time: m[4] && m[5] ? `${m[4]}:${m[5]}` : ''
+      };
+    }
+
+    function parseICSFileContent(text) {
+      const unfolded = String(text || '').replace(/\r?\n[ \t]/g, '');
+      const rawLines = unfolded.split(/\r?\n/);
+      const events = [];
+      let current = null;
+      for (const line of rawLines) {
+        if (line === 'BEGIN:VEVENT') { current = {}; continue; }
+        if (line === 'END:VEVENT') { if (current) events.push(current); current = null; continue; }
+        if (!current) continue;
+        const idx = line.indexOf(':');
+        if (idx === -1) continue;
+        const prop = line.slice(0, idx).split(';')[0].toUpperCase();
+        const val = line.slice(idx + 1).replace(/\\n/gi, ' ').replace(/\\,/g, ',').trim();
+        if (prop === 'DTSTART') current.dtStart = parseICSDateAndTime(val);
+        else if (prop === 'DTEND') current.dtEnd = parseICSDateAndTime(val);
+        else if (prop === 'SUMMARY') current.summary = val;
+        else if (prop === 'DESCRIPTION') current.description = val;
+      }
+      return events.filter(ev => ev.dtStart && ev.dtStart.dateKey);
+    }
+
+    function triggerImportCalendarICS() {
+      const inp = document.getElementById('import-ics-file-input');
+      if (inp) { inp.value = ''; inp.click(); }
+    }
+
+    function triggerImportShifts() {
+      const inp = document.getElementById('import-shifts-file-input');
+      if (inp) { inp.value = ''; inp.click(); }
+    }
+
+    function handleImportICSFile(event, asShift = false) {
+      const file = event?.target?.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = parseICSFileContent(reader.result);
+          let imported = 0;
+          parsed.forEach(ev => {
+            const key = ev.dtStart.dateKey;
+            if (!dayDataMap[key]) dayDataMap[key] = [];
+            const title = ev.summary || (asShift ? 'Turno importado' : 'Evento importado');
+            const exists = dayDataMap[key].some(x => x && (x.title === title || x.text === title));
+            if (exists) return;
+            const noteObj = {
+              id: generateId(asShift ? 'shift' : 'note'),
+              title,
+              text: title,
+              description: ev.description || '',
+              color: asShift ? '#8B5CF6' : '#14B8A6'
+            };
+            if (asShift) {
+              noteObj.isShift = true;
+              noteObj.shiftType = title;
+              noteObj.shiftStart = ev.dtStart.time || '';
+              noteObj.shiftEnd = ev.dtEnd?.time || '';
+            }
+            dayDataMap[key].push(noteObj);
+            imported++;
+          });
+          saveToLocalStorage();
+          renderAll();
+          showToast('Importación completada', `Se importaron ${imported} ${asShift ? 'turno(s)' : 'evento(s)'} desde .ics.`, 'fa-file-import', 'text-indigo-400');
+        } catch (err) {
+          console.error('Error importando .ics:', err);
+          showToast('Error al importar', 'El archivo .ics no tiene un formato válido.', 'fa-circle-exclamation', 'text-red-400');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function handleImportShiftsFile(event) {
+      const file = event?.target?.files?.[0];
+      if (!file) return;
+      if (file.name.toLowerCase().endsWith('.ics')) {
+        handleImportICSFile(event, true);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const lines = String(reader.result || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+          let imported = 0;
+          lines.forEach((line, idx) => {
+            const cols = line.split(/[;,\t]/).map(c => c.trim().replace(/^"|"$/g, ''));
+            if (idx === 0 && /fecha|date/i.test(cols[0])) return;
+            let dateKey = cols[0] || '';
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateKey)) {
+              const [dd, mm, yy] = dateKey.split('/');
+              dateKey = `${yy}-${mm}-${dd}`;
+            }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
+            const title = cols[1] || 'Turno';
+            const start = /^\d{1,2}:\d{2}$/.test(cols[2] || '') ? cols[2].padStart(5, '0') : '';
+            const end = /^\d{1,2}:\d{2}$/.test(cols[3] || '') ? cols[3].padStart(5, '0') : '';
+            if (!dayDataMap[dateKey]) dayDataMap[dateKey] = [];
+            dayDataMap[dateKey].push({
+              id: generateId('shift'),
+              title,
+              text: title,
+              isShift: true,
+              shiftType: title,
+              shiftStart: start,
+              shiftEnd: end,
+              color: '#8B5CF6'
+            });
+            imported++;
+          });
+          saveToLocalStorage();
+          renderAll();
+          showToast('Turnos importados', `Se agregaron ${imported} turno(s) desde CSV.`, 'fa-user-doctor', 'text-purple-300');
+        } catch (err) {
+          console.error('Error importando CSV de turnos:', err);
+          showToast('Error al importar', 'Usa columnas: YYYY-MM-DD,Nombre,Inicio,Fin.', 'fa-circle-exclamation', 'text-red-400');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
     function isValidCalendarMap(value) {
       if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
       return Object.entries(value).every(([key, notes]) =>
@@ -12115,8 +12398,128 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
+    function syncAlarmsToIndexedDB(list) {
+      try {
+        if (!('indexedDB' in window)) return;
+        const req = indexedDB.open('mi_calendario_alarms_db', 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('alarms')) db.createObjectStore('alarms', { keyPath: 'id' });
+        };
+        req.onsuccess = () => {
+          const db = req.result;
+          const tx = db.transaction('alarms', 'readwrite');
+          const store = tx.objectStore('alarms');
+          store.clear();
+          (list || []).forEach(item => { if (item && item.id) store.put(item); });
+        };
+      } catch (e) {}
+    }
+
+    function getCapacitorLocalNotifs() {
+      try {
+        return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications
+          ? window.Capacitor.Plugins.LocalNotifications
+          : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function alarmNumericId(strId, suffix = 0) {
+      let hash = 2166136261;
+      const s = String(strId || 'alarm') + '_' + suffix;
+      for (let i = 0; i < s.length; i++) {
+        hash ^= s.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (Math.abs(hash) % 2000000000) + 1;
+    }
+
+    async function initNativeAlarmChannel() {
+      const ln = getCapacitorLocalNotifs();
+      if (!ln) return;
+      try {
+        if (typeof ln.createChannel === 'function') {
+          await ln.createChannel({
+            id: 'mi_calendario_alarms',
+            name: 'Alarmas Mi Calendario',
+            description: 'Alarmas exactas de turnos, salud, bebé y notas',
+            importance: 5,
+            visibility: 1,
+            vibration: true
+          });
+        }
+        const perm = await ln.checkPermissions();
+        if (perm && perm.display !== 'granted') {
+          await ln.requestPermissions();
+        }
+      } catch (e) {
+        console.warn('Capacitor LocalNotifications init:', e);
+      }
+    }
+
+    async function syncAlarmsToNativeAndroid(list) {
+      const ln = getCapacitorLocalNotifs();
+      if (!ln) return;
+      try {
+        await initNativeAlarmChannel();
+        const pending = await ln.getPending();
+        if (pending && Array.isArray(pending.notifications) && pending.notifications.length) {
+          await ln.cancel({ notifications: pending.notifications.map(n => ({ id: n.id })) });
+        }
+        const now = new Date();
+        const toSchedule = [];
+        (list || []).forEach(alarm => {
+          if (!alarm || !alarm.enabled || !alarm.time) return;
+          const [hh, mm] = String(alarm.time).split(':').map(Number);
+          if (!Number.isInteger(hh) || !Number.isInteger(mm)) return;
+
+          if (alarm.repeat === 'daily') {
+            toSchedule.push({
+              id: alarmNumericId(alarm.id, 0),
+              title: alarm.title || 'Alarma Mi Calendario',
+              body: `Recordatorio diario (${alarm.time})`,
+              channelId: 'mi_calendario_alarms',
+              schedule: { on: { hour: hh, minute: mm }, repeats: true, allowWhileIdle: true }
+            });
+          } else if (alarm.repeat === 'weekdays') {
+            [2, 3, 4, 5, 6].forEach((wd, idx) => {
+              toSchedule.push({
+                id: alarmNumericId(alarm.id, idx + 1),
+                title: alarm.title || 'Alarma Mi Calendario',
+                body: `Recordatorio Lunes a Viernes (${alarm.time})`,
+                channelId: 'mi_calendario_alarms',
+                schedule: { on: { weekday: wd, hour: hh, minute: mm }, repeats: true, allowWhileIdle: true }
+              });
+            });
+          } else if (alarm.date) {
+            const [y, m, d] = String(alarm.date).split('-').map(Number);
+            if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return;
+            const atDate = new Date(y, m - 1, d, hh, mm, 0, 0);
+            if (atDate.getTime() > now.getTime()) {
+              toSchedule.push({
+                id: alarmNumericId(alarm.id, 0),
+                title: alarm.title || 'Alarma Mi Calendario',
+                body: `Recordatorio programado (${alarm.time})`,
+                channelId: 'mi_calendario_alarms',
+                schedule: { at: atDate, allowWhileIdle: true }
+              });
+            }
+          }
+        });
+        if (toSchedule.length) {
+          await ln.schedule({ notifications: toSchedule });
+        }
+      } catch (e) {
+        console.warn('Error sincronizando alarmas nativas Android:', e);
+      }
+    }
+
     function saveCustomAlarms(list) {
       try { localStorage.setItem(CUSTOM_ALARMS_KEY, JSON.stringify(list)); } catch (e) {}
+      syncAlarmsToIndexedDB(list);
+      syncAlarmsToNativeAndroid(list);
       updateAlarmsBadge();
     }
 
@@ -12136,6 +12539,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         badge: './mi-calendario-icon-192.png',
         tag: tag || `mical-${Date.now()}`,
         renotify: true,
+        silent: false,
         requireInteraction: !!extra.requireInteraction,
         vibrate: extra.vibrate === false ? undefined : [300, 150, 300],
         data: { url: extra.url || './' }
@@ -12446,15 +12850,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const list = getCustomAlarms();
       let changed = false;
 
+      const nowTotalMin = now.getHours() * 60 + now.getMinutes();
+
       list.forEach(alarm => {
-        if (!alarm || !alarm.enabled || alarm.time !== nowHHMM) return;
+        if (!alarm || !alarm.enabled || !alarm.time) return;
+        const [ah, am] = String(alarm.time).split(':').map(Number);
+        if (!Number.isInteger(ah) || !Number.isInteger(am)) return;
+        const alarmTotalMin = ah * 60 + am;
+        if (nowTotalMin < alarmTotalMin || nowTotalMin - alarmTotalMin > 60) return;
         const matchesDay =
           alarm.repeat === 'daily' ||
           (alarm.repeat === 'weekdays' && dow >= 1 && dow <= 5) ||
           (alarm.repeat === 'once' && alarm.date === todayKey);
         if (!matchesDay) return;
 
-        const firedKey = `cal_custom_alarm_fired_${todayKey}_${alarm.id}_${nowHHMM}`;
+        const firedKey = `cal_custom_alarm_fired_${todayKey}_${alarm.id}_${alarm.time}`;
         try {
           if (localStorage.getItem(firedKey) === '1') return;
           localStorage.setItem(firedKey, '1');
