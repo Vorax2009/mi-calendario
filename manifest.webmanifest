@@ -2,21 +2,79 @@
   "id": "/mi-calendario/",
   "name": "Mi Calendario: Turnos, Salud y Bebé",
   "short_name": "Mi Calendario",
-  "description": "Calendario personal con turnos laborales, notas, cumpleaños, control de medicamentos y seguimiento del bebé.",
+  "description": "Calendario personal con turnos laborales, notas, cumpleaños, control de medicamentos y seguimiento integral del bebé.",
   "lang": "es-CL",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#020617",
   "theme_color": "#0f172a",
   "categories": [
     "productivity",
     "medical",
-    "lifestyle"
+    "lifestyle",
+    "health",
+    "utilities"
   ],
   "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario",
+      "id": "cl.vorax2009.micalendario"
+    }
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://vorax2009.github.io"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "note_taking": {
+    "new_note_url": "./?tab=notes"
+  },
+  "file_handlers": [
+    {
+      "action": "./",
+      "accept": {
+        "application/json": [
+          ".json"
+        ]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+micalendario",
+      "url": "./?evento=%s"
+    }
+  ],
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "./mi-calendario-icon-192.png",
@@ -28,13 +86,117 @@
       "src": "./mi-calendario-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./mi-calendario-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-mobile-1.png",
+      "sizes": "553x1000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Calendario mensual con feriados y notas"
+    },
+    {
+      "src": "./screenshot-mobile-2.png",
+      "sizes": "541x1000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Eventos, cumpleaños y notas"
+    },
+    {
+      "src": "./screenshot-mobile-3.png",
+      "sizes": "546x1000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Agenda y estadísticas de turnos laborales"
+    },
+    {
+      "src": "./screenshot-mobile-4.png",
+      "sizes": "543x1000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Módulo Salud: controles médicos y medicamentos"
+    },
+    {
+      "src": "./screenshot-mobile-5.png",
+      "sizes": "543x1000",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Módulo Bebé: cuidados, vacunas y crecimiento"
+    },
+    {
+      "src": "./screenshot-wide-1.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vista de escritorio de Mi Calendario"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calendario Mensual",
+      "short_name": "Calendario",
+      "description": "Abrir el calendario mensual y feriados",
+      "url": "./?tab=calendar",
+      "icons": [
+        {
+          "src": "./mi-calendario-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mis Turnos",
+      "short_name": "Turnos",
+      "description": "Consultar y programar turnos laborales",
+      "url": "./?tab=turns",
+      "icons": [
+        {
+          "src": "./mi-calendario-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Salud y Medicamentos",
+      "short_name": "Salud",
+      "description": "Ver tratamientos, dosis y controles médicos",
+      "url": "./?tab=meds",
+      "icons": [
+        {
+          "src": "./mi-calendario-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Control del Bebé",
+      "short_name": "Bebé",
+      "description": "Registrar tomas, pañales, sueño y vacunas del bebé",
+      "url": "./?tab=baby",
+      "icons": [
+        {
+          "src": "./mi-calendario-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

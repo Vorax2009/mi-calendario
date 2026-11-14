@@ -273,9 +273,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <span>Instalar App</span>
         </button>
 
-        <!-- Notification Permission Button -->
-        <button id="notif-permission-btn" onclick="requestNotificationPermission()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Activar recordatorios de medicamentos y cumpleaños">
+        <!-- Alarms & Notifications Center Button -->
+        <button id="notif-permission-btn" onclick="openAlarmsModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Alarmas y Notificaciones">
           <i class="fa-solid fa-bell"></i>
+          <span id="alarms-active-badge" class="hidden -mr-0.5 px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black leading-tight">0</span>
         </button>
 
         <!-- Backup & Settings Modal Trigger -->
@@ -1046,6 +1047,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
           </div>
 
+          <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <label class="flex items-center justify-between gap-2 cursor-pointer text-[11px] text-amber-200 font-semibold">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres poner un recordatorio / alarma?</span>
+              <input type="checkbox" id="day-reminder-enabled" onchange="document.getElementById('day-reminder-time-wrap')?.classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-amber-500 rounded">
+            </label>
+            <div id="day-reminder-time-wrap" class="hidden flex items-center justify-between gap-2 pt-1 border-t border-amber-500/20">
+              <label for="day-reminder-time" class="text-[10px] text-slate-300 font-semibold">Hora del aviso:</label>
+              <input type="time" id="day-reminder-time" value="09:00" class="bg-slate-950 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+            </div>
+          </div>
+
           <button type="button" onclick="addNoteToCurrentDay()" class="w-full mt-1 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md font-bold text-xs tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-plus"></i> <span id="form-submit-label">Guardar e Incluir Nota</span>
           </button>
@@ -1178,6 +1190,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <textarea id="babyControlModalNotes" rows="2" placeholder="Ej. Llevar exámenes de sangre y carnet de control..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
         </div>
 
+        <label class="flex items-center justify-between gap-2 cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 font-semibold">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres poner un recordatorio en el celular?</span>
+          <input type="checkbox" id="bt-ctrl-reminder-enabled" class="w-4 h-4 accent-amber-500 rounded">
+        </label>
+
         <div class="flex gap-2 pt-2 border-t border-slate-800">
           <button type="button" onclick="closeBabyControlModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
             Cancelar
@@ -1287,6 +1304,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <label for="babyMedModalNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">Motivo / Indicaciones <span class="text-slate-500 font-normal">(Opcional)</span></label>
           <input type="text" id="babyMedModalNotes" placeholder="Ej. Para fiebre > 38°C, dar junto con la leche..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
         </div>
+
+        <label class="flex items-center justify-between gap-2 cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 font-semibold">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres activar alarma de recordatorio?</span>
+          <input type="checkbox" id="bt-med-reminder-enabled" class="w-4 h-4 accent-amber-500 rounded">
+        </label>
 
         <div class="flex gap-2 pt-2 border-t border-slate-800">
           <button type="button" onclick="closeBabyMedModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
@@ -1763,6 +1785,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <input type="text" id="babyVaccineQuickNotes" placeholder="Ej. Lote #A45, brazo izquierdo, sin reacción..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-400">
         </div>
 
+        <label class="flex items-center justify-between gap-2 cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 font-semibold">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres poner un recordatorio en el celular?</span>
+          <input type="checkbox" id="bt-vax-reminder-enabled" class="w-4 h-4 accent-amber-500 rounded">
+        </label>
+
         <div class="flex gap-2 pt-2 border-t border-slate-800">
           <button type="button" id="babyVaccineQuickUnmarkBtn" onclick="unmarkBabyVaccineFromQuickModal()" class="hidden py-2.5 px-3 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 rounded-xl text-xs font-bold transition-all active:scale-95">
             Marcar Pendiente
@@ -2075,6 +2102,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <label for="healthControlNotes" class="block text-[11px] font-semibold text-slate-300 mb-1">Notas</label>
           <textarea id="healthControlNotes" rows="3" maxlength="500" placeholder="Detalles adicionales..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
         </div>
+        <label class="flex items-center justify-between gap-2 cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 font-semibold">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres poner un recordatorio en el celular?</span>
+          <input type="checkbox" id="hc-reminder-enabled" class="w-4 h-4 accent-amber-500 rounded">
+        </label>
         <div class="flex gap-2 pt-1">
           <button type="button" onclick="closeHealthControlForm()" class="flex-1 py-2 rounded-lg border border-slate-700 text-slate-300 font-bold text-xs">Cancelar</button>
           <button type="submit" class="flex-1 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs">Guardar control</button>
@@ -2216,6 +2247,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Notas / Indicaciones Médicas</label>
           <textarea id="medNotes" rows="2" placeholder="Ej. Tomar en ayunas..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 resize-none"></textarea>
         </div>
+
+        <label class="flex items-center justify-between gap-2 cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 font-semibold">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> ¿Quieres activar alarma de recordatorio?</span>
+          <input type="checkbox" id="med-reminder-enabled" class="w-4 h-4 accent-amber-500 rounded">
+        </label>
 
         <!-- Botones -->
         <div class="flex space-x-2 pt-2">
@@ -2474,10 +2510,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div id="storage-status" class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1.5"></div>
 
         <div>
-          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Exportar Copia de Seguridad Completa:</span>
-          <button onclick="exportDataJSON()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
-            <i class="fa-solid fa-download"></i> Descargar JSON
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Alarmas y Notificaciones del Celular:</span>
+          <button type="button" onclick="closeSettingsModal(); openAlarmsModal();" class="w-full min-h-11 py-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-bell"></i> Configurar Alarmas y Avisos
           </button>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 mb-1.5">Exportar Copia de Seguridad y Reporte:</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button onclick="exportDataJSON()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-download"></i> Descargar JSON
+            </button>
+            <button type="button" onclick="exportDataPDF()" class="w-full min-h-11 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+            </button>
+          </div>
         </div>
 
         <div>
@@ -2508,6 +2556,133 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <i class="fa-solid fa-file-shield"></i> Ver Política de Privacidad y Uso de Datos
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CENTRO DE ALARMAS Y NOTIFICACIONES -->
+  <div id="alarms-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4 z-[60] transition-opacity" onclick="if(event.target===this) closeAlarmsModal()">
+    <div role="dialog" aria-modal="true" aria-labelledby="alarms-modal-title" class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-md w-full max-h-[92vh] max-h-[92dvh] overflow-hidden shadow-2xl flex flex-col font-sans border border-slate-700">
+      <div class="flex items-center justify-between border-b border-slate-700/70 px-4 pt-4 pb-2.5 shrink-0">
+        <h3 id="alarms-modal-title" class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-bell text-amber-400"></i>
+          <span>Alarmas y Notificaciones</span>
+        </h3>
+        <button type="button" onclick="closeAlarmsModal()" aria-label="Cerrar" class="p-1 text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3.5 space-y-3.5 text-xs">
+        <!-- Estado de permisos y prueba -->
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-200">Estado en el celular:</span>
+            <span id="notif-permission-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">Verificando...</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="requestNotificationPermission()" class="min-h-10 py-2 px-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
+              <i class="fa-solid fa-bell"></i> Activar Avisos
+            </button>
+            <button type="button" onclick="testMobileAlarm()" class="min-h-10 py-2 px-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
+              <i class="fa-solid fa-volume-high"></i> Probar Alarma
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400 leading-relaxed">
+            Las alarmas con sonido y vibración funcionan con la app abierta o en segundo plano. Para que suene aunque cierres la app por completo, toca el botón <strong>.ics</strong> en cada alarma para guardarla en el calendario/reloj del teléfono.
+          </p>
+        </div>
+
+        <!-- Recordatorios automáticos -->
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/70 space-y-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Avisos Automáticos de la App</span>
+          <label class="flex items-center justify-between gap-2 cursor-pointer py-0.5">
+            <span class="text-slate-200 font-semibold">Medicamentos a la hora programada</span>
+            <input type="checkbox" id="notif-toggle-meds" onchange="saveAlarmPrefs()" class="w-4 h-4 accent-amber-500 rounded">
+          </label>
+          <label class="flex items-center justify-between gap-2 cursor-pointer py-0.5">
+            <span class="text-slate-200 font-semibold">Turnos laborales (1 hora y 15 min antes)</span>
+            <input type="checkbox" id="notif-toggle-turns" onchange="saveAlarmPrefs()" class="w-4 h-4 accent-amber-500 rounded">
+          </label>
+          <label class="flex items-center justify-between gap-2 cursor-pointer py-0.5">
+            <span class="text-slate-200 font-semibold">Controles médicos (1 día antes y el mismo día)</span>
+            <input type="checkbox" id="notif-toggle-controls" onchange="saveAlarmPrefs()" class="w-4 h-4 accent-amber-500 rounded">
+          </label>
+          <label class="flex items-center justify-between gap-2 cursor-pointer py-0.5">
+            <span class="text-slate-200 font-semibold">Cumpleaños y aniversarios</span>
+            <input type="checkbox" id="notif-toggle-birthdays" onchange="saveAlarmPrefs()" class="w-4 h-4 accent-amber-500 rounded">
+          </label>
+        </div>
+
+        <!-- Crear nueva alarma personalizada -->
+        <form id="custom-alarm-form" onsubmit="addCustomAlarm(event)" class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-2.5">
+          <span class="text-[10px] font-black uppercase tracking-wider text-amber-300 block">Nueva Alarma Personalizada</span>
+          <div>
+            <label for="alarm-title-input" class="block text-[11px] font-semibold text-slate-300 mb-1">Título</label>
+            <input id="alarm-title-input" type="text" required maxlength="80" placeholder="Ej: Turno mañana, Tomar pastilla, Control..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="alarm-time-input" class="block text-[11px] font-semibold text-slate-300 mb-1">Hora</label>
+              <input id="alarm-time-input" type="time" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+            </div>
+            <div>
+              <label for="alarm-repeat-input" class="block text-[11px] font-semibold text-slate-300 mb-1">Frecuencia</label>
+              <select id="alarm-repeat-input" onchange="toggleAlarmDateField()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+                <option value="once">Una vez (fecha)</option>
+                <option value="daily">Todos los días</option>
+                <option value="weekdays">Lunes a Viernes</option>
+              </select>
+            </div>
+          </div>
+          <div id="alarm-date-wrapper">
+            <label for="alarm-date-input" class="block text-[11px] font-semibold text-slate-300 mb-1">Fecha</label>
+            <input id="alarm-date-input" type="date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400">
+          </div>
+          <div class="flex items-center gap-4 pt-0.5">
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-300">
+              <input type="checkbox" id="alarm-sound-input" checked class="w-4 h-4 accent-amber-500 rounded">
+              <span>Sonido</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-slate-300">
+              <input type="checkbox" id="alarm-vibrate-input" checked class="w-4 h-4 accent-amber-500 rounded">
+              <span>Vibración</span>
+            </label>
+          </div>
+          <button type="submit" class="w-full min-h-10 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> Guardar Alarma
+          </button>
+        </form>
+
+        <!-- Lista de alarmas guardadas -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Mis Alarmas Programadas</span>
+            <span id="custom-alarms-count" class="text-[10px] font-bold text-amber-300">0</span>
+          </div>
+          <div id="custom-alarms-list" class="space-y-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ALARMA ACTIVA SONANDO -->
+  <div id="ringing-alarm-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-[80]">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="ringing-alarm-title" class="bg-[#1e293b] border-2 border-amber-400 text-slate-100 rounded-2xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-2xl text-amber-300 animate-bounce">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="space-y-1">
+        <p class="text-[11px] font-black uppercase tracking-widest text-amber-300">Alarma de Mi Calendario</p>
+        <h3 id="ringing-alarm-title" class="text-lg font-black text-white">Recordatorio</h3>
+        <p id="ringing-alarm-body" class="text-xs text-slate-300"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <button type="button" onclick="snoozeRingingAlarm(5)" class="min-h-11 py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-xl font-bold text-xs transition-all active:scale-95">
+          Posponer 5 min
+        </button>
+        <button type="button" onclick="stopRingingAlarm()" class="min-h-11 py-2.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-black text-xs transition-all active:scale-95">
+          Detener
+        </button>
       </div>
     </div>
   </div>
@@ -3197,6 +3372,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const now = new Date();
       const dayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
       checkMedicationReminders();
+      if (typeof checkCustomAlarms === 'function') checkCustomAlarms();
+      if (typeof checkShiftAndControlReminders === 'function') checkShiftAndControlReminders();
       if (lastActiveDayKey && lastActiveDayKey !== dayKey) {
         pruneOldReminderKeys();
         checkNotificationsOnLaunch();
@@ -3217,12 +3394,26 @@ Check your Browserslist config to be sure that your targets are set up correctly
       pruneOldReminderKeys();
       applyTabVisibility();
       initPWAAndServiceWorker();
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const initialTab = params.get('tab');
+        if (initialTab && ['calendar', 'notes', 'turns', 'meds', 'baby'].includes(initialTab) && typeof switchMainView === 'function') {
+          setTimeout(() => switchMainView(initialTab), 60);
+        }
+      } catch (e) {}
       setBirthdayDateMax();
       syncBirthdayCalendarEvents();
       detectCountryFromEnvironmentAsync();
+      if (typeof updateAlarmsBadge === 'function') updateAlarmsBadge();
       checkNotificationsOnLaunch();
       checkMedicationReminders();
-      setInterval(checkMedicationReminders, 15000);
+      if (typeof checkCustomAlarms === 'function') checkCustomAlarms();
+      if (typeof checkShiftAndControlReminders === 'function') checkShiftAndControlReminders();
+      setInterval(() => {
+        checkMedicationReminders();
+        if (typeof checkCustomAlarms === 'function') checkCustomAlarms();
+        if (typeof checkShiftAndControlReminders === 'function') checkShiftAndControlReminders();
+      }, 15000);
       setupSwipeGestures();
       renderAll();
       lastActiveDayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
@@ -3279,12 +3470,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
           const currentIndex = views.indexOf(currentView);
           if (diffX < 0) {
-            if (currentIndex < views.length - 1) switchView(views[currentIndex + 1]);
+            if (currentIndex < views.length - 1) switchView(views[currentIndex + 1], true);
           } else {
             if (currentIndex > 0) {
               const previousView = views[currentIndex - 1];
               if (previousView === 'calendar') openCurrentCalendarView();
-              else switchView(previousView);
+              else switchView(previousView, true);
             }
           }
         } else if (activeView === 'month') {
@@ -3520,12 +3711,27 @@ Check your Browserslist config to be sure that your targets are set up correctly
           birthdayFilterTab = 'upcoming';
           if (document.getElementById('bday-tab-upcoming')) setBirthdayFilterTab('upcoming');
         } else if (view === 'turns') {
+          const now = new Date();
+          turnsStatsDate = createLocalDate(now.getFullYear(), now.getMonth(), 1);
           setTurnsSubTab('upcoming');
           setTurnsStatsMode('month');
+          ['view-turns', 'turns-upcoming-panel', 'turns-list-container', 'turns-stats-panel'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.scrollTop = 0; el.scrollLeft = 0; }
+          });
         } else if (view === 'meds') {
+          const now = new Date();
+          healthControlStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          medStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
           activeHealthControlSubTab = 'hoy';
           activeMedicationSubTab = 'today';
+          if (typeof setHealthControlStatsMode === 'function') setHealthControlStatsMode('month');
+          if (typeof setMedicationStatsMode === 'function') setMedicationStatsMode('month');
           switchMedRegistration('control');
+          ['view-meds', 'medSubViewHoy', 'medSubViewStats', 'medSubViewMeds', 'allMedsList', 'medicationViewToday', 'medicationViewStats'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.scrollTop = 0; el.scrollLeft = 0; }
+          });
         } else if (view === 'baby') {
           if (typeof window.resetBtAllToFirst === 'function') window.resetBtAllToFirst();
         }
@@ -3567,7 +3773,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function switchView(view, resetSubTabs) {
       if (!canUseView(view)) view = 'month';
-      if (resetSubTabs === true && view !== activeView) resetViewSubTabs(view);
+      const isViewChange = view !== activeView;
+      if (resetSubTabs === true && isViewChange) resetViewSubTabs(view);
+      if (isViewChange && typeof window !== 'undefined') {
+        try { window.scrollTo(0, 0); } catch (_) {}
+      }
       if (view === 'birthdays') {
         view = 'summary';
         notesEventsActiveSubTab = 'events';
@@ -3899,6 +4109,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         });
       }
 
+      const btCtrlRemChk = document.getElementById('bt-ctrl-reminder-enabled');
+      if (btCtrlRemChk && btCtrlRemChk.checked) {
+        createReminderAlarmFromForm({
+          title: `Control Bebé: ${customType || type || 'Control'}`,
+          date,
+          time: time || '09:00',
+          repeat: 'once'
+        });
+        btCtrlRemChk.checked = false;
+      }
       persistBabyTrackerStoreSafe(store);
       closeBabyControlModal();
       renderAll();
@@ -4089,6 +4309,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
         });
       }
 
+      const btMedRemChk = document.getElementById('bt-med-reminder-enabled');
+      if (btMedRemChk && btMedRemChk.checked) {
+        createReminderAlarmFromForm({
+          title: `Med. Bebé (${bName}): ${name}`,
+          time: time || '09:00',
+          repeat: 'daily'
+        });
+        btMedRemChk.checked = false;
+      }
       persistBabyTrackerStoreSafe(store);
       closeBabyMedModal();
       renderAll();
@@ -5026,6 +5255,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
       vax.date = '';
       vax.location = '';
       vax.notes = '';
+      const btVaxRemChk = document.getElementById('bt-vax-reminder-enabled');
+      if (btVaxRemChk && btVaxRemChk.checked) {
+        createReminderAlarmFromForm({
+          title: `Vacuna Bebé (${bName}): ${vaxName}`,
+          date: dateVal,
+          time: '09:00',
+          repeat: 'once'
+        });
+        btVaxRemChk.checked = false;
+      }
       persistBabyTrackerStoreSafe(store);
       closeBabyVaccineQuickModal();
       renderAll();
@@ -5544,6 +5783,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
 
+      const hcRemChk = document.getElementById('hc-reminder-enabled');
+      if (hcRemChk && hcRemChk.checked) {
+        createReminderAlarmFromForm({
+          title: `Control Salud: ${customType || types.join(', ') || 'Control'}`,
+          date,
+          time: time || '09:00',
+          repeat: 'once'
+        });
+        hcRemChk.checked = false;
+      }
       closeHealthControlForm();
       renderUpcomingHealthControls();
       renderHealthControlCalendar();
@@ -5826,6 +6075,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function switchMedSubTab(tab) {
       if (tab !== 'hoy' && tab !== 'stats') return;
+      if (tab !== 'stats') {
+        const now = new Date();
+        healthControlStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        healthControlStatsMode = 'month';
+      }
       activeHealthControlSubTab = tab;
       document.getElementById('healthControlSubTabs').classList.remove('hidden');
       document.getElementById('medicationSubTabs').classList.add('hidden');
@@ -5854,15 +6108,28 @@ Check your Browserslist config to be sure that your targets are set up correctly
         document.getElementById('medSubTabMeds').className = "flex-1 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition-all shadow";
         renderHealthControlStats();
       }
+      ['medSubViewHoy', 'medSubViewStats'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.scrollTop = 0;
+      });
     }
 
     function switchMedRegistration(tab) {
+      const now = new Date();
       if (tab === 'control') {
+        if (activeMedRegistration !== 'control') {
+          healthControlStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          healthControlStatsMode = 'month';
+        }
         activeMedRegistration = 'control';
         switchMedSubTab(activeHealthControlSubTab);
         return;
       }
 
+      if (activeMedRegistration !== 'meds') {
+        medStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        medStatsMode = 'month';
+      }
       activeMedRegistration = 'meds';
       document.getElementById('healthControlSubTabs').classList.add('hidden');
       document.getElementById('medicationSubTabs').classList.remove('hidden');
@@ -5877,6 +6144,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function switchMedicationSubTab(tab) {
       if (!['today', 'treatments', 'stats'].includes(tab)) return;
+      if (tab !== 'stats') {
+        const now = new Date();
+        medStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        medStatsMode = 'month';
+      }
       activeMedicationSubTab = tab;
       document.getElementById('healthControlSubTabs').classList.add('hidden');
       document.getElementById('medicationSubTabs').classList.remove('hidden');
@@ -5900,6 +6172,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (tab === 'today') renderTodayMedView();
       else if (tab === 'stats') renderMedicationStats();
       else renderAllMedsList();
+      ['medicationViewToday', 'medSubViewMeds', 'allMedsList', 'medicationViewStats'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.scrollTop = 0;
+      });
     }
 
     function renderMedsView() {
@@ -6095,6 +6371,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
       persistMedicationData();
 
       closeMedModal();
+      const medRemChk = document.getElementById('med-reminder-enabled');
+      if (medRemChk && medRemChk.checked) {
+        const medNameVal = (document.getElementById('medName')?.value || 'Medicamento').trim();
+        const medTimeVal = document.getElementById('medTime')?.value || '09:00';
+        createReminderAlarmFromForm({
+          title: `Medicamento: ${medNameVal}`,
+          time: medTimeVal,
+          repeat: 'daily'
+        });
+        medRemChk.checked = false;
+      }
       renderTodayMedView();
       renderMedCalendar();
       renderAllMedsList();
@@ -6454,6 +6741,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function setHealthControlStatsMode(mode) {
       if (!['month', 'year', 'history'].includes(mode)) return;
+      if (mode !== healthControlStatsMode) {
+        const now = new Date();
+        healthControlStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
       healthControlStatsMode = mode;
       renderHealthControlStats();
     }
@@ -6652,6 +6943,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function setMedicationStatsMode(mode) {
       if (!['month', 'year', 'history'].includes(mode)) return;
+      if (mode !== medStatsMode) {
+        const now = new Date();
+        medStatsDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
       medStatsMode = mode;
       renderMedicationStats();
     }
@@ -9677,6 +9972,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
         generateRecurringEvents(selectedDate, noteObj);
       }
 
+      const dayRemChk = document.getElementById('day-reminder-enabled');
+      if (dayRemChk && dayRemChk.checked) {
+        const dayRemTime = document.getElementById('day-reminder-time')?.value || (isShift && noteObj.shiftStart ? noteObj.shiftStart : '09:00');
+        createReminderAlarmFromForm({
+          title: noteObj.title || noteObj.text || (isShift ? 'Turno' : isBirthday ? 'Evento' : 'Nota'),
+          date: key,
+          time: dayRemTime,
+          repeat: 'once'
+        });
+        dayRemChk.checked = false;
+        document.getElementById('day-reminder-time-wrap')?.classList.add('hidden');
+      }
       saveToLocalStorage();
       renderAll();
       closeDayDetailModal();
@@ -10159,6 +10466,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function setTurnsSubTab(tab) {
       if (!['upcoming', 'stats'].includes(tab)) return;
+      if (tab !== 'stats') {
+        const now = new Date();
+        turnsStatsDate = createLocalDate(now.getFullYear(), now.getMonth(), 1);
+        turnsStatsMode = 'month';
+      }
       turnsSubTab = tab;
       const activeClass = 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow bg-purple-500 text-white';
       const inactiveClass = 'py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700';
@@ -10166,11 +10478,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
       document.getElementById('turns-subtab-stats').className = tab === 'stats' ? activeClass : inactiveClass;
       document.getElementById('turns-upcoming-panel').classList.toggle('hidden', tab !== 'upcoming');
       document.getElementById('turns-stats-panel').classList.toggle('hidden', tab !== 'stats');
+      ['turns-upcoming-panel', 'turns-list-container', 'turns-stats-panel'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.scrollTop = 0;
+      });
       renderTurnsView();
     }
 
     function setTurnsStatsMode(mode) {
       if (!['month', 'year', 'all'].includes(mode)) return;
+      if (mode !== turnsStatsMode) {
+        const now = new Date();
+        turnsStatsDate = createLocalDate(now.getFullYear(), now.getMonth(), 1);
+      }
       turnsStatsMode = mode;
       ['month', 'year', 'all'].forEach(item => {
         const button = document.getElementById(`turns-stats-mode-${item}`);
@@ -10947,6 +11267,235 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!isAutoBackup) showToast('Exportación Exitosa', 'Respaldo completo descargado (calendario y salud).', 'fa-file-export', 'text-teal-400');
     }
 
+    function toPdfWinAnsiBytes(str) {
+      const clean = String(str || '')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/[\u2013\u2014]/g, '-')
+        .replace(/\u2022/g, '*')
+        .replace(/\u2026/g, '...')
+        .replace(/[^\x20-\x7E\xA0-\xFF]/g, '');
+      const bytes = [];
+      for (let i = 0; i < clean.length; i++) {
+        const code = clean.charCodeAt(i);
+        if (code === 40 || code === 41 || code === 92) {
+          bytes.push(92, code);
+        } else if (code >= 32 && code <= 255) {
+          bytes.push(code);
+        } else {
+          bytes.push(32);
+        }
+      }
+      return bytes;
+    }
+
+    function wrapPdfText(text, maxChars) {
+      const clean = String(text || '').replace(/\s+/g, ' ').trim();
+      if (!clean) return [''];
+      const words = clean.split(' ');
+      const lines = [];
+      let current = '';
+      for (const word of words) {
+        if (!current) {
+          current = word;
+        } else if (current.length + 1 + word.length <= maxChars) {
+          current += ' ' + word;
+        } else {
+          lines.push(current);
+          current = word;
+        }
+      }
+      if (current) lines.push(current);
+      return lines;
+    }
+
+    function buildPdfDocumentBlob(title, subtitle, sections) {
+      const pageW = 595;
+      const pageH = 842;
+      const marginX = 42;
+      const topY = pageH - 48;
+      const bottomY = 52;
+      const pages = [[]];
+
+      const pushCmd = (cmd) => pages[pages.length - 1].push(cmd);
+      const newPage = () => {
+        pages.push([]);
+        return topY;
+      };
+
+      const addTextLine = (x, y, font, size, r, g, b, text) => {
+        const bytes = toPdfWinAnsiBytes(text);
+        let hex = '';
+        for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
+        pushCmd(`BT /${font} ${size} Tf ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} rg 1 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)} Tm <${hex}> Tj ET`);
+      };
+
+      let y = topY;
+      // Header banner
+      pushCmd(`0.059 0.090 0.165 rg ${marginX} ${(y - 34).toFixed(1)} ${(pageW - marginX * 2).toFixed(1)} 46 re f`);
+      addTextLine(marginX + 12, y - 6, 'F2', 15, 0.945, 0.961, 0.976, title);
+      addTextLine(marginX + 12, y - 22, 'F1', 9, 0.580, 0.639, 0.722, subtitle);
+      y -= 54;
+
+      for (const sec of sections) {
+        if (y - 34 < bottomY) y = newPage();
+        addTextLine(marginX, y, 'F2', 11.5, 0.059, 0.463, 0.431, sec.heading);
+        pushCmd(`0.800 0.835 0.882 RG 0.8 w ${marginX} ${(y - 4).toFixed(1)} m ${(pageW - marginX).toFixed(1)} ${(y - 4).toFixed(1)} l S`);
+        y -= 18;
+
+        const items = sec.lines && sec.lines.length ? sec.lines : ['Sin registros guardados.'];
+        for (const rawLine of items) {
+          const isSub = typeof rawLine === 'object' && rawLine !== null;
+          const text = isSub ? rawLine.text : String(rawLine);
+          const font = isSub && rawLine.bold ? 'F2' : 'F1';
+          const size = isSub && rawLine.size ? rawLine.size : 9.5;
+          const color = (isSub && rawLine.color) || [0.118, 0.161, 0.231];
+          const maxChars = size >= 10.5 ? 78 : 88;
+          const wrapped = wrapPdfText(text, maxChars);
+          for (const wLine of wrapped) {
+            if (y - 14 < bottomY) y = newPage();
+            addTextLine(marginX + (isSub && rawLine.indent ? rawLine.indent : 0), y, font, size, color[0], color[1], color[2], wLine);
+            y -= (size + 4.2);
+          }
+        }
+        y -= 8;
+      }
+
+      // Add page numbers
+      const totalPages = pages.length;
+      for (let i = 0; i < totalPages; i++) {
+        const footerText = `Mi Calendario - Pagina ${i + 1} de ${totalPages}`;
+        const bytes = toPdfWinAnsiBytes(footerText);
+        let hex = '';
+        for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
+        pages[i].push(`0.850 0.875 0.910 RG 0.5 w ${marginX} 36 m ${(pageW - marginX).toFixed(1)} 36 l S`);
+        pages[i].push(`BT /F1 8.5 Tf 0.392 0.455 0.545 rg 1 0 0 1 ${marginX} 24 Tm <${hex}> Tj ET`);
+      }
+
+      // Assemble PDF 1.4 objects
+      const objects = [];
+      const addObj = (body) => {
+        objects.push(body);
+        return objects.length;
+      };
+
+      const font1Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+      const font2Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+      const pagesId = addObj(''); // placeholder
+      const pageIds = [];
+
+      for (const cmds of pages) {
+        const stream = cmds.join('\n');
+        const contentId = addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+        const pageId = addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /Font << /F1 ${font1Id} 0 R /F2 ${font2Id} 0 R >> >> /Contents ${contentId} 0 R >>`);
+        pageIds.push(pageId);
+      }
+      objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
+      const catalogId = addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+
+      let pdf = '%PDF-1.4\n';
+      const offsets = [0];
+      for (let i = 0; i < objects.length; i++) {
+        offsets.push(pdf.length);
+        pdf += `${i + 1} 0 obj\n${objects[i]}\nendobj\n`;
+      }
+      const xrefPos = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      for (let i = 1; i < offsets.length; i++) {
+        pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+      }
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+
+      const outBytes = new Uint8Array(pdf.length);
+      for (let i = 0; i < pdf.length; i++) outBytes[i] = pdf.charCodeAt(i) & 0xFF;
+      return new Blob([outBytes], { type: 'application/pdf' });
+    }
+
+    function exportDataPDF() {
+      try {
+        const now = new Date();
+        const dateStr = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+        const exportedLabel = now.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+
+        const shiftLines = [];
+        const eventNoteLines = [];
+        Object.keys(dayDataMap || {}).sort().forEach(dateKey => {
+          const items = Array.isArray(dayDataMap[dateKey]) ? dayDataMap[dateKey] : [];
+          items.forEach(item => {
+            if (!item) return;
+            if (item.isShift) {
+              const timePart = item.shiftStatus ? `(${item.shiftStatus})` : (item.shiftStart || item.shiftEnd ? `${item.shiftStart || '--:--'} - ${item.shiftEnd || '--:--'}` : 'Sin horario');
+              shiftLines.push(`- ${dateKey}: ${item.text || 'Turno'} | ${timePart}`);
+            } else {
+              const tag = item.category ? `[${item.category}] ` : '';
+              eventNoteLines.push(`- ${dateKey}: ${tag}${item.text || ''}`);
+            }
+          });
+        });
+
+        const controlLines = (Array.isArray(healthControls) ? [...healthControls] : [])
+          .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
+          .map(c => `- ${c.date || 'Sin fecha'}${c.time ? ' ' + c.time : ''}: ${c.title || c.name || 'Control'} (${c.type || 'Control'})${c.notes ? ' - ' + c.notes : ''}`);
+
+        const medLines = (Array.isArray(medications) ? medications : []).map(m => {
+          const dose = m.dose ? ` | Dosis: ${m.dose}` : '';
+          const freq = m.freqHours ? ` | Cada ${m.freqHours}h` : '';
+          return `- ${m.name || 'Medicamento'}${dose}${freq}${m.patient ? ' | Paciente: ' + m.patient : ''}`;
+        });
+
+        const btData = typeof window.getBabyTrackerState === 'function' ? window.getBabyTrackerState() : null;
+        const babyLines = [];
+        if (btData && Array.isArray(btData.babies) && btData.babies.length) {
+          btData.babies.forEach(b => {
+            babyLines.push({ text: `Bebe: ${b.name || 'Sin nombre'}${b.birthDate ? ' (Nac: ' + b.birthDate + ')' : ''}`, bold: true });
+          });
+        }
+        if (btData && btData.profiles) {
+          Object.values(btData.profiles).forEach(prof => {
+            if (!prof) return;
+            const feeds = Array.isArray(prof.feeds) ? prof.feeds.length : 0;
+            const diapers = Array.isArray(prof.diapers) ? prof.diapers.length : 0;
+            const sleeps = Array.isArray(prof.sleeps) ? prof.sleeps.length : 0;
+            const controls = Array.isArray(prof.healthControls) ? prof.healthControls.length : 0;
+            if (feeds || diapers || sleeps || controls) {
+              babyLines.push(`- Registros: ${feeds} tomas/comidas, ${diapers} panales, ${sleeps} suenos, ${controls} controles`);
+            }
+          });
+        }
+
+        const sections = [
+          {
+            heading: 'RESUMEN GENERAL',
+            lines: [
+              `Eventos y notas: ${eventNoteLines.length}`,
+              `Turnos laborales: ${shiftLines.length}`,
+              `Controles de salud: ${controlLines.length}`,
+              `Medicamentos registrados: ${medLines.length}`
+            ]
+          },
+          { heading: 'TURNOS LABORALES', lines: shiftLines },
+          { heading: 'EVENTOS Y NOTAS', lines: eventNoteLines },
+          { heading: 'SALUD - CONTROLES MEDICOS', lines: controlLines },
+          { heading: 'SALUD - MEDICAMENTOS', lines: medLines }
+        ];
+        if (babyLines.length) sections.push({ heading: 'MODULO BEBE', lines: babyLines });
+
+        const blob = buildPdfDocumentBlob('MI CALENDARIO - REPORTE GENERAL', `Exportado el ${exportedLabel}`, sections);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_mi_calendario_${dateStr}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('PDF Exportado', 'Reporte en PDF descargado correctamente.', 'fa-file-pdf', 'text-rose-400');
+      } catch (error) {
+        console.error('Error al exportar PDF:', error);
+        showToast('Error al exportar', 'No se pudo generar el archivo PDF.', 'fa-circle-exclamation', 'text-red-400');
+      }
+    }
+
     function isValidCalendarMap(value) {
       if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
       return Object.entries(value).every(([key, notes]) =>
@@ -11524,6 +12073,457 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
+    const CUSTOM_ALARMS_KEY = 'cal_custom_alarms_v1';
+    const ALARM_PREFS_KEY = 'cal_alarm_prefs_v1';
+    let alarmAudioInterval = null;
+    let alarmVibrateInterval = null;
+    let currentRingingAlarm = null;
+
+    function getAlarmPrefs() {
+      try {
+        const raw = localStorage.getItem(ALARM_PREFS_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return {
+          meds: parsed.meds !== false,
+          turns: parsed.turns !== false,
+          controls: parsed.controls !== false,
+          birthdays: parsed.birthdays !== false
+        };
+      } catch (e) {
+        return { meds: true, turns: true, controls: true, birthdays: true };
+      }
+    }
+
+    function saveAlarmPrefs() {
+      const prefs = {
+        meds: !!document.getElementById('notif-toggle-meds')?.checked,
+        turns: !!document.getElementById('notif-toggle-turns')?.checked,
+        controls: !!document.getElementById('notif-toggle-controls')?.checked,
+        birthdays: !!document.getElementById('notif-toggle-birthdays')?.checked
+      };
+      try { localStorage.setItem(ALARM_PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+      showToast('Preferencias guardadas', 'Se actualizaron los avisos automáticos.', 'fa-bell', 'text-amber-400');
+    }
+
+    function getCustomAlarms() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_ALARMS_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        return Array.isArray(list) ? list : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCustomAlarms(list) {
+      try { localStorage.setItem(CUSTOM_ALARMS_KEY, JSON.stringify(list)); } catch (e) {}
+      updateAlarmsBadge();
+    }
+
+    function updateAlarmsBadge() {
+      const badge = document.getElementById('alarms-active-badge');
+      if (!badge) return;
+      const activeCount = getCustomAlarms().filter(a => a && a.enabled).length;
+      badge.textContent = String(activeCount);
+      badge.classList.toggle('hidden', activeCount === 0);
+    }
+
+    function sendMobileNotification(title, body, tag, extra = {}) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const opts = {
+        body: body || '',
+        icon: './mi-calendario-icon-192.png',
+        badge: './mi-calendario-icon-192.png',
+        tag: tag || `mical-${Date.now()}`,
+        renotify: true,
+        requireInteraction: !!extra.requireInteraction,
+        vibrate: extra.vibrate === false ? undefined : [300, 150, 300],
+        data: { url: extra.url || './' }
+      };
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready
+          .then(reg => reg.showNotification(title, opts))
+          .catch(() => {
+            try { new Notification(title, opts); } catch (e) {}
+          });
+      } else {
+        try { new Notification(title, opts); } catch (e) {}
+      }
+    }
+
+    function playAlarmBeepOnce() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        [880, 1046.5, 1318.5].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+          gain.gain.setValueAtTime(0.001, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + idx * 0.14 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.13);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.14);
+        });
+        setTimeout(() => { try { ctx.close(); } catch (e) {} }, 700);
+      } catch (e) {}
+    }
+
+    function triggerRingingAlarm(title, body, options = {}) {
+      stopRingingAlarm();
+      currentRingingAlarm = { title, body, options };
+      const modal = document.getElementById('ringing-alarm-modal');
+      const titleEl = document.getElementById('ringing-alarm-title');
+      const bodyEl = document.getElementById('ringing-alarm-body');
+      if (titleEl) titleEl.textContent = title || 'Alarma';
+      if (bodyEl) bodyEl.textContent = body || '';
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      if (options.sound !== false) {
+        playAlarmBeepOnce();
+        alarmAudioInterval = setInterval(playAlarmBeepOnce, 1600);
+      }
+      if (options.vibrate !== false && 'vibrate' in navigator) {
+        try { navigator.vibrate([400, 200, 400]); } catch (e) {}
+        alarmVibrateInterval = setInterval(() => {
+          try { navigator.vibrate([400, 200, 400]); } catch (e) {}
+        }, 1600);
+      }
+      sendMobileNotification(title, body, options.tag, { requireInteraction: true, vibrate: options.vibrate !== false });
+    }
+
+    function stopRingingAlarm() {
+      if (alarmAudioInterval) { clearInterval(alarmAudioInterval); alarmAudioInterval = null; }
+      if (alarmVibrateInterval) { clearInterval(alarmVibrateInterval); alarmVibrateInterval = null; }
+      if ('vibrate' in navigator) { try { navigator.vibrate(0); } catch (e) {} }
+      const modal = document.getElementById('ringing-alarm-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function snoozeRingingAlarm(minutes) {
+      const info = currentRingingAlarm;
+      stopRingingAlarm();
+      if (!info) return;
+      const target = new Date(Date.now() + minutes * 60000);
+      const hh = String(target.getHours()).padStart(2, '0');
+      const mm = String(target.getMinutes()).padStart(2, '0');
+      const dateKey = formatDateKey(target.getFullYear(), target.getMonth(), target.getDate());
+      const list = getCustomAlarms();
+      list.unshift({
+        id: `snooze-${Date.now()}`,
+        title: `${info.title} (Pospuesta)`,
+        time: `${hh}:${mm}`,
+        repeat: 'once',
+        date: dateKey,
+        sound: info.options?.sound !== false,
+        vibrate: info.options?.vibrate !== false,
+        enabled: true
+      });
+      saveCustomAlarms(list);
+      renderCustomAlarmsList();
+      showToast('Alarma pospuesta', `Volverá a sonar a las ${hh}:${mm}.`, 'fa-clock', 'text-sky-400');
+    }
+
+    function openAlarmsModal() {
+      const modal = document.getElementById('alarms-modal');
+      if (!modal) return;
+      const prefs = getAlarmPrefs();
+      const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+      setChk('notif-toggle-meds', prefs.meds);
+      setChk('notif-toggle-turns', prefs.turns);
+      setChk('notif-toggle-controls', prefs.controls);
+      setChk('notif-toggle-birthdays', prefs.birthdays);
+
+      const dateInput = document.getElementById('alarm-date-input');
+      if (dateInput && !dateInput.value) {
+        const now = new Date();
+        dateInput.value = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      }
+      const timeInput = document.getElementById('alarm-time-input');
+      if (timeInput && !timeInput.value) {
+        const soon = new Date(Date.now() + 5 * 60000);
+        timeInput.value = `${String(soon.getHours()).padStart(2, '0')}:${String(soon.getMinutes()).padStart(2, '0')}`;
+      }
+      updateNotifPermissionStatusUI();
+      toggleAlarmDateField();
+      renderCustomAlarmsList();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAlarmsModal() {
+      const modal = document.getElementById('alarms-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function updateNotifPermissionStatusUI() {
+      const el = document.getElementById('notif-permission-status');
+      if (!el) return;
+      if (!('Notification' in window)) {
+        el.textContent = 'No compatible';
+        el.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400';
+      } else if (Notification.permission === 'granted') {
+        el.textContent = 'Activadas';
+        el.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+      } else if (Notification.permission === 'denied') {
+        el.textContent = 'Bloqueadas en ajustes';
+        el.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/40';
+      } else {
+        el.textContent = 'Pendiente de permiso';
+        el.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      }
+    }
+
+    function toggleAlarmDateField() {
+      const repeat = document.getElementById('alarm-repeat-input')?.value;
+      const wrap = document.getElementById('alarm-date-wrapper');
+      if (wrap) wrap.classList.toggle('hidden', repeat !== 'once');
+    }
+
+    function createReminderAlarmFromForm({ title, date, time, repeat = 'once' }) {
+      if (!title) return;
+      const now = new Date();
+      const targetDate = date || formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const targetTime = (time && /^\d{2}:\d{2}$/.test(time)) ? time : '09:00';
+      const list = getCustomAlarms();
+      list.unshift({
+        id: `alarm-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        title: String(title).slice(0, 80),
+        time: targetTime,
+        repeat,
+        date: repeat === 'once' ? targetDate : '',
+        sound: true,
+        vibrate: true,
+        enabled: true
+      });
+      saveCustomAlarms(list);
+      if ('Notification' in window && Notification.permission === 'default' && window.isSecureContext) {
+        Notification.requestPermission().then(() => updateNotifPermissionStatusUI()).catch(() => {});
+      }
+      showToast('Recordatorio activado', `Alarma programada a las ${targetTime}${repeat === 'once' ? ' (' + targetDate + ')' : ''}.`, 'fa-bell', 'text-amber-400');
+    }
+
+    function addCustomAlarm(event) {
+      event.preventDefault();
+      const title = (document.getElementById('alarm-title-input')?.value || '').trim();
+      const time = document.getElementById('alarm-time-input')?.value || '';
+      const repeat = document.getElementById('alarm-repeat-input')?.value || 'once';
+      const now = new Date();
+      const date = document.getElementById('alarm-date-input')?.value || formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const sound = !!document.getElementById('alarm-sound-input')?.checked;
+      const vibrate = !!document.getElementById('alarm-vibrate-input')?.checked;
+      if (!title || !time) return;
+
+      const list = getCustomAlarms();
+      list.unshift({
+        id: `alarm-${Date.now()}`,
+        title,
+        time,
+        repeat,
+        date: repeat === 'once' ? date : '',
+        sound,
+        vibrate,
+        enabled: true
+      });
+      saveCustomAlarms(list);
+      document.getElementById('alarm-title-input').value = '';
+      renderCustomAlarmsList();
+      showToast('Alarma guardada', `${title} a las ${time}.`, 'fa-bell', 'text-amber-400');
+    }
+
+    function toggleCustomAlarm(id) {
+      const list = getCustomAlarms().map(a => a.id === id ? { ...a, enabled: !a.enabled } : a);
+      saveCustomAlarms(list);
+      renderCustomAlarmsList();
+    }
+
+    function deleteCustomAlarm(id) {
+      const list = getCustomAlarms().filter(a => a.id !== id);
+      saveCustomAlarms(list);
+      renderCustomAlarmsList();
+    }
+
+    function exportAlarmICS(id) {
+      const alarm = getCustomAlarms().find(a => a.id === id);
+      if (!alarm || !alarm.time) return;
+      const now = new Date();
+      const baseDate = alarm.date || formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const [y, m, d] = baseDate.split('-');
+      const [hh, mm] = alarm.time.split(':');
+      const dtStart = `${y}${m}${d}T${hh}${mm}00`;
+      const endDate = new Date(Number(y), Number(m) - 1, Number(d), Number(hh), Number(mm) + 15);
+      const dtEnd = `${endDate.getFullYear()}${String(endDate.getMonth() + 1).padStart(2, '0')}${String(endDate.getDate()).padStart(2, '0')}T${String(endDate.getHours()).padStart(2, '0')}${String(endDate.getMinutes()).padStart(2, '0')}00`;
+      const rrule = alarm.repeat === 'daily' ? 'RRULE:FREQ=DAILY\n' : (alarm.repeat === 'weekdays' ? 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR\n' : '');
+      const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Mi Calendario//Alarmas//ES',
+        'BEGIN:VEVENT',
+        `UID:${alarm.id}@micalendario`,
+        `DTSTAMP:${dtStart}`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        ...(rrule ? [rrule.trim()] : []),
+        `SUMMARY:${alarm.title}`,
+        'BEGIN:VALARM',
+        'TRIGGER:-PT0M',
+        'ACTION:DISPLAY',
+        `DESCRIPTION:${alarm.title}`,
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `alarma_${alarm.time.replace(':', '')}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Archivo .ics descargado', 'Ábrelo para guardarla en el calendario/reloj del celular.', 'fa-calendar-plus', 'text-teal-400');
+    }
+
+    function renderCustomAlarmsList() {
+      const container = document.getElementById('custom-alarms-list');
+      const countEl = document.getElementById('custom-alarms-count');
+      if (!container) return;
+      const list = getCustomAlarms();
+      if (countEl) countEl.textContent = `${list.filter(a => a.enabled).length} activa(s)`;
+      if (!list.length) {
+        container.innerHTML = '<div class="text-center py-4 text-slate-500 italic bg-slate-900/40 rounded-xl border border-slate-800">No hay alarmas personalizadas.</div>';
+        return;
+      }
+      container.innerHTML = list.map(a => {
+        const freqLabel = a.repeat === 'daily' ? 'Todos los días' : (a.repeat === 'weekdays' ? 'Lunes a Viernes' : (a.date || 'Una vez'));
+        return `
+          <div class="p-2.5 rounded-xl bg-slate-900/80 border ${a.enabled ? 'border-amber-500/40' : 'border-slate-800 opacity-60'} flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-black text-amber-300">${escapeHtml(a.time)}</span>
+                <span class="font-bold text-slate-100 truncate">${escapeHtml(a.title)}</span>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-0.5">
+                ${escapeHtml(freqLabel)} ${a.sound ? '• Sonido' : ''} ${a.vibrate ? '• Vibración' : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="exportAlarmICS('${escapeHtml(a.id)}')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[10px] font-bold" title="Añadir al calendario/reloj del teléfono">.ics</button>
+              <button type="button" onclick="toggleCustomAlarm('${escapeHtml(a.id)}')" class="px-2 py-1 rounded-md text-[10px] font-bold ${a.enabled ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${a.enabled ? 'ON' : 'OFF'}</button>
+              <button type="button" onclick="deleteCustomAlarm('${escapeHtml(a.id)}')" aria-label="Eliminar alarma" class="p-1.5 text-slate-400 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function testMobileAlarm() {
+      triggerRingingAlarm('Prueba de Alarma', 'Así sonará y vibrará tu aviso en Mi Calendario.', {
+        sound: true,
+        vibrate: true,
+        tag: `test-alarm-${Date.now()}`
+      });
+    }
+
+    function checkCustomAlarms() {
+      const now = new Date();
+      const todayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const nowHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const dow = now.getDay();
+      const list = getCustomAlarms();
+      let changed = false;
+
+      list.forEach(alarm => {
+        if (!alarm || !alarm.enabled || alarm.time !== nowHHMM) return;
+        const matchesDay =
+          alarm.repeat === 'daily' ||
+          (alarm.repeat === 'weekdays' && dow >= 1 && dow <= 5) ||
+          (alarm.repeat === 'once' && alarm.date === todayKey);
+        if (!matchesDay) return;
+
+        const firedKey = `cal_custom_alarm_fired_${todayKey}_${alarm.id}_${nowHHMM}`;
+        try {
+          if (localStorage.getItem(firedKey) === '1') return;
+          localStorage.setItem(firedKey, '1');
+        } catch (e) {}
+
+        triggerRingingAlarm(alarm.title, `Alarma programada para las ${alarm.time}`, {
+          sound: alarm.sound !== false,
+          vibrate: alarm.vibrate !== false,
+          tag: `custom-alarm-${alarm.id}-${todayKey}`
+        });
+
+        if (alarm.repeat === 'once') {
+          alarm.enabled = false;
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        saveCustomAlarms(list);
+        renderCustomAlarmsList();
+      }
+    }
+
+    function checkShiftAndControlReminders() {
+      const prefs = getAlarmPrefs();
+      const now = new Date();
+      const todayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const nowMs = now.getTime();
+
+      if (prefs.turns) {
+        const items = Array.isArray(dayDataMap?.[todayKey]) ? dayDataMap[todayKey] : [];
+        items.forEach(item => {
+          if (!item || !item.isShift || !item.shiftStart) return;
+          const [h, m] = String(item.shiftStart).split(':').map(Number);
+          if (!Number.isInteger(h) || !Number.isInteger(m)) return;
+          const startMs = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m).getTime();
+          const diffMin = Math.round((startMs - nowMs) / 60000);
+          [60, 15].forEach(lead => {
+            if (diffMin <= lead && diffMin >= lead - 2) {
+              const key = `cal_shift_notif_${todayKey}_${item.id || item.text}_${lead}`;
+              try {
+                if (localStorage.getItem(key) === '1') return;
+                localStorage.setItem(key, '1');
+              } catch (e) {}
+              const title = `Turno en ${lead} min: ${item.text || 'Turno'}`;
+              const body = `Comienza a las ${item.shiftStart}`;
+              showToast(title, body, 'fa-user-doctor', 'text-purple-300');
+              sendMobileNotification(title, body, `shift-${todayKey}-${lead}`);
+            }
+          });
+        });
+      }
+
+      if (prefs.controls && Array.isArray(healthControls)) {
+        healthControls.forEach(ctrl => {
+          if (!ctrl || !ctrl.date || ctrl.date !== todayKey) return;
+          const key = `cal_ctrl_notif_${todayKey}_${ctrl.id || ctrl.title || ctrl.name}`;
+          try {
+            if (localStorage.getItem(key) === '1') return;
+            localStorage.setItem(key, '1');
+          } catch (e) {}
+          const title = `Control médico hoy: ${ctrl.title || ctrl.name || 'Control'}`;
+          const body = ctrl.time ? `Horario: ${ctrl.time}` : 'Revisar detalles en Salud';
+          showToast(title, body, 'fa-stethoscope', 'text-blue-400');
+          sendMobileNotification(title, body, `ctrl-${todayKey}-${ctrl.id || '0'}`);
+        });
+      }
+    }
+
     function requestNotificationPermission() {
       if (!('Notification' in window)) {
         showToast('No Compatible', 'Este navegador no soporta notificaciones.', 'fa-bell-slash', 'text-amber-400');
@@ -11534,10 +12534,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
       Notification.requestPermission().then(permission => {
+        updateNotifPermissionStatusUI();
         if (permission === 'granted') {
-          showToast('Permiso concedido', 'Se activaron los avisos de medicamentos y cumpleaños mientras la app esté abierta.', 'fa-bell', 'text-teal-400');
+          showToast('Permiso concedido', 'Notificaciones activadas en el dispositivo.', 'fa-bell', 'text-teal-400');
+          sendMobileNotification('Mi Calendario', 'Notificaciones activadas correctamente.', 'welcome-notif');
           checkNotificationsOnLaunch();
           checkMedicationReminders();
+          checkShiftAndControlReminders();
         } else {
           showToast('Permiso Denegado', 'No se mostrarán avisos del navegador. Revisa los permisos del navegador.', 'fa-bell-slash', 'text-amber-400');
         }
@@ -11587,16 +12590,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
           : baseDose;
         showToast('Hora del medicamento', `${item.med.name}: ${doseDetails}`, 'fa-pills', 'text-blue-400');
 
-        if ('Notification' in window && Notification.permission === 'granted') {
-          try {
-            new Notification(`Hora de tomar: ${item.med.name}`, {
-              body: doseDetails,
-              icon: './mi-calendario-icon-192.png',
-              tag: `medication-${logKey}`
-            });
-          } catch (error) {
-            console.warn('No se pudo mostrar el recordatorio del medicamento.', error);
-          }
+        if (getAlarmPrefs().meds) {
+          triggerRingingAlarm(`Hora de tomar: ${item.med.name}`, doseDetails, {
+            sound: true,
+            vibrate: true,
+            tag: `medication-${logKey}`
+          });
         }
       });
     }
@@ -11650,12 +12649,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
           ? `🎂 ¡Hoy es el cumpleaños de ${person}!`
           : `🎂 Recordatorio: Cumpleaños de ${person} en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'}`;
 
+        if (!getAlarmPrefs().birthdays) return;
         try {
-          new Notification(titleMsg, {
-            body: note.description || '¡No olvides desearle un feliz día!',
-            icon: './mi-calendario-icon-192.png',
-            tag: `birthday-${todayKey}-${note.id || person}-${daysLeft}`
-          });
+          sendMobileNotification(
+            titleMsg,
+            note.description || '¡No olvides desearle un feliz día!',
+            `birthday-${todayKey}-${note.id || person}-${daysLeft}`
+          );
           localStorage.setItem(notifiedKey, '1');
         } catch (error) {
           console.warn('No se pudo mostrar o registrar la notificación de cumpleaños:', error);
