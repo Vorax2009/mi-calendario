@@ -2609,6 +2609,30 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </p>
         </div>
 
+        <!-- Personalización de sonido -->
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/70 space-y-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-amber-300 block">Sonido de la Alarma</span>
+          <div class="flex items-center gap-2">
+            <select id="alarm-tone-select" onchange="saveSelectedAlarmTone(this.value)" class="flex-1 min-h-10 bg-slate-950 border border-slate-700 rounded-lg px-2.5 text-xs text-slate-100 font-semibold focus:outline-none focus:border-amber-400">
+              <option value="campana">🔔 Campana clásica</option>
+              <option value="suave">🎵 Melodía suave (Bebé / Salud)</option>
+              <option value="urgente">🚨 Alerta urgente</option>
+              <option value="digital">⏰ Reloj digital</option>
+              <option value="custom">🎧 Audio propio del celular</option>
+            </select>
+            <button type="button" onclick="previewSelectedAlarmTone()" class="min-h-10 px-3 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center gap-1.5 transition-all active:scale-95">
+              <i class="fa-solid fa-play"></i> Escuchar
+            </button>
+          </div>
+          <div id="alarm-custom-audio-box" class="hidden flex items-center justify-between gap-2 pt-1 border-t border-slate-800">
+            <span id="alarm-custom-audio-name" class="text-[10px] text-slate-300 truncate">Sin audio cargado</span>
+            <label class="px-2.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[10px] font-bold cursor-pointer shrink-0">
+              <i class="fa-solid fa-upload"></i> Elegir audio
+              <input type="file" id="alarm-custom-audio-input" accept="audio/*" class="hidden" onchange="handleCustomAlarmAudioUpload(event)">
+            </label>
+          </div>
+        </div>
+
         <!-- Recordatorios automáticos -->
         <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/70 space-y-2">
           <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Avisos Automáticos de la App</span>
@@ -12562,27 +12586,153 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
-    function playAlarmBeepOnce() {
+    const ALARM_TONE_KEY = 'cal_alarm_tone_v1';
+    const ALARM_CUSTOM_AUDIO_NAME_KEY = 'cal_alarm_custom_audio_name_v1';
+    let activeCustomAudioEl = null;
+    let activeCustomAudioUrl = null;
+
+    function getSelectedAlarmTone() {
+      try {
+        return localStorage.getItem(ALARM_TONE_KEY) || 'campana';
+      } catch (e) {
+        return 'campana';
+      }
+    }
+
+    function saveSelectedAlarmTone(tone) {
+      try { localStorage.setItem(ALARM_TONE_KEY, tone); } catch (e) {}
+      const box = document.getElementById('alarm-custom-audio-box');
+      if (box) box.classList.toggle('hidden', tone !== 'custom');
+    }
+
+    function openAlarmSoundDB() {
+      return new Promise((resolve, reject) => {
+        if (!('indexedDB' in window)) return reject(new Error('Sin IndexedDB'));
+        const req = indexedDB.open('mi_calendario_sound_db', 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('sounds')) db.createObjectStore('sounds');
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function handleCustomAlarmAudioUpload(event) {
+      const file = event?.target?.files?.[0];
+      if (!file) return;
+      if (file.size > 8 * 1024 * 1024) {
+        showToast('Archivo muy grande', 'Elige un audio de hasta 8 MB.', 'fa-circle-exclamation', 'text-amber-400');
+        return;
+      }
+      try {
+        const db = await openAlarmSoundDB();
+        await new Promise((res, rej) => {
+          const tx = db.transaction('sounds', 'readwrite');
+          tx.objectStore('sounds').put(file, 'custom_alarm');
+          tx.oncomplete = () => res();
+          tx.onerror = () => rej(tx.error);
+        });
+        try { localStorage.setItem(ALARM_CUSTOM_AUDIO_NAME_KEY, file.name); } catch (e) {}
+        saveSelectedAlarmTone('custom');
+        const sel = document.getElementById('alarm-tone-select');
+        if (sel) sel.value = 'custom';
+        const nameEl = document.getElementById('alarm-custom-audio-name');
+        if (nameEl) nameEl.textContent = file.name;
+        showToast('Audio guardado', `Se usará "${file.name}" como sonido de alarma.`, 'fa-music', 'text-teal-400');
+      } catch (e) {
+        showToast('Error al guardar', 'No se pudo almacenar el audio.', 'fa-circle-exclamation', 'text-red-400');
+      }
+    }
+
+    async function playCustomAudioBlob(loopMode = false) {
+      try {
+        const db = await openAlarmSoundDB();
+        const blob = await new Promise((res, rej) => {
+          const tx = db.transaction('sounds', 'readonly');
+          const r = tx.objectStore('sounds').get('custom_alarm');
+          r.onsuccess = () => res(r.result || null);
+          r.onerror = () => rej(r.error);
+        });
+        if (!blob) return false;
+        stopCustomAudioPlayer();
+        activeCustomAudioUrl = URL.createObjectURL(blob);
+        activeCustomAudioEl = new Audio(activeCustomAudioUrl);
+        activeCustomAudioEl.loop = !!loopMode;
+        await activeCustomAudioEl.play();
+        if (!loopMode) {
+          setTimeout(() => stopCustomAudioPlayer(), 4000);
+        }
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function stopCustomAudioPlayer() {
+      if (activeCustomAudioEl) {
+        try { activeCustomAudioEl.pause(); activeCustomAudioEl.currentTime = 0; } catch (e) {}
+        activeCustomAudioEl = null;
+      }
+      if (activeCustomAudioUrl) {
+        try { URL.revokeObjectURL(activeCustomAudioUrl); } catch (e) {}
+        activeCustomAudioUrl = null;
+      }
+    }
+
+    function playSynthTone(tone) {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         const ctx = new AudioCtx();
         const now = ctx.currentTime;
-        [880, 1046.5, 1318.5].forEach((freq, idx) => {
+        const patterns = {
+          campana: { type: 'sine', notes: [[880, 0, 0.14], [1046.5, 0.16, 0.14], [1318.5, 0.32, 0.22]], gain: 0.24 },
+          suave: { type: 'triangle', notes: [[523.25, 0, 0.22], [659.25, 0.24, 0.22], [783.99, 0.48, 0.32]], gain: 0.18 },
+          urgente: { type: 'sawtooth', notes: [[1100, 0, 0.1], [1480, 0.12, 0.1], [1100, 0.26, 0.1], [1480, 0.38, 0.16]], gain: 0.2 },
+          digital: { type: 'square', notes: [[988, 0, 0.09], [988, 0.14, 0.09], [988, 0.28, 0.09], [988, 0.42, 0.09]], gain: 0.14 }
+        };
+        const cfg = patterns[tone] || patterns.campana;
+        cfg.notes.forEach(([freq, offset, dur]) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
-          gain.gain.setValueAtTime(0.001, now + idx * 0.14);
-          gain.gain.exponentialRampToValueAtTime(0.22, now + idx * 0.14 + 0.03);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.13);
+          osc.type = cfg.type;
+          osc.frequency.setValueAtTime(freq, now + offset);
+          gain.gain.setValueAtTime(0.001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(cfg.gain, now + offset + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + dur);
           osc.connect(gain);
           gain.connect(ctx.destination);
-          osc.start(now + idx * 0.14);
-          osc.stop(now + idx * 0.14 + 0.14);
+          osc.start(now + offset);
+          osc.stop(now + offset + dur + 0.02);
         });
-        setTimeout(() => { try { ctx.close(); } catch (e) {} }, 700);
+        setTimeout(() => { try { ctx.close(); } catch (e) {} }, 1000);
       } catch (e) {}
+    }
+
+    function playAlarmBeepOnce() {
+      const tone = getSelectedAlarmTone();
+      if (tone === 'custom') {
+        playCustomAudioBlob(false).then(ok => {
+          if (!ok) playSynthTone('campana');
+        });
+      } else {
+        playSynthTone(tone);
+      }
+    }
+
+    function previewSelectedAlarmTone() {
+      const tone = document.getElementById('alarm-tone-select')?.value || getSelectedAlarmTone();
+      if (tone === 'custom') {
+        playCustomAudioBlob(false).then(ok => {
+          if (!ok) {
+            showToast('Sin audio cargado', 'Sube un audio del celular primero o elige otro tono.', 'fa-circle-info', 'text-amber-400');
+            playSynthTone('campana');
+          }
+        });
+      } else {
+        playSynthTone(tone);
+      }
     }
 
     function triggerRingingAlarm(title, body, options = {}) {
@@ -12598,8 +12748,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
         modal.classList.add('flex');
       }
       if (options.sound !== false) {
-        playAlarmBeepOnce();
-        alarmAudioInterval = setInterval(playAlarmBeepOnce, 1600);
+        const tone = getSelectedAlarmTone();
+        if (tone === 'custom') {
+          playCustomAudioBlob(true).then(ok => {
+            if (!ok) {
+              playSynthTone('campana');
+              alarmAudioInterval = setInterval(() => playSynthTone('campana'), 1600);
+            }
+          });
+        } else {
+          playSynthTone(tone);
+          alarmAudioInterval = setInterval(() => playSynthTone(tone), 1600);
+        }
       }
       if (options.vibrate !== false && 'vibrate' in navigator) {
         try { navigator.vibrate([400, 200, 400]); } catch (e) {}
@@ -12613,6 +12773,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     function stopRingingAlarm() {
       if (alarmAudioInterval) { clearInterval(alarmAudioInterval); alarmAudioInterval = null; }
       if (alarmVibrateInterval) { clearInterval(alarmVibrateInterval); alarmVibrateInterval = null; }
+      stopCustomAudioPlayer();
       if ('vibrate' in navigator) { try { navigator.vibrate(0); } catch (e) {} }
       const modal = document.getElementById('ringing-alarm-modal');
       if (modal) {
@@ -12664,6 +12825,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (timeInput && !timeInput.value) {
         const soon = new Date(Date.now() + 5 * 60000);
         timeInput.value = `${String(soon.getHours()).padStart(2, '0')}:${String(soon.getMinutes()).padStart(2, '0')}`;
+      }
+      const toneSel = document.getElementById('alarm-tone-select');
+      const currentTone = getSelectedAlarmTone();
+      if (toneSel) toneSel.value = currentTone;
+      saveSelectedAlarmTone(currentTone);
+      const customAudioNameEl = document.getElementById('alarm-custom-audio-name');
+      if (customAudioNameEl) {
+        try {
+          customAudioNameEl.textContent = localStorage.getItem(ALARM_CUSTOM_AUDIO_NAME_KEY) || 'Sin audio cargado';
+        } catch (e) {}
       }
       updateNotifPermissionStatusUI();
       toggleAlarmDateField();
