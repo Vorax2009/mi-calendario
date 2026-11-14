@@ -11535,38 +11535,45 @@ Check your Browserslist config to be sure that your targets are set up correctly
           healthControls,
           babyTracker: typeof window.getBabyTrackerState === 'function' ? window.getBabyTrackerState() : undefined
         };
-        const fileName = `backup_mi_calendario_${dateKey}.json`;
         const jsonText = JSON.stringify(backup, null, 2);
-        const file = new File([jsonText], fileName, { type: 'application/json' });
+        const jsonFileName = `backup_mi_calendario_${dateKey}.json`;
+        const txtFileName = `backup_mi_calendario_${dateKey}.txt`;
 
         try { localStorage.setItem(LAST_BACKUP_KEY, String(Date.now())); } catch (e) {}
         updateStorageStatus();
 
-        if (window.isSecureContext && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              title: 'Copia de seguridad Mi Calendario',
-              text: 'Selecciona Google Drive para guardar tu respaldo.',
-              files: [file]
-            });
-            showToast('Respaldo compartido', 'Elige Google Drive para completar la copia.', 'fa-cloud-arrow-up', 'text-sky-400');
-            return;
-          } catch (shareErr) {
-            if (shareErr && shareErr.name === 'AbortError') return;
+        // Android Chrome bloquea application/json en navigator.share; text/plain (.txt) sí es aceptado por Drive y compatible al reimportar.
+        if (window.isSecureContext && navigator.share && navigator.canShare) {
+          const shareFile = new File([jsonText], txtFileName, { type: 'text/plain' });
+          if (navigator.canShare({ files: [shareFile] })) {
+            try {
+              await navigator.share({
+                title: 'Copia de seguridad Mi Calendario',
+                text: 'Elige Google Drive para guardar tu copia de seguridad.',
+                files: [shareFile]
+              });
+              showToast('Compartido a Drive', 'Si elegiste Drive, tu copia quedó guardada.', 'fa-cloud-arrow-up', 'text-sky-400');
+              return;
+            } catch (shareErr) {
+              if (shareErr && shareErr.name === 'AbortError') return;
+            }
           }
         }
 
+        // Respaldo por descarga directa + apertura de Google Drive
         const blob = new Blob([jsonText], { type: 'application/json;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName;
+        a.download = jsonFileName;
         document.body.appendChild(a);
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
-        showToast('Respaldo listo', 'Se descargó el JSON y se abrió Google Drive para subirlo.', 'fa-cloud-arrow-up', 'text-sky-400');
+        showToast('Respaldo descargado', 'Sube el archivo JSON descargado en tu Google Drive (+ → Subir).', 'fa-cloud-arrow-up', 'text-sky-400');
+        setTimeout(() => {
+          window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
+        }, 350);
       } catch (err) {
         if (err && err.name === 'AbortError') return;
         console.warn('Error en respaldo Drive:', err);
