@@ -278,11 +278,6 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <i class="fa-solid fa-bell"></i>
         </button>
 
-        <!-- Share with Another Person Trigger -->
-        <button onclick="openShareModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95 shadow-sm" title="Compartir con otra persona (combina sin borrar)">
-          <i class="fa-solid fa-share-nodes"></i>
-        </button>
-
         <!-- Backup & Settings Modal Trigger -->
         <button onclick="openSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Ajustes y Respaldos">
           <i class="fa-solid fa-gear"></i>
@@ -333,11 +328,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <i class="fa-solid fa-chevron-left text-lg"></i>
           </button>
           
-          <div class="flex items-center gap-4">
-            <button type="button" id="month-year-title" onclick="switchView('year')" aria-label="Abrir vista anual" class="text-base md:text-lg font-black tracking-wide text-slate-100 uppercase hover:text-indigo-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded">NOVIEMBRE 2026</button>
-            <button onclick="goToToday()" class="px-2 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded font-bold uppercase transition-colors active:scale-95" title="Ir a hoy">
-              Hoy
-            </button>
+          <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+            <button type="button" id="month-year-title" onclick="switchView('year')" aria-label="Abrir vista anual" class="text-sm sm:text-base md:text-lg font-black tracking-wide text-slate-100 uppercase hover:text-indigo-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded">NOVIEMBRE 2026</button>
+            <div class="flex items-center gap-1.5">
+              <button onclick="goToToday()" class="px-2 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded font-bold uppercase transition-colors active:scale-95" title="Ir a hoy">
+                Hoy
+              </button>
+              <button type="button" id="holiday-country-badge" onclick="openHolidaysModal()" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded font-bold transition-colors active:scale-95 flex items-center gap-1 shadow-sm" title="Feriados según el país donde se ejecuta la app">
+                <span id="holiday-country-flag">🇨🇱</span>
+                <span id="holiday-country-code-label">CL</span>
+              </button>
+            </div>
           </div>
 
           <button onclick="changeMonth(1)" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors focus:outline-none active:scale-95" title="Siguiente Mes">
@@ -345,15 +346,15 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </button>
         </div>
 
-        <!-- DAYS OF THE WEEK HEADER -->
+        <!-- DAYS OF THE WEEK HEADER (Lunes a Domingo) -->
         <div class="grid grid-cols-7 gap-px text-center text-xs md:text-sm font-bold bg-slate-800 border-x border-slate-700/60">
-          <div class="py-2 bg-[#C81E1E] text-white font-black">DOM</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">LUN</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">MAR</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">MIÉ</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">JUE</div>
           <div class="py-2 bg-[#1e293b] text-slate-300">VIE</div>
           <div class="py-2 bg-[#C81E1E] text-white font-black">SÁB</div>
+          <div class="py-2 bg-[#C81E1E] text-white font-black">DOM</div>
         </div>
 
         <!-- CALENDAR GRID -->
@@ -383,7 +384,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <span id="year-prev-label">2025</span>
           </button>
           
-          <button type="button" id="year-title" onclick="openYearPicker()" aria-label="Elegir año" title="Elegir año" class="text-base font-extrabold tracking-widest text-teal-400 px-3 uppercase shrink-0 hover:text-teal-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded">2026</button>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" id="year-title" onclick="openYearPicker()" aria-label="Elegir año" title="Elegir año" class="text-base font-extrabold tracking-widest text-teal-400 px-2 uppercase shrink-0 hover:text-teal-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded">2026</button>
+            <button type="button" id="year-holiday-country-badge" onclick="openHolidaysModal()" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded-full font-bold transition-colors active:scale-95 flex items-center gap-1" title="Ver feriados del año según país">
+              <span id="year-holiday-country-flag">🇨🇱</span>
+              <span id="year-holiday-country-code">CL</span>
+            </button>
+          </div>
 
           <button onclick="changeYear(1)" class="flex-1 py-2 px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-full border border-slate-700 font-bold text-xs tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95">
             <span id="year-next-label">2027</span>
@@ -1208,40 +1215,73 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         <div>
           <label for="babyMedModalName" class="block text-[11px] font-semibold text-slate-300 mb-1">Nombre del Medicamento</label>
-          <input type="text" id="babyMedModalName" required placeholder="Ej. Paracetamol gotas, Ibuprofeno jarabe, Vitamina D3..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          <input type="text" id="babyMedModalName" required list="commonMedsList" autocomplete="off" placeholder="Ej. Paracetamol, Ibuprofeno, Vitamina D3..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
         </div>
 
+        <!-- Dosis y Unidad + Frasco / Presentación -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label for="babyMedModalDose" class="block text-[11px] font-semibold text-slate-300 mb-1">Dosis indicada</label>
-            <input type="text" id="babyMedModalDose" required placeholder="Ej. 10 gotas, 2.5 ml" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+            <div class="flex space-x-1">
+              <input type="number" step="any" id="babyMedModalDose" oninput="calculateBabyDoseHelper()" required placeholder="Ej. 70" class="w-2/3 bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+              <select id="babyMedModalDoseUnit" onchange="calculateBabyDoseHelper()" class="w-1/3 bg-slate-950 border border-slate-700 rounded-lg px-1 py-2 text-[10px] font-bold text-slate-100 focus:outline-none focus:border-blue-400">
+                <option value="mg">mg</option>
+                <option value="ml">ml</option>
+                <option value="gotas">gotas</option>
+                <option value="g">g</option>
+                <option value="mcg">mcg</option>
+                <option value="UI">UI</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="babyMedModalFormType" class="block text-[11px] font-semibold text-slate-300 mb-1">Frasco / Presentación</label>
+            <input type="text" id="babyMedModalFormType" oninput="calculateBabyDoseHelper()" placeholder="Ej. 100mg/1ml o 500mg/comp" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+          </div>
+        </div>
+
+        <!-- Calculadora dinámica visual para Bebé -->
+        <div id="babyDoseCalcResult" class="hidden p-2 rounded-lg bg-blue-950/60 border border-blue-800/60 text-[11px] text-blue-300 space-y-0.5">
+          <div class="flex items-center gap-1 font-bold text-blue-400">
+            <i class="fa-solid fa-calculator"></i>
+            <span>Cálculo automático:</span>
+          </div>
+          <p id="babyDoseCalcText" class="font-semibold text-xs">--</p>
+        </div>
+
+        <!-- Horario Inicial & Frecuencia -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="babyMedModalTime" class="block text-[11px] font-semibold text-slate-300 mb-1">1ª Hora de toma</label>
+            <input type="time" id="babyMedModalTime" required value="08:00" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-center text-slate-100 focus:outline-none focus:border-blue-400 font-mono font-bold">
           </div>
           <div>
             <label for="babyMedModalFrequency" class="block text-[11px] font-semibold text-slate-300 mb-1">Frecuencia</label>
             <select id="babyMedModalFrequency" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-blue-400">
+              <option value="3">Cada 3 horas</option>
               <option value="4">Cada 4 horas</option>
               <option value="6">Cada 6 horas</option>
               <option value="8" selected>Cada 8 horas</option>
+              <option value="9">Cada 9 horas</option>
               <option value="12">Cada 12 horas</option>
-              <option value="24">Cada 24 horas (Diario)</option>
+              <option value="24">Cada 24h (Diario)</option>
+              <option value="48">Cada 48h (Cada 2 días)</option>
+              <option value="168">Cada 7 días (Semanal)</option>
             </select>
           </div>
         </div>
 
+        <!-- Fecha Inicio & Duración -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="babyMedModalTime" class="block text-[11px] font-semibold text-slate-300 mb-1">1ª Hora de toma</label>
-            <input type="time" id="babyMedModalTime" required value="08:00" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-mono font-bold">
+            <label for="babyMedModalStartDate" class="block text-[11px] font-semibold text-slate-300 mb-1">Fecha de inicio</label>
+            <input type="date" id="babyMedModalStartDate" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-mono font-bold">
           </div>
           <div>
             <label for="babyMedModalDuration" class="block text-[11px] font-semibold text-slate-300 mb-1">Duración (días)</label>
-            <input type="number" id="babyMedModalDuration" min="1" max="180" value="7" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-bold">
+            <input type="number" id="babyMedModalDuration" min="1" max="365" value="7" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-bold">
           </div>
-        </div>
-
-        <div>
-          <label for="babyMedModalStartDate" class="block text-[11px] font-semibold text-slate-300 mb-1">Fecha de inicio</label>
-          <input type="date" id="babyMedModalStartDate" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-400 font-mono font-bold">
         </div>
 
         <div>
@@ -2066,6 +2106,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Nombre del Medicamento</label>
           <input type="text" id="medName" required list="commonMedsList" autocomplete="off" placeholder="Ej. Omeprazol, Paracetamol" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
           <datalist id="commonMedsList">
+            <option value="Paracetamol Gotas">
+            <option value="Ibuprofeno Jarabe">
+            <option value="Vitamina D3 (ACD)">
+            <option value="Sulfato Ferroso (Hierro)">
+            <option value="Simeticona (Flapex / Espaven)">
+            <option value="Probióticos (BioGaia / Perenteryl)">
+            <option value="Amoxicilina Suspensión">
+            <option value="Desloratadina Jarabe">
+            <option value="Clorfenamina">
+            <option value="Suero Fisiológico Nasal">
             <option value="Paracetamol">
             <option value="Ibuprofeno">
             <option value="Omeprazol">
@@ -2315,6 +2365,55 @@ Check your Browserslist config to be sure that your targets are set up correctly
           </select>
         </div>
 
+        <div class="p-2.5 rounded-xl bg-rose-950/25 border border-rose-500/30 space-y-2">
+          <div class="flex items-center justify-between">
+            <label for="holiday-country-setting" class="font-bold text-rose-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-flag-checkered text-rose-400"></i>
+              <span>Feriados por país:</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <span class="text-[10px] text-slate-300">Mostrar</span>
+              <input type="checkbox" id="holiday-enabled-setting" onchange="setHolidaysEnabled(this.checked)" class="peer sr-only" checked>
+              <span class="relative w-8 h-4 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-3 after:h-3 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+            </label>
+          </div>
+          <select id="holiday-country-setting" onchange="setHolidayCountryMode(this.value)" class="w-full bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-rose-400">
+            <option value="AUTO">🌐 Automático (según país donde se ejecuta)</option>
+            <option value="CL">🇨🇱 Chile</option>
+            <option value="AR">🇦🇷 Argentina</option>
+            <option value="PE">🇵🇪 Perú</option>
+            <option value="CO">🇨🇴 Colombia</option>
+            <option value="MX">🇲🇽 México</option>
+            <option value="ES">🇪🇸 España</option>
+            <option value="UY">🇺🇾 Uruguay</option>
+            <option value="PY">🇵🇾 Paraguay</option>
+            <option value="BO">🇧🇴 Bolivia</option>
+            <option value="EC">🇪🇨 Ecuador</option>
+            <option value="VE">🇻🇪 Venezuela</option>
+            <option value="BR">🇧🇷 Brasil</option>
+            <option value="PA">🇵🇦 Panamá</option>
+            <option value="CR">🇨🇷 Costa Rica</option>
+            <option value="DO">🇩🇴 República Dominicana</option>
+            <option value="GT">🇬🇹 Guatemala</option>
+            <option value="SV">🇸🇻 El Salvador</option>
+            <option value="HN">🇭🇳 Honduras</option>
+            <option value="NI">🇳🇮 Nicaragua</option>
+            <option value="CU">🇨🇺 Cuba</option>
+            <option value="PR">🇵🇷 Puerto Rico</option>
+            <option value="US">🇺🇸 Estados Unidos</option>
+            <option value="CA">🇨🇦 Canadá</option>
+            <option value="PT">🇵🇹 Portugal</option>
+            <option value="IT">🇮🇹 Italia</option>
+            <option value="FR">🇫🇷 Francia</option>
+            <option value="DE">🇩🇪 Alemania</option>
+            <option value="GB">🇬🇧 Reino Unido</option>
+          </select>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+            <span id="holiday-detected-status" class="truncate">País activo: Detectando...</span>
+            <button type="button" onclick="closeSettingsModal(); openHolidaysModal();" class="text-rose-300 hover:text-rose-200 font-bold underline shrink-0 ml-2">Ver lista de feriados</button>
+          </div>
+        </div>
+
         <div>
           <span class="font-semibold text-slate-300 block mb-1">Menús visibles:</span>
           <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
@@ -2392,6 +2491,87 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
+  <!-- MODAL: FERIADOS POR PAÍS -->
+  <div id="holidays-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-3 z-[75] transition-opacity" onclick="if(event.target===this) closeHolidaysModal()">
+    <div class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-md w-full p-4 shadow-2xl flex flex-col font-sans border border-rose-500/40 space-y-3 max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5">
+        <h3 class="font-extrabold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-flag-checkered text-rose-400"></i>
+          <span>Feriados del Calendario</span>
+        </h3>
+        <button type="button" onclick="closeHolidaysModal()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 space-y-2.5 text-xs">
+        <div class="flex items-center justify-between gap-2">
+          <label for="holidays-modal-country-select" class="font-bold text-slate-200">País de ejecución:</label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <span class="text-[11px] text-slate-300 font-semibold">Mostrar en calendario</span>
+            <input type="checkbox" id="holidays-modal-enabled-toggle" onchange="setHolidaysEnabled(this.checked)" class="peer sr-only" checked>
+            <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-rose-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+          </label>
+        </div>
+
+        <select id="holidays-modal-country-select" onchange="setHolidayCountryMode(this.value)" class="w-full bg-slate-950 text-slate-100 border border-slate-700 rounded-lg px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-rose-400">
+          <option value="AUTO">🌐 Automático (según país donde se ejecuta la app)</option>
+          <option value="CL">🇨🇱 Chile</option>
+          <option value="AR">🇦🇷 Argentina</option>
+          <option value="PE">🇵🇪 Perú</option>
+          <option value="CO">🇨🇴 Colombia</option>
+          <option value="MX">🇲🇽 México</option>
+          <option value="ES">🇪🇸 España</option>
+          <option value="UY">🇺🇾 Uruguay</option>
+          <option value="PY">🇵🇾 Paraguay</option>
+          <option value="BO">🇧🇴 Bolivia</option>
+          <option value="EC">🇪🇨 Ecuador</option>
+          <option value="VE">🇻🇪 Venezuela</option>
+          <option value="BR">🇧🇷 Brasil</option>
+          <option value="PA">🇵🇦 Panamá</option>
+          <option value="CR">🇨🇷 Costa Rica</option>
+          <option value="DO">🇩🇴 República Dominicana</option>
+          <option value="GT">🇬🇹 Guatemala</option>
+          <option value="SV">🇸🇻 El Salvador</option>
+          <option value="HN">🇭🇳 Honduras</option>
+          <option value="NI">🇳🇮 Nicaragua</option>
+          <option value="CU">🇨🇺 Cuba</option>
+          <option value="PR">🇵🇷 Puerto Rico</option>
+          <option value="US">🇺🇸 Estados Unidos</option>
+          <option value="CA">🇨🇦 Canadá</option>
+          <option value="PT">🇵🇹 Portugal</option>
+          <option value="IT">🇮🇹 Italia</option>
+          <option value="FR">🇫🇷 Francia</option>
+          <option value="DE">🇩🇪 Alemania</option>
+          <option value="GB">🇬🇧 Reino Unido</option>
+        </select>
+
+        <div class="flex items-center justify-between gap-2 pt-0.5 text-[11px]">
+          <span id="holidays-modal-detected-label" class="text-rose-300 font-semibold truncate">Detectado: Chile (🇨🇱)</span>
+          <button type="button" onclick="refreshCountryHolidaysOnline()" class="px-2.5 py-1 rounded-lg bg-rose-600/25 hover:bg-rose-600/40 text-rose-200 border border-rose-500/40 font-bold flex items-center gap-1 transition-all active:scale-95 shrink-0">
+            <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+            <span>Sincronizar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between bg-slate-900/70 px-3 py-1.5 rounded-xl border border-slate-800">
+        <button type="button" onclick="changeHolidaysModalYear(-1)" class="p-1 text-slate-300 hover:text-white"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+        <span id="holidays-modal-year-title" class="text-xs font-black uppercase tracking-wider text-rose-300">FERIADOS 2026</span>
+        <button type="button" onclick="changeHolidaysModalYear(1)" class="p-1 text-slate-300 hover:text-white"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+      </div>
+
+      <div id="holidays-modal-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 min-h-[180px] max-h-[46vh]">
+      </div>
+
+      <div class="pt-1 border-t border-slate-800 flex justify-end">
+        <button type="button" onclick="closeHolidaysModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold text-xs transition-all">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT APP LOGIC -->
   <script>
     const monthNames = [
@@ -2427,6 +2607,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     let copiedNote = null;
     const selectedPasteDateKeys = new Set();
     let pasteRangeStartDateKey = null;
+    let lastCalendarTapDateKey = null;
     let summaryMode = 'month';
     let summaryCategory = 'labels';
     let notesTab = 'next';
@@ -2930,6 +3111,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       initPWAAndServiceWorker();
       setBirthdayDateMax();
       syncBirthdayCalendarEvents();
+      detectCountryFromEnvironmentAsync();
       checkNotificationsOnLaunch();
       checkMedicationReminders();
       setInterval(checkMedicationReminders, 15000);
@@ -3605,6 +3787,24 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     // 2. MODAL INDIVIDUAL: MEDICAMENTO DEL BEBÉ
+    function calculateBabyDoseHelper() {
+      const doseVal = document.getElementById('babyMedModalDose')?.value || '';
+      const doseUnit = document.getElementById('babyMedModalDoseUnit')?.value || 'mg';
+      const formType = (document.getElementById('babyMedModalFormType')?.value || '').trim();
+      const calcBox = document.getElementById('babyDoseCalcResult');
+      const calcText = document.getElementById('babyDoseCalcText');
+      if (!calcBox || !calcText) return;
+
+      const calculation = getDoseCalculation(doseVal, doseUnit, formType);
+      if (!calculation) {
+        calcBox.classList.add('hidden');
+        return;
+      }
+
+      calcText.innerHTML = `Equivalencia matemática: <strong class="text-white">${calculation.equivalence}</strong>. ${calculation.warning}`;
+      calcBox.classList.remove('hidden');
+    }
+
     function openBabyMedModal(presetDateKey = null, editId = null) {
       closeBabyRegistrationChooser();
       closeHealthRegistrationChooser();
@@ -3613,6 +3813,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const modal = document.getElementById('babyMedModal');
       const form = document.getElementById('babyMedModalForm');
       if (form) form.reset();
+
+      const calcBox = document.getElementById('babyDoseCalcResult');
+      if (calcBox) calcBox.classList.add('hidden');
 
       const editInput = document.getElementById('babyMedModalEditId');
       if (editInput) editInput.value = editId || '';
@@ -3629,7 +3832,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const titleSpan = document.getElementById('babyMedModalTitle');
       const medNameInput = document.getElementById('babyMedModalName');
-      const doseInput = document.getElementById('babyMedModalDose');
+      const doseValInput = document.getElementById('babyMedModalDose');
+      const doseUnitSelect = document.getElementById('babyMedModalDoseUnit');
+      const formTypeInput = document.getElementById('babyMedModalFormType');
       const freqSelect = document.getElementById('babyMedModalFrequency');
       const timeInput = document.getElementById('babyMedModalTime');
       const durInput = document.getElementById('babyMedModalDuration');
@@ -3639,14 +3844,32 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (existing) {
         if (titleSpan) titleSpan.textContent = `Editar Medicamento de ${babyName}`;
         if (medNameInput) medNameInput.value = existing.name || '';
-        if (doseInput) doseInput.value = existing.dose || '';
+
+        let parsedVal = existing.doseVal || '';
+        let parsedUnit = existing.doseUnit || 'mg';
+        if (!parsedVal && existing.dose) {
+          const m = String(existing.dose).trim().match(/^(\d+(?:[.,]\d+)?)\s*(mg|ml|gotas|g|mcg|UI)?/i);
+          if (m) {
+            parsedVal = m[1].replace(',', '.');
+            if (m[2]) {
+              const uLower = m[2].toLowerCase();
+              parsedUnit = uLower === 'ui' ? 'UI' : uLower;
+            }
+          }
+        }
+        if (doseValInput) doseValInput.value = parsedVal;
+        if (doseUnitSelect) doseUnitSelect.value = parsedUnit;
+        if (formTypeInput) formTypeInput.value = existing.formType || '';
         if (freqSelect) freqSelect.value = String(existing.frequency || 8);
         if (timeInput) timeInput.value = existing.time || '08:00';
         if (durInput) durInput.value = String(existing.duration || 7);
         if (dateInput) dateInput.value = existing.startDate || defaultDate;
         if (notesInput) notesInput.value = existing.notes || '';
+        calculateBabyDoseHelper();
       } else {
         if (titleSpan) titleSpan.textContent = `Medicamento para ${babyName}`;
+        if (doseUnitSelect) doseUnitSelect.value = 'mg';
+        if (formTypeInput) formTypeInput.value = '';
         if (dateInput) dateInput.value = defaultDate;
         if (timeInput) timeInput.value = '08:00';
         if (freqSelect) freqSelect.value = '8';
@@ -3677,14 +3900,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const editId = document.getElementById('babyMedModalEditId')?.value || '';
       const name = (document.getElementById('babyMedModalName')?.value || '').trim();
-      const dose = (document.getElementById('babyMedModalDose')?.value || '').trim();
+      const doseVal = (document.getElementById('babyMedModalDose')?.value || '').trim();
+      const doseUnit = document.getElementById('babyMedModalDoseUnit')?.value || 'mg';
+      const formType = (document.getElementById('babyMedModalFormType')?.value || '').trim();
       const frequency = parseInt(document.getElementById('babyMedModalFrequency')?.value, 10) || 8;
       const time = document.getElementById('babyMedModalTime')?.value || '08:00';
       const duration = parseInt(document.getElementById('babyMedModalDuration')?.value, 10) || 7;
       const startDate = document.getElementById('babyMedModalStartDate')?.value || formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       const notes = (document.getElementById('babyMedModalNotes')?.value || '').trim();
 
-      if (!name || !dose) return;
+      if (!name || !doseVal) return;
+
+      const calculation = getDoseCalculation(doseVal, doseUnit, formType);
+      const calculatedDoseStr = calculation
+        ? `${calculation.equivalence} (${calculation.warning})`
+        : '';
+      const dose = `${doseVal} ${doseUnit}`.trim();
+      const formKind = inferMedFormKind(formType);
 
       if (!btState.health) btState.health = {};
       if (!Array.isArray(btState.health.medications)) btState.health.medications = [];
@@ -3695,22 +3927,34 @@ Check your Browserslist config to be sure that your targets are set up correctly
           ...btState.health.medications[existingIdx],
           name,
           dose,
+          doseVal,
+          doseUnit,
+          formType,
+          formKind,
+          calculatedDoseStr,
           frequency,
           time,
           duration,
           startDate,
-          notes
+          notes,
+          updatedAt: Date.now()
         };
       } else {
         btState.health.medications.push({
           id: 'bmed_' + Date.now(),
           name,
           dose,
+          doseVal,
+          doseUnit,
+          formType,
+          formKind,
+          calculatedDoseStr,
           frequency,
           time,
           duration,
           startDate,
-          notes
+          notes,
+          updatedAt: Date.now()
         });
       }
 
@@ -5246,45 +5490,48 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
     window.getBabyTrackerDataSafe = getBabyTrackerDataSafe;
 
+    function getMedicationDoseTimesForDate(startDateKey, startTime, durationDays, frequencyHours, dateKey) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(startDateKey || ''))) return [];
+      const [sy, sm, sd] = startDateKey.split('-').map(Number);
+      const [ty, tm, td] = dateKey.split('-').map(Number);
+      const startDay = new Date(sy, sm - 1, sd, 0, 0, 0, 0);
+      const targetDay = new Date(ty, tm - 1, td, 0, 0, 0, 0);
+      const duration = Math.max(1, Number(durationDays) || 1);
+      const endDay = new Date(startDay);
+      endDay.setDate(endDay.getDate() + duration);
+      if (targetDay < startDay || targetDay >= endDay) return [];
+
+      const [hour, minute] = String(startTime || '08:00').split(':').map(Number);
+      const firstDose = new Date(sy, sm - 1, sd, Number(hour) || 0, Number(minute) || 0, 0, 0);
+      const intervalMs = (Number(frequencyHours) || 24) * 60 * 60 * 1000;
+      if (!(intervalMs > 0)) return [];
+
+      const targetStart = new Date(ty, tm - 1, td, 0, 0, 0, 0).getTime();
+      const targetEnd = new Date(ty, tm - 1, td + 1, 0, 0, 0, 0).getTime();
+      const firstMs = firstDose.getTime();
+      const firstIndex = Math.max(0, Math.ceil((targetStart - firstMs) / intervalMs));
+      const lastIndex = Math.floor((targetEnd - 1 - firstMs) / intervalMs);
+      const times = [];
+
+      for (let index = firstIndex; index <= lastIndex && times.length < 100; index++) {
+        const doseDate = new Date(firstMs + index * intervalMs);
+        times.push(String(doseDate.getHours()).padStart(2, '0') + ':' +
+          String(doseDate.getMinutes()).padStart(2, '0'));
+      }
+      return times;
+    }
+
     function getBabyDosesForDate(baby, dateKey) {
       if (!baby || !baby.health || !Array.isArray(baby.health.medications)) return [];
-      const parts = dateKey.split('-').map(Number);
-      const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
       const doses = [];
-
       baby.health.medications.forEach(med => {
-        if (!med.startDate || !med.duration) return;
-        const startParts = med.startDate.split('-').map(Number);
-        const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
-        const end = new Date(start);
-        end.setDate(end.getDate() + (Number(med.duration) || 1));
-
-        if (targetDate >= start && targetDate < end) {
-          const freqHours = Number(med.frequency) || 24;
-          const [startHour, startMin] = (med.time || '08:00').split(':').map(Number);
-          if (freqHours <= 24) {
-            const dosesPerDay = Math.floor(24 / freqHours);
-            const seenTimes = new Set();
-            for (let i = 0; i < dosesPerDay; i++) {
-              const totalHour = (startHour + i * freqHours) % 24;
-              const timeStr = String(totalHour).padStart(2, '0') + ':' + String(startMin || 0).padStart(2, '0');
-              if (!seenTimes.has(timeStr)) {
-                seenTimes.add(timeStr);
-                const doseId = `${med.id}_${timeStr}`;
-                doses.push({ doseId, med, time: timeStr, dateKey });
-              }
-            }
-          } else {
-            const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
-            const intervalDays = Math.floor(freqHours / 24);
-            if (diffDays % intervalDays === 0) {
-              const doseId = `${med.id}_${med.time || '08:00'}`;
-              doses.push({ doseId, med, time: med.time || '08:00', dateKey });
-            }
-          }
-        }
+        const times = getMedicationDoseTimesForDate(
+          med.startDate, med.time || '08:00', med.duration, med.frequency, dateKey
+        );
+        times.forEach(timeStr => {
+          doses.push({ doseId: `${med.id}_${timeStr}`, med, time: timeStr, dateKey });
+        });
       });
-
       return doses.sort((a, b) => a.time.localeCompare(b.time));
     }
     window.getBabyDosesForDate = getBabyDosesForDate;
@@ -5337,9 +5584,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }).join(' y ');
     }
 
-    function getAllUnifiedHealthControls() {
+    function getAllUnifiedHealthControls(includeBaby = true) {
       const list = healthControls.map(c => ({ ...c, isBaby: false }));
-      const bt = getBabyTrackerDataSafe();
+      const bt = includeBaby ? getBabyTrackerDataSafe() : null;
       if (bt && Array.isArray(bt.babies)) {
         bt.babies.forEach((baby, bIdx) => {
           const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : `Bebé ${bIdx + 1}`;
@@ -5374,7 +5621,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!container) return;
       const today = new Date();
       const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
-      const upcomingControls = getAllUnifiedHealthControls()
+      const upcomingControls = getAllUnifiedHealthControls(false)
         .filter(control => control.date >= todayKey)
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
@@ -5641,8 +5888,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function formatMedicationDose(medication) {
       const drops = getMedicationDoseInDrops(medication);
-      if (drops > 0) return `${Number(drops.toFixed(2)).toLocaleString('es-ES')} gotas`;
-      return `${medication.doseVal} ${medication.doseUnit}`;
+      if (drops > 0) {
+        const mlVal = drops / 20;
+        const dropsStr = Number(drops.toFixed(2)).toLocaleString('es-ES');
+        const mlStr = Number(mlVal.toFixed(2)).toLocaleString('es-ES');
+        return `${dropsStr} gotas (${mlStr} ml)`;
+      }
+      if (medication && medication.doseUnit === 'mg' && medication.formType) {
+        const calc = getDoseCalculation(medication.doseVal, medication.doseUnit, medication.formType);
+        if (calc && calc.equivalence) return calc.equivalence;
+      }
+      return `${medication.doseVal} ${medication.doseUnit}`.trim();
     }
 
     function formatMedicationDoseDetails(medication) {
@@ -5838,44 +6094,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
       }
     }
 
-    function getDosesForMedDate(dateKey) {
+    function getDosesForMedDate(dateKey, includeBaby = true) {
       const parts = dateKey.split('-').map(Number);
       const targetDate = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
       const doses = [];
 
       medications.forEach(med => {
-        const startParts = med.startDate.split('-').map(Number);
-        const start = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
-        const end = new Date(start);
-        end.setDate(end.getDate() + med.duration);
-
-        if (targetDate >= start && targetDate < end) {
-          const freqHours = med.frequency;
-
-          if (freqHours <= 24) {
-            const dosesPerDay = Math.floor(24 / freqHours);
-            const [startHour, startMin] = med.time.split(':').map(Number);
-
-            for (let i = 0; i < dosesPerDay; i++) {
-              const h = (startHour + i * freqHours) % 24;
-              const timeStr = `${String(h).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-              const doseId = `${med.id}_${timeStr}`;
-
-              doses.push({ doseId, med, time: timeStr, isBaby: false });
-            }
-          } else {
-            const diffDays = Math.floor((targetDate - start) / (1000 * 60 * 60 * 24));
-            const intervalDays = freqHours / 24;
-
-            if (diffDays % intervalDays === 0) {
-              const doseId = `${med.id}_${med.time}`;
-              doses.push({ doseId, med, time: med.time, isBaby: false });
-            }
-          }
-        }
+        const times = getMedicationDoseTimesForDate(
+          med.startDate, med.time || '08:00', med.duration, med.frequency, dateKey
+        );
+        times.forEach(timeStr => {
+          const doseId = `${med.id}_${timeStr}`;
+          doses.push({ doseId, med, time: timeStr, isBaby: false });
+        });
       });
 
-      const bt = getBabyTrackerDataSafe();
+      const bt = includeBaby ? getBabyTrackerDataSafe() : null;
       if (bt && Array.isArray(bt.babies)) {
         bt.babies.forEach((baby, bIdx) => {
           const bName = (baby.profile && baby.profile.name) ? baby.profile.name.trim() : `Bebé ${bIdx + 1}`;
@@ -5887,9 +6121,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
               med: {
                 id: bd.med.id,
                 name: `👶 ${bName}: ${bd.med.name}`,
-                doseVal: bd.med.dose,
-                dose: bd.med.dose,
-                doseUnit: '',
+                doseVal: bd.med.doseVal || bd.med.dose,
+                dose: bd.med.dose || `${bd.med.doseVal || ''} ${bd.med.doseUnit || ''}`.trim(),
+                doseUnit: bd.med.doseUnit || '',
+                formType: bd.med.formType || '',
+                calculatedDoseStr: bd.med.calculatedDoseStr || '',
                 frequency: bd.med.frequency,
                 notes: bd.med.notes || ''
               },
@@ -6037,7 +6273,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       }).toLocaleUpperCase('es-ES');
 
-      const doses = getDosesForMedDate(dateKey);
+      const doses = getDosesForMedDate(dateKey, false);
 
       if (doses.length === 0) {
         container.innerHTML = `
@@ -6134,7 +6370,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           : String(selectedYear);
       }
 
-      const allUnifiedControls = getAllUnifiedHealthControls();
+      const allUnifiedControls = getAllUnifiedHealthControls(false);
       let periodControls = allUnifiedControls;
       if (healthControlStatsMode === 'month') {
         const monthKey = formatDateKey(selectedYear, selectedMonth, 1).slice(0, 7);
@@ -6342,15 +6578,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       } else {
         let earliest = null;
         let latest = null;
-        const btForRange = getBabyTrackerDataSafe();
         const allMedsForRange = [...medications];
-        if (btForRange && Array.isArray(btForRange.babies)) {
-          btForRange.babies.forEach(b => {
-            if (b && b.health && Array.isArray(b.health.medications)) {
-              allMedsForRange.push(...b.health.medications);
-            }
-          });
-        }
         allMedsForRange.forEach(med => {
           const [year, month, day] = String(med.startDate || '').split('-').map(Number);
           if (!year || !month || !day) return;
@@ -6369,7 +6597,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       let guard = 0;
       while (cursor <= rangeEnd && guard < 4000) {
         const dateKey = formatDateKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
-        getDosesForMedDate(dateKey).forEach(item => {
+        getDosesForMedDate(dateKey, false).forEach(item => {
           const { med, doseId, time } = item;
           const [hours, minutes] = time.split(':').map(Number);
           const scheduled = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate(), hours, minutes);
@@ -6684,6 +6912,723 @@ Check your Browserslist config to be sure that your targets are set up correctly
       renderAll();
     }
 
+
+    // ===== SISTEMA DE FERIADOS AUTOMÁTICOS POR PAÍS (OFFLINE + ONLINE API) =====
+    const HOLIDAY_COUNTRY_STORAGE_KEY = 'cal_holiday_country_mode';
+    const HOLIDAY_ENABLED_STORAGE_KEY = 'cal_holidays_enabled';
+    const HOLIDAY_GEOIP_CACHE_KEY = 'cal_geoip_country_code';
+    const HOLIDAY_API_CACHE_PREFIX = 'cal_holidays_api_v1_';
+
+    const HOLIDAY_COUNTRIES = {
+      CL: { code: 'CL', name: 'Chile', flag: '🇨🇱' },
+      AR: { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+      PE: { code: 'PE', name: 'Perú', flag: '🇵🇪' },
+      CO: { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+      MX: { code: 'MX', name: 'México', flag: '🇲🇽' },
+      ES: { code: 'ES', name: 'España', flag: '🇪🇸' },
+      UY: { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
+      PY: { code: 'PY', name: 'Paraguay', flag: '🇵🇾' },
+      BO: { code: 'BO', name: 'Bolivia', flag: '🇧🇴' },
+      EC: { code: 'EC', name: 'Ecuador', flag: '🇪🇨' },
+      VE: { code: 'VE', name: 'Venezuela', flag: '🇻🇪' },
+      BR: { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
+      PA: { code: 'PA', name: 'Panamá', flag: '🇵🇦' },
+      CR: { code: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
+      DO: { code: 'DO', name: 'República Dominicana', flag: '🇩🇴' },
+      GT: { code: 'GT', name: 'Guatemala', flag: '🇬🇹' },
+      SV: { code: 'SV', name: 'El Salvador', flag: '🇸🇻' },
+      HN: { code: 'HN', name: 'Honduras', flag: '🇭🇳' },
+      NI: { code: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
+      CU: { code: 'CU', name: 'Cuba', flag: '🇨🇺' },
+      PR: { code: 'PR', name: 'Puerto Rico', flag: '🇵🇷' },
+      US: { code: 'US', name: 'Estados Unidos', flag: '🇺🇸' },
+      CA: { code: 'CA', name: 'Canadá', flag: '🇨🇦' },
+      PT: { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+      IT: { code: 'IT', name: 'Italia', flag: '🇮🇹' },
+      FR: { code: 'FR', name: 'Francia', flag: '🇫🇷' },
+      DE: { code: 'DE', name: 'Alemania', flag: '🇩🇪' },
+      GB: { code: 'GB', name: 'Reino Unido', flag: '🇬🇧' }
+    };
+
+    const TIMEZONE_TO_COUNTRY = {
+      'America/Santiago': 'CL', 'America/Punta_Arenas': 'CL', 'Pacific/Easter': 'CL', 'Chile/Continental': 'CL', 'Chile/EasterIsland': 'CL',
+      'America/Buenos_Aires': 'AR', 'America/Cordoba': 'AR', 'America/Mendoza': 'AR', 'America/Argentina/Buenos_Aires': 'AR',
+      'America/Argentina/Cordoba': 'AR', 'America/Argentina/Mendoza': 'AR', 'America/Argentina/Salta': 'AR', 'America/Argentina/Jujuy': 'AR',
+      'America/Argentina/Tucuman': 'AR', 'America/Argentina/Catamarca': 'AR', 'America/Argentina/La_Rioja': 'AR', 'America/Argentina/San_Juan': 'AR',
+      'America/Argentina/San_Luis': 'AR', 'America/Argentina/Rio_Gallegos': 'AR', 'America/Argentina/Ushuaia': 'AR',
+      'America/Lima': 'PE',
+      'America/Bogota': 'CO',
+      'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Cancun': 'MX', 'America/Tijuana': 'MX', 'America/Chihuahua': 'MX',
+      'America/Hermosillo': 'MX', 'America/Mazatlan': 'MX', 'America/Merida': 'MX', 'America/Matamoros': 'MX', 'America/Ciudad_Juarez': 'MX',
+      'America/Bahia_Banderas': 'MX', 'America/Ojinaga': 'MX',
+      'Europe/Madrid': 'ES', 'Atlantic/Canary': 'ES', 'Africa/Ceuta': 'ES',
+      'America/Montevideo': 'UY',
+      'America/Asuncion': 'PY',
+      'America/La_Paz': 'BO',
+      'America/Guayaquil': 'EC', 'Pacific/Galapagos': 'EC',
+      'America/Caracas': 'VE',
+      'America/Sao_Paulo': 'BR', 'America/Manaus': 'BR', 'America/Fortaleza': 'BR', 'America/Recife': 'BR', 'America/Belem': 'BR',
+      'America/Cuiaba': 'BR', 'America/Campo_Grande': 'BR', 'America/Porto_Velho': 'BR', 'America/Boa_Vista': 'BR', 'America/Maceio': 'BR', 'America/Bahia': 'BR',
+      'America/Panama': 'PA',
+      'America/Costa_Rica': 'CR',
+      'America/Santo_Domingo': 'DO',
+      'America/Guatemala': 'GT',
+      'America/El_Salvador': 'SV',
+      'America/Tegucigalpa': 'HN',
+      'America/Managua': 'NI',
+      'America/Havana': 'CU',
+      'America/Puerto_Rico': 'PR',
+      'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US', 'America/Phoenix': 'US',
+      'America/Anchorage': 'US', 'Pacific/Honolulu': 'US', 'America/Detroit': 'US', 'America/Boise': 'US', 'America/Indiana/Indianapolis': 'US',
+      'America/Toronto': 'CA', 'America/Vancouver': 'CA', 'America/Montreal': 'CA', 'America/Edmonton': 'CA', 'America/Winnipeg': 'CA',
+      'America/Halifax': 'CA', 'America/St_Johns': 'CA', 'America/Regina': 'CA',
+      'Europe/Lisbon': 'PT', 'Atlantic/Madeira': 'PT', 'Atlantic/Azores': 'PT',
+      'Europe/Rome': 'IT',
+      'Europe/Paris': 'FR',
+      'Europe/Berlin': 'DE',
+      'Europe/London': 'GB'
+    };
+
+    let holidayCountryMode = readStoredValue(HOLIDAY_COUNTRY_STORAGE_KEY, 'AUTO') || 'AUTO';
+    let holidaysEnabled = readStoredValue(HOLIDAY_ENABLED_STORAGE_KEY, 'true') !== 'false';
+    let holidaysModalYear = new Date().getFullYear();
+    const holidayMemoryCache = {};
+    const holidayApiFetchInFlight = new Set();
+
+    function detectExecutionCountryCode() {
+      // 1. Si se detectó previamente por GeoIP cuando la zona horaria era ambigua, o revisar zona horaria primero
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        if (tz && TIMEZONE_TO_COUNTRY[tz]) {
+          return TIMEZONE_TO_COUNTRY[tz];
+        }
+        if (tz.startsWith('America/Argentina/')) return 'AR';
+        if (tz.startsWith('America/Indiana/') || tz.startsWith('America/Kentucky/') || tz.startsWith('America/North_Dakota/')) return 'US';
+      } catch (e) {}
+
+      // 2. Revisar GeoIP en caché si existe
+      try {
+        const geoCached = (localStorage.getItem(HOLIDAY_GEOIP_CACHE_KEY) || '').trim().toUpperCase();
+        if (geoCached && HOLIDAY_COUNTRIES[geoCached]) return geoCached;
+      } catch (e) {}
+
+      // 3. Revisar configuración regional del navegador (navigator.languages / navigator.language)
+      try {
+        const langs = Array.isArray(navigator.languages) && navigator.languages.length > 0
+          ? navigator.languages
+          : [navigator.language || ''];
+        for (const lang of langs) {
+          const parts = String(lang || '').replace('_', '-').split('-');
+          if (parts.length >= 2) {
+            const region = parts[parts.length - 1].toUpperCase();
+            if (HOLIDAY_COUNTRIES[region]) return region;
+          }
+        }
+      } catch (e) {}
+
+      return 'CL';
+    }
+
+    function getActiveHolidayCountryCode() {
+      if (holidayCountryMode && holidayCountryMode !== 'AUTO' && HOLIDAY_COUNTRIES[holidayCountryMode]) {
+        return holidayCountryMode;
+      }
+      return detectExecutionCountryCode();
+    }
+
+    function getActiveCountryMeta() {
+      const code = getActiveHolidayCountryCode();
+      return HOLIDAY_COUNTRIES[code] || HOLIDAY_COUNTRIES.CL;
+    }
+
+    function isHolidaysEnabled() {
+      return !!holidaysEnabled;
+    }
+
+    function setHolidaysEnabled(enabled) {
+      holidaysEnabled = !!enabled;
+      try { localStorage.setItem(HOLIDAY_ENABLED_STORAGE_KEY, String(holidaysEnabled)); } catch (e) {}
+      syncHolidayUIControls();
+      renderAll();
+      if (!document.getElementById('holidays-modal')?.classList.contains('hidden')) {
+        renderHolidaysModalList();
+      }
+    }
+
+    function setHolidayCountryMode(mode) {
+      holidayCountryMode = (mode && (mode === 'AUTO' || HOLIDAY_COUNTRIES[mode])) ? mode : 'AUTO';
+      try { localStorage.setItem(HOLIDAY_COUNTRY_STORAGE_KEY, holidayCountryMode); } catch (e) {}
+      const activeCode = getActiveHolidayCountryCode();
+      ensureCountryHolidaysLoaded(currentDate.getFullYear(), activeCode);
+      ensureCountryHolidaysLoaded(holidaysModalYear, activeCode);
+      syncHolidayUIControls();
+      renderAll();
+      if (!document.getElementById('holidays-modal')?.classList.contains('hidden')) {
+        renderHolidaysModalList();
+      }
+      const meta = getActiveCountryMeta();
+      showToast('Feriados actualizados', `Mostrando feriados de ${meta.flag} ${meta.name}${holidayCountryMode === 'AUTO' ? ' (Automático)' : ''}.`, 'fa-flag-checkered', 'text-rose-400');
+    }
+
+    // Algoritmo de Meeus/Jones/Butcher para calcular Domingo de Pascua (Gregoriano)
+    function getEasterSundayDate(year) {
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+      return createLocalDate(year, month, day);
+    }
+
+    function addDaysLocal(baseDate, offsetDays) {
+      return createLocalDate(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() + offsetDays);
+    }
+
+    // N-ésimo día de la semana en un mes (ej. 3er lunes de enero: nthWeekdayOfMonth(y, 0, 1, 3))
+    function nthWeekdayOfMonth(year, monthIndex, targetDow, n) {
+      if (n < 0) {
+        const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+        let d = createLocalDate(year, monthIndex, lastDay);
+        while (d.getDay() !== targetDow) {
+          d = addDaysLocal(d, -1);
+        }
+        return d;
+      }
+      let d = createLocalDate(year, monthIndex, 1);
+      while (d.getDay() !== targetDow) {
+        d = addDaysLocal(d, 1);
+      }
+      return addDaysLocal(d, (n - 1) * 7);
+    }
+
+    // Ley 19.668 (Chile): traslada al lunes previo si cae martes, miércoles o jueves; o al lunes siguiente si cae viernes
+    function applyChileMondayLaw(dateObj) {
+      const dow = dateObj.getDay();
+      if (dow === 2) return addDaysLocal(dateObj, -1);
+      if (dow === 3) return addDaysLocal(dateObj, -2);
+      if (dow === 4) return addDaysLocal(dateObj, -3);
+      if (dow === 5) return addDaysLocal(dateObj, 3);
+      return dateObj;
+    }
+
+    // Ley Emiliani (Colombia): si no es lunes, se traslada al lunes siguiente
+    function applyColombiaEmilianiLaw(dateObj) {
+      const dow = dateObj.getDay();
+      if (dow === 1) return dateObj;
+      const delta = dow === 0 ? 1 : (8 - dow);
+      return addDaysLocal(dateObj, delta);
+    }
+
+    // Traslado argentino (Ley 27.399): martes/miércoles -> lunes previo; jueves/viernes -> lunes siguiente
+    function applyArgentinaMovableLaw(dateObj) {
+      const dow = dateObj.getDay();
+      if (dow === 2) return addDaysLocal(dateObj, -1);
+      if (dow === 3) return addDaysLocal(dateObj, -2);
+      if (dow === 4) return addDaysLocal(dateObj, 4);
+      if (dow === 5) return addDaysLocal(dateObj, 3);
+      return dateObj;
+    }
+
+    function makeShortHolidayName(name) {
+      const clean = String(name || '').trim();
+      if (clean.length <= 14) return clean;
+      const replacements = [
+        [/^Día Nacional del Trabajo$/i, 'Día del Trabajo'],
+        [/^Día Internacional de los Trabajadores$/i, 'Día del Trabajo'],
+        [/^Día de las Glorias Navales$/i, 'Glorias Navales'],
+        [/^Día Nacional de los Pueblos Indígenas$/i, 'Pueblos Indígenas'],
+        [/^Día de la Virgen del Carmen$/i, 'Virgen del Carmen'],
+        [/^Asunción de la Virgen$/i, 'Asunción Virgen'],
+        [/^Independencia Nacional$/i, 'Independencia'],
+        [/^Día de las Glorias del Ejército$/i, 'Glorias Ejército'],
+        [/^Encuentro de Dos Mundos$/i, 'Dos Mundos'],
+        [/^Día de las Iglesias Evangélicas y Protestantes$/i, 'Iglesias Evang.'],
+        [/^Día de Todos los Santos$/i, 'Todos los Santos'],
+        [/^Inmaculada Concepción$/i, 'Inmac. Concepción'],
+        [/^Feriado Adicional Fiestas Patrias$/i, 'Fiestas Patrias']
+      ];
+      for (const [regex, shortVal] of replacements) {
+        if (regex.test(clean)) return shortVal;
+      }
+      return clean.length > 16 ? clean.slice(0, 15).trim() + '…' : clean;
+    }
+
+    function computeBuiltInHolidaysForYear(year, countryCode) {
+      const map = {};
+      const easter = getEasterSundayDate(year);
+      const addH = (dateOrMonth, dayOrName, maybeName, irrenunciable = false, type = 'Feriado Nacional') => {
+        let dObj;
+        let name;
+        let isIrren = irrenunciable;
+        let hType = type;
+        if (dateOrMonth instanceof Date) {
+          dObj = dateOrMonth;
+          name = dayOrName;
+          isIrren = !!maybeName;
+          if (typeof irrenunciable === 'string') hType = irrenunciable;
+        } else {
+          dObj = createLocalDate(year, dateOrMonth - 1, dayOrName);
+          name = maybeName;
+        }
+        if (dObj.getFullYear() !== year) return;
+        const key = formatDateKey(dObj.getFullYear(), dObj.getMonth(), dObj.getDate());
+        map[key] = {
+          date: key,
+          name: name,
+          shortName: makeShortHolidayName(name),
+          irrenunciable: !!isIrren,
+          countryCode: countryCode,
+          type: hType || 'Feriado Nacional'
+        };
+      };
+
+      const viernesSanto = addDaysLocal(easter, -2);
+      const juevesSanto = addDaysLocal(easter, -3);
+      const sabadoSanto = addDaysLocal(easter, -1);
+      const lunesPascua = addDaysLocal(easter, 1);
+
+      if (countryCode === 'CL') {
+        addH(1, 1, 'Año Nuevo', true);
+        // Ley 20.983: si 1 de enero cae domingo, el lunes 2 de enero es feriado
+        if (createLocalDate(year, 0, 1).getDay() === 0) {
+          addH(1, 2, 'Feriado Adicional Año Nuevo', false);
+        }
+        addH(viernesSanto, 'Viernes Santo', false);
+        addH(sabadoSanto, 'Sábado Santo', false);
+        addH(5, 1, 'Día Nacional del Trabajo', true);
+        addH(5, 21, 'Día de las Glorias Navales', false);
+        // Día Nacional de los Pueblos Indígenas (Solsticio de invierno en junio)
+        const indigenousDay = (year % 4 === 0 || year % 4 === 1) ? 20 : 21;
+        addH(6, indigenousDay, 'Día Nacional de los Pueblos Indígenas', false);
+        addH(applyChileMondayLaw(createLocalDate(year, 5, 29)), 'San Pedro y San Pablo', false);
+        addH(7, 16, 'Día de la Virgen del Carmen', false);
+        addH(8, 15, 'Asunción de la Virgen', false);
+        // Fiestas Patrias: Ley 20.215 y Ley 20.983
+        const sep18Dow = createLocalDate(year, 8, 18).getDay();
+        const sep19Dow = createLocalDate(year, 8, 19).getDay();
+        if (sep18Dow === 2 || sep18Dow === 6) {
+          addH(9, 17, 'Feriado Adicional Fiestas Patrias', false);
+        }
+        addH(9, 18, 'Independencia Nacional', true);
+        addH(9, 19, 'Día de las Glorias del Ejército', true);
+        if (sep19Dow === 0) {
+          addH(9, 20, 'Feriado Adicional Fiestas Patrias', false);
+        }
+        addH(applyChileMondayLaw(createLocalDate(year, 9, 12)), 'Encuentro de Dos Mundos', false);
+        // Ley 20.299: Día de las Iglesias Evangélicas (31 oct; martes -> viernes previo, miércoles -> viernes siguiente)
+        let evangDate = createLocalDate(year, 9, 31);
+        if (evangDate.getDay() === 2) evangDate = addDaysLocal(evangDate, -4);
+        else if (evangDate.getDay() === 3) evangDate = addDaysLocal(evangDate, 2);
+        addH(evangDate, 'Día de las Iglesias Evangélicas y Protestantes', false);
+        addH(11, 1, 'Día de Todos los Santos', false);
+        addH(12, 8, 'Inmaculada Concepción', false);
+        addH(12, 25, 'Navidad', true);
+      } else if (countryCode === 'AR') {
+        addH(1, 1, 'Año Nuevo');
+        addH(addDaysLocal(easter, -48), 'Lunes de Carnaval');
+        addH(addDaysLocal(easter, -47), 'Martes de Carnaval');
+        addH(3, 24, 'Día Nacional de la Memoria por la Verdad y la Justicia');
+        addH(4, 2, 'Día del Veterano y de los Caídos en la Guerra de Malvinas');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(5, 1, 'Día del Trabajador');
+        addH(5, 25, 'Día de la Revolución de Mayo');
+        addH(applyArgentinaMovableLaw(createLocalDate(year, 5, 17)), 'Paso a la Inmortalidad del Gral. Martín Miguel de Güemes');
+        addH(6, 20, 'Paso a la Inmortalidad del Gral. Manuel Belgrano');
+        addH(7, 9, 'Día de la Independencia');
+        addH(applyArgentinaMovableLaw(createLocalDate(year, 7, 17)), 'Paso a la Inmortalidad del Gral. José de San Martín');
+        addH(applyArgentinaMovableLaw(createLocalDate(year, 9, 12)), 'Día del Respeto a la Diversidad Cultural');
+        addH(applyArgentinaMovableLaw(createLocalDate(year, 10, 20)), 'Día de la Soberanía Nacional');
+        addH(12, 8, 'Inmaculada Concepción de María');
+        addH(12, 25, 'Navidad');
+      } else if (countryCode === 'PE') {
+        addH(1, 1, 'Año Nuevo');
+        addH(juevesSanto, 'Jueves Santo');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(5, 1, 'Día del Trabajo');
+        addH(6, 7, 'Batalla de Arica y Día de la Bandera');
+        addH(6, 29, 'San Pedro y San Pablo');
+        addH(7, 23, 'Día de la Fuerza Aérea del Perú');
+        addH(7, 28, 'Fiestas Patrias - Independencia del Perú');
+        addH(7, 29, 'Fiestas Patrias');
+        addH(8, 6, 'Batalla de Junín');
+        addH(8, 30, 'Santa Rosa de Lima');
+        addH(10, 8, 'Combate de Angamos');
+        addH(11, 1, 'Día de Todos los Santos');
+        addH(12, 8, 'Inmaculada Concepción');
+        addH(12, 9, 'Batalla de Ayacucho');
+        addH(12, 25, 'Navidad');
+      } else if (countryCode === 'CO') {
+        addH(1, 1, 'Año Nuevo');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 0, 6)), 'Día de los Reyes Magos');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 2, 19)), 'Día de San José');
+        addH(juevesSanto, 'Jueves Santo');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(5, 1, 'Día del Trabajo');
+        addH(addDaysLocal(easter, 43), 'Ascensión del Señor');
+        addH(addDaysLocal(easter, 64), 'Corpus Christi');
+        addH(addDaysLocal(easter, 71), 'Sagrado Corazón de Jesús');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 5, 29)), 'San Pedro y San Pablo');
+        addH(7, 20, 'Día de la Independencia');
+        addH(8, 7, 'Batalla de Boyacá');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 7, 15)), 'Asunción de la Virgen');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 9, 12)), 'Día de la Raza');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 10, 1)), 'Día de Todos los Santos');
+        addH(applyColombiaEmilianiLaw(createLocalDate(year, 10, 11)), 'Independencia de Cartagena');
+        addH(12, 8, 'Inmaculada Concepción');
+        addH(12, 25, 'Navidad');
+      } else if (countryCode === 'MX') {
+        addH(1, 1, 'Año Nuevo');
+        addH(nthWeekdayOfMonth(year, 1, 1, 1), 'Día de la Constitución');
+        addH(nthWeekdayOfMonth(year, 2, 1, 3), 'Natalicio de Benito Juárez');
+        addH(juevesSanto, 'Jueves Santo');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(5, 1, 'Día del Trabajo');
+        addH(9, 16, 'Día de la Independencia');
+        addH(11, 2, 'Día de Muertos');
+        addH(nthWeekdayOfMonth(year, 10, 1, 3), 'Día de la Revolución Mexicana');
+        addH(12, 12, 'Día de la Virgen de Guadalupe');
+        addH(12, 25, 'Navidad');
+      } else if (countryCode === 'ES') {
+        addH(1, 1, 'Año Nuevo');
+        addH(1, 6, 'Epifanía del Señor (Día de Reyes)');
+        addH(juevesSanto, 'Jueves Santo');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(5, 1, 'Fiesta del Trabajo');
+        addH(8, 15, 'Asunción de la Virgen');
+        addH(10, 12, 'Fiesta Nacional de España');
+        addH(11, 1, 'Todos los Santos');
+        addH(12, 6, 'Día de la Constitución Española');
+        addH(12, 8, 'Inmaculada Concepción');
+        addH(12, 25, 'Natividad del Señor (Navidad)');
+      } else if (countryCode === 'US') {
+        addH(1, 1, "New Year's Day (Año Nuevo)");
+        addH(nthWeekdayOfMonth(year, 0, 1, 3), 'Martin Luther King Jr. Day');
+        addH(nthWeekdayOfMonth(year, 1, 1, 3), "Presidents' Day");
+        addH(nthWeekdayOfMonth(year, 4, 1, -1), 'Memorial Day');
+        addH(6, 19, 'Juneteenth');
+        addH(7, 4, 'Independence Day (4 de Julio)');
+        addH(nthWeekdayOfMonth(year, 8, 1, 1), 'Labor Day (Día del Trabajo)');
+        addH(nthWeekdayOfMonth(year, 9, 1, 2), 'Columbus Day');
+        addH(11, 11, 'Veterans Day');
+        addH(nthWeekdayOfMonth(year, 10, 4, 4), 'Thanksgiving Day (Acción de Gracias)');
+        addH(12, 25, 'Christmas Day (Navidad)');
+      } else if (countryCode === 'UY') {
+        addH(1, 1, 'Año Nuevo');
+        addH(1, 6, 'Día de los Niños (Reyes)');
+        addH(addDaysLocal(easter, -48), 'Carnaval');
+        addH(addDaysLocal(easter, -47), 'Carnaval');
+        addH(juevesSanto, 'Semana de Turismo (Jueves)');
+        addH(viernesSanto, 'Semana de Turismo (Viernes)');
+        addH(4, 19, 'Desembarco de los 33 Orientales');
+        addH(5, 1, 'Día de los Trabajadores');
+        addH(5, 18, 'Batalla de Las Piedras');
+        addH(6, 19, 'Natalicio de Artigas');
+        addH(7, 18, 'Jura de la Constitución');
+        addH(8, 25, 'Declaratoria de la Independencia');
+        addH(10, 12, 'Día de la Raza');
+        addH(11, 2, 'Día de los Difuntos');
+        addH(12, 25, 'Día de la Familia (Navidad)');
+      } else if (countryCode === 'BR') {
+        addH(1, 1, 'Confraternização Universal (Año Nuevo)');
+        addH(addDaysLocal(easter, -47), 'Carnaval');
+        addH(viernesSanto, 'Sexta-feira Santa');
+        addH(4, 21, 'Tiradentes');
+        addH(5, 1, 'Dia do Trabalhador');
+        addH(addDaysLocal(easter, 60), 'Corpus Christi');
+        addH(9, 7, 'Independência do Brasil');
+        addH(10, 12, 'Nossa Senhora Aparecida');
+        addH(11, 2, 'Finados');
+        addH(11, 15, 'Proclamação da República');
+        addH(11, 20, 'Dia Nacional de Zumbi e da Consciência Negra');
+        addH(12, 25, 'Natal');
+      } else {
+        // Base universal para otros países de Latinoamérica y Europa (complementado automáticamente vía API Nager.Date)
+        addH(1, 1, 'Año Nuevo');
+        addH(juevesSanto, 'Jueves Santo');
+        addH(viernesSanto, 'Viernes Santo');
+        addH(lunesPascua, 'Lunes de Pascua');
+        addH(5, 1, 'Día del Trabajo');
+        if (countryCode === 'PY') { addH(5, 14, 'Día de la Independencia'); addH(5, 15, 'Día de la Independencia'); addH(8, 15, 'Fundación de Asunción'); addH(12, 8, 'Virgen de Caacupé'); }
+        if (countryCode === 'BO') { addH(addDaysLocal(easter, -48), 'Carnaval'); addH(addDaysLocal(easter, -47), 'Carnaval'); addH(addDaysLocal(easter, 60), 'Corpus Christi'); addH(6, 21, 'Año Nuevo Andino Amazónico'); addH(8, 6, 'Día de la Independencia'); addH(11, 2, 'Día de Todos los Difuntos'); }
+        if (countryCode === 'EC') { addH(addDaysLocal(easter, -48), 'Carnaval'); addH(addDaysLocal(easter, -47), 'Carnaval'); addH(5, 24, 'Batalla de Pichincha'); addH(8, 10, 'Primer Grito de Independencia'); addH(10, 9, 'Independencia de Guayaquil'); addH(11, 2, 'Día de los Difuntos'); addH(11, 3, 'Independencia de Cuenca'); }
+        if (countryCode === 'VE') { addH(addDaysLocal(easter, -48), 'Carnaval'); addH(addDaysLocal(easter, -47), 'Carnaval'); addH(4, 19, 'Declaración de la Independencia'); addH(6, 24, 'Batalla de Carabobo'); addH(7, 5, 'Día de la Independencia'); addH(7, 24, 'Natalicio de Simón Bolívar'); addH(10, 12, 'Día de la Resistencia Indígena'); }
+        if (countryCode === 'CR' || countryCode === 'GT' || countryCode === 'SV' || countryCode === 'HN' || countryCode === 'NI') {
+          addH(9, 15, 'Día de la Independencia');
+        }
+        if (countryCode === 'PA') { addH(11, 3, 'Separación de Panamá de Colombia'); addH(11, 28, 'Independencia de Panamá'); addH(12, 8, 'Día de las Madres'); }
+        if (countryCode === 'DO') { addH(2, 27, 'Día de la Independencia Nacional'); addH(8, 16, 'Día de la Restauración'); }
+        addH(12, 25, 'Navidad');
+      }
+
+      return map;
+    }
+
+    function getHolidaysMapForYear(year, countryCode = getActiveHolidayCountryCode()) {
+      const y = Number(year) || new Date().getFullYear();
+      const code = (countryCode || 'CL').toUpperCase();
+      const cacheKey = `${code}_${y}`;
+      if (holidayMemoryCache[cacheKey]) {
+        return holidayMemoryCache[cacheKey];
+      }
+
+      const merged = computeBuiltInHolidaysForYear(y, code);
+
+      // Combinar con feriados sincronizados desde la API pública (si están en caché local)
+      try {
+        const rawApi = localStorage.getItem(`${HOLIDAY_API_CACHE_PREFIX}${code}_${y}`);
+        if (rawApi) {
+          const parsedApi = JSON.parse(rawApi);
+          if (Array.isArray(parsedApi)) {
+            parsedApi.forEach(item => {
+              if (!item || !/^\d{4}-\d{2}-\d{2}$/.test(item.date)) return;
+              const localName = (item.localName || item.name || '').trim();
+              if (!localName) return;
+              if (!merged[item.date]) {
+                merged[item.date] = {
+                  date: item.date,
+                  name: localName,
+                  shortName: makeShortHolidayName(localName),
+                  irrenunciable: false,
+                  countryCode: code,
+                  type: 'Feriado Oficial'
+                };
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
+      holidayMemoryCache[cacheKey] = merged;
+      return merged;
+    }
+
+    function getHolidayForDateKey(dateKey) {
+      if (!holidaysEnabled || !dateKey || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return null;
+      const year = Number(dateKey.slice(0, 4));
+      const code = getActiveHolidayCountryCode();
+      const map = getHolidaysMapForYear(year, code);
+      return map[dateKey] || null;
+    }
+
+    async function ensureCountryHolidaysLoaded(year, countryCode = getActiveHolidayCountryCode(), forceRefresh = false) {
+      const y = Number(year) || new Date().getFullYear();
+      const code = (countryCode || 'CL').toUpperCase();
+      const flightKey = `${code}_${y}`;
+      if (holidayApiFetchInFlight.has(flightKey)) return false;
+
+      if (!forceRefresh) {
+        try {
+          if (localStorage.getItem(`${HOLIDAY_API_CACHE_PREFIX}${code}_${y}`)) {
+            return true;
+          }
+        } catch (e) {}
+      }
+
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
+      holidayApiFetchInFlight.add(flightKey);
+      try {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 5000) : null;
+        const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/${code}`, controller ? { signal: controller.signal } : {});
+        if (timer) clearTimeout(timer);
+        if (!res.ok) return false;
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          try {
+            localStorage.setItem(`${HOLIDAY_API_CACHE_PREFIX}${code}_${y}`, JSON.stringify(data));
+          } catch (e) {}
+          delete holidayMemoryCache[flightKey];
+          getHolidaysMapForYear(y, code);
+          if (activeView === 'month' || activeView === 'year') {
+            renderAll();
+          }
+          if (!document.getElementById('holidays-modal')?.classList.contains('hidden')) {
+            renderHolidaysModalList();
+          }
+          return true;
+        }
+      } catch (e) {
+        // Modo offline o sin acceso a red externa: usa motor interno de feriados sin error
+      } finally {
+        holidayApiFetchInFlight.delete(flightKey);
+      }
+      return false;
+    }
+
+    async function detectCountryFromEnvironmentAsync() {
+      syncHolidayUIControls();
+      const currentCode = getActiveHolidayCountryCode();
+      ensureCountryHolidaysLoaded(currentDate.getFullYear(), currentCode);
+
+      // Si está en modo AUTO, verificar silenciosamente el país por IP cuando haya conexión
+      // solo si la zona horaria no definió un país específico
+      let tzMatched = false;
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        if (tz && (TIMEZONE_TO_COUNTRY[tz] || tz.startsWith('America/Argentina/'))) {
+          tzMatched = true;
+        }
+      } catch (e) {}
+
+      if (!tzMatched && typeof navigator !== 'undefined' && navigator.onLine !== false) {
+        try {
+          const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+          const timer = controller ? setTimeout(() => controller.abort(), 3500) : null;
+          const resp = await fetch('https://get.geojs.io/v1/ip/country.json', controller ? { signal: controller.signal } : {});
+          if (timer) clearTimeout(timer);
+          if (resp.ok) {
+            const info = await resp.json();
+            const ipCountry = String(info && info.country ? info.country : '').trim().toUpperCase();
+            if (ipCountry && HOLIDAY_COUNTRIES[ipCountry]) {
+              try { localStorage.setItem(HOLIDAY_GEOIP_CACHE_KEY, ipCountry); } catch (e) {}
+              if (holidayCountryMode === 'AUTO') {
+                syncHolidayUIControls();
+                ensureCountryHolidaysLoaded(currentDate.getFullYear(), ipCountry);
+                renderAll();
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    function syncHolidayUIControls() {
+      const meta = getActiveCountryMeta();
+      const detectedCode = detectExecutionCountryCode();
+      const detectedMeta = HOLIDAY_COUNTRIES[detectedCode] || HOLIDAY_COUNTRIES.CL;
+
+      const flagEl = document.getElementById('holiday-country-flag');
+      const codeEl = document.getElementById('holiday-country-code-label');
+      const badgeEl = document.getElementById('holiday-country-badge');
+      if (flagEl) flagEl.textContent = meta.flag;
+      if (codeEl) codeEl.textContent = holidaysEnabled ? meta.code : `${meta.code} (Oculto)`;
+      if (badgeEl) {
+        badgeEl.title = `Feriados de ${meta.name}${holidayCountryMode === 'AUTO' ? ' (Detectado automáticamente)' : ''} · Toca para configurar`;
+      }
+
+      const yFlagEl = document.getElementById('year-holiday-country-flag');
+      const yCodeEl = document.getElementById('year-holiday-country-code');
+      if (yFlagEl) yFlagEl.textContent = meta.flag;
+      if (yCodeEl) yCodeEl.textContent = meta.code;
+
+      const settingSelect = document.getElementById('holiday-country-setting');
+      if (settingSelect) settingSelect.value = holidayCountryMode;
+      const settingToggle = document.getElementById('holiday-enabled-setting');
+      if (settingToggle) settingToggle.checked = holidaysEnabled;
+      const settingStatus = document.getElementById('holiday-detected-status');
+      if (settingStatus) {
+        settingStatus.textContent = holidayCountryMode === 'AUTO'
+          ? `Detectado en tu ubicación: ${detectedMeta.flag} ${detectedMeta.name}`
+          : `País fijado manualmente: ${meta.flag} ${meta.name}`;
+      }
+
+      const modalSelect = document.getElementById('holidays-modal-country-select');
+      if (modalSelect) modalSelect.value = holidayCountryMode;
+      const modalToggle = document.getElementById('holidays-modal-enabled-toggle');
+      if (modalToggle) modalToggle.checked = holidaysEnabled;
+      const modalDetected = document.getElementById('holidays-modal-detected-label');
+      if (modalDetected) {
+        modalDetected.textContent = holidayCountryMode === 'AUTO'
+          ? `Ubicación detectada: ${detectedMeta.flag} ${detectedMeta.name}`
+          : `Mostrando: ${meta.flag} ${meta.name} (Manual)`;
+      }
+    }
+
+    function openHolidaysModal() {
+      holidaysModalYear = currentDate.getFullYear();
+      syncHolidayUIControls();
+      ensureCountryHolidaysLoaded(holidaysModalYear, getActiveHolidayCountryCode());
+      renderHolidaysModalList();
+      const modal = document.getElementById('holidays-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeHolidaysModal() {
+      const modal = document.getElementById('holidays-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function changeHolidaysModalYear(delta) {
+      holidaysModalYear += delta;
+      ensureCountryHolidaysLoaded(holidaysModalYear, getActiveHolidayCountryCode());
+      renderHolidaysModalList();
+    }
+
+    async function refreshCountryHolidaysOnline() {
+      const code = getActiveHolidayCountryCode();
+      const meta = getActiveCountryMeta();
+      const updated = await ensureCountryHolidaysLoaded(holidaysModalYear, code, true);
+      renderHolidaysModalList();
+      renderAll();
+      if (updated) {
+        showToast('Feriados sincronizados', `Calendario de ${meta.flag} ${meta.name} (${holidaysModalYear}) actualizado.`, 'fa-circle-check', 'text-emerald-400');
+      } else {
+        showToast('Calendario oficial activo', `Feriados oficiales de ${meta.flag} ${meta.name} (${holidaysModalYear}) cargados.`, 'fa-flag-checkered', 'text-rose-400');
+      }
+    }
+
+    function renderHolidaysModalList() {
+      const container = document.getElementById('holidays-modal-list');
+      const titleEl = document.getElementById('holidays-modal-year-title');
+      const meta = getActiveCountryMeta();
+      if (titleEl) {
+        titleEl.textContent = `${meta.flag} FERIADOS ${meta.name.toUpperCase()} ${holidaysModalYear}`;
+      }
+      if (!container) return;
+
+      const map = getHolidaysMapForYear(holidaysModalYear, meta.code);
+      const list = Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs italic">No hay feriados registrados para este año.</div>`;
+        return;
+      }
+
+      const todayKey = formatDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+      container.innerHTML = list.map(h => {
+        const [y, m, d] = h.date.split('-').map(Number);
+        const dObj = createLocalDate(y, m - 1, d);
+        const dateFormatted = dObj.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+        const isPast = h.date < todayKey;
+        const isToday = h.date === todayKey;
+
+        return `
+          <div onclick="closeHolidaysModal(); jumpToSpecificDate(${y}, ${m - 1}, ${d});" role="button" tabindex="0" class="p-2.5 rounded-xl border ${isToday ? 'bg-rose-950/60 border-amber-400' : (isPast ? 'bg-slate-900/50 border-slate-800 opacity-75' : 'bg-slate-900 border-rose-500/30 hover:border-rose-400')} flex items-center justify-between gap-2 cursor-pointer transition-all">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-10 h-10 rounded-lg bg-rose-600/20 border border-rose-500/40 flex flex-col items-center justify-center shrink-0 text-rose-300">
+                <span class="text-[9px] font-bold uppercase leading-none">${escapeHtml(String(monthNames[m - 1]).slice(0, 3))}</span>
+                <span class="text-xs font-black text-white leading-tight">${d}</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(h.name)}</span>
+                  ${h.irrenunciable ? `<span class="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-rose-600 text-white">Irrenunciable</span>` : ''}
+                </div>
+                <span class="text-[10px] text-slate-400 capitalize block">${escapeHtml(dateFormatted)} · ${escapeHtml(meta.flag)} ${escapeHtml(meta.name)}</span>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 shrink-0"></i>
+          </div>
+        `;
+      }).join('');
+    }
+
     function updateTopHeaderLabels() {
       const year = currentDate.getFullYear();
       const monthIndex = currentDate.getMonth();
@@ -6707,11 +7652,13 @@ Check your Browserslist config to be sure that your targets are set up correctly
     function changeMonth(delta) {
       const target = new Date(currentDate.getFullYear(), currentDate.getMonth() + delta, 1);
       currentDate = createLocalDate(target.getFullYear(), target.getMonth(), 1);
+      ensureCountryHolidaysLoaded(currentDate.getFullYear());
       renderAll();
     }
 
     function changeYear(delta) {
       currentDate = createLocalDate(currentDate.getFullYear() + delta, currentDate.getMonth(), 1);
+      ensureCountryHolidaysLoaded(currentDate.getFullYear());
       renderAll();
     }
 
@@ -6734,16 +7681,23 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const action = document.createElement('button');
       action.id = 'calendar-note-copy-action';
       action.type = 'button';
-      action.className = 'fixed z-[80] min-h-11 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 touch-manipulation';
-      action.innerHTML = '<i class="fa-regular fa-copy"></i><span>Copiar nota</span>';
-      action.style.left = `${Math.max(8, Math.min(x + 16, window.innerWidth - 150))}px`;
-      action.style.top = `${Math.max(8, Math.min(y + 16, window.innerHeight - 60))}px`;
-      action.onclick = event => {
-        event.stopPropagation();
-        copyNote(note);
-        action.remove();
-      };
+      action.className = 'fixed z-[80] flex items-center gap-2 p-2 bg-slate-900 border border-slate-600 rounded-xl shadow-xl';
+      action.style.left = `${Math.max(8, Math.min(x + 16, window.innerWidth - 250))}px`;
+      action.style.top = `${Math.max(8, Math.min(y + 16, window.innerHeight - 70))}px`;
+      action.innerHTML = `
+        <button type="button" class="min-h-11 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs flex items-center gap-2 touch-manipulation"><i class="fa-regular fa-copy"></i><span>Copiar nota</span></button>
+        <button type="button" aria-label="Cancelar" title="Cancelar" class="min-h-11 min-w-11 px-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-base touch-manipulation"><i class="fa-solid fa-xmark"></i></button>`;
+      const [copyButton, cancelButton] = action.querySelectorAll('button');
+      copyButton.onclick = event => { event.stopPropagation(); copyNote(note); action.remove(); };
+      cancelButton.onclick = event => { event.stopPropagation(); action.remove(); };
       document.body.appendChild(action);
+      const dismissOnOutside = event => {
+        if (!action.contains(event.target)) {
+          action.remove();
+          document.removeEventListener('pointerdown', dismissOnOutside, true);
+        }
+      };
+      document.addEventListener('pointerdown', dismissOnOutside, true);
     }
 
     function showCalendarDayPasteAction(year, month, day, x, y) {
@@ -6752,23 +7706,29 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const action = document.createElement('button');
       action.id = 'calendar-note-copy-action';
       action.type = 'button';
-      action.className = 'fixed z-[80] min-h-11 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 touch-manipulation';
-      action.innerHTML = '<i class="fa-solid fa-paste"></i><span>Pegar nota</span>';
-      action.style.left = `${Math.max(8, Math.min(x + 16, window.innerWidth - 150))}px`;
-      action.style.top = `${Math.max(8, Math.min(y + 16, window.innerHeight - 60))}px`;
-      action.onclick = event => {
-        event.stopPropagation();
-        selectedDate = createLocalDate(year, month, day);
-        pasteNoteToCurrentDay();
-        action.remove();
-      };
+      action.className = 'fixed z-[80] flex items-center gap-2 p-2 bg-slate-900 border border-slate-600 rounded-xl shadow-xl';
+      action.style.left = `${Math.max(8, Math.min(x + 16, window.innerWidth - 250))}px`;
+      action.style.top = `${Math.max(8, Math.min(y + 16, window.innerHeight - 70))}px`;
+      action.innerHTML = `
+        <button type="button" class="min-h-11 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs flex items-center gap-2 touch-manipulation"><i class="fa-solid fa-paste"></i><span>Pegar nota</span></button>
+        <button type="button" aria-label="Cancelar" title="Cancelar" class="min-h-11 min-w-11 px-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-base touch-manipulation"><i class="fa-solid fa-xmark"></i></button>`;
+      const [pasteButton, cancelButton] = action.querySelectorAll('button');
+      pasteButton.onclick = event => { event.stopPropagation(); selectedDate = createLocalDate(year, month, day); pasteNoteToCurrentDay(); action.remove(); };
+      cancelButton.onclick = event => { event.stopPropagation(); action.remove(); };
       document.body.appendChild(action);
+      const dismissOnOutside = event => {
+        if (!action.contains(event.target)) {
+          action.remove();
+          document.removeEventListener('pointerdown', dismissOnOutside, true);
+        }
+      };
+      document.addEventListener('pointerdown', dismissOnOutside, true);
     }
 
     function renderPasteSelectionToolbar() {
       const toolbarId = 'paste-selection-toolbar';
       let toolbar = document.getElementById(toolbarId);
-      if (!copiedNote || selectedPasteDateKeys.size === 0) {
+      if (!copiedNote) {
         if (toolbar) toolbar.remove();
         return;
       }
@@ -6779,12 +7739,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
         toolbar.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-2 bg-slate-900 border border-indigo-400/60 rounded-xl p-2 shadow-2xl';
         document.body.appendChild(toolbar);
       }
+      const selectedCount = selectedPasteDateKeys.size;
+      const selectionLabel = selectedCount === 0
+        ? 'Nota copiada. Selecciona un día para pegar.'
+        : `${selectedCount} día${selectedCount === 1 ? '' : 's'} seleccionado${selectedCount === 1 ? '' : 's'}`;
+      const pasteLabel = selectedCount === 1 ? 'Pegar en este día' : `Pegar en ${selectedCount} días`;
+
       toolbar.innerHTML = `
-        <span class="px-2 text-xs font-bold text-slate-200">${pasteRangeStartDateKey ? 'Selecciona el día final' : `${selectedPasteDateKeys.size} día${selectedPasteDateKeys.size === 1 ? '' : 's'} seleccionado${selectedPasteDateKeys.size === 1 ? '' : 's'}`}</span>
-        ${pasteRangeStartDateKey ? '' : `<button type="button" onclick="pasteNoteToSelectedDays()" class="min-h-11 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 touch-manipulation">
-          <i class="fa-solid fa-paste"></i><span>Pegar en días seleccionados</span>
-        </button>`}
-        <button type="button" onclick="clearPasteDateSelection()" aria-label="Limpiar días seleccionados" class="min-h-11 min-w-11 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold touch-manipulation">×</button>
+        <div class="px-2 flex flex-col gap-0.5">
+          <span class="text-xs font-bold text-slate-200">${selectionLabel}</span>
+          ${pasteRangeStartDateKey ? '<span class="text-[10px] text-slate-400">Toca otro día para ampliar el rango</span>' : ''}
+        </div>
+        ${selectedCount > 0 ? `<button type="button" onclick="pasteNoteToSelectedDays()" class="min-h-11 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 touch-manipulation"><i class="fa-solid fa-paste"></i><span>${pasteLabel}</span></button>` : ''}
+        ${selectedCount > 0 ? '<button type="button" onclick="clearPasteDateSelection()" aria-label="Limpiar días seleccionados" class="min-h-11 min-w-11 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold touch-manipulation">×</button>' : ''}
+        <button type="button" onclick="cancelCopyNote()" aria-label="Cancelar copia y pegado" title="Cancelar" class="min-h-11 min-w-11 px-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-base touch-manipulation"><i class="fa-solid fa-xmark"></i></button>
       `;
     }
 
@@ -6815,6 +7783,18 @@ Check your Browserslist config to be sure that your targets are set up correctly
       pasteRangeStartDateKey = null;
       renderMonthCalendar();
       renderPasteSelectionToolbar();
+    }
+
+    function cancelCopyNote() {
+      copiedNote = null;
+      selectedPasteDateKeys.clear();
+      pasteRangeStartDateKey = null;
+      const action = document.getElementById('calendar-note-copy-action');
+      if (action) action.remove();
+      updatePasteNoteButton();
+      if (activeView === 'month') renderMonthCalendar();
+      renderPasteSelectionToolbar();
+      showToast('Acción cancelada', 'No se pegará ninguna nota.', 'fa-circle-xmark', 'text-slate-300');
     }
 
     function pasteNoteToSelectedDays() {
@@ -6850,6 +7830,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function renderMonthCalendar() {
+      syncHolidayUIControls();
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
       const today = new Date();
@@ -6862,7 +7843,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const firstDayOfMonth = createLocalDate(year, month, 1);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      let startDayOfWeek = firstDayOfMonth.getDay();
+      let startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
 
       const prevMonthLastDate = new Date(year, month, 0).getDate();
       const totalSlots = Math.ceil((startDayOfWeek + daysInMonth) / 7) * 7;
@@ -6937,11 +7918,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
           cell.classList.add('ring-2', 'ring-indigo-400', 'z-20');
         }
 
+        const dayHoliday = getHolidayForDateKey(dateKey);
+        if (dayHoliday && isCurrentMonth && !isToday) {
+          cell.classList.add('border-rose-500/40', 'bg-rose-950/15');
+        }
+        if (dayHoliday) {
+          cell.title = `Feriado (${getActiveCountryMeta().name}): ${dayHoliday.name}${dayHoliday.irrenunciable ? ' (Irrenunciable)' : ''}`;
+        }
+
         const dayHeader = document.createElement('div');
-        dayHeader.className = `absolute top-0.5 right-1 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'text-amber-400 font-black' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600')}`;
+        dayHeader.className = `absolute top-0.5 right-1 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'text-amber-400 font-black' : (dayHoliday && isCurrentMonth ? 'text-rose-400 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600'))}`;
         
         if (isToday) {
-          dayHeader.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
+          dayHeader.innerHTML = `${dayHoliday ? '<span class="px-1 py-0.2 rounded bg-rose-600 text-white text-[7px] font-black uppercase leading-tight shadow-sm">FER</span>' : ''}<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
+        } else if (dayHoliday && isCurrentMonth) {
+          dayHeader.innerHTML = `<span class="px-1 py-0.2 rounded bg-rose-600 text-white text-[7px] font-black uppercase leading-tight shadow-sm">FER</span><span>${dayNum}</span>`;
         } else {
           dayHeader.textContent = dayNum;
         }
@@ -7071,8 +8062,31 @@ Check your Browserslist config to be sure that your targets are set up correctly
               blocksContainer.appendChild(block);
             });
 
+            if (dayHoliday) {
+              const holidayStrip = document.createElement('div');
+              holidayStrip.className = 'w-full bg-rose-600 text-white text-[8px] font-extrabold px-1 py-0.5 truncate text-center leading-tight pointer-events-none shrink-0';
+              holidayStrip.textContent = dayHoliday.shortName || dayHoliday.name;
+              blocksContainer.appendChild(holidayStrip);
+            }
+
             cell.appendChild(blocksContainer);
+          } else if (dayHoliday) {
+            const holidayBlock = document.createElement('div');
+            holidayBlock.className = 'mt-auto w-full bg-rose-600/25 border-t border-rose-500/40 px-1 py-1 flex flex-col items-center justify-center text-center pointer-events-none';
+            holidayBlock.innerHTML = `
+              <span class="text-[7px] font-black uppercase tracking-tighter text-rose-300 leading-tight">${dayHoliday.irrenunciable ? 'FERIADO IRREN.' : 'FERIADO'}</span>
+              <span class="text-[8px] font-bold text-rose-100 truncate max-w-full leading-tight">${escapeHtml(dayHoliday.shortName || dayHoliday.name)}</span>
+            `;
+            cell.appendChild(holidayBlock);
           }
+        } else if (isCurrentMonth && dayHoliday) {
+          const holidayBlock = document.createElement('div');
+          holidayBlock.className = 'mt-auto w-full bg-rose-600/25 border-t border-rose-500/40 px-1 py-1 flex flex-col items-center justify-center text-center pointer-events-none';
+          holidayBlock.innerHTML = `
+            <span class="text-[7px] font-black uppercase tracking-tighter text-rose-300 leading-tight">${dayHoliday.irrenunciable ? 'FERIADO IRREN.' : 'FERIADO'}</span>
+            <span class="text-[8px] font-bold text-rose-100 truncate max-w-full leading-tight">${escapeHtml(dayHoliday.shortName || dayHoliday.name)}</span>
+          `;
+          cell.appendChild(holidayBlock);
         }
 
         if (isCurrentMonth) {
@@ -7114,6 +8128,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           }
           selectedDate = createLocalDate(cellYear, cellMonth, dayNum);
           updateSelectedDateInfo();
+          lastCalendarTapDateKey = null;
           renderMonthCalendar();
           openDayDetailModal();
         };
@@ -7126,6 +8141,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function renderYearView() {
+      syncHolidayUIControls();
       const year = currentDate.getFullYear();
       document.getElementById('year-title').textContent = year;
       document.getElementById('year-prev-label').textContent = year - 1;
@@ -7151,14 +8167,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const miniGrid = document.createElement('div');
         miniGrid.className = 'grid grid-cols-7 gap-1 text-[9px] text-center flex-1';
 
-        ['D', 'L', 'M', 'X', 'J', 'V', 'S'].forEach((d, idx) => {
+        ['L', 'M', 'X', 'J', 'V', 'S', 'D'].forEach((d, idx) => {
           const dLabel = document.createElement('div');
-          dLabel.className = `font-bold ${idx === 0 || idx === 6 ? 'text-red-400' : 'text-slate-400'}`;
+          dLabel.className = `font-bold ${idx === 5 || idx === 6 ? 'text-red-400' : 'text-slate-400'}`;
           dLabel.textContent = d;
           miniGrid.appendChild(dLabel);
         });
 
-        const firstDay = createLocalDate(year, m, 1).getDay();
+        const firstDay = (createLocalDate(year, m, 1).getDay() + 6) % 7;
         const daysInM = new Date(year, m + 1, 0).getDate();
 
         for (let i = 0; i < firstDay; i++) {
@@ -7172,6 +8188,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           dayCell.textContent = d;
 
           const dKey = formatDateKey(year, m, d);
+          const yearHoliday = getHolidayForDateKey(dKey);
+          if (yearHoliday) {
+            dayCell.title = `Feriado (${getActiveCountryMeta().name}): ${yearHoliday.name}${yearHoliday.irrenunciable ? ' (Irrenunciable)' : ''}`;
+          }
           if (dayDataMap[dKey] && dayDataMap[dKey].length > 0) {
             const dayMarker = getDayMarker(dayDataMap[dKey]);
             const calendarNotes = dayDataMap[dKey].filter(isCalendarNote);
@@ -7193,6 +8213,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
               dot.style.backgroundColor = counterNotes[0].color || '#EC4899';
               dayCell.appendChild(dot);
             }
+            if (yearHoliday) {
+              dayCell.classList.add('ring-1', 'ring-rose-500');
+            }
+          } else if (yearHoliday) {
+            dayCell.className = 'aspect-square flex items-center justify-center rounded font-black text-rose-200 bg-rose-600/35 border border-rose-500/60 transition-all relative';
           }
 
           const hasMedicationDoses = getDosesForMedDate(dKey).length > 0;
@@ -7231,9 +8256,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const visibleNotes = Array.isArray(dayNotes) ? dayNotes.filter(isCalendarNote) : [];
       const dayMarker = getDayMarker(dayNotes);
 
+      const selectedHoliday = getHolidayForDateKey(key);
+      const holidaySuffix = selectedHoliday ? ` · ${getActiveCountryMeta().flag} Feriado: ${selectedHoliday.name}${selectedHoliday.irrenunciable ? ' (Irrenunciable)' : ''}` : '';
       const capitalizedStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
       const el = document.getElementById('selected-date-info');
-      if (el) el.textContent = `${capitalizedStr}${dayMarker ? ` (${dayMarker.title || DAY_MARKER_TYPES[getDayMarkerType(dayMarker)].title})` : (visibleNotes.length > 0 ? ` (${visibleNotes.length} etiqueta${visibleNotes.length > 1 ? 's' : ''})` : '')}`;
+      if (el) el.textContent = `${capitalizedStr}${dayMarker ? ` (${dayMarker.title || DAY_MARKER_TYPES[getDayMarkerType(dayMarker)].title})` : (visibleNotes.length > 0 ? ` (${visibleNotes.length} etiqueta${visibleNotes.length > 1 ? 's' : ''})` : '')}${holidaySuffix}`;
     }
 
     function selectNoteColor(color) {
@@ -8082,9 +9109,54 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       const scheduledDoses = getDosesForMedDate(selectedDateKey);
       const scheduledControls = getHealthControlsForDate(selectedDateKey);
+      const dayHoliday = getHolidayForDateKey(selectedDateKey);
       updatePasteNoteButton();
 
-      if (visibleNotes.length === 0 && scheduledDoses.length === 0 && scheduledControls.length === 0) {
+      if (dayHoliday) {
+        const countryMeta = getActiveCountryMeta();
+        const holidayItem = document.createElement('div');
+        holidayItem.className = 'bg-rose-950/35 p-2.5 rounded-lg border border-rose-500/50 hover:border-rose-400 flex items-center justify-between gap-2 shadow-sm cursor-pointer transition-colors';
+        holidayItem.setAttribute('role', 'button');
+        holidayItem.setAttribute('tabindex', '0');
+        const openHolidayPreview = () => showAssignedNotePreview({
+          title: dayHoliday.name,
+          text: dayHoliday.name,
+          assignedDate: selectedDateKey,
+          previewType: `Feriado en ${countryMeta.flag} ${countryMeta.name}`,
+          description: `${dayHoliday.type || 'Feriado Nacional'}${dayHoliday.irrenunciable ? ' · Feriado Irrenunciable' : ''}. Actualizado automáticamente según el país de ejecución (${countryMeta.name}).`,
+          color: '#E11D48'
+        });
+        holidayItem.onclick = openHolidayPreview;
+        holidayItem.onkeydown = event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openHolidayPreview();
+          }
+        };
+        holidayItem.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <span class="w-3 h-3 rounded-full shrink-0 bg-rose-500"></span>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-xs text-rose-100 truncate">${escapeHtml(dayHoliday.name)}</span>
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-500/25 text-rose-200 border border-rose-500/40 flex items-center gap-1">
+                  <span>${escapeHtml(countryMeta.flag)}</span> FERIADO
+                </span>
+                ${dayHoliday.irrenunciable ? `<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-rose-600 text-white">IRRENUNCIABLE</span>` : ''}
+              </div>
+              <span class="text-[10px] text-rose-300/90 font-semibold mt-0.5">
+                Feriado oficial de ${escapeHtml(countryMeta.name)}
+              </span>
+            </div>
+          </div>
+          <button type="button" onclick="event.stopPropagation(); closeDayDetailModal(); openHolidaysModal();" class="shrink-0 px-2 py-1 rounded-lg bg-rose-900/50 hover:bg-rose-800/60 text-rose-200 border border-rose-500/40 text-[10px] font-bold transition-colors">
+            Ver todos
+          </button>
+        `;
+        container.appendChild(holidayItem);
+      }
+
+      if (visibleNotes.length === 0 && scheduledDoses.length === 0 && scheduledControls.length === 0 && !dayHoliday) {
         container.innerHTML = `
           <div class="text-center py-6 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
             ${getDayMarker(currentModalNotes) ? `Este día está marcado como ${escapeHtml((getDayMarker(currentModalNotes).title || DAY_MARKER_TYPES[getDayMarkerType(getDayMarker(currentModalNotes))].title).toLowerCase())}.` : 'No hay notas asignadas para este día.'}
@@ -8185,7 +9257,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
           }
         };
 
-        const doseDetails = med.doseVal ? `${med.doseVal} ${med.doseUnit || ''}` : (med.dose || '');
+        const baseDoseStr = med.doseVal ? `${med.doseVal} ${med.doseUnit || ''}`.trim() : (med.dose || '');
+        const formText = med.formType ? ` · Frasco: ${med.formType}` : '';
+        const takeCalc = (med.doseVal && med.doseUnit) ? formatMedicationDose(med) : '';
+        const calcPart = (takeCalc && takeCalc !== baseDoseStr) ? ` · Toma: ${takeCalc}` : '';
+        const doseDetails = `${baseDoseStr}${formText}${calcPart}`;
         const freqText = med.frequency ? ` · cada ${med.frequency}h` : '';
 
         item.innerHTML = `
@@ -9703,6 +10779,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function openSettingsModal() {
       document.getElementById('time-format-setting').value = timeFormat;
+      syncHolidayUIControls();
       applyTabVisibility();
       updateStorageStatus();
       document.getElementById('settings-modal').classList.remove('hidden');
@@ -10721,20 +11798,26 @@ Check your Browserslist config to be sure that your targets are set up correctly
             headCm: null,
             temperatureC: null,
             vaccines: [
-              { id: 'v1', name: 'BCG (Recién nacido)', age: 'RN', done: false, date: '', location: '', notes: '' },
+              { id: 'v1', name: 'BCG (Tuberculosis)', age: 'RN', done: false, date: '', location: '', notes: '' },
               { id: 'v2', name: 'Hepatitis B (Recién nacido)', age: 'RN', done: false, date: '', location: '', notes: '' },
+              { id: 'v_vrs', name: 'Inmunización VRS (Nirsevimab)', age: 'RN / Lactante', done: false, date: '', location: '', notes: '' },
               { id: 'v3', name: 'Hexavalente 1ª Dosis', age: '2 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v4', name: 'Neumocócica Conjugada 1ª', age: '2 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v5', name: 'Rotavirus 1ª Dosis', age: '2 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v4', name: 'Neumocócica Conjugada 1ª (PCV)', age: '2 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v5', name: 'Meningocócica Serogrupo B 1ª (Bexsero)', age: '2 meses', done: false, date: '', location: '', notes: '' },
               { id: 'v6', name: 'Hexavalente 2ª Dosis', age: '4 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v7', name: 'Neumocócica Conjugada 2ª', age: '4 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v8', name: 'Rotavirus 2ª Dosis', age: '4 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v7', name: 'Neumocócica Conjugada 2ª (PCV)', age: '4 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v8', name: 'Meningocócica Serogrupo B 2ª (Bexsero)', age: '4 meses', done: false, date: '', location: '', notes: '' },
               { id: 'v9', name: 'Hexavalente 3ª Dosis', age: '6 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v_flu', name: 'Influenza (Campaña anual MINSAL)', age: '6 meses', done: false, date: '', location: '', notes: '' },
               { id: 'v10', name: 'Tres Vírica (SRP) 1ª Dosis', age: '12 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v11', name: 'Meningocócica Conjugada', age: '12 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v12', name: 'Neumocócica Refuerzo', age: '12 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v11', name: 'Meningocócica Conjugada Tetravalente (ACWY)', age: '12 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v12', name: 'Neumocócica Conjugada Refuerzo (PCV)', age: '12 meses', done: false, date: '', location: '', notes: '' },
               { id: 'v13', name: 'Hexavalente Refuerzo', age: '18 meses', done: false, date: '', location: '', notes: '' },
-              { id: 'v14', name: 'Varicela / Hepatitis A', age: '18 meses', done: false, date: '', location: '', notes: '' }
+              { id: 'v14', name: 'Hepatitis A (Dosis única)', age: '18 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v15', name: 'Varicela 1ª Dosis', age: '18 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v16', name: 'Meningocócica Serogrupo B Refuerzo (Bexsero)', age: '18 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v17', name: 'Tres Vírica (SRP) 2ª Dosis', age: '36 meses', done: false, date: '', location: '', notes: '' },
+              { id: 'v18', name: 'Varicela 2ª Dosis', age: '36 meses', done: false, date: '', location: '', notes: '' }
             ],
             logs: [],
             medicalControls: [],
@@ -10835,14 +11918,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
             : [];
           healthData.medLogs = rawHealth.medLogs && typeof rawHealth.medLogs === 'object' && !Array.isArray(rawHealth.medLogs) ? rawHealth.medLogs : {};
 
-          // Asegurar que cada vacuna tenga campos date, location, notes y conservar vacunas personalizadas
+          // Asegurar esquema oficial PNI Chile (reemplazando Rotavirus heredado por Meningocócica B y manteniendo personalizadas)
           if (Array.isArray(rawHealth.vaccines)) {
             const mergedVaccines = base.health.vaccines.map(baseVax => {
               const userVax = rawHealth.vaccines.find(x => x && (x.id === baseVax.id || x.name === baseVax.name));
               if (userVax) {
+                const isLegacyRotavirus = /rotavirus/i.test(String(userVax.name || ''));
+                if (isLegacyRotavirus) {
+                  return { ...baseVax };
+                }
                 return {
-                  ...baseVax,
                   ...userVax,
+                  id: baseVax.id,
+                  name: baseVax.name,
+                  age: baseVax.age,
+                  done: !!userVax.done,
                   date: userVax.date || '',
                   location: userVax.location || '',
                   notes: userVax.notes || ''
@@ -10851,11 +11941,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
               return baseVax;
             });
             rawHealth.vaccines.forEach(userVax => {
-              if (userVax && userVax.id && !mergedVaccines.some(v => v.id === userVax.id || v.name === userVax.name)) {
+              if (!userVax || !userVax.id) return;
+              const isLegacyRotavirus = /rotavirus/i.test(String(userVax.name || '')) && !String(userVax.id).startsWith('v_custom_');
+              if (isLegacyRotavirus) return;
+              if (!mergedVaccines.some(v => v.id === userVax.id || v.name === userVax.name)) {
                 mergedVaccines.push({
                   id: userVax.id,
                   name: userVax.name || 'Vacuna',
-                  age: userVax.age || 'Extra',
+                  age: userVax.age || 'Complementaria',
                   done: !!userVax.done,
                   date: userVax.date || '',
                   location: userVax.location || '',
@@ -12409,9 +13502,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <div class="flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h5 class="text-xs font-black uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-syringe"></i> Esquema y Estadísticas de Vacunas
+                    <i class="fa-solid fa-syringe"></i> Esquema PNI Chile (MINSAL) y Vacunas
                   </h5>
-                  <p class="text-[10px] text-slate-400">Marca en verde las vacunas administradas o toca para editar su fecha</p>
+                  <p class="text-[10px] text-slate-400">Calendario oficial PNI actualizado (sin Rotavirus; incluye Meningocócica B y VRS). Usa «+ Nueva Vacuna» para vacunas complementarias.</p>
                 </div>
                 <button type="button" onclick="openBabyVaccineQuickModal('${btSelectedDateKey}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow active:scale-95">
                   <i class="fa-solid fa-plus"></i> Nueva Vacuna
@@ -12745,7 +13838,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                               <span class="font-mono font-bold ${isTaken ? 'text-emerald-300' : 'text-blue-300'} text-xs shrink-0">${escapeHtml(formatTime(dose.time))}</span>
                               <div class="min-w-0 flex-1">
                                 <span class="block font-bold ${isTaken ? 'line-through text-slate-400' : 'text-slate-100'} truncate">${escapeHtml(dose.med.name)}</span>
-                                <span class="block text-[10px] text-slate-400 mt-0.5">Dosis: <strong class="text-blue-200">${escapeHtml(dose.med.dose)}</strong> · cada ${escapeHtml(dose.med.frequency)}h</span>
+                                <span class="block text-[10px] text-slate-400 mt-0.5">${escapeHtml(formatMedicationDoseDetails(dose.med))} · cada ${escapeHtml(dose.med.frequency)}h</span>
                               </div>
                             </div>
                             <button type="button" data-bt-toggle-babydose="${escapeHtml(logKey)}" class="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 font-bold text-xs transition-all active:scale-95 shrink-0 ${isTaken ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300' : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent shadow'}">
@@ -12778,7 +13871,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                         </div>
                       </div>
                       <div class="text-[11px] text-slate-400 space-y-0.5">
-                        <p><strong class="text-slate-300">Dosis:</strong> ${escapeHtml(m.dose)}</p>
+                        <p><strong class="text-slate-300">Dosis:</strong> ${escapeHtml(m.calculatedDoseStr ? `${m.doseVal || m.dose} ${m.doseUnit || ''} (${m.calculatedDoseStr}) - Frasco: ${m.formType}` : `${m.doseVal ? `${m.doseVal} ${m.doseUnit || ''}` : m.dose}${m.formType ? ` (Frasco: ${m.formType})` : ''}`)}</p>
                         <p><strong class="text-slate-300">Horarios:</strong> Cada ${escapeHtml(m.frequency)} horas desde las ${escapeHtml(formatTime(m.time || '08:00'))}</p>
                         <p><strong class="text-slate-300">Duración:</strong> ${escapeHtml(m.duration)} días (Inicio: ${escapeHtml(m.startDate)})</p>
                         ${m.notes ? `<p class="italic text-slate-400 pt-0.5">"${escapeHtml(m.notes)}"</p>` : ''}
@@ -14805,7 +15898,30 @@ Check your Browserslist config to be sure that your targets are set up correctly
               }
             }
           });
-          lb.health.vaccines = Array.from(vaxMap.values());
+          const baseCanonicalVax = createEmptyBabyRecord('tmp', 1).health.vaccines;
+          const baseCanonicalMap = new Map(baseCanonicalVax.map(v => [v.id, v]));
+          lb.health.vaccines = Array.from(vaxMap.values()).filter(v => {
+            if (!v || !v.id) return false;
+            if (/rotavirus/i.test(String(v.name || '')) && !String(v.id).startsWith('v_custom_')) {
+              if (baseCanonicalMap.has(v.id)) {
+                const canon = baseCanonicalMap.get(v.id);
+                v.name = canon.name;
+                v.age = canon.age;
+                v.done = false;
+                v.date = '';
+                v.location = '';
+                v.notes = '';
+                return true;
+              }
+              return false;
+            }
+            if (baseCanonicalMap.has(v.id)) {
+              const canon = baseCanonicalMap.get(v.id);
+              v.name = canon.name;
+              v.age = canon.age;
+            }
+            return true;
+          });
 
           // Tomas de medicamentos (medLogs)
           if (!lb.health.medLogs) lb.health.medLogs = {};
@@ -15187,6 +16303,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'medModal': { label: 'Medicamento', close: () => window.closeMedModal && window.closeMedModal() },
         'delete-confirm-modal': { label: 'Confirmar eliminación', close: () => window.closeDeleteConfirmModal && window.closeDeleteConfirmModal() },
         'settings-modal': { label: 'Ajustes y respaldos', close: () => window.closeSettingsModal && window.closeSettingsModal() },
+        'holidays-modal': { label: 'Feriados del calendario', close: () => window.closeHolidaysModal && window.closeHolidaysModal() },
         'share-modal': { label: 'Compartir datos', close: () => window.closeShareModal && window.closeShareModal() },
         'import-choice-modal': { label: 'Importar respaldo', close: () => window.closeImportChoiceModal && window.closeImportChoiceModal() },
         'babyRegistrationChooser': { label: 'Registrar en bebé', close: () => window.closeBabyRegistrationChooser && window.closeBabyRegistrationChooser() },
