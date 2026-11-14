@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.vorax2009.twa",
+        "sha256_cert_fingerprints": ["D9:F1:24:82:5D:A4:75:FA:F4:82:2A:05:9B:DB:12:4D:BD:A5:C6:BD:79:4C:31:72:37:96:02:10:98:8E:7D:80"]
+      }
+    }]
