@@ -11744,9 +11744,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const bytes = [];
       for (let i = 0; i < clean.length; i++) {
         const code = clean.charCodeAt(i);
-        if (code === 40 || code === 41 || code === 92) {
-          bytes.push(92, code);
-        } else if (code >= 32 && code <= 255) {
+        if (code >= 32 && code <= 255) {
           bytes.push(code);
         } else {
           bytes.push(32);
@@ -12455,8 +12453,35 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         const shiftRows = [];
         const eventRows = [];
+        const dateRows = [];
         const shiftCountByType = {};
         let totalShiftMins = 0;
+
+        const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const fmtLong = (d) => formatHealthControlDate(d, { day: 'numeric', month: 'long', year: 'numeric' });
+        const parseISO = (iso) => {
+          const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          return m ? { y: +m[1], m: +m[2] - 1, d: +m[3] } : null;
+        };
+        const buildOccurrence = (iso, isBday) => {
+          const o = parseISO(iso);
+          if (!o) return null;
+          const occ = (year) => new Date(year, o.m, Math.min(o.d, new Date(year, o.m + 1, 0).getDate()));
+          let nextYear = todayMid.getFullYear();
+          if (occ(nextYear) < todayMid) nextYear++;
+          const nextDate = occ(nextYear);
+          const completed = nextYear - o.y - (nextDate.getTime() === todayMid.getTime() ? 0 : 1);
+          const turning = nextYear - o.y;
+          const nextISO = formatDateKey(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
+          const isToday = nextDate.getTime() === todayMid.getTime();
+          const daysLeft = Math.round((nextDate - todayMid) / 86400000);
+          const nextTxt = `${fmtLong(nextISO)}${isToday ? ' - HOY' : (daysLeft === 1 ? ' - mañana' : ` - en ${daysLeft} días`)}, ${isBday ? 'cumple' : 'cumplen'} ${turning}`;
+          const ageTxt = completed < 0
+            ? '-'
+            : (isBday ? `${completed} ${completed === 1 ? 'año' : 'años'}` : `${completed} ${completed === 1 ? 'aniversario' : 'aniversarios'}`);
+          return { nextDate, nextTxt, ageTxt };
+        };
+        const seenDates = new Set();
 
         Object.keys(dayDataMap || {}).sort().forEach(dateKey => {
           const items = Array.isArray(dayDataMap[dateKey]) ? dayDataMap[dateKey] : [];
@@ -12483,29 +12508,55 @@ Check your Browserslist config to be sure that your targets are set up correctly
               const types = Array.isArray(item.eventTypes) ? item.eventTypes : [];
               const isBday = !!item.isBirthday || types.includes('birthday');
               const isAnniv = !!item.isAnniversary || types.includes('anniversary');
-              const kind = isBday ? 'Cumpleaños' : (isAnniv ? 'Aniversario' : (item.isEvent ? 'Evento' : 'Nota'));
-              const fmtLong = (d) => formatHealthControlDate(d, { day: 'numeric', month: 'long', year: 'numeric' });
-              const yearOf = (d) => parseInt(String(d || '').slice(0, 4), 10);
-              const detailParts = [];
+              let handled = false;
               if (isBday && item.birthDate) {
-                const age = parseInt(dateKey.slice(0, 4), 10) - yearOf(item.birthDate);
-                detailParts.push(`Nació el ${fmtLong(item.birthDate)}${age > 0 ? ` (cumple ${age} años)` : ''}`);
+                handled = true;
+                const key = `b|${String(titleTxt).trim().toLowerCase()}|${item.birthDate}`;
+                if (!seenDates.has(key)) {
+                  seenDates.add(key);
+                  const occ = buildOccurrence(item.birthDate, true);
+                  if (occ) dateRows.push({ sort: occ.nextDate.getTime(), row: [
+                    { text: 'Cumpleaños', bold: true, color: [0.851, 0.467, 0.024] },
+                    { text: titleTxt || 'Sin título', bold: true },
+                    fmtLong(item.birthDate),
+                    occ.ageTxt,
+                    occ.nextTxt
+                  ] });
+                }
               }
               if (isAnniv && item.anniversaryDate) {
-                const yrs = parseInt(dateKey.slice(0, 4), 10) - yearOf(item.anniversaryDate);
-                detailParts.push(`Aniversario desde el ${fmtLong(item.anniversaryDate)}${yrs > 0 ? ` (${yrs} años)` : ''}`);
+                handled = true;
+                const key = `a|${String(titleTxt).trim().toLowerCase()}|${item.anniversaryDate}`;
+                if (!seenDates.has(key)) {
+                  seenDates.add(key);
+                  const occ = buildOccurrence(item.anniversaryDate, false);
+                  if (occ) dateRows.push({ sort: occ.nextDate.getTime(), row: [
+                    { text: 'Aniversario', bold: true, color: [0.059, 0.463, 0.431] },
+                    { text: titleTxt || 'Sin título', bold: true },
+                    fmtLong(item.anniversaryDate),
+                    occ.ageTxt,
+                    occ.nextTxt
+                  ] });
+                }
               }
-              if (item.description) detailParts.push(item.description);
-              eventRows.push([
-                dateKey,
-                { text: kind, bold: true, color: isBday ? [0.851, 0.467, 0.024] : [0.059, 0.463, 0.431] },
-                titleTxt || 'Sin título',
-                item.noteTime || '-',
-                detailParts.length ? detailParts.join(' | ') : '-'
-              ]);
+              if (!handled && !isBday && !isAnniv) {
+                const kind = item.isEvent ? 'Evento' : 'Nota';
+                const groupKey = `n|${item.repeatGroupId || ''}|${String(titleTxt).trim().toLowerCase()}|${item.repeatGroupId ? '' : dateKey}`;
+                if (!seenDates.has(groupKey)) {
+                  seenDates.add(groupKey);
+                  eventRows.push([
+                    dateKey,
+                    { text: kind, bold: true, color: [0.059, 0.463, 0.431] },
+                    titleTxt || 'Sin título',
+                    item.description || '-'
+                  ]);
+                }
+              }
             }
           });
         });
+        dateRows.sort((x, y) => x.sort - y.sort);
+        const dateTableRows = dateRows.map(r => r.row);
 
         const ctrlList = (Array.isArray(healthControls) ? [...healthControls] : [])
           .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
@@ -12553,7 +12604,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const totalShiftHours = Math.floor(totalShiftMins / 60);
         const kpiCards = [];
         if (incTurns) kpiCards.push({ label: 'Turnos Laborales', value: `${shiftRows.length} turnos`, sub: `${totalShiftHours} horas acumuladas`, color: [0.490, 0.231, 0.929] });
-        if (incEvents) kpiCards.push({ label: 'Eventos y Notas', value: `${eventRows.length} registros`, sub: 'Agenda y recordatorios', color: [0.851, 0.467, 0.024] });
+        if (incEvents) kpiCards.push({ label: 'Eventos y Notas', value: `${dateTableRows.length + eventRows.length} registros`, sub: `${dateTableRows.length} fechas especiales`, color: [0.851, 0.467, 0.024] });
         if (incHealth) {
           kpiCards.push({ label: 'Controles de Salud', value: `${ctrlRows.length} citas`, sub: `${ctrlList.length} registrados`, color: [0.231, 0.510, 0.965] });
           kpiCards.push({ label: 'Tratamientos Activos', value: `${medRows.length} med.`, sub: 'Modulo MiMedicina', color: [0.059, 0.463, 0.431] });
@@ -12596,13 +12647,22 @@ Check your Browserslist config to be sure that your targets are set up correctly
         }
 
         if (incEvents) {
-          pdf.addSectionHeader('EVENTOS, CUMPLEANOS Y NOTAS DEL CALENDARIO', `${eventRows.length} REGISTROS`, [0.851, 0.467, 0.024]);
+          pdf.addSectionHeader('CUMPLEAÑOS Y ANIVERSARIOS', `${dateTableRows.length} REGISTROS`, [0.851, 0.467, 0.024]);
           pdf.addTable(
-            ['Fecha', 'Categoria', 'Titulo / Persona', 'Hora', 'Detalle'],
-            eventRows.slice(-60),
-            [68, 80, 145, 55, 175],
+            ['Categoría', 'Persona / Título', 'Fecha de nacimiento / aniversario', 'Edad / Aniversarios', 'Próximo cumpleaños / aniversario'],
+            dateTableRows,
+            [62, 100, 110, 66, 185],
             [0.851, 0.467, 0.024]
           );
+          if (eventRows.length > 0) {
+            pdf.addSectionHeader('EVENTOS Y NOTAS DEL CALENDARIO', `${eventRows.length} REGISTROS`, [0.059, 0.463, 0.431]);
+            pdf.addTable(
+              ['Fecha', 'Categoría', 'Título', 'Detalle'],
+              eventRows.slice(-60),
+              [68, 70, 150, 235],
+              [0.059, 0.463, 0.431]
+            );
+          }
         }
 
         if (incBaby) {
