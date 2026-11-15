@@ -146,6 +146,318 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     :root { color-scheme: dark; }
+    html.theme-light { color-scheme: light; }
+
+    /* ==================== MODO DIURNO (ALTO CONTRASTE) ==================== */
+    html.theme-light ::-webkit-scrollbar-track { background: #e2e8f0; }
+    html.theme-light ::-webkit-scrollbar-thumb { background: #94a3b8; }
+    html.theme-light ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    /* 1. Superficies oscuras -> Superficies claras nítidas */
+    html.theme-light.bg-slate-950,
+    html.theme-light body.bg-slate-950 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light :not(.fixed) > .bg-slate-950,
+    html.theme-light div.bg-slate-950:not(.fixed),
+    html.theme-light input.bg-slate-950,
+    html.theme-light select.bg-slate-950,
+    html.theme-light textarea.bg-slate-950 {
+      background-color: #f8fafc !important;
+    }
+    html.theme-light .bg-slate-950\/80:not(.fixed),
+    html.theme-light .bg-slate-950\/70:not(.fixed),
+    html.theme-light .bg-slate-950\/60:not(.fixed),
+    html.theme-light .bg-slate-950\/50:not(.fixed),
+    html.theme-light .bg-slate-950\/90:not(.fixed) {
+      background-color: #f1f5f9 !important;
+    }
+    html.theme-light .fixed.bg-slate-950\/80,
+    html.theme-light .fixed.bg-slate-950\/85,
+    html.theme-light .fixed.bg-slate-950\/90,
+    html.theme-light .fixed.bg-slate-950\/95 {
+      background-color: rgba(15, 23, 42, 0.55) !important;
+    }
+    html.theme-light .bg-slate-900 {
+      background-color: #f1f5f9 !important;
+    }
+    html.theme-light input.bg-slate-900,
+    html.theme-light select.bg-slate-900,
+    html.theme-light textarea.bg-slate-900,
+    html.theme-light .bg-slate-900\/90,
+    html.theme-light .bg-slate-900\/80,
+    html.theme-light .bg-slate-900\/70,
+    html.theme-light .bg-slate-900\/60,
+    html.theme-light .bg-slate-900\/50,
+    html.theme-light .bg-slate-900\/40 {
+      background-color: #ffffff !important;
+    }
+    html.theme-light .bg-\[\#1e293b\],
+    html.theme-light .bg-\[\#1e2733\],
+    html.theme-light .bg-\[\#151d2a\] {
+      background-color: #ffffff !important;
+    }
+    html.theme-light .bg-slate-800,
+    html.theme-light .bg-slate-800\/90,
+    html.theme-light .bg-slate-800\/80,
+    html.theme-light .bg-slate-800\/70,
+    html.theme-light .bg-slate-800\/60 {
+      background-color: #e2e8f0 !important;
+    }
+    html.theme-light #calendar-grid.bg-slate-800,
+    html.theme-light #weekdays-header.bg-slate-800 {
+      background-color: #cbd5e1 !important;
+    }
+    html.theme-light .hover\:bg-slate-800:hover,
+    html.theme-light .hover\:bg-slate-800\/80:hover,
+    html.theme-light .hover\:bg-slate-800\/70:hover,
+    html.theme-light .hover\:bg-slate-800\/60:hover,
+    html.theme-light .hover\:bg-slate-800\/40:hover,
+    html.theme-light .hover\:bg-slate-700:hover {
+      background-color: #cbd5e1 !important;
+    }
+    html.theme-light .from-\[\#1e2733\],
+    html.theme-light .from-\[\#1e293b\],
+    html.theme-light .from-\[\#172036\],
+    html.theme-light .from-slate-900,
+    html.theme-light .from-slate-800 {
+      --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
+      --tw-gradient-to: rgba(255, 255, 255, 0) var(--tw-gradient-to-position) !important;
+    }
+    html.theme-light .via-\[\#0f172a\],
+    html.theme-light .via-slate-900,
+    html.theme-light .via-indigo-950\/60 {
+      --tw-gradient-via: #f1f5f9 var(--tw-gradient-via-position) !important;
+    }
+    html.theme-light .to-\[\#17202c\],
+    html.theme-light .to-\[\#172033\],
+    html.theme-light .to-\[\#161f2b\],
+    html.theme-light .to-\[\#090d16\],
+    html.theme-light .to-slate-900,
+    html.theme-light .to-slate-800\/90 {
+      --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
+    }
+    html.theme-light .from-indigo-950 {
+      --tw-gradient-from: #e0e7ff var(--tw-gradient-from-position) !important;
+    }
+    html.theme-light .to-indigo-950 {
+      --tw-gradient-to: #e0e7ff var(--tw-gradient-to-position) !important;
+    }
+    html.theme-light .from-sky-950\/40,
+    html.theme-light .from-sky-950\/60 {
+      --tw-gradient-from: #e0f2fe var(--tw-gradient-from-position) !important;
+    }
+    html.theme-light .to-teal-950\/40 {
+      --tw-gradient-to: #ccfbf1 var(--tw-gradient-to-position) !important;
+    }
+
+    /* Fondos traslúcidos de tarjetas y alertas en modo diurno */
+    html.theme-light .bg-amber-950\/30,
+    html.theme-light .bg-amber-900\/30,
+    html.theme-light .bg-amber-900\/35,
+    html.theme-light .bg-amber-500\/10,
+    html.theme-light .bg-amber-500\/15,
+    html.theme-light .bg-amber-500\/20,
+    html.theme-light .bg-amber-600\/15 {
+      background-color: #fef3c7 !important;
+    }
+    html.theme-light .bg-emerald-950\/20,
+    html.theme-light .bg-emerald-950\/25,
+    html.theme-light .bg-emerald-950\/30,
+    html.theme-light .bg-emerald-950\/35,
+    html.theme-light .bg-emerald-900\/35,
+    html.theme-light .bg-emerald-500\/20,
+    html.theme-light .bg-emerald-500\/25,
+    html.theme-light .bg-emerald-600\/15,
+    html.theme-light .bg-emerald-600\/20 {
+      background-color: #d1fae5 !important;
+    }
+    html.theme-light .bg-sky-950\/30,
+    html.theme-light .bg-sky-950\/40,
+    html.theme-light .bg-sky-900\/35,
+    html.theme-light .bg-sky-500\/10,
+    html.theme-light .bg-sky-500\/15,
+    html.theme-light .bg-sky-500\/20,
+    html.theme-light .bg-sky-600\/15,
+    html.theme-light .bg-sky-600\/30 {
+      background-color: #e0f2fe !important;
+    }
+    html.theme-light .bg-teal-950\/40,
+    html.theme-light .bg-teal-900\/30,
+    html.theme-light .bg-teal-500\/15,
+    html.theme-light .bg-teal-500\/20,
+    html.theme-light .bg-teal-600\/15 {
+      background-color: #ccfbf1 !important;
+    }
+    html.theme-light .bg-indigo-950\/20,
+    html.theme-light .bg-indigo-950\/30,
+    html.theme-light .bg-indigo-500\/10,
+    html.theme-light .bg-indigo-500\/15,
+    html.theme-light .bg-indigo-500\/20,
+    html.theme-light .bg-indigo-600\/15,
+    html.theme-light .bg-indigo-600\/30 {
+      background-color: #e0e7ff !important;
+    }
+    html.theme-light .bg-purple-900\/40,
+    html.theme-light .bg-purple-900\/60,
+    html.theme-light .bg-purple-500\/20,
+    html.theme-light .bg-purple-600\/15 {
+      background-color: #f3e8ff !important;
+    }
+    html.theme-light .bg-blue-950\/60,
+    html.theme-light .bg-blue-900\/40,
+    html.theme-light .bg-blue-500\/20,
+    html.theme-light .bg-blue-600\/15 {
+      background-color: #dbeafe !important;
+    }
+    html.theme-light .bg-rose-950\/15,
+    html.theme-light .bg-rose-950\/20,
+    html.theme-light .bg-rose-950\/25,
+    html.theme-light .bg-rose-950\/35,
+    html.theme-light .bg-rose-950\/60,
+    html.theme-light .bg-rose-900\/50,
+    html.theme-light .bg-rose-600\/20,
+    html.theme-light .bg-rose-600\/25,
+    html.theme-light .bg-rose-600\/35,
+    html.theme-light .bg-rose-500\/20,
+    html.theme-light .bg-rose-500\/25,
+    html.theme-light .bg-red-500\/15,
+    html.theme-light .bg-red-500\/20 {
+      background-color: #ffe4e6 !important;
+    }
+
+    /* 2. Bordes y divisores visibles en modo diurno */
+    html.theme-light .border-slate-800,
+    html.theme-light .border-slate-800\/80,
+    html.theme-light .border-slate-800\/50,
+    html.theme-light .border-slate-700,
+    html.theme-light .border-slate-700\/80,
+    html.theme-light .border-slate-700\/70,
+    html.theme-light .border-slate-700\/60,
+    html.theme-light .border-slate-700\/50 {
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light .border-slate-600,
+    html.theme-light .border-slate-600\/70 {
+      border-color: #94a3b8 !important;
+    }
+    html.theme-light .divide-slate-700\/70 > :not([hidden]) ~ :not([hidden]),
+    html.theme-light .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light .color-btn.border-white {
+      border-color: #0f172a !important;
+    }
+    html.theme-light .color-btn.hover\:border-white:hover {
+      border-color: #334155 !important;
+    }
+
+    /* 3. Textos neutros: máximo contraste garantizado */
+    html.theme-light .text-slate-50,
+    html.theme-light .text-slate-100,
+    html.theme-light .text-slate-200 {
+      color: #0f172a !important;
+    }
+    html.theme-light .text-slate-300 {
+      color: #1e293b !important;
+    }
+    html.theme-light .text-slate-400 {
+      color: #334155 !important;
+    }
+    html.theme-light .text-slate-500 {
+      color: #475569 !important;
+    }
+    html.theme-light .text-slate-600 {
+      color: #64748b !important;
+    }
+    html.theme-light .placeholder-slate-500::placeholder,
+    html.theme-light input::placeholder,
+    html.theme-light textarea::placeholder {
+      color: #64748b !important;
+    }
+    html.theme-light .hover\:text-slate-200:hover {
+      color: #0f172a !important;
+    }
+    /* Evitar que hover:text-white oculte texto en botones sin fondo sólido */
+    html.theme-light .hover\:text-white:hover:not([class*="bg-teal-"]):not([class*="bg-blue-"]):not([class*="bg-indigo-"]):not([class*="bg-purple-"]):not([class*="bg-sky-"]):not([class*="bg-amber-"]):not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-red-"]):not([class*="bg-slate-600"]):not([class*="bg-slate-700"]):not([class*="from-"]) {
+      color: #0f172a !important;
+    }
+
+    /* 4. Textos de colores de acento: tonos oscuros profundos para que ninguna palabra se pierda */
+    html.theme-light .text-amber-50,
+    html.theme-light .text-amber-100\/90,
+    html.theme-light .text-amber-200,
+    html.theme-light .text-amber-200\/90,
+    html.theme-light .text-amber-300,
+    html.theme-light .text-amber-300\/80,
+    html.theme-light .text-amber-400,
+    html.theme-light .text-amber-500 {
+      color: #b45309 !important;
+    }
+    html.theme-light .text-teal-50,
+    html.theme-light .text-teal-200,
+    html.theme-light .text-teal-300,
+    html.theme-light .text-teal-400,
+    html.theme-light .text-teal-500 {
+      color: #0f766e !important;
+    }
+    html.theme-light .text-sky-50,
+    html.theme-light .text-sky-100,
+    html.theme-light .text-sky-200,
+    html.theme-light .text-sky-300,
+    html.theme-light .text-sky-300\/80,
+    html.theme-light .text-sky-400,
+    html.theme-light .text-sky-500 {
+      color: #0369a1 !important;
+    }
+    html.theme-light .text-blue-50,
+    html.theme-light .text-blue-100,
+    html.theme-light .text-blue-200,
+    html.theme-light .text-blue-300,
+    html.theme-light .text-blue-400,
+    html.theme-light .text-blue-500 {
+      color: #1d4ed8 !important;
+    }
+    html.theme-light .text-indigo-200,
+    html.theme-light .text-indigo-300,
+    html.theme-light .text-indigo-400 {
+      color: #4338ca !important;
+    }
+    html.theme-light .text-purple-100,
+    html.theme-light .text-purple-200,
+    html.theme-light .text-purple-300,
+    html.theme-light .text-purple-400,
+    html.theme-light .text-violet-300 {
+      color: #6d28d9 !important;
+    }
+    html.theme-light .text-emerald-100,
+    html.theme-light .text-emerald-200,
+    html.theme-light .text-emerald-300,
+    html.theme-light .text-emerald-300\/80,
+    html.theme-light .text-emerald-400 {
+      color: #047857 !important;
+    }
+    html.theme-light .text-rose-100,
+    html.theme-light .text-rose-200,
+    html.theme-light .text-rose-300,
+    html.theme-light .text-rose-300\/90,
+    html.theme-light .text-rose-400,
+    html.theme-light .text-red-300,
+    html.theme-light .text-red-400 {
+      color: #be123c !important;
+    }
+    /* Mantener textos claros cuando están dentro de un botón o tarjeta con fondo sólido oscuro */
+    html.theme-light .bg-purple-700 .text-purple-100,
+    html.theme-light .bg-purple-700 .text-purple-200,
+    html.theme-light .bg-sky-600 .text-sky-100,
+    html.theme-light .bg-sky-600 .text-sky-200,
+    html.theme-light .from-blue-600 .text-blue-100 {
+      color: #f8fafc !important;
+    }
+    html.theme-light .drop-shadow-\[0_1px_2px_rgba\(0\,0\,0\,0\.9\)\] {
+      filter: none !important;
+    }
 
     /* Los controles no se seleccionan; el texto de las notas sí se puede copiar */
     button, select, summary, [role="button"], label { -webkit-user-select: none; user-select: none; }
@@ -231,6 +543,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-clock-rotate-left::before{content:"🕘"}
 .fa-layer-group::before{content:"🗂"}
 .fa-moon::before{content:"🌙"}
+.fa-sun::before{content:"☀️"}
 .fa-syringe::before{content:"💉"}
 .fa-champagne-glasses::before{content:"🥂"}
 .fa-file-signature::before{content:"📝"}
@@ -277,6 +590,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <button id="notif-permission-btn" onclick="openAlarmsModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1" title="Alarmas y Notificaciones">
           <i class="fa-solid fa-bell"></i>
           <span id="alarms-active-badge" class="hidden -mr-0.5 px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black leading-tight">0</span>
+        </button>
+
+        <!-- Theme Mode Toggle Button (Oscuro / Diurno) -->
+        <button id="theme-toggle-btn" type="button" onclick="toggleAppTheme()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95" title="Cambiar entre modo oscuro y modo diurno" aria-label="Cambiar tema">
+          <i id="theme-toggle-icon" class="fa-solid fa-sun"></i>
+          <span id="theme-toggle-label" class="hidden sm:inline text-[11px]">Día</span>
         </button>
 
         <!-- Backup & Settings Modal Trigger -->
@@ -798,7 +1117,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     <div class="bg-[#1e293b] text-slate-100 rounded-xl max-w-md w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 max-h-[92vh] my-auto">
       
       <!-- Modal Header -->
-      <div class="text-white px-1 pb-3 mb-2 font-bold text-lg md:text-xl tracking-wide flex justify-between items-center border-b border-slate-700/60">
+      <div class="text-slate-100 px-1 pb-3 mb-2 font-bold text-lg md:text-xl tracking-wide flex justify-between items-center border-b border-slate-700/60">
         <span class="flex items-center gap-2">
           <i class="fa-solid fa-tags text-teal-400"></i>
           <span id="modal-title-text">Notas Asignadas</span>
@@ -1516,7 +1835,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         <div id="babyFormulaCanPreviewBanner" class="p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/30 text-[11px] text-sky-200 flex items-center justify-between">
           <span><i class="fa-solid fa-clock mr-1 text-sky-400"></i> Cálculo del contador:</span>
-          <strong id="babyFormulaCanPreviewText" class="text-white font-bold">15 días de duración</strong>
+          <strong id="babyFormulaCanPreviewText" class="text-slate-100 font-bold">15 días de duración</strong>
         </div>
 
         <div>
@@ -1588,7 +1907,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
         <div class="p-2.5 rounded-xl bg-teal-950/40 border border-teal-500/30 text-[11px] text-teal-200 flex items-center justify-between">
           <span><i class="fa-solid fa-calculator mr-1 text-teal-400"></i> Total de pañales a sumar al stock:</span>
-          <strong id="babyDiaperPurchaseTotalPreviewText" class="text-white font-black text-xs">+40 unidades</strong>
+          <strong id="babyDiaperPurchaseTotalPreviewText" class="text-slate-100 font-black text-xs">+40 unidades</strong>
         </div>
 
         <div>
@@ -2402,6 +2721,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/80 space-y-3">
           <span class="text-[10px] font-black uppercase tracking-wider text-teal-300 block">Preferencias del Calendario</span>
 
+          <div>
+            <label for="app-theme-setting" class="text-[10px] font-bold text-slate-400 block mb-1">Modo de apariencia</label>
+            <select id="app-theme-setting" onchange="setAppTheme(this.value)" class="w-full min-h-10 bg-slate-800 text-slate-100 border border-slate-700 rounded-lg px-2.5 text-xs font-semibold focus:outline-none focus:border-teal-400">
+              <option value="dark">🌙 Modo Oscuro (Noche)</option>
+              <option value="light">☀️ Modo Diurno (Día - Alto contraste)</option>
+            </select>
+          </div>
+
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label for="time-format-setting" class="text-[10px] font-bold text-slate-400 block mb-1">Formato de hora</label>
@@ -2714,7 +3041,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </div>
       <div class="space-y-1">
         <p class="text-[11px] font-black uppercase tracking-widest text-amber-300">Alarma de OmniTask</p>
-        <h3 id="ringing-alarm-title" class="text-lg font-black text-white">Recordatorio</h3>
+        <h3 id="ringing-alarm-title" class="text-lg font-black text-slate-100">Recordatorio</h3>
         <p id="ringing-alarm-body" class="text-xs text-slate-300"></p>
       </div>
       <div class="grid grid-cols-2 gap-2.5 pt-1">
@@ -2928,6 +3255,35 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return fallback;
       }
     }
+
+    let appTheme = readStoredValue('cal_app_theme', 'dark') === 'light' ? 'light' : 'dark';
+    function applyAppTheme() {
+      const isLight = appTheme === 'light';
+      document.documentElement.classList.toggle('theme-light', isLight);
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', isLight ? '#f8fafc' : '#0f172a');
+      const iconEl = document.getElementById('theme-toggle-icon');
+      if (iconEl) iconEl.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+      const labelEl = document.getElementById('theme-toggle-label');
+      if (labelEl) labelEl.textContent = isLight ? 'Noche' : 'Día';
+      const selectEl = document.getElementById('app-theme-setting');
+      if (selectEl) selectEl.value = appTheme;
+    }
+    function setAppTheme(mode) {
+      appTheme = mode === 'light' ? 'light' : 'dark';
+      try { localStorage.setItem('cal_app_theme', appTheme); } catch (e) {}
+      applyAppTheme();
+      if (typeof renderShiftStatistics === 'function') {
+        try { renderShiftStatistics(); } catch (e) {}
+      }
+      if (typeof btRenderSalud === 'function' && activeView === 'baby') {
+        try { btRenderSalud(); } catch (e) {}
+      }
+    }
+    function toggleAppTheme() {
+      setAppTheme(appTheme === 'light' ? 'dark' : 'light');
+    }
+    applyAppTheme();
 
     let timeFormat = readStoredValue('cal_time_format', '24') === 'ampm' ? 'ampm' : '24';
     let weekStart = readStoredValue('cal_week_start', '1') === '0' ? 0 : 1; // 0 = domingo, 1 = lunes
@@ -4201,7 +4557,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
 
-      calcText.innerHTML = `Equivalencia matemática: <strong class="text-white">${calculation.equivalence}</strong>. ${calculation.warning}`;
+      calcText.innerHTML = `Equivalencia matemática: <strong class="text-slate-100">${calculation.equivalence}</strong>. ${calculation.warning}`;
       calcBox.classList.remove('hidden');
     }
 
@@ -6383,7 +6739,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         return;
       }
 
-      calcText.innerHTML = `Equivalencia matemática: <strong class="text-white">${calculation.equivalence}</strong>. ${calculation.warning}`;
+      calcText.innerHTML = `Equivalencia matemática: <strong class="text-slate-100">${calculation.equivalence}</strong>. ${calculation.warning}`;
       calcBox.classList.remove('hidden');
     }
 
@@ -8088,7 +8444,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <div class="flex items-center gap-2.5 min-w-0">
               <div class="w-10 h-10 rounded-lg bg-rose-600/20 border border-rose-500/40 flex flex-col items-center justify-center shrink-0 text-rose-300">
                 <span class="text-[9px] font-bold uppercase leading-none">${escapeHtml(String(monthNames[m - 1]).slice(0, 3))}</span>
-                <span class="text-xs font-black text-white leading-tight">${d}</span>
+                <span class="text-xs font-black text-slate-100 leading-tight">${d}</span>
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
@@ -8871,7 +9227,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <span class="mt-1 h-3 w-3 shrink-0 rounded-full" style="background-color:${safeColor(note.color, '#14B8A6')}"></span>
             <div class="min-w-0 flex-1">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${typeLabel}</span>
-              <h3 class="mt-1 break-words text-base font-extrabold text-white">${escapeHtml(note.title || note.text || 'Sin título')}</h3>
+              <h3 class="mt-1 break-words text-base font-extrabold text-slate-100">${escapeHtml(note.title || note.text || 'Sin título')}</h3>
               <p class="mt-1 text-xs capitalize text-slate-400">${escapeHtml(dateLabel)}</p>
             </div>
           </div>
@@ -10667,7 +11023,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         : allShifts.find(({ note }) => String(note.title || note.text || 'Turno').trim() === selectedShiftStatsName);
       const selectedShiftColor = getValidBirthdayColor(
         selectedShiftColorSource && selectedShiftColorSource.note.color,
-        '#CBD5E1'
+        appTheme === 'light' ? '#1E293B' : '#CBD5E1'
       );
       const upcomingCount = selectedShifts.filter(item => item.dateKey >= todayKey).length;
       const totalMinutes = selectedShifts.reduce((total, { note }) =>
@@ -10738,7 +11094,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               </div>`;
             }).join('');
           const isSelected = selectedShiftStatsName === type;
-          const shiftNameColor = getValidBirthdayColor(stats.items[0] && stats.items[0].note.color, '#E2E8F0');
+          const shiftNameColor = getValidBirthdayColor(stats.items[0] && stats.items[0].note.color, appTheme === 'light' ? '#0F172A' : '#E2E8F0');
           return `<div class="rounded-lg bg-slate-900 border ${isSelected ? 'border-purple-400/70' : 'border-slate-800'} overflow-hidden">
             <div class="flex items-center gap-2">
               <button type="button" data-shift-type="${escapeHtml(type)}" aria-pressed="${isSelected}" onclick="selectShiftStatisticsName(this.dataset.shiftType)" class="flex-1 min-w-0 flex items-center justify-between gap-3 p-2.5 text-left hover:bg-slate-800/70 transition-colors">
@@ -11258,6 +11614,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
     function openSettingsModal() {
       document.getElementById('time-format-setting').value = timeFormat;
+      const themeSel = document.getElementById('app-theme-setting');
+      if (themeSel) themeSel.value = appTheme;
       const weekStartSel = document.getElementById('week-start-setting');
       if (weekStartSel) weekStartSel.value = String(weekStart);
       syncHolidayUIControls();
@@ -13399,7 +13757,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       </span>
       <div class="min-w-0 flex-1">
         <span id="btLiveSleepBannerTitle" class="text-[10px] font-black uppercase tracking-wider text-indigo-300 block truncate">😴 Durmiendo en vivo</span>
-        <span id="btLiveSleepBannerClock" class="text-sm font-black font-mono text-white tracking-wider">00:00:00</span>
+        <span id="btLiveSleepBannerClock" class="text-sm font-black font-mono text-slate-100 tracking-wider">00:00:00</span>
       </div>
     </button>
     <div class="flex items-center gap-1.5 shrink-0">
@@ -13431,7 +13789,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div id="btLiveSleepIconCircle" class="w-16 h-16 mx-auto rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-3xl shadow-inner">
           🌙
         </div>
-        <h3 id="btLiveSleepBabyLabel" class="text-base font-black text-white tracking-tight">Bebé durmiendo</h3>
+        <h3 id="btLiveSleepBabyLabel" class="text-base font-black text-slate-100 tracking-tight">Bebé durmiendo</h3>
         <div class="flex items-center justify-center gap-2">
           <span id="btLiveSleepTypeBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40">
             ☀️ Siesta en curso
@@ -13442,7 +13800,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       <!-- Reloj digital principal en vivo -->
       <div class="py-4 px-3 rounded-2xl bg-slate-950/90 border border-indigo-500/40 shadow-inner space-y-1">
         <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold block">Tiempo Transcurrido</span>
-        <div id="btLiveSleepClockDisplay" class="text-4xl sm:text-5xl font-black font-mono tracking-widest text-white py-1">
+        <div id="btLiveSleepClockDisplay" class="text-4xl sm:text-5xl font-black font-mono tracking-widest text-slate-100 py-1">
           00:00:00
         </div>
         <p id="btLiveSleepHoursPreview" class="text-xs font-bold text-indigo-300">
@@ -14676,7 +15034,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-xs">😴</span>
                   <div>
                     <span class="text-[10px] font-black uppercase tracking-wider text-sky-300 block">${btState.sleepTimer && btState.sleepTimer.running ? `Durmiendo (${btState.sleepTimer.type})` : 'Cronómetro de Sueño en Vivo'}</span>
-                    <span id="btSleepTimerDisplay" class="text-sm font-black text-white font-mono tracking-wider">00:00:00</span>
+                    <span id="btSleepTimerDisplay" class="text-sm font-black text-slate-100 font-mono tracking-wider">00:00:00</span>
                   </div>
                 </div>
                 <div class="flex gap-1.5">
@@ -14986,7 +15344,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               ctx.arc(lx + 4, 14, 4, 0, Math.PI * 2);
               ctx.fillStyle = item.color;
               ctx.fill();
-              ctx.fillStyle = '#e2e8f0';
+              ctx.fillStyle = appTheme === 'light' ? '#0f172a' : '#e2e8f0';
               ctx.textAlign = 'left';
               ctx.fillText(item.text, lx + 12, 14);
               lx += ctx.measureText(item.text).width + 26;
@@ -14996,7 +15354,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             for (let i = 0; i <= 3; i++) {
               const y = padTop + (i / 3) * plotH;
               ctx.beginPath();
-              ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+              ctx.strokeStyle = appTheme === 'light' ? 'rgba(100, 116, 139, 0.25)' : 'rgba(148, 163, 184, 0.14)';
               ctx.lineWidth = 1;
               ctx.setLineDash([3, 3]);
               ctx.moveTo(padLeft, y);
@@ -15063,7 +15421,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 ctx.fillStyle = def.stroke;
                 ctx.fill();
                 ctx.lineWidth = 1.5;
-                ctx.strokeStyle = '#0f172a';
+                ctx.strokeStyle = appTheme === 'light' ? '#ffffff' : '#0f172a';
                 ctx.stroke();
 
                 ctx.font = 'bold 9.5px Inter, system-ui, sans-serif';
@@ -15085,7 +15443,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               ctx.font = 'bold 10px Inter, system-ui, sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'top';
-              ctx.fillStyle = '#cbd5e1';
+              ctx.fillStyle = appTheme === 'light' ? '#334155' : '#cbd5e1';
               ctx.fillText(shortLbl, x, padTop + plotH + 8);
             });
 
@@ -15139,7 +15497,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             const valLabel = (minVal + ratio * (maxVal - minVal)).toFixed(1);
 
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+            ctx.strokeStyle = appTheme === 'light' ? 'rgba(100, 116, 139, 0.25)' : 'rgba(148, 163, 184, 0.14)';
             ctx.lineWidth = 1;
             ctx.setLineDash([3, 3]);
             ctx.moveTo(padLeft, y);
@@ -15147,7 +15505,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             ctx.stroke();
             ctx.setLineDash([]);
 
-            ctx.fillStyle = '#94a3b8';
+            ctx.fillStyle = appTheme === 'light' ? '#475569' : '#94a3b8';
             ctx.fillText(`${valLabel}`, padLeft - 6, y);
           }
 
@@ -15202,21 +15560,21 @@ Check your Browserslist config to be sure that your targets are set up correctly
             ctx.fillStyle = metricMeta.stroke;
             ctx.fill();
             ctx.lineWidth = 2;
-            ctx.strokeStyle = '#0f172a';
+            ctx.strokeStyle = appTheme === 'light' ? '#ffffff' : '#0f172a';
             ctx.stroke();
 
             const valText = `${pt.val}${metricMeta.unit}`;
             ctx.font = 'bold 10px Inter, system-ui, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
-            ctx.fillStyle = '#f8fafc';
+            ctx.fillStyle = appTheme === 'light' ? '#0f172a' : '#f8fafc';
             ctx.fillText(valText, pt.x, Math.max(12, pt.y - 7));
 
             {
               ctx.font = 'bold 10px Inter, system-ui, sans-serif';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'top';
-              ctx.fillStyle = '#cbd5e1';
+              ctx.fillStyle = appTheme === 'light' ? '#334155' : '#cbd5e1';
               const shortLbl = String(pt.label).length > 10 ? String(pt.label).slice(0, 9) + '…' : String(pt.label);
               ctx.fillText(shortLbl, pt.x, padTop + plotH + 8);
             }
@@ -16030,7 +16388,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                   <div class="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-xl border border-slate-700">
                     <span class="text-[10px] text-slate-400 font-bold mr-1">Ajustar sellados:</span>
                     <button type="button" data-bt-milk-stock-adj="-1" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs flex items-center justify-center active:scale-95">−</button>
-                    <span class="text-xs font-black text-white px-1.5">${sealedCansInStock}</span>
+                    <span class="text-xs font-black text-slate-100 px-1.5">${sealedCansInStock}</span>
                     <button type="button" data-bt-milk-stock-adj="1" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-xs flex items-center justify-center active:scale-95">+</button>
                   </div>
                 </div>
@@ -16076,7 +16434,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                         <span class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-xl shrink-0">🥫</span>
                         <div>
                           <div class="flex items-center gap-1.5 flex-wrap">
-                            <h6 class="text-sm font-black text-white">${escapeHtml(activeCan.brand)}</h6>
+                            <h6 class="text-sm font-black text-slate-100">${escapeHtml(activeCan.brand)}</h6>
                             <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/40">${escapeHtml(activeCan.weightGrams || 800)} g</span>
                             <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ABIERTO</span>
                           </div>
