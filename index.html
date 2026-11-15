@@ -2459,6 +2459,12 @@ Check your Browserslist config to be sure that your targets are set up correctly
       <form id="medForm" onsubmit="handleMedFormSubmit(event)" class="space-y-3">
         <input type="hidden" id="medId">
 
+        <!-- Paciente -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-300 mb-1">Paciente (opcional)</label>
+          <input type="text" id="medPerson" autocomplete="off" maxlength="60" placeholder="Ej. Juan Pérez" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-blue-400">
+        </div>
+
         <!-- Nombre -->
         <div>
           <label class="block text-[11px] font-semibold text-slate-300 mb-1">Nombre del Medicamento</label>
@@ -6663,6 +6669,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           document.getElementById('medModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-blue-400"></i> Editar Medicamento';
           document.getElementById('medId').value = med.id;
           document.getElementById('medName').value = med.name;
+          document.getElementById('medPerson').value = med.person || '';
           document.getElementById('medDoseVal').value = med.doseVal || '';
           document.getElementById('medDoseUnit').value = med.doseUnit || 'mg';
           document.getElementById('medFormType').value = med.formType || '';
@@ -6799,6 +6806,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
 
       const id = document.getElementById('medId').value || 'med_' + Date.now();
       const name = document.getElementById('medName').value.trim();
+      const person = document.getElementById('medPerson').value.trim();
       const doseVal = document.getElementById('medDoseVal').value;
       const doseUnit = document.getElementById('medDoseUnit').value;
       const formType = document.getElementById('medFormType').value.trim();
@@ -6813,7 +6821,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         ? `${calculation.equivalence} (${calculation.warning})`
         : '';
 
-      const newMed = { id, name, doseVal, doseUnit, formType, formKind: inferMedFormKind(formType), calculatedDoseStr, time, frequency, startDate, duration, notes };
+      const newMed = { id, person, name, doseVal, doseUnit, formType, formKind: inferMedFormKind(formType), calculatedDoseStr, time, frequency, startDate, duration, notes };
 
       const existingIndex = medications.findIndex(m => m.id === id);
       if (existingIndex >= 0) {
@@ -12406,19 +12414,19 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function toggleAllPdfOptions(checked) {
-      [pdf-opt-events, pdf-opt-turns, pdf-opt-health, pdf-opt-baby].forEach(id => {
+      ['pdf-opt-events', 'pdf-opt-turns', 'pdf-opt-health', 'pdf-opt-baby'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.checked = !!checked;
       });
     }
 
     function syncPdfAllCheckbox() {
-      const ids = [pdf-opt-events, pdf-opt-turns, pdf-opt-health, pdf-opt-baby];
+      const ids = ['pdf-opt-events', 'pdf-opt-turns', 'pdf-opt-health', 'pdf-opt-baby'];
       const allChecked = ids.every(id => {
         const el = document.getElementById(id);
         return el ? el.checked : false;
       });
-      const allEl = document.getElementById(pdf-opt-all);
+      const allEl = document.getElementById('pdf-opt-all');
       if (allEl) allEl.checked = allChecked;
     }
 
@@ -12472,13 +12480,28 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 item.description || '-'
               ]);
             } else {
-              const kind = item.isBirthday ? 'Cumpleanos' : (item.isAnniversary ? 'Aniversario' : (item.isEvent ? 'Evento' : 'Nota'));
+              const types = Array.isArray(item.eventTypes) ? item.eventTypes : [];
+              const isBday = !!item.isBirthday || types.includes('birthday');
+              const isAnniv = !!item.isAnniversary || types.includes('anniversary');
+              const kind = isBday ? 'Cumpleaños' : (isAnniv ? 'Aniversario' : (item.isEvent ? 'Evento' : 'Nota'));
+              const fmtLong = (d) => formatHealthControlDate(d, { day: 'numeric', month: 'long', year: 'numeric' });
+              const yearOf = (d) => parseInt(String(d || '').slice(0, 4), 10);
+              const detailParts = [];
+              if (isBday && item.birthDate) {
+                const age = parseInt(dateKey.slice(0, 4), 10) - yearOf(item.birthDate);
+                detailParts.push(`Nació el ${fmtLong(item.birthDate)}${age > 0 ? ` (cumple ${age} años)` : ''}`);
+              }
+              if (isAnniv && item.anniversaryDate) {
+                const yrs = parseInt(dateKey.slice(0, 4), 10) - yearOf(item.anniversaryDate);
+                detailParts.push(`Aniversario desde el ${fmtLong(item.anniversaryDate)}${yrs > 0 ? ` (${yrs} años)` : ''}`);
+              }
+              if (item.description) detailParts.push(item.description);
               eventRows.push([
                 dateKey,
-                { text: kind, bold: true, color: item.isBirthday ? [0.851, 0.467, 0.024] : [0.059, 0.463, 0.431] },
-                titleTxt || 'Sin titulo',
+                { text: kind, bold: true, color: isBday ? [0.851, 0.467, 0.024] : [0.059, 0.463, 0.431] },
+                titleTxt || 'Sin título',
                 item.noteTime || '-',
-                item.description || '-'
+                detailParts.length ? detailParts.join(' | ') : '-'
               ]);
             }
           });
@@ -12489,41 +12512,56 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const ctrlRows = ctrlList.map(c => [
           c.date || '-',
           c.time || '-',
-          { text: c.title || c.name || 'Control Medico', bold: true },
-          c.doctor || c.location || '-',
-          c.attended ? { text: 'Asistio', bold: true, color: [0.020, 0.588, 0.412] } : { text: 'Pendiente', color: [0.078, 0.325, 0.533] },
+          { text: c.person || 'Sin nombre', bold: true },
+          formatHealthControlTypes(c) || c.name || 'Control',
+          c.location || '-',
           c.notes || '-'
         ]);
 
         const medList = Array.isArray(medications) ? medications : [];
         const medRows = medList.map(m => [
-          { text: m.name || 'Medicamento', bold: true },
-          m.dose || '-',
-          m.freqHours ? `Cada ${m.freqHours} h` : (m.everyHours ? `Cada ${m.everyHours} h` : '-'),
-          m.durationDays ? `${m.durationDays} dias` : '-',
+          { text: m.person || 'Sin paciente', bold: true },
+          m.name || 'Medicamento',
+          `${m.doseVal || m.dose || ''} ${m.doseUnit || ''}`.trim() || '-',
+          m.frequency ? `Cada ${m.frequency} h` : '-',
+          m.duration ? `${m.duration} días` : '-',
           m.startDate || '-',
           m.notes || '-'
         ]);
-
-        const pdf = createVectorPdfBuilder(
-          'OMNITASK - RESUMEN GENERAL',
-          `Exportado el ${exportedLabel}  |  Turnos, Eventos, Salud y Bebé`,
-          [0.059, 0.463, 0.431]
-        );
 
         const incTurns = !opts || opts.turns !== false;
         const incEvents = !opts || opts.events !== false;
         const incHealth = !opts || opts.health !== false;
         const incBaby = !opts || opts.baby !== false;
 
+        const selectedLabels = [];
+        if (incTurns) selectedLabels.push('Turnos');
+        if (incEvents) selectedLabels.push('Eventos y Notas');
+        if (incHealth) selectedLabels.push('Salud');
+        if (incBaby) selectedLabels.push('Bebé');
+        const singleSection = selectedLabels.length === 1;
+        const fileTag = singleSection
+          ? '_' + selectedLabels[0].toLowerCase().replace(/ y /g, '_').replace(/[éÉ]/g, 'e').replace(/\s+/g, '_')
+          : '';
+
+        const pdf = createVectorPdfBuilder(
+          singleSection ? `OMNITASK - ${selectedLabels[0].toUpperCase()}` : 'OMNITASK - RESUMEN GENERAL',
+          `Exportado el ${exportedLabel}  |  ${selectedLabels.join(', ')}`,
+          [0.059, 0.463, 0.431]
+        );
+
         const totalShiftHours = Math.floor(totalShiftMins / 60);
-        pdf.addSectionHeader('RESUMEN GENERAL', 'VISTA GENERAL', [0.059, 0.463, 0.431]);
-        pdf.addKpiRow([
-          { label: 'Turnos Laborales', value: `${shiftRows.length} turnos`, sub: `${totalShiftHours} horas acumuladas`, color: [0.490, 0.231, 0.929] },
-          { label: 'Eventos y Notas', value: `${eventRows.length} registros`, sub: 'Agenda y recordatorios', color: [0.851, 0.467, 0.024] },
-          { label: 'Controles de Salud', value: `${ctrlRows.length} citas`, sub: `${ctrlList.filter(c => c && c.attended).length} realizados`, color: [0.231, 0.510, 0.965] },
-          { label: 'Tratamientos Activos', value: `${medRows.length} med.`, sub: 'Modulo MiMedicina', color: [0.059, 0.463, 0.431] }
-        ]);
+        const kpiCards = [];
+        if (incTurns) kpiCards.push({ label: 'Turnos Laborales', value: `${shiftRows.length} turnos`, sub: `${totalShiftHours} horas acumuladas`, color: [0.490, 0.231, 0.929] });
+        if (incEvents) kpiCards.push({ label: 'Eventos y Notas', value: `${eventRows.length} registros`, sub: 'Agenda y recordatorios', color: [0.851, 0.467, 0.024] });
+        if (incHealth) {
+          kpiCards.push({ label: 'Controles de Salud', value: `${ctrlRows.length} citas`, sub: `${ctrlList.length} registrados`, color: [0.231, 0.510, 0.965] });
+          kpiCards.push({ label: 'Tratamientos Activos', value: `${medRows.length} med.`, sub: 'Modulo MiMedicina', color: [0.059, 0.463, 0.431] });
+        }
+        if (kpiCards.length > 0) {
+          pdf.addSectionHeader(singleSection ? 'RESUMEN' : 'RESUMEN GENERAL', singleSection ? selectedLabels[0].toUpperCase() : 'VISTA GENERAL', [0.059, 0.463, 0.431]);
+          pdf.addKpiRow(kpiCards);
+        }
 
         if (incTurns) {
           const shiftBars = Object.entries(shiftCountByType).map(([k, v]) => ({ label: k.slice(0, 6), val: v }));
@@ -12542,16 +12580,16 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (incHealth) {
           pdf.addSectionHeader('SALUD Y MIMEDICINA: CONTROLES Y TRATAMIENTOS', `${ctrlRows.length + medRows.length} REGISTROS`, [0.114, 0.306, 0.847]);
           pdf.addTable(
-            ['Fecha', 'Hora', 'Control / Especialidad', 'Profesional / Lugar', 'Estado', 'Notas'],
+            ['Fecha', 'Hora', 'Paciente', 'Tipo de control', 'Lugar', 'Notas'],
             ctrlRows.slice(0, 50),
-            [64, 44, 120, 105, 60, 130],
+            [60, 38, 100, 90, 100, 135],
             [0.114, 0.306, 0.847]
           );
           if (medRows.length > 0) {
             pdf.addTable(
-              ['Medicamento', 'Dosis', 'Frecuencia', 'Duracion', 'Inicio', 'Indicaciones'],
+              ['Paciente', 'Medicamento', 'Dosis', 'Frecuencia', 'Duración', 'Inicio', 'Indicaciones'],
               medRows,
-              [120, 85, 70, 60, 65, 123],
+              [80, 90, 70, 55, 50, 60, 118],
               [0.059, 0.463, 0.431]
             );
           }
@@ -12580,7 +12618,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte_omnitask_${dateStr}.pdf`;
+        a.download = `reporte_omnitask${fileTag}_${dateStr}.pdf`;
         document.body.appendChild(a);
         a.click();
         a.remove();
