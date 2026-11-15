@@ -6,8 +6,8 @@
   <title>OmniTask: Turnos, Salud y Bebé</title>
   <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
   
-  <link rel="icon" href="./omnitask-icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="./omnitask-icon-192.png">
+  <link rel="icon" href="./omnitask-icon-192.png?v=2" type="image/png">
+  <link rel="apple-touch-icon" href="./omnitask-icon-192.png?v=2">
 
   <!-- Tailwind CSS CDN -->
   <!-- Tailwind CSS 3.4.17 (build de navegador, MIT) incrustado para funcionar sin conexión -->
@@ -464,7 +464,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
   </style>
 
   <!-- PWA Meta Tags -->
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest?v=2">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -544,6 +544,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
 .fa-layer-group::before{content:"🗂"}
 .fa-moon::before{content:"🌙"}
 .fa-sun::before{content:"☀️"}
+.fa-file-pdf::before{content:"📄"}
+.fa-shield-halved::before{content:"🛡"}
+.fa-file-shield::before{content:"📋"}
+.fa-google-drive::before{content:"☁"}
 .fa-syringe::before{content:"💉"}
 .fa-champagne-glasses::before{content:"🥂"}
 .fa-file-signature::before{content:"📝"}
@@ -2662,6 +2666,53 @@ Check your Browserslist config to be sure that your targets are set up correctly
     </div>
   </div>
 
+  <!-- MODAL: SELECCIÓN DE APARTADOS PARA EXPORTAR EN PDF -->
+  <div id="pdf-export-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-3 z-[80] transition-opacity" onclick="if(event.target===this) closePdfExportModal()">
+    <div class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3.5">
+      <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-file-pdf text-rose-400"></i>
+          <span>Elegir qué exportar en PDF</span>
+        </h3>
+        <button type="button" onclick="closePdfExportModal()" aria-label="Cerrar" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-300">Marca los apartados que deseas incluir en el documento PDF (si seleccionas todos, se descargan todos en un mismo PDF):</p>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl divide-y divide-slate-800 text-xs shadow-inner">
+        <label class="flex items-center justify-between gap-3 px-3 py-2.5 cursor-pointer bg-slate-800/40">
+          <span class="font-extrabold text-teal-300 flex items-center gap-2"><i class="fa-solid fa-check text-teal-400 text-xs"></i>Seleccionar todos</span>
+          <input type="checkbox" id="pdf-opt-all" checked onchange="toggleAllPdfOptions(this.checked)" class="w-4 h-4 rounded text-teal-500 focus:ring-teal-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cake-candles text-amber-400 text-xs"></i>Eventos y Notas</span>
+          <input type="checkbox" id="pdf-opt-events" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-amber-500 focus:ring-amber-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-400 text-xs"></i>Turnos</span>
+          <input type="checkbox" id="pdf-opt-turns" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
+          <input type="checkbox" id="pdf-opt-health" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-400 bg-slate-800 border-slate-700">
+        </label>
+        <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-baby text-sky-400 text-xs"></i>Bebé (con gráficos)</span>
+          <input type="checkbox" id="pdf-opt-baby" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-sky-500 focus:ring-sky-400 bg-slate-800 border-slate-700">
+        </label>
+      </div>
+
+      <div class="pt-1">
+        <button type="button" onclick="executePdfExportFromModal()" class="w-full py-2.5 px-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95">
+          <i class="fa-solid fa-download"></i>
+          <span>Descargar PDF seleccionado</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: MODO DE CARGA / IMPORTACIÓN (COMBINAR vs REEMPLAZAR) -->
   <div id="import-choice-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-3 z-[80] transition-opacity" onclick="if(event.target===this) closeImportChoiceModal()">
     <div class="bg-[#1e293b] text-slate-100 rounded-2xl max-w-sm w-full p-4 shadow-2xl flex flex-col font-sans border border-slate-700/70 space-y-3.5">
@@ -2848,7 +2899,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
               <button onclick="exportDataJSON()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
                 <i class="fa-solid fa-download"></i> JSON
               </button>
-              <button type="button" onclick="exportDataPDF()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
+              <button type="button" onclick="openPdfExportModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Elegir qué exportar en PDF">
                 <i class="fa-solid fa-file-pdf"></i> PDF
               </button>
               <button type="button" onclick="backupToGoogleDrive()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
@@ -11716,187 +11767,825 @@ Check your Browserslist config to be sure that your targets are set up correctly
       return lines;
     }
 
-    function buildPdfDocumentBlob(title, subtitle, sections) {
+    function createVectorPdfBuilder(docTitle, docSubtitle, accentRGB = [0.078, 0.325, 0.533]) {
       const pageW = 595;
       const pageH = 842;
-      const marginX = 42;
-      const topY = pageH - 48;
-      const bottomY = 52;
+      const marginX = 36;
+      const contentW = pageW - marginX * 2;
+      const topY = pageH - 42;
+      const bottomY = 48;
       const pages = [[]];
+      let y = topY;
 
       const pushCmd = (cmd) => pages[pages.length - 1].push(cmd);
-      const newPage = () => {
-        pages.push([]);
-        return topY;
-      };
 
-      const addTextLine = (x, y, font, size, r, g, b, text) => {
+      const rectFill = (x, ry, w, h, r, g, b) => {
+        pushCmd(`${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} rg ${x.toFixed(1)} ${ry.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)} re f`);
+      };
+      const rectStroke = (x, ry, w, h, r, g, b, lw = 0.8) => {
+        pushCmd(`${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} RG ${lw.toFixed(2)} w ${x.toFixed(1)} ${ry.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)} re S`);
+      };
+      const rectFillStroke = (x, ry, w, h, fr, fg, fb, sr, sg, sb, lw = 0.8) => {
+        pushCmd(`${fr.toFixed(3)} ${fg.toFixed(3)} ${fb.toFixed(3)} rg ${sr.toFixed(3)} ${sg.toFixed(3)} ${sb.toFixed(3)} RG ${lw.toFixed(2)} w ${x.toFixed(1)} ${ry.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)} re B`);
+      };
+      const drawLine = (x1, y1, x2, y2, r, g, b, lw = 0.8, dashed = false) => {
+        const dashCmd = dashed ? '[2 2] 0 d ' : '[] 0 d ';
+        pushCmd(`q ${dashCmd}${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} RG ${lw.toFixed(2)} w ${x1.toFixed(1)} ${y1.toFixed(1)} m ${x2.toFixed(1)} ${y2.toFixed(1)} l S Q`);
+      };
+      const drawCircle = (cx, cy, rad, fr, fg, fb, sr = 1, sg = 1, sb = 1, lw = 1.2) => {
+        const k = 0.5522847498 * rad;
+        pushCmd(`${fr.toFixed(3)} ${fg.toFixed(3)} ${fb.toFixed(3)} rg ${sr.toFixed(3)} ${sg.toFixed(3)} ${sb.toFixed(3)} RG ${lw.toFixed(2)} w`);
+        pushCmd(`${(cx + rad).toFixed(2)} ${cy.toFixed(2)} m`);
+        pushCmd(`${(cx + rad).toFixed(2)} ${(cy + k).toFixed(2)} ${(cx + k).toFixed(2)} ${(cy + rad).toFixed(2)} ${cx.toFixed(2)} ${(cy + rad).toFixed(2)} c`);
+        pushCmd(`${(cx - k).toFixed(2)} ${(cy + rad).toFixed(2)} ${(cx - rad).toFixed(2)} ${(cy + k).toFixed(2)} ${(cx - rad).toFixed(2)} ${cy.toFixed(2)} c`);
+        pushCmd(`${(cx - rad).toFixed(2)} ${(cy - k).toFixed(2)} ${(cx - k).toFixed(2)} ${(cy - rad).toFixed(2)} ${cx.toFixed(2)} ${(cy - rad).toFixed(2)} c`);
+        pushCmd(`${(cx + k).toFixed(2)} ${(cy - rad).toFixed(2)} ${(cx + rad).toFixed(2)} ${(cy - k).toFixed(2)} ${(cx + rad).toFixed(2)} ${cy.toFixed(2)} c B`);
+      };
+      const addText = (x, ty, font, size, r, g, b, text) => {
         const bytes = toPdfWinAnsiBytes(text);
         let hex = '';
         for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
-        pushCmd(`BT /${font} ${size} Tf ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} rg 1 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)} Tm <${hex}> Tj ET`);
+        pushCmd(`BT /${font} ${size.toFixed(1)} Tf ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} rg 1 0 0 1 ${x.toFixed(1)} ${ty.toFixed(1)} Tm <${hex}> Tj ET`);
       };
 
-      let y = topY;
-      // Header banner
-      pushCmd(`0.059 0.090 0.165 rg ${marginX} ${(y - 34).toFixed(1)} ${(pageW - marginX * 2).toFixed(1)} 46 re f`);
-      addTextLine(marginX + 12, y - 6, 'F2', 15, 0.945, 0.961, 0.976, title);
-      addTextLine(marginX + 12, y - 22, 'F1', 9, 0.580, 0.639, 0.722, subtitle);
-      y -= 54;
-
-      for (const sec of sections) {
-        if (y - 34 < bottomY) y = newPage();
-        addTextLine(marginX, y, 'F2', 11.5, 0.059, 0.463, 0.431, sec.heading);
-        pushCmd(`0.800 0.835 0.882 RG 0.8 w ${marginX} ${(y - 4).toFixed(1)} m ${(pageW - marginX).toFixed(1)} ${(y - 4).toFixed(1)} l S`);
-        y -= 18;
-
-        const items = sec.lines && sec.lines.length ? sec.lines : ['Sin registros guardados.'];
-        for (const rawLine of items) {
-          const isSub = typeof rawLine === 'object' && rawLine !== null;
-          const text = isSub ? rawLine.text : String(rawLine);
-          const font = isSub && rawLine.bold ? 'F2' : 'F1';
-          const size = isSub && rawLine.size ? rawLine.size : 9.5;
-          const color = (isSub && rawLine.color) || [0.118, 0.161, 0.231];
-          const maxChars = size >= 10.5 ? 78 : 88;
-          const wrapped = wrapPdfText(text, maxChars);
-          for (const wLine of wrapped) {
-            if (y - 14 < bottomY) y = newPage();
-            addTextLine(marginX + (isSub && rawLine.indent ? rawLine.indent : 0), y, font, size, color[0], color[1], color[2], wLine);
-            y -= (size + 4.2);
-          }
+      const drawPageTopBanner = (isFirstPage) => {
+        if (isFirstPage) {
+          // Banner clínico principal con acento dorado y azul marino
+          rectFill(marginX, topY - 48, contentW, 56, 0.059, 0.090, 0.165);
+          rectFill(marginX, topY - 48, 5, 56, accentRGB[0], accentRGB[1], accentRGB[2]);
+          rectFill(marginX, topY - 48, contentW, 2.5, 0.898, 0.651, 0.196);
+          addText(marginX + 16, topY - 12, 'F2', 14.5, 0.980, 0.988, 0.996, docTitle);
+          addText(marginX + 16, topY - 27, 'F1', 8.5, 0.796, 0.835, 0.882, docSubtitle);
+          addText(marginX + 16, topY - 40, 'F2', 7.5, 0.961, 0.776, 0.365, 'OMNITASK  |  ORGANIZACION PERSONAL Y FAMILIAR');
+          y = topY - 64;
+        } else {
+          rectFill(marginX, topY - 16, contentW, 22, 0.094, 0.141, 0.227);
+          rectFill(marginX, topY - 16, 4, 22, accentRGB[0], accentRGB[1], accentRGB[2]);
+          addText(marginX + 12, topY - 8, 'F2', 8.5, 0.945, 0.961, 0.976, docTitle);
+          addText(pageW - marginX - 145, topY - 8, 'F1', 7.5, 0.710, 0.769, 0.839, docSubtitle.slice(0, 32));
+          y = topY - 30;
         }
-        y -= 8;
-      }
-
-      // Add page numbers
-      const totalPages = pages.length;
-      for (let i = 0; i < totalPages; i++) {
-        const footerText = `OmniTask - Pagina ${i + 1} de ${totalPages}`;
-        const bytes = toPdfWinAnsiBytes(footerText);
-        let hex = '';
-        for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
-        pages[i].push(`0.850 0.875 0.910 RG 0.5 w ${marginX} 36 m ${(pageW - marginX).toFixed(1)} 36 l S`);
-        pages[i].push(`BT /F1 8.5 Tf 0.392 0.455 0.545 rg 1 0 0 1 ${marginX} 24 Tm <${hex}> Tj ET`);
-      }
-
-      // Assemble PDF 1.4 objects
-      const objects = [];
-      const addObj = (body) => {
-        objects.push(body);
-        return objects.length;
       };
 
-      const font1Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
-      const font2Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
-      const pagesId = addObj(''); // placeholder
-      const pageIds = [];
+      const ensureSpace = (neededH) => {
+        if (y - neededH < bottomY) {
+          pages.push([]);
+          drawPageTopBanner(false);
+        }
+      };
 
-      for (const cmds of pages) {
-        const stream = cmds.join('\n');
-        const contentId = addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
-        const pageId = addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /Font << /F1 ${font1Id} 0 R /F2 ${font2Id} 0 R >> >> /Contents ${contentId} 0 R >>`);
-        pageIds.push(pageId);
-      }
-      objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
-      const catalogId = addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+      drawPageTopBanner(true);
 
-      let pdf = '%PDF-1.4\n';
-      const offsets = [0];
-      for (let i = 0; i < objects.length; i++) {
-        offsets.push(pdf.length);
-        pdf += `${i + 1} 0 obj\n${objects[i]}\nendobj\n`;
-      }
-      const xrefPos = pdf.length;
-      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-      for (let i = 1; i < offsets.length; i++) {
-        pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
-      }
-      pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+      const addSectionHeader = (title, badgeText = '', rgb = [0.059, 0.463, 0.431]) => {
+        ensureSpace(34);
+        y -= 4;
+        rectFill(marginX, y - 16, contentW, 21, 0.945, 0.961, 0.976);
+        rectFill(marginX, y - 16, 4, 21, rgb[0], rgb[1], rgb[2]);
+        addText(marginX + 11, y - 9, 'F2', 10, 0.059, 0.090, 0.165, title);
+        if (badgeText) {
+          const bLen = Math.max(44, String(badgeText).length * 4.4 + 12);
+          rectFill(pageW - marginX - bLen - 6, y - 13.5, bLen, 15, rgb[0], rgb[1], rgb[2]);
+          addText(pageW - marginX - bLen, y - 9, 'F2', 7.5, 1, 1, 1, badgeText);
+        }
+        y -= 24;
+      };
 
-      const outBytes = new Uint8Array(pdf.length);
-      for (let i = 0; i < pdf.length; i++) outBytes[i] = pdf.charCodeAt(i) & 0xFF;
-      return new Blob([outBytes], { type: 'application/pdf' });
+      const addKpiRow = (cards) => {
+        if (!cards || !cards.length) return;
+        ensureSpace(46);
+        const gap = 8;
+        const n = cards.length;
+        const cardW = (contentW - gap * (n - 1)) / n;
+        const cardH = 38;
+        cards.forEach((c, idx) => {
+          const cx = marginX + idx * (cardW + gap);
+          const cy = y - cardH;
+          const col = c.color || [0.078, 0.455, 0.690];
+          rectFillStroke(cx, cy, cardW, cardH, 0.976, 0.984, 0.992, 0.820, 0.859, 0.902, 0.7);
+          rectFill(cx, cy + cardH - 3, cardW, 3, col[0], col[1], col[2]);
+          addText(cx + 8, cy + cardH - 13, 'F2', 7.2, 0.392, 0.455, 0.545, String(c.label || '').toUpperCase().slice(0, 26));
+          addText(cx + 8, cy + 14, 'F2', 11.5, col[0], col[1], col[2], String(c.value || '0').slice(0, 22));
+          if (c.sub) {
+            addText(cx + 8, cy + 4.5, 'F1', 6.8, 0.455, 0.518, 0.604, String(c.sub).slice(0, 28));
+          }
+        });
+        y -= (cardH + 10);
+      };
+
+      const addProgressBar = (label, current, total, rgb = [0.063, 0.627, 0.431]) => {
+        ensureSpace(26);
+        const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+        addText(marginX + 2, y - 6, 'F2', 8.2, 0.118, 0.161, 0.231, label);
+        addText(pageW - marginX - 95, y - 6, 'F2', 8.2, rgb[0], rgb[1], rgb[2], `${current} / ${total} (${pct}%)`);
+        const barY = y - 16;
+        rectFillStroke(marginX, barY, contentW, 7, 0.910, 0.929, 0.953, 0.800, 0.835, 0.882, 0.5);
+        if (pct > 0) {
+          rectFill(marginX, barY, Math.max(4, (contentW * pct) / 100), 7, rgb[0], rgb[1], rgb[2]);
+        }
+        y -= 23;
+      };
+
+      const addTable = (headers, rows, colWidths, accent = [0.078, 0.325, 0.533]) => {
+        ensureSpace(32);
+        const rowH = 15.5;
+        const drawHeader = () => {
+          rectFill(marginX, y - rowH, contentW, rowH, accent[0], accent[1], accent[2]);
+          let hx = marginX + 6;
+          headers.forEach((h, idx) => {
+            addText(hx, y - 10.8, 'F2', 7.8, 1, 1, 1, String(h || ''));
+            hx += colWidths[idx];
+          });
+          y -= rowH;
+        };
+        drawHeader();
+        if (!rows || !rows.length) {
+          rectFillStroke(marginX, y - rowH, contentW, rowH, 0.984, 0.988, 0.996, 0.855, 0.886, 0.922, 0.5);
+          addText(marginX + 8, y - 10.5, 'F1', 8, 0.455, 0.518, 0.604, 'Sin registros en este apartado.');
+          y -= (rowH + 8);
+          return;
+        }
+        rows.forEach((r, rIdx) => {
+          if (y - rowH < bottomY) {
+            pages.push([]);
+            drawPageTopBanner(false);
+            drawHeader();
+          }
+          const bg = rIdx % 2 === 0 ? [1, 1, 1] : [0.961, 0.973, 0.988];
+          rectFillStroke(marginX, y - rowH, contentW, rowH, bg[0], bg[1], bg[2], 0.863, 0.894, 0.929, 0.45);
+          let cx = marginX + 6;
+          r.forEach((cell, cIdx) => {
+            const w = colWidths[cIdx] || 80;
+            const maxCh = Math.max(6, Math.floor((w - 8) / 4.2));
+            const isObj = cell && typeof cell === 'object';
+            const txt = String(isObj ? (cell.text || '') : (cell ?? '')).replace(/\s+/g, ' ').trim();
+            const clipped = txt.length > maxCh ? txt.slice(0, maxCh - 2) + '..' : txt;
+            const fnt = isObj && cell.bold ? 'F2' : 'F1';
+            const col = (isObj && cell.color) ? cell.color : [0.118, 0.161, 0.231];
+            addText(cx, y - 10.6, fnt, 7.8, col[0], col[1], col[2], clipped);
+            cx += w;
+          });
+          y -= rowH;
+        });
+        y -= 8;
+      };
+
+      const addLineChart = (title, unit, points, strokeRGB = [0.024, 0.580, 0.635], fillRGB = [0.878, 0.949, 0.996], boxX = null, boxY = null, boxW = null, boxH = null) => {
+        const standalone = boxX === null;
+        const x0 = standalone ? marginX : boxX;
+        const w0 = standalone ? contentW : boxW;
+        const h0 = standalone ? 115 : boxH;
+        if (standalone) ensureSpace(h0 + 10);
+        const yTop = standalone ? y : boxY;
+        const yBot = yTop - h0;
+
+        rectFillStroke(x0, yBot, w0, h0, 0.988, 0.992, 0.998, 0.812, 0.855, 0.906, 0.7);
+        rectFill(x0, yTop - 16, w0, 16, 0.937, 0.957, 0.980);
+        addText(x0 + 8, yTop - 11.2, 'F2', 8, 0.059, 0.090, 0.165, title);
+
+        const validPts = (points || []).filter(p => Number.isFinite(p.val));
+        if (!validPts.length) {
+          addText(x0 + 12, yBot + h0 / 2 - 4, 'F1', 8, 0.455, 0.518, 0.604, 'Sin mediciones registradas para graficar.');
+          if (standalone) y -= (h0 + 8);
+          return;
+        }
+
+        const padL = 34;
+        const padR = 14;
+        const padT = 26;
+        const padB = 20;
+        const plotX = x0 + padL;
+        const plotY = yBot + padB;
+        const plotW = Math.max(40, w0 - padL - padR);
+        const plotH = Math.max(30, h0 - padT - padB);
+
+        const vals = validPts.map(p => p.val);
+        let minV = Math.min(...vals);
+        let maxV = Math.max(...vals);
+        if (minV === maxV) {
+          minV = Math.max(0, minV - 1);
+          maxV = maxV + 1;
+        } else {
+          const sp = (maxV - minV) * 0.15;
+          minV = Math.max(0, minV - sp);
+          maxV = maxV + sp;
+        }
+
+        // Ejes y grillas horizontales
+        for (let g = 0; g <= 3; g++) {
+          const ratio = g / 3;
+          const gy = plotY + ratio * plotH;
+          const gv = (minV + ratio * (maxV - minV)).toFixed(1);
+          drawLine(plotX, gy, plotX + plotW, gy, 0.820, 0.859, 0.902, 0.5, g > 0);
+          addText(x0 + 4, gy - 2.5, 'F1', 6.5, 0.392, 0.455, 0.545, gv);
+        }
+
+        const coords = validPts.map((p, i) => {
+          const px = validPts.length === 1 ? plotX + plotW / 2 : plotX + (i / (validPts.length - 1)) * plotW;
+          const py = plotY + ((p.val - minV) / (maxV - minV || 1)) * plotH;
+          return { x: px, y: py, val: p.val, label: p.label || '' };
+        });
+
+        // Área sombreada bajo la curva
+        if (coords.length > 1) {
+          let areaCmd = `${fillRGB[0].toFixed(3)} ${fillRGB[1].toFixed(3)} ${fillRGB[2].toFixed(3)} rg ${coords[0].x.toFixed(1)} ${plotY.toFixed(1)} m `;
+          coords.forEach(pt => { areaCmd += `${pt.x.toFixed(1)} ${pt.y.toFixed(1)} l `; });
+          areaCmd += `${coords[coords.length - 1].x.toFixed(1)} ${plotY.toFixed(1)} l h f`;
+          pushCmd(areaCmd);
+
+          // Línea de tendencia
+          let lineCmd = `${strokeRGB[0].toFixed(3)} ${strokeRGB[1].toFixed(3)} ${strokeRGB[2].toFixed(3)} RG 1.8 w ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)} m `;
+          for (let i = 1; i < coords.length; i++) {
+            lineCmd += `${coords[i].x.toFixed(1)} ${coords[i].y.toFixed(1)} l `;
+          }
+          lineCmd += 'S';
+          pushCmd(lineCmd);
+        }
+
+        // Puntos, valores y etiquetas eje X
+        const stepLbl = Math.max(1, Math.ceil(coords.length / 8));
+        coords.forEach((pt, idx) => {
+          drawCircle(pt.x, pt.y, 2.8, strokeRGB[0], strokeRGB[1], strokeRGB[2], 1, 1, 1, 1);
+          if (coords.length <= 10 || idx === 0 || idx === coords.length - 1 || idx % stepLbl === 0) {
+            addText(pt.x - 10, pt.y + 5.5, 'F2', 6.8, 0.059, 0.090, 0.165, `${pt.val}${unit}`);
+          }
+          if (idx % stepLbl === 0 || idx === coords.length - 1) {
+            const shortL = String(pt.label).slice(0, 7);
+            addText(pt.x - 10, yBot + 5.5, 'F1', 6.3, 0.333, 0.388, 0.471, shortL);
+          }
+        });
+
+        if (standalone) y -= (h0 + 8);
+      };
+
+      const addBarChart = (title, unit, bars, barRGB = [0.231, 0.510, 0.965], boxX = null, boxY = null, boxW = null, boxH = null) => {
+        const standalone = boxX === null;
+        const x0 = standalone ? marginX : boxX;
+        const w0 = standalone ? contentW : boxW;
+        const h0 = standalone ? 105 : boxH;
+        if (standalone) ensureSpace(h0 + 10);
+        const yTop = standalone ? y : boxY;
+        const yBot = yTop - h0;
+
+        rectFillStroke(x0, yBot, w0, h0, 0.988, 0.992, 0.998, 0.812, 0.855, 0.906, 0.7);
+        rectFill(x0, yTop - 16, w0, 16, 0.937, 0.957, 0.980);
+        addText(x0 + 8, yTop - 11.2, 'F2', 8, 0.059, 0.090, 0.165, title);
+
+        const items = (bars || []).slice(-10);
+        if (!items.length || items.every(b => !(b.val > 0))) {
+          addText(x0 + 12, yBot + h0 / 2 - 4, 'F1', 8, 0.455, 0.518, 0.604, 'Sin datos recientes para graficar.');
+          if (standalone) y -= (h0 + 8);
+          return;
+        }
+
+        const padL = 28;
+        const padR = 10;
+        const padT = 26;
+        const padB = 18;
+        const plotX = x0 + padL;
+        const plotY = yBot + padB;
+        const plotW = Math.max(40, w0 - padL - padR);
+        const plotH = Math.max(30, h0 - padT - padB);
+        const maxV = Math.max(...items.map(b => Number(b.val) || 0), 1);
+
+        for (let g = 0; g <= 2; g++) {
+          const ratio = g / 2;
+          const gy = plotY + ratio * plotH;
+          const gv = Math.round(ratio * maxV);
+          drawLine(plotX, gy, plotX + plotW, gy, 0.835, 0.867, 0.910, 0.45, g > 0);
+          addText(x0 + 4, gy - 2.5, 'F1', 6.3, 0.392, 0.455, 0.545, String(gv));
+        }
+
+        const slotW = plotW / items.length;
+        const barW = Math.min(22, Math.max(6, slotW * 0.58));
+
+        items.forEach((b, idx) => {
+          const v = Number(b.val) || 0;
+          const bh = Math.max(v > 0 ? 3 : 0, (v / maxV) * plotH);
+          const bx = plotX + idx * slotW + (slotW - barW) / 2;
+          const col = b.color || barRGB;
+          if (bh > 0) {
+            rectFill(bx, plotY, barW, bh, col[0], col[1], col[2]);
+            addText(bx - 1, plotY + bh + 3, 'F2', 6.3, 0.118, 0.161, 0.231, `${v}${unit}`);
+          }
+          addText(bx - 2, yBot + 5.5, 'F1', 6, 0.333, 0.388, 0.471, String(b.label || '').slice(0, 6));
+        });
+
+        if (standalone) y -= (h0 + 8);
+      };
+
+      const addSideBySideCharts = (leftCfg, rightCfg) => {
+        const h0 = 108;
+        ensureSpace(h0 + 10);
+        const gap = 10;
+        const halfW = (contentW - gap) / 2;
+        if (leftCfg.type === 'line') {
+          addLineChart(leftCfg.title, leftCfg.unit, leftCfg.data, leftCfg.stroke, leftCfg.fill, marginX, y, halfW, h0);
+        } else {
+          addBarChart(leftCfg.title, leftCfg.unit, leftCfg.data, leftCfg.color, marginX, y, halfW, h0);
+        }
+        if (rightCfg.type === 'line') {
+          addLineChart(rightCfg.title, rightCfg.unit, rightCfg.data, rightCfg.stroke, rightCfg.fill, marginX + halfW + gap, y, halfW, h0);
+        } else {
+          addBarChart(rightCfg.title, rightCfg.unit, rightCfg.data, rightCfg.color, marginX + halfW + gap, y, halfW, h0);
+        }
+        y -= (h0 + 10);
+      };
+
+      const addMedicalDisclaimerBox = () => {
+        ensureSpace(34);
+        rectFillStroke(marginX, y - 28, contentW, 28, 0.996, 0.969, 0.898, 0.961, 0.620, 0.043, 0.6);
+        addText(marginX + 8, y - 11, 'F2', 7.5, 0.573, 0.251, 0.055, 'NOTA INFORMATIVA:');
+        addText(marginX + 8, y - 21.5, 'F1', 7.2, 0.471, 0.208, 0.059, 'Resumen generado desde OmniTask con los registros diarios de crecimiento, vacunas, alimentacion y cuidados del bebe.');
+        y -= 34;
+      };
+
+      const buildBlob = () => {
+        const totalPages = pages.length;
+        for (let i = 0; i < totalPages; i++) {
+          const footerLeft = 'OmniTask  |  Resumen Personal y Familiar';
+          const footerRight = `Pagina ${i + 1} de ${totalPages}`;
+          const bytesL = toPdfWinAnsiBytes(footerLeft);
+          const bytesR = toPdfWinAnsiBytes(footerRight);
+          let hexL = '', hexR = '';
+          for (const b of bytesL) hexL += b.toString(16).padStart(2, '0');
+          for (const b of bytesR) hexR += b.toString(16).padStart(2, '0');
+          pages[i].push(`0.820 0.859 0.902 RG 0.6 w ${marginX} 34 m ${(pageW - marginX).toFixed(1)} 34 l S`);
+          pages[i].push(`BT /F1 7.8 Tf 0.392 0.455 0.545 rg 1 0 0 1 ${marginX} 22 Tm <${hexL}> Tj ET`);
+          pages[i].push(`BT /F2 7.8 Tf 0.118 0.161 0.231 rg 1 0 0 1 ${(pageW - marginX - 68).toFixed(1)} 22 Tm <${hexR}> Tj ET`);
+        }
+
+        const objects = [];
+        const addObj = (body) => {
+          objects.push(body);
+          return objects.length;
+        };
+
+        const font1Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+        const font2Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+        const pagesId = addObj('');
+        const pageIds = [];
+
+        for (const cmds of pages) {
+          const stream = cmds.join('\n');
+          const contentId = addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+          const pageId = addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /Font << /F1 ${font1Id} 0 R /F2 ${font2Id} 0 R >> >> /Contents ${contentId} 0 R >>`);
+          pageIds.push(pageId);
+        }
+        objects[pagesId - 1] = `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
+        const catalogId = addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+
+        let pdf = '%PDF-1.4\n';
+        const offsets = [0];
+        for (let i = 0; i < objects.length; i++) {
+          offsets.push(pdf.length);
+          pdf += `${i + 1} 0 obj\n${objects[i]}\nendobj\n`;
+        }
+        const xrefPos = pdf.length;
+        pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+        for (let i = 1; i < offsets.length; i++) {
+          pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+        }
+        pdf += `trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+
+        const outBytes = new Uint8Array(pdf.length);
+        for (let i = 0; i < pdf.length; i++) outBytes[i] = pdf.charCodeAt(i) & 0xFF;
+        return new Blob([outBytes], { type: 'application/pdf' });
+      };
+
+      return {
+        addSectionHeader,
+        addKpiRow,
+        addProgressBar,
+        addTable,
+        addLineChart,
+        addBarChart,
+        addSideBySideCharts,
+        addMedicalDisclaimerBox,
+        buildBlob
+      };
     }
 
-    function exportDataPDF() {
+    function appendBabyClinicalSectionsToPdf(pdf, baby, indexLabel = '') {
+      if (!baby) return;
+      const prof = baby.profile || {};
+      const health = baby.health || {};
+      const feeding = baby.feeding || {};
+      const diapers = baby.diapers || {};
+      const sleep = baby.sleep || {};
+      const growth = Array.isArray(baby.growth) ? baby.growth.slice() : [];
+      const vaccines = Array.isArray(health.vaccines) ? health.vaccines : [];
+      const medControls = Array.isArray(health.medicalControls) ? health.medicalControls.slice() : [];
+      const babyMeds = Array.isArray(health.medications) ? health.medications : [];
+      const milestones = (baby.development && Array.isArray(baby.development.milestones)) ? baby.development.milestones : [];
+
+      const bName = (prof.name && prof.name.trim()) ? prof.name.trim() : (prof.placeholderLabel || `Bebe ${indexLabel || 1}`);
+      let ageStr = 'Sin fecha de nacimiento';
+      if (prof.birthDate && /^\d{4}-\d{2}-\d{2}$/.test(prof.birthDate)) {
+        const [by, bm, bd] = prof.birthDate.split('-').map(Number);
+        const bDate = new Date(by, bm - 1, bd);
+        const now = new Date();
+        const diffDays = Math.max(0, Math.floor((now - bDate) / 86400000));
+        const months = Math.floor(diffDays / 30.4375);
+        const remDays = Math.round(diffDays - months * 30.4375);
+        ageStr = months > 0 ? `${months} mes(es) y ${remDays} dia(s) (${diffDays} dias)` : `${diffDays} dias`;
+      }
+
+      const lastG = growth.length > 0 ? growth[growth.length - 1] : null;
+      const latestWeight = (lastG && lastG.weight) ? `${lastG.weight} kg` : (health.weightKg ? `${health.weightKg} kg` : 'Sin reg.');
+      const latestHeight = (lastG && lastG.height) ? `${lastG.height} cm` : (health.heightCm ? `${health.heightCm} cm` : 'Sin reg.');
+      const latestHead = (lastG && lastG.head) ? `${lastG.head} cm` : (health.headCm ? `${health.headCm} cm` : 'Sin reg.');
+
+      pdf.addSectionHeader(
+        `RESUMEN DEL BEBE: ${bName.toUpperCase()}`,
+        prof.birthDate ? `NAC: ${prof.birthDate}` : 'PERFIL DEL BEBE',
+        [0.012, 0.412, 0.631]
+      );
+
+      pdf.addKpiRow([
+        { label: 'Edad Actual', value: ageStr.split(' (')[0], sub: prof.birthDate ? `F. Nac: ${prof.birthDate}` : 'Completar en perfil', color: [0.012, 0.412, 0.631] },
+        { label: 'Ultimo Peso', value: latestWeight, sub: lastG && lastG.date ? `Medido: ${lastG.date}` : 'Sin mediciones', color: [0.020, 0.588, 0.412] },
+        { label: 'Ultima Talla', value: latestHeight, sub: `Perim. Cefalico: ${latestHead}`, color: [0.490, 0.231, 0.929] },
+        { label: 'Grupo y Alergias', value: prof.bloodType || 'S/I', sub: prof.allergies ? `Alergia: ${prof.allergies}` : 'Sin alergias reg.', color: [0.882, 0.114, 0.282] }
+      ]);
+
+      // 1. Curvas de Crecimiento (Peso, Talla y Perímetro Cefálico)
+      const weightPts = growth.map((g, i) => ({ label: g.label || g.date || `M${i + 1}`, val: parseFloat(g.weight) })).filter(p => Number.isFinite(p.val));
+      const heightPts = growth.map((g, i) => ({ label: g.label || g.date || `M${i + 1}`, val: parseFloat(g.height) })).filter(p => Number.isFinite(p.val));
+      const headPts = growth.map((g, i) => ({ label: g.label || g.date || `M${i + 1}`, val: parseFloat(g.head) })).filter(p => Number.isFinite(p.val));
+
+      pdf.addSectionHeader('CURVAS DE CRECIMIENTO (PESO, TALLA Y PERIMETRO)', `${growth.length} MEDICIONES`, [0.020, 0.588, 0.412]);
+      pdf.addSideBySideCharts(
+        { type: 'line', title: 'Evolucion de Peso (kg)', unit: 'kg', data: weightPts, stroke: [0.012, 0.518, 0.780], fill: [0.878, 0.949, 0.996] },
+        { type: 'line', title: 'Evolucion de Talla / Estatura (cm)', unit: 'cm', data: heightPts, stroke: [0.020, 0.588, 0.412], fill: [0.820, 0.980, 0.900] }
+      );
+      if (headPts.length > 0) {
+        pdf.addLineChart('Evolucion de Perimetro Cefalico (cm)', 'cm', headPts, [0.576, 0.200, 0.918], [0.953, 0.910, 1.000]);
+      }
+
+      if (growth.length > 0) {
+        const growthRows = growth.slice().reverse().map((g, idx, arr) => {
+          const prev = arr[idx + 1];
+          const wDiff = (prev && Number.isFinite(parseFloat(g.weight)) && Number.isFinite(parseFloat(prev.weight)))
+            ? `${(parseFloat(g.weight) - parseFloat(prev.weight)) >= 0 ? '+' : ''}${(parseFloat(g.weight) - parseFloat(prev.weight)).toFixed(2)} kg`
+            : 'Base';
+          return [
+            g.date || '-',
+            { text: g.label || 'Control', bold: true },
+            g.weight ? `${g.weight} kg` : '-',
+            g.height ? `${g.height} cm` : '-',
+            g.head ? `${g.head} cm` : '-',
+            { text: wDiff, bold: true, color: wDiff.startsWith('+') ? [0.020, 0.588, 0.412] : [0.278, 0.333, 0.412] }
+          ];
+        });
+        pdf.addTable(
+          ['Fecha', 'Control / Edad', 'Peso (kg)', 'Talla (cm)', 'P. Cefalico', 'Variacion Peso'],
+          growthRows,
+          [75, 115, 80, 80, 85, 88],
+          [0.012, 0.412, 0.631]
+        );
+      }
+
+      // 2. Esquema de Vacunación PNI MINSAL
+      const doneVax = vaccines.filter(v => v && v.done).length;
+      pdf.addSectionHeader('VACUNAS REGISTRADAS', `${doneVax}/${vaccines.length} APLICADAS`, [0.059, 0.463, 0.431]);
+      pdf.addProgressBar('Progreso del Calendario de Vacunacion', doneVax, vaccines.length, [0.059, 0.463, 0.431]);
+
+      const vaxRows = vaccines.map(v => [
+        { text: v.age || '-', bold: true },
+        v.name || 'Vacuna',
+        v.done
+          ? { text: 'APLICADA', bold: true, color: [0.020, 0.588, 0.412] }
+          : { text: 'Pendiente', color: [0.706, 0.325, 0.035] },
+        v.date || '-',
+        [v.location, v.notes].filter(Boolean).join(' | ') || '-'
+      ]);
+      pdf.addTable(
+        ['Edad', 'Vacuna', 'Estado', 'Fecha', 'Lugar / Notas'],
+        vaxRows,
+        [62, 175, 65, 68, 153],
+        [0.059, 0.463, 0.431]
+      );
+
+      // 3. Gráficos de Alimentación, Sueño y Pañales (últimos 7 días con registros)
+      const feedEntries = Array.isArray(feeding.entries) ? feeding.entries : [];
+      const sleepEntries = Array.isArray(sleep.entries) ? sleep.entries : [];
+      const diaperEntries = Array.isArray(diapers.entries) ? diapers.entries : [];
+
+      const getEntryDay = (it) => (it && typeof it.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(it.date)) ? it.date : '';
+      const allCareDates = [...new Set([
+        ...feedEntries.map(getEntryDay),
+        ...sleepEntries.map(getEntryDay),
+        ...diaperEntries.map(getEntryDay)
+      ].filter(Boolean))].sort().slice(-7);
+
+      const milkByDay = allCareDates.map(d => {
+        const ml = feedEntries.filter(f => getEntryDay(f) === d && f.kind === 'milk').reduce((s, f) => s + (Number(f.amountMl) || 0), 0);
+        return { label: d.slice(5), val: ml };
+      });
+      const sleepByDay = allCareDates.map(d => {
+        const mins = sleepEntries.filter(s => getEntryDay(s) === d).reduce((acc, s) => acc + (typeof window.getBabySleepEntryMinutes === 'function' ? window.getBabySleepEntryMinutes(s) : (Number(s.durationMin) || 0)), 0);
+        return { label: d.slice(5), val: Math.round((mins / 60) * 10) / 10 };
+      });
+
+      const totalMilkMl = feedEntries.filter(f => f && f.kind === 'milk').reduce((s, f) => s + (Number(f.amountMl) || 0), 0);
+      const totalWaterMl = feedEntries.filter(f => f && f.kind === 'water').reduce((s, f) => s + (Number(f.amountMl) || 0), 0);
+      const totalSolid = feedEntries.filter(f => f && f.kind === 'solid').length;
+      const wetCount = diaperEntries.filter(d => d && d.type === 'Mojado').length;
+      const dirtyCount = diaperEntries.filter(d => d && d.type === 'Sucio').length;
+      const bothCount = diaperEntries.filter(d => d && d.type === 'Ambos').length;
+
+      pdf.addSectionHeader('CUIDADOS DIARIOS: ALIMENTACION, SUENO Y PANALES', 'RESUMEN DIARIO', [0.851, 0.467, 0.024]);
+      pdf.addKpiRow([
+        { label: 'Tomas de Leche', value: `${totalMilkMl} ml`, sub: `${feedEntries.filter(f => f && f.kind === 'milk').length} tomas reg.`, color: [0.012, 0.518, 0.780] },
+        { label: 'Comida y Agua', value: `${totalSolid} comidas`, sub: `Agua: ${totalWaterMl} ml`, color: [0.851, 0.467, 0.024] },
+        { label: 'Cambios de Panal', value: `${diaperEntries.length} cambios`, sub: `Moj:${wetCount} Suc:${dirtyCount} Amb:${bothCount}`, color: [0.059, 0.463, 0.431] },
+        { label: 'Sesiones de Sueno', value: `${sleepEntries.length} reg.`, sub: `Hitos logrados: ${milestones.filter(m => m && m.done).length}/${milestones.length}`, color: [0.310, 0.275, 0.898] }
+      ]);
+
+      if (allCareDates.length > 0) {
+        pdf.addSideBySideCharts(
+          { type: 'bar', title: 'Ingesta Diaria de Leche (ml - Ult. dias)', unit: '', data: milkByDay, color: [0.012, 0.518, 0.780] },
+          { type: 'bar', title: 'Horas de Sueno por Dia (h - Ult. dias)', unit: 'h', data: sleepByDay, color: [0.388, 0.400, 0.945] }
+        );
+      }
+
+      // 4. Controles Pediátricos y Medicamentos del Bebé
+      pdf.addSectionHeader('CONTROLES Y MEDICAMENTOS DEL BEBE', `${medControls.length} CONTROLES`, [0.388, 0.400, 0.945]);
+      const ctrlRows = medControls
+        .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+        .map(c => [
+          c.date || '-',
+          c.time || '-',
+          { text: c.specialty || c.title || 'Control Pediatrico', bold: true },
+          c.doctor || c.location || '-',
+          c.attended ? { text: 'Realizado', bold: true, color: [0.020, 0.588, 0.412] } : { text: 'Programado', color: [0.012, 0.412, 0.631] },
+          c.notes || '-'
+        ]);
+      pdf.addTable(
+        ['Fecha', 'Hora', 'Especialidad / Motivo', 'Profesional / Centro', 'Estado', 'Indicaciones / Observaciones'],
+        ctrlRows,
+        [62, 42, 115, 105, 62, 137],
+        [0.388, 0.400, 0.945]
+      );
+
+      if (babyMeds.length > 0) {
+        const bMedRows = babyMeds.map(m => [
+          { text: m.name || 'Medicamento', bold: true },
+          m.dose || '-',
+          m.everyHours ? `Cada ${m.everyHours} h` : '-',
+          m.durationDays ? `${m.durationDays} dias` : '-',
+          m.startDate || '-',
+          m.notes || '-'
+        ]);
+        pdf.addTable(
+          ['Medicamento', 'Dosis', 'Frecuencia', 'Duracion', 'Inicio', 'Notas / Motivo'],
+          bMedRows,
+          [115, 85, 68, 58, 64, 133],
+          [0.012, 0.412, 0.631]
+        );
+      }
+
+      pdf.addMedicalDisclaimerBox();
+    }
+
+    function exportBabyMedicalPDF() {
+      try {
+        const now = new Date();
+        const dateStr = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+        const exportedLabel = now.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
+        const { store, baby } = getActiveBabyObjectSafe();
+        const targetBaby = baby || (store && Array.isArray(store.babies) && store.babies[0]) || null;
+        if (!targetBaby) {
+          showToast('Sin datos del bebé', 'Registra primero los datos en el apartado Bebé.', 'fa-circle-exclamation', 'text-amber-400');
+          return;
+        }
+        const bName = (targetBaby.profile && targetBaby.profile.name && targetBaby.profile.name.trim())
+          ? targetBaby.profile.name.trim()
+          : 'Bebe';
+
+        const pdf = createVectorPdfBuilder(
+          `RESUMEN DE CUIDADOS Y CRECIMIENTO - ${bName.toUpperCase()}`,
+          `Exportado el ${exportedLabel}  |  Crecimiento, Vacunas, Alimentacion y Sueno`,
+          [0.012, 0.412, 0.631]
+        );
+
+        appendBabyClinicalSectionsToPdf(pdf, targetBaby, 1);
+
+        const blob = pdf.buildBlob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const cleanSlug = bName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'bebe';
+        a.download = `resumen_${cleanSlug}_${dateStr}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('PDF del Bebé Listo', 'Resumen con gráficos descargado correctamente.', 'fa-file-pdf', 'text-rose-400');
+      } catch (error) {
+        console.error('Error al exportar Ficha PDF del bebé:', error);
+        showToast('Error al exportar', 'No se pudo generar el PDF del bebé.', 'fa-circle-exclamation', 'text-red-400');
+      }
+    }
+
+    function openPdfExportModal() {
+      const m = document.getElementById('pdf-export-modal');
+      if (!m) {
+        exportDataPDF();
+        return;
+      }
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closePdfExportModal() {
+      const m = document.getElementById('pdf-export-modal');
+      if (!m) return;
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function toggleAllPdfOptions(checked) {
+      [pdf-opt-events, pdf-opt-turns, pdf-opt-health, pdf-opt-baby].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!checked;
+      });
+    }
+
+    function syncPdfAllCheckbox() {
+      const ids = [pdf-opt-events, pdf-opt-turns, pdf-opt-health, pdf-opt-baby];
+      const allChecked = ids.every(id => {
+        const el = document.getElementById(id);
+        return el ? el.checked : false;
+      });
+      const allEl = document.getElementById(pdf-opt-all);
+      if (allEl) allEl.checked = allChecked;
+    }
+
+    function executePdfExportFromModal() {
+      const incTurns = document.getElementById('pdf-opt-turns') ? document.getElementById('pdf-opt-turns').checked : true;
+      const incEvents = document.getElementById('pdf-opt-events') ? document.getElementById('pdf-opt-events').checked : true;
+      const incHealth = document.getElementById('pdf-opt-health') ? document.getElementById('pdf-opt-health').checked : true;
+      const incBaby = document.getElementById('pdf-opt-baby') ? document.getElementById('pdf-opt-baby').checked : true;
+      if (!incTurns && !incEvents && !incHealth && !incBaby) {
+        showToast('Selecciona un apartado', 'Marca al menos una opción para generar el PDF.', 'fa-circle-exclamation', 'text-amber-400');
+        return;
+      }
+      closePdfExportModal();
+      if (incBaby && !incTurns && !incEvents && !incHealth) {
+        exportBabyMedicalPDF();
+        return;
+      }
+      exportDataPDF({ turns: incTurns, events: incEvents, health: incHealth, baby: incBaby });
+    }
+
+    function exportDataPDF(opts = null) {
       try {
         const now = new Date();
         const dateStr = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
         const exportedLabel = now.toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
 
-        const shiftLines = [];
-        const eventNoteLines = [];
+        const shiftRows = [];
+        const eventRows = [];
+        const shiftCountByType = {};
+        let totalShiftMins = 0;
+
         Object.keys(dayDataMap || {}).sort().forEach(dateKey => {
           const items = Array.isArray(dayDataMap[dateKey]) ? dayDataMap[dateKey] : [];
           items.forEach(item => {
             if (!item) return;
+            const titleTxt = item.title || item.text || '';
             if (item.isShift) {
-              const timePart = item.shiftStatus ? `(${item.shiftStatus})` : (item.shiftStart || item.shiftEnd ? `${item.shiftStart || '--:--'} - ${item.shiftEnd || '--:--'}` : 'Sin horario');
-              shiftLines.push(`- ${dateKey}: ${item.text || 'Turno'} | ${timePart}`);
+              const tName = String(titleTxt || 'Turno').trim();
+              shiftCountByType[tName] = (shiftCountByType[tName] || 0) + 1;
+              const mins = (Number(item.hours) || 0) * 60 + (Number(item.mins) || 0);
+              totalShiftMins += mins;
+              const scheduleStr = item.shiftStatus
+                ? item.shiftType || item.shiftStatus
+                : ((item.shiftStart || item.shiftEnd) ? `${item.shiftStart || '--:--'} a ${item.shiftEnd || '--:--'}` : (item.shiftType || 'Regular'));
+              const durStr = mins > 0 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : '-';
+              shiftRows.push([
+                dateKey,
+                { text: tName, bold: true },
+                scheduleStr,
+                durStr,
+                item.description || '-'
+              ]);
             } else {
-              const tag = item.category ? `[${item.category}] ` : '';
-              eventNoteLines.push(`- ${dateKey}: ${tag}${item.text || ''}`);
+              const kind = item.isBirthday ? 'Cumpleanos' : (item.isAnniversary ? 'Aniversario' : (item.isEvent ? 'Evento' : 'Nota'));
+              eventRows.push([
+                dateKey,
+                { text: kind, bold: true, color: item.isBirthday ? [0.851, 0.467, 0.024] : [0.059, 0.463, 0.431] },
+                titleTxt || 'Sin titulo',
+                item.noteTime || '-',
+                item.description || '-'
+              ]);
             }
           });
         });
 
-        const controlLines = (Array.isArray(healthControls) ? [...healthControls] : [])
-          .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
-          .map(c => `- ${c.date || 'Sin fecha'}${c.time ? ' ' + c.time : ''}: ${c.title || c.name || 'Control'} (${c.type || 'Control'})${c.notes ? ' - ' + c.notes : ''}`);
+        const ctrlList = (Array.isArray(healthControls) ? [...healthControls] : [])
+          .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        const ctrlRows = ctrlList.map(c => [
+          c.date || '-',
+          c.time || '-',
+          { text: c.title || c.name || 'Control Medico', bold: true },
+          c.doctor || c.location || '-',
+          c.attended ? { text: 'Asistio', bold: true, color: [0.020, 0.588, 0.412] } : { text: 'Pendiente', color: [0.078, 0.325, 0.533] },
+          c.notes || '-'
+        ]);
 
-        const medLines = (Array.isArray(medications) ? medications : []).map(m => {
-          const dose = m.dose ? ` | Dosis: ${m.dose}` : '';
-          const freq = m.freqHours ? ` | Cada ${m.freqHours}h` : '';
-          return `- ${m.name || 'Medicamento'}${dose}${freq}${m.patient ? ' | Paciente: ' + m.patient : ''}`;
-        });
+        const medList = Array.isArray(medications) ? medications : [];
+        const medRows = medList.map(m => [
+          { text: m.name || 'Medicamento', bold: true },
+          m.dose || '-',
+          m.freqHours ? `Cada ${m.freqHours} h` : (m.everyHours ? `Cada ${m.everyHours} h` : '-'),
+          m.durationDays ? `${m.durationDays} dias` : '-',
+          m.startDate || '-',
+          m.notes || '-'
+        ]);
 
-        const btData = typeof window.getBabyTrackerState === 'function' ? window.getBabyTrackerState() : null;
-        const babyLines = [];
-        if (btData && Array.isArray(btData.babies) && btData.babies.length) {
-          btData.babies.forEach(b => {
-            babyLines.push({ text: `Bebe: ${b.name || 'Sin nombre'}${b.birthDate ? ' (Nac: ' + b.birthDate + ')' : ''}`, bold: true });
-          });
+        const pdf = createVectorPdfBuilder(
+          'OMNITASK - RESUMEN GENERAL',
+          `Exportado el ${exportedLabel}  |  Turnos, Eventos, Salud y Bebé`,
+          [0.059, 0.463, 0.431]
+        );
+
+        const incTurns = !opts || opts.turns !== false;
+        const incEvents = !opts || opts.events !== false;
+        const incHealth = !opts || opts.health !== false;
+        const incBaby = !opts || opts.baby !== false;
+
+        const totalShiftHours = Math.floor(totalShiftMins / 60);
+        pdf.addSectionHeader('RESUMEN GENERAL', 'VISTA GENERAL', [0.059, 0.463, 0.431]);
+        pdf.addKpiRow([
+          { label: 'Turnos Laborales', value: `${shiftRows.length} turnos`, sub: `${totalShiftHours} horas acumuladas`, color: [0.490, 0.231, 0.929] },
+          { label: 'Eventos y Notas', value: `${eventRows.length} registros`, sub: 'Agenda y recordatorios', color: [0.851, 0.467, 0.024] },
+          { label: 'Controles de Salud', value: `${ctrlRows.length} citas`, sub: `${ctrlList.filter(c => c && c.attended).length} realizados`, color: [0.231, 0.510, 0.965] },
+          { label: 'Tratamientos Activos', value: `${medRows.length} med.`, sub: 'Modulo MiMedicina', color: [0.059, 0.463, 0.431] }
+        ]);
+
+        if (incTurns) {
+          const shiftBars = Object.entries(shiftCountByType).map(([k, v]) => ({ label: k.slice(0, 6), val: v }));
+          if (shiftBars.length > 0) {
+            pdf.addBarChart('Distribucion de Turnos Laborales por Tipo', '', shiftBars, [0.490, 0.231, 0.929]);
+          }
+          pdf.addSectionHeader('TURNOS LABORALES REGISTRADOS', `${shiftRows.length} REGISTROS`, [0.490, 0.231, 0.929]);
+          pdf.addTable(
+            ['Fecha', 'Turno', 'Horario / Modalidad', 'Duracion', 'Observaciones'],
+            shiftRows.slice(-80),
+            [68, 120, 120, 65, 150],
+            [0.490, 0.231, 0.929]
+          );
         }
-        if (btData && btData.profiles) {
-          Object.values(btData.profiles).forEach(prof => {
-            if (!prof) return;
-            const feeds = Array.isArray(prof.feeds) ? prof.feeds.length : 0;
-            const diapers = Array.isArray(prof.diapers) ? prof.diapers.length : 0;
-            const sleeps = Array.isArray(prof.sleeps) ? prof.sleeps.length : 0;
-            const controls = Array.isArray(prof.healthControls) ? prof.healthControls.length : 0;
-            if (feeds || diapers || sleeps || controls) {
-              babyLines.push(`- Registros: ${feeds} tomas/comidas, ${diapers} panales, ${sleeps} suenos, ${controls} controles`);
-            }
-          });
+
+        if (incHealth) {
+          pdf.addSectionHeader('SALUD Y MIMEDICINA: CONTROLES Y TRATAMIENTOS', `${ctrlRows.length + medRows.length} REGISTROS`, [0.114, 0.306, 0.847]);
+          pdf.addTable(
+            ['Fecha', 'Hora', 'Control / Especialidad', 'Profesional / Lugar', 'Estado', 'Notas'],
+            ctrlRows.slice(0, 50),
+            [64, 44, 120, 105, 60, 130],
+            [0.114, 0.306, 0.847]
+          );
+          if (medRows.length > 0) {
+            pdf.addTable(
+              ['Medicamento', 'Dosis', 'Frecuencia', 'Duracion', 'Inicio', 'Indicaciones'],
+              medRows,
+              [120, 85, 70, 60, 65, 123],
+              [0.059, 0.463, 0.431]
+            );
+          }
         }
 
-        const sections = [
-          {
-            heading: 'RESUMEN GENERAL',
-            lines: [
-              `Eventos y notas: ${eventNoteLines.length}`,
-              `Turnos laborales: ${shiftLines.length}`,
-              `Controles de salud: ${controlLines.length}`,
-              `Medicamentos registrados: ${medLines.length}`
-            ]
-          },
-          { heading: 'TURNOS LABORALES', lines: shiftLines },
-          { heading: 'EVENTOS Y NOTAS', lines: eventNoteLines },
-          { heading: 'SALUD - CONTROLES MEDICOS', lines: controlLines },
-          { heading: 'SALUD - MEDICAMENTOS', lines: medLines }
-        ];
-        if (babyLines.length) sections.push({ heading: 'MODULO BEBE', lines: babyLines });
+        if (incEvents) {
+          pdf.addSectionHeader('EVENTOS, CUMPLEANOS Y NOTAS DEL CALENDARIO', `${eventRows.length} REGISTROS`, [0.851, 0.467, 0.024]);
+          pdf.addTable(
+            ['Fecha', 'Categoria', 'Titulo / Persona', 'Hora', 'Detalle'],
+            eventRows.slice(-60),
+            [68, 80, 145, 55, 175],
+            [0.851, 0.467, 0.024]
+          );
+        }
 
-        const blob = buildPdfDocumentBlob('OMNITASK - REPORTE GENERAL', `Exportado el ${exportedLabel}`, sections);
+        if (incBaby) {
+          const btStoreData = getBabyTrackerDataSafe();
+          if (btStoreData && Array.isArray(btStoreData.babies) && btStoreData.babies.length > 0) {
+            btStoreData.babies.forEach((babyObj, idx) => {
+              appendBabyClinicalSectionsToPdf(pdf, babyObj, idx + 1);
+            });
+          }
+        }
+
+        const blob = pdf.buildBlob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte_mi_calendario_${dateStr}.pdf`;
+        a.download = `reporte_omnitask_${dateStr}.pdf`;
         document.body.appendChild(a);
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-        showToast('PDF Exportado', 'Reporte en PDF descargado correctamente.', 'fa-file-pdf', 'text-rose-400');
+        showToast('PDF Exportado', 'Reporte visual con gráficos descargado.', 'fa-file-pdf', 'text-rose-400');
       } catch (error) {
         console.error('Error al exportar PDF:', error);
         showToast('Error al exportar', 'No se pudo generar el archivo PDF.', 'fa-circle-exclamation', 'text-red-400');
@@ -18432,6 +19121,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         'privacy-medical-modal': { label: 'Política de privacidad y aviso médico', close: () => window.closePrivacyPolicyModal && window.closePrivacyPolicyModal() },
         'holidays-modal': { label: 'Feriados del calendario', close: () => window.closeHolidaysModal && window.closeHolidaysModal() },
         'share-modal': { label: 'Compartir datos', close: () => window.closeShareModal && window.closeShareModal() },
+        'pdf-export-modal': { label: 'Descargar PDF', close: () => window.closePdfExportModal && window.closePdfExportModal() },
         'import-choice-modal': { label: 'Importar respaldo', close: () => window.closeImportChoiceModal && window.closeImportChoiceModal() },
         'babyRegistrationChooser': { label: 'Registrar en bebé', close: () => window.closeBabyRegistrationChooser && window.closeBabyRegistrationChooser() },
         'babyOthersChooser': { label: 'Otros registros del bebé', close: () => window.closeBabyOthersChooser && window.closeBabyOthersChooser() },
