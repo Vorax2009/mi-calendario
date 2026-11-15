@@ -6725,10 +6725,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
           };
         }
       } else {
-        const liquidMatch = normalizedForm.match(/(\d+(?:\.\d+)?)\s*mg\s*[\/,a-z\s]+\s*(\d+(?:\.\d+)?)\s*ml/i);
+        const liquidMatch = normalizedForm.match(/(\d+(?:\.\d+)?)\s*mg\s*[\/,a-z\s]*?\s*(?:(\d+(?:\.\d+)?)\s*)?ml\b/i);
         if (liquidMatch) {
           const mgPerPack = parseFloat(liquidMatch[1]);
-          const mlPerPack = parseFloat(liquidMatch[2]);
+          const mlPerPack = liquidMatch[2] ? parseFloat(liquidMatch[2]) : 1;
           if (mgPerPack > 0 && mlPerPack > 0) {
             const calculatedMl = (dose * mlPerPack) / mgPerPack;
             const calculatedDrops = calculatedMl * 20;
@@ -7325,6 +7325,10 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 ${control.attended === true ? '<span class="block text-[10px] font-bold text-emerald-300">✔ Asistió</span>' : ''}
                 <span class="block text-[10px] text-slate-400"><span class="text-slate-500">Lugar:</span> ${escapeHtml(control.location) || '—'}</span>
                 <span class="block text-[10px] text-slate-400"><span class="text-slate-500">Detalle:</span> ${escapeHtml(control.notes) || '—'}</span>
+                <div class="flex items-center justify-end gap-1 pt-1">
+                  <button type="button" onclick="${control.isBaby ? `openBabyControlModal(${jsArg(control.date)}, ${jsArg(control.id)})` : `openHealthControlForm(${jsArg(control.id)})`}" aria-label="Editar control" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-300 hover:text-indigo-300 flex items-center gap-1"><i class="fa-solid fa-pen"></i> Editar</button>
+                  <button type="button" onclick="deleteHealthControl(${jsArg(control.id)}, ${control.isBaby ? 'true' : 'false'}, ${jsArg(control.babyId || '')})" aria-label="Eliminar control" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-300 hover:text-red-400 flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Eliminar</button>
+                </div>
               </div>`).join('');
           return `<div class="rounded-lg bg-slate-900 border ${isSelected ? 'border-indigo-400/70' : 'border-slate-800'} overflow-hidden">
             <div class="flex items-center gap-2">
@@ -11733,6 +11737,27 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!isAutoBackup) showToast('Exportación Exitosa', 'Respaldo completo descargado (calendario y salud).', 'fa-file-export', 'text-teal-400');
     }
 
+    function getMedicationEndDateKey(startDate, duration) {
+      const m = String(startDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const days = Number(duration);
+      if (!m || !Number.isFinite(days) || days <= 0) return '-';
+      const end = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + days - 1);
+      return formatDateKey(end.getFullYear(), end.getMonth(), end.getDate());
+    }
+
+    function formatMedicationDoseForPdf(med) {
+      if (!med) return '-';
+      if (med.dose && !med.doseVal) return String(med.dose);
+      const base = `${med.doseVal || ''} ${med.doseUnit || ''}`.trim();
+      if (!base) return '-';
+      let eq = '';
+      try {
+        const txt = (med.doseVal && med.doseUnit) ? formatMedicationDose(med) : '';
+        if (txt && txt !== base) eq = txt;
+      } catch (e) { eq = ''; }
+      return eq ? `${base} = ${eq}` : base;
+    }
+
     function toPdfWinAnsiBytes(str) {
       const clean = String(str || '')
         .replace(/[\u2018\u2019]/g, "'")
@@ -12322,7 +12347,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         .map(c => [
           c.date || '-',
           c.time || '-',
-          { text: c.specialty || c.title || 'Control Pediatrico', bold: true },
+          { text: ((c.type === 'otro' && c.customType) ? c.customType : ((window.BT_CONTROL_SPECIALTIES && window.BT_CONTROL_SPECIALTIES[c.type] && window.BT_CONTROL_SPECIALTIES[c.type].name) || c.customType || 'Control pediátrico')), bold: true },
           c.doctor || c.location || '-',
           c.attended ? { text: 'Realizado', bold: true, color: [0.020, 0.588, 0.412] } : { text: 'Programado', color: [0.012, 0.412, 0.631] },
           c.notes || '-'
@@ -12337,16 +12362,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (babyMeds.length > 0) {
         const bMedRows = babyMeds.map(m => [
           { text: m.name || 'Medicamento', bold: true },
-          m.dose || '-',
-          m.everyHours ? `Cada ${m.everyHours} h` : '-',
-          m.durationDays ? `${m.durationDays} dias` : '-',
+          formatMedicationDoseForPdf(m),
+          m.frequency ? `Cada ${m.frequency} h` : '-',
+          m.duration ? `${m.duration} días` : '-',
           m.startDate || '-',
+          getMedicationEndDateKey(m.startDate, m.duration),
           m.notes || '-'
         ]);
         pdf.addTable(
-          ['Medicamento', 'Dosis', 'Frecuencia', 'Duracion', 'Inicio', 'Notas / Motivo'],
+          ['Medicamento', 'Dosis', 'Frecuencia', 'Duración', 'Inicio', 'Fin', 'Notas / Motivo'],
           bMedRows,
-          [115, 85, 68, 58, 64, 133],
+          [88, 112, 56, 48, 58, 58, 103],
           [0.012, 0.412, 0.631]
         );
       }
@@ -12582,10 +12608,11 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const medRows = medList.map(m => [
           { text: m.person || 'Sin paciente', bold: true },
           m.name || 'Medicamento',
-          `${m.doseVal || m.dose || ''} ${m.doseUnit || ''}`.trim() || '-',
+          formatMedicationDoseForPdf(m),
           m.frequency ? `Cada ${m.frequency} h` : '-',
           m.duration ? `${m.duration} días` : '-',
           m.startDate || '-',
+          getMedicationEndDateKey(m.startDate, m.duration),
           m.notes || '-'
         ]);
 
@@ -12647,9 +12674,9 @@ Check your Browserslist config to be sure that your targets are set up correctly
           );
           if (medRows.length > 0) {
             pdf.addTable(
-              ['Paciente', 'Medicamento', 'Dosis', 'Frecuencia', 'Duración', 'Inicio', 'Indicaciones'],
+              ['Paciente', 'Medicamento', 'Dosis', 'Frecuencia', 'Duración', 'Inicio', 'Fin', 'Indicaciones'],
               medRows,
-              [80, 90, 70, 55, 50, 60, 118],
+              [68, 80, 96, 50, 44, 54, 54, 77],
               [0.059, 0.463, 0.431]
             );
           }
