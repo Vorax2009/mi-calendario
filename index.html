@@ -12475,13 +12475,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
           const nextISO = formatDateKey(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
           const isToday = nextDate.getTime() === todayMid.getTime();
           const daysLeft = Math.round((nextDate - todayMid) / 86400000);
-          const nextTxt = `${fmtLong(nextISO)}${isToday ? ' - HOY' : (daysLeft === 1 ? ' - mañana' : ` - en ${daysLeft} días`)}, ${isBday ? 'cumple' : 'cumplen'} ${turning}`;
+          const nextTxt = fmtLong(nextISO);
           const ageTxt = completed < 0
             ? '-'
             : (isBday ? `${completed} ${completed === 1 ? 'año' : 'años'}` : `${completed} ${completed === 1 ? 'aniversario' : 'aniversarios'}`);
           return { nextDate, nextTxt, ageTxt };
         };
         const seenDates = new Set();
+        const noteStats = {};
 
         Object.keys(dayDataMap || {}).sort().forEach(dateKey => {
           const items = Array.isArray(dayDataMap[dateKey]) ? dayDataMap[dateKey] : [];
@@ -12540,21 +12541,29 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 }
               }
               if (!handled && !isBday && !isAnniv) {
-                const kind = item.isEvent ? 'Evento' : 'Nota';
-                const groupKey = `n|${item.repeatGroupId || ''}|${String(titleTxt).trim().toLowerCase()}|${item.repeatGroupId ? '' : dateKey}`;
-                if (!seenDates.has(groupKey)) {
-                  seenDates.add(groupKey);
-                  eventRows.push([
-                    dateKey,
-                    { text: kind, bold: true, color: [0.059, 0.463, 0.431] },
-                    titleTxt || 'Sin título',
-                    item.description || '-'
-                  ]);
+                if (dateKey <= dateStr) {
+                  const nKey = String(titleTxt || 'Sin título').trim().toLowerCase();
+                  if (!noteStats[nKey]) {
+                    noteStats[nKey] = { title: String(titleTxt || 'Sin título').trim(), kind: item.isEvent ? 'Evento' : 'Nota', count: 0, first: dateKey, last: dateKey };
+                  }
+                  const st = noteStats[nKey];
+                  st.count++;
+                  if (dateKey < st.first) st.first = dateKey;
+                  if (dateKey > st.last) st.last = dateKey;
                 }
               }
             }
           });
         });
+        Object.values(noteStats)
+          .sort((x, y) => y.count - x.count || x.title.localeCompare(y.title))
+          .forEach(st => eventRows.push([
+            { text: st.title, bold: true },
+            { text: st.kind, color: [0.059, 0.463, 0.431] },
+            { text: String(st.count), bold: true },
+            st.first,
+            st.last
+          ]));
         dateRows.sort((x, y) => x.sort - y.sort);
         const dateTableRows = dateRows.map(r => r.row);
 
@@ -12649,17 +12658,17 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (incEvents) {
           pdf.addSectionHeader('CUMPLEAÑOS Y ANIVERSARIOS', `${dateTableRows.length} REGISTROS`, [0.851, 0.467, 0.024]);
           pdf.addTable(
-            ['Categoría', 'Persona / Título', 'Fecha de nacimiento / aniversario', 'Edad / Aniversarios', 'Próximo cumpleaños / aniversario'],
+            ['Tipo', 'Persona', 'Fecha inicial', 'Edad / Aniv.', 'Próxima fecha'],
             dateTableRows,
-            [62, 100, 110, 66, 185],
+            [62, 100, 118, 78, 165],
             [0.851, 0.467, 0.024]
           );
           if (eventRows.length > 0) {
-            pdf.addSectionHeader('EVENTOS Y NOTAS DEL CALENDARIO', `${eventRows.length} REGISTROS`, [0.059, 0.463, 0.431]);
+            pdf.addSectionHeader('RESUMEN HISTORICO DE NOTAS Y EVENTOS', `${eventRows.length} TITULOS`, [0.059, 0.463, 0.431]);
             pdf.addTable(
-              ['Fecha', 'Categoría', 'Título', 'Detalle'],
-              eventRows.slice(-60),
-              [68, 70, 150, 235],
+              ['Título', 'Tipo', 'Veces', 'Primer registro', 'Último registro'],
+              eventRows,
+              [190, 60, 50, 111, 112],
               [0.059, 0.463, 0.431]
             );
           }
