@@ -1,7 +1,7 @@
 {
   "id": "/mi-calendario/",
-  "name": "Mi Calendario: Turnos, Salud y Bebé",
-  "short_name": "Mi Calendario",
+  "name": "OmniTask: Turnos, Salud y Bebé",
+  "short_name": "OmniTask",
   "description": "Calendario personal con turnos laborales, notas, cumpleaños, control de medicamentos y seguimiento integral del bebé.",
   "lang": "es-CL",
   "dir": "ltr",
@@ -77,28 +77,22 @@
   },
   "icons": [
     {
-      "src": "./mi-calendario-icon-192.png",
+      "src": "./omnitask-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./mi-calendario-icon-512.png",
+      "src": "./omnitask-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./mi-calendario-icon-512.png",
+      "src": "./omnitask-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ],
   "screenshots": [
@@ -142,7 +136,7 @@
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Vista de escritorio de Mi Calendario"
+      "label": "Vista de escritorio de OmniTask"
     }
   ],
   "shortcuts": [
@@ -153,7 +147,7 @@
       "url": "./?tab=calendar",
       "icons": [
         {
-          "src": "./mi-calendario-icon-192.png",
+          "src": "./omnitask-icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -166,7 +160,7 @@
       "url": "./?tab=turns",
       "icons": [
         {
-          "src": "./mi-calendario-icon-192.png",
+          "src": "./omnitask-icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -179,7 +173,7 @@
       "url": "./?tab=meds",
       "icons": [
         {
-          "src": "./mi-calendario-icon-192.png",
+          "src": "./omnitask-icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -192,7 +186,7 @@
       "url": "./?tab=baby",
       "icons": [
         {
-          "src": "./mi-calendario-icon-192.png",
+          "src": "./omnitask-icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

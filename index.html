@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Calendario, Turnos, Etiquetas y Cumpleaños</title>
+  <title>OmniTask: Turnos, Salud y Bebé</title>
   <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
   
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./mi-calendario-icon-192.png">
+  <link rel="icon" href="./omnitask-icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./omnitask-icon-192.png">
 
   <!-- Tailwind CSS CDN -->
   <!-- Tailwind CSS 3.4.17 (build de navegador, MIT) incrustado para funcionar sin conexión -->
@@ -156,7 +156,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Calendario">
+  <meta name="apple-mobile-web-app-title" content="OmniTask">
 <style>[class*="fa-solid"],[class*="fa-regular"]{font-style:normal;display:inline-block;line-height:1}
 .fa-arrow-left::before{content:"←"}
 .fa-arrows-rotate::before{content:"⟳"}
@@ -262,8 +262,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
     <!-- TOP BAR CONTROL -->
     <div class="bg-slate-950 border-b border-slate-800 px-3 py-2.5 flex items-center justify-between text-xs">
       <div class="flex items-center gap-2">
-        <i class="fa-solid fa-calendar-check text-teal-400 text-base"></i>
-        <span class="font-extrabold tracking-wide text-slate-200 text-sm">CALENDARIO</span>
+        <img src="./omnitask-icon-192.png" alt="OmniTask" class="w-5 h-5 object-contain">
+        <span class="font-extrabold tracking-wide text-slate-200 text-sm">OMNITASK</span>
       </div>
 
       <div class="flex items-center gap-1.5">
@@ -2713,7 +2713,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <i class="fa-solid fa-bell"></i>
       </div>
       <div class="space-y-1">
-        <p class="text-[11px] font-black uppercase tracking-widest text-amber-300">Alarma de Mi Calendario</p>
+        <p class="text-[11px] font-black uppercase tracking-widest text-amber-300">Alarma de OmniTask</p>
         <h3 id="ringing-alarm-title" class="text-lg font-black text-white">Recordatorio</h3>
         <p id="ringing-alarm-body" class="text-xs text-slate-300"></p>
       </div>
@@ -2747,7 +2747,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <span>Descargo de Responsabilidad Médica</span>
           </div>
           <p class="text-[11px] text-amber-100/90">
-            Mi Calendario (incluyendo los módulos <strong>Salud / MiMedicina</strong> y <strong>Bebé</strong>) es una herramienta de registro y organización personal. <strong>No es un dispositivo médico</strong> y no ofrece consejo médico, diagnóstico, tratamiento, cura ni prevención de ninguna enfermedad o condición de salud. Los cálculos de dosis, recordatorios de vacunas (esquema PNI) y curvas de crecimiento son referenciales y basados en los datos ingresados por el usuario. Consulta siempre al pediatra o profesional de la salud antes de tomar decisiones médicas o administrar medicamentos.
+            OmniTask (incluyendo los módulos <strong>Salud / MiMedicina</strong> y <strong>Bebé</strong>) es una herramienta de registro y organización personal. <strong>No es un dispositivo médico</strong> y no ofrece consejo médico, diagnóstico, tratamiento, cura ni prevención de ninguna enfermedad o condición de salud. Los cálculos de dosis, recordatorios de vacunas (esquema PNI) y curvas de crecimiento son referenciales y basados en los datos ingresados por el usuario. Consulta siempre al pediatra o profesional de la salud antes de tomar decisiones médicas o administrar medicamentos.
           </p>
         </div>
 
@@ -11413,7 +11413,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       // Add page numbers
       const totalPages = pages.length;
       for (let i = 0; i < totalPages; i++) {
-        const footerText = `Mi Calendario - Pagina ${i + 1} de ${totalPages}`;
+        const footerText = `OmniTask - Pagina ${i + 1} de ${totalPages}`;
         const bytes = toPdfWinAnsiBytes(footerText);
         let hex = '';
         for (const byte of bytes) hex += byte.toString(16).padStart(2, '0');
@@ -11529,7 +11529,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         ];
         if (babyLines.length) sections.push({ heading: 'MODULO BEBE', lines: babyLines });
 
-        const blob = buildPdfDocumentBlob('MI CALENDARIO - REPORTE GENERAL', `Exportado el ${exportedLabel}`, sections);
+        const blob = buildPdfDocumentBlob('OMNITASK - REPORTE GENERAL', `Exportado el ${exportedLabel}`, sections);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -11572,7 +11572,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           if (navigator.canShare({ files: [shareFile] })) {
             try {
               await navigator.share({
-                title: 'Copia de seguridad Mi Calendario',
+                title: 'Copia de seguridad OmniTask',
                 text: 'Elige Google Drive para guardar tu copia de seguridad.',
                 files: [shareFile]
               });
@@ -11610,7 +11610,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         const lines = [
           'BEGIN:VCALENDAR',
           'VERSION:2.0',
-          'PRODID:-//Mi Calendario//Google Calendar Export//ES',
+          'PRODID:-//OmniTask//Google Calendar Export//ES',
           'CALSCALE:GREGORIAN',
           'METHOD:PUBLISH'
         ];
@@ -12338,14 +12338,14 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!/^https?:$/.test(location.protocol) || document.querySelector('link[rel="manifest"]')) return;
       try {
         const manifest = {
-          name: 'Calendario, Turnos, Etiquetas y Cumpleaños',
-          short_name: 'Calendario',
+          name: 'OmniTask: Turnos, Salud y Bebé',
+          short_name: 'OmniTask',
           start_url: location.href.split('#')[0],
           scope: location.href.split('#')[0].replace(/[^/]*$/, ''),
           display: 'standalone',
           background_color: '#0f172a',
           theme_color: '#0f172a',
-          icons: [{ src: APP_ICON_URL, sizes: 'any', type: 'image/svg+xml', purpose: 'any' }]
+          icons: [{ src: './omnitask-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' }]
         };
         const link = document.createElement('link');
         link.rel = 'manifest';
@@ -12474,7 +12474,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         if (typeof ln.createChannel === 'function') {
           await ln.createChannel({
             id: 'mi_calendario_alarms',
-            name: 'Alarmas Mi Calendario',
+            name: 'Alarmas OmniTask',
             description: 'Alarmas exactas de turnos, salud, bebé y notas',
             importance: 5,
             visibility: 1,
@@ -12509,7 +12509,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
           if (alarm.repeat === 'daily') {
             toSchedule.push({
               id: alarmNumericId(alarm.id, 0),
-              title: alarm.title || 'Alarma Mi Calendario',
+              title: alarm.title || 'Alarma OmniTask',
               body: `Recordatorio diario (${alarm.time})`,
               channelId: 'mi_calendario_alarms',
               schedule: { on: { hour: hh, minute: mm }, repeats: true, allowWhileIdle: true }
@@ -12518,7 +12518,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             [2, 3, 4, 5, 6].forEach((wd, idx) => {
               toSchedule.push({
                 id: alarmNumericId(alarm.id, idx + 1),
-                title: alarm.title || 'Alarma Mi Calendario',
+                title: alarm.title || 'Alarma OmniTask',
                 body: `Recordatorio Lunes a Viernes (${alarm.time})`,
                 channelId: 'mi_calendario_alarms',
                 schedule: { on: { weekday: wd, hour: hh, minute: mm }, repeats: true, allowWhileIdle: true }
@@ -12531,7 +12531,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             if (atDate.getTime() > now.getTime()) {
               toSchedule.push({
                 id: alarmNumericId(alarm.id, 0),
-                title: alarm.title || 'Alarma Mi Calendario',
+                title: alarm.title || 'Alarma OmniTask',
                 body: `Recordatorio programado (${alarm.time})`,
                 channelId: 'mi_calendario_alarms',
                 schedule: { at: atDate, allowWhileIdle: true }
@@ -12566,8 +12566,8 @@ Check your Browserslist config to be sure that your targets are set up correctly
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
       const opts = {
         body: body || '',
-        icon: './mi-calendario-icon-192.png',
-        badge: './mi-calendario-icon-192.png',
+        icon: './omnitask-icon-192.png',
+        badge: './omnitask-icon-192.png',
         tag: tag || `mical-${Date.now()}`,
         renotify: true,
         silent: false,
@@ -12951,7 +12951,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
       const ics = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//Mi Calendario//Alarmas//ES',
+        'PRODID:-//OmniTask//Alarmas//ES',
         'BEGIN:VEVENT',
         `UID:${alarm.id}@micalendario`,
         `DTSTAMP:${dtStart}`,
@@ -13013,7 +13013,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
     }
 
     function testMobileAlarm() {
-      triggerRingingAlarm('Prueba de Alarma', 'Así sonará y vibrará tu aviso en Mi Calendario.', {
+      triggerRingingAlarm('Prueba de Alarma', 'Así sonará y vibrará tu aviso en OmniTask.', {
         sound: true,
         vibrate: true,
         tag: `test-alarm-${Date.now()}`
@@ -13125,7 +13125,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         updateNotifPermissionStatusUI();
         if (permission === 'granted') {
           showToast('Permiso concedido', 'Notificaciones activadas en el dispositivo.', 'fa-bell', 'text-teal-400');
-          sendMobileNotification('Mi Calendario', 'Notificaciones activadas correctamente.', 'welcome-notif');
+          sendMobileNotification('OmniTask', 'Notificaciones activadas correctamente.', 'welcome-notif');
           checkNotificationsOnLaunch();
           checkMedicationReminders();
           checkShiftAndControlReminders();
