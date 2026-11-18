@@ -443,6 +443,8 @@
 .fa-sun::before{content:"☀️"}
 .fa-file-pdf::before{content:"📄"}
 .fa-shield-halved::before{content:"🛡"}
+.fa-car::before{content:"🚗"}
+.fa-rotate-left::before{content:"↩"}
 .fa-file-shield::before{content:"📋"}
 .fa-google-drive::before{content:"☁"}
 .fa-syringe::before{content:"💉"}
@@ -511,28 +513,28 @@
 
     <!-- TOP NAVIGATION TAB BAR -->
     <header id="top-tab-header" class="bg-[#1e293b] border-b border-slate-700/60 sticky top-0 z-20 shadow-md">
-      <div class="flex text-center font-bold uppercase">
-        <button id="tab-calendar-btn" onclick="toggleCalendarView()" aria-label="Cambiar vista del calendario" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-indigo-300">
+      <div role="tablist" aria-label="Navegación principal" class="flex text-center font-bold uppercase">
+        <button id="tab-calendar-btn" role="tab" aria-selected="true" onclick="toggleCalendarView()" title="Cambiar vista del calendario" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-indigo-300">
           <i class="fa-solid fa-calendar-days text-lg md:text-sm leading-none"></i>
           <span id="tab-calendar-label" class="block max-w-full truncate uppercase text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">CALENDARIO</span>
           <div id="tab-calendar-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-400"></div>
         </button>
-        <button id="tab-summary-btn" onclick="switchView('summary', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
+        <button id="tab-summary-btn" role="tab" aria-selected="false" onclick="switchView('summary', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
           <i class="fa-solid fa-cake-candles text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full text-center whitespace-normal break-words md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-turns-btn" onclick="openViewOrPaywall('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
+        <button id="tab-turns-btn" role="tab" aria-selected="false" onclick="openViewOrPaywall('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
           <i class="fa-solid fa-user-doctor text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">TURNOS</span>
           <div id="tab-turns-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-meds-btn" onclick="openViewOrPaywall('meds')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400">
+        <button id="tab-meds-btn" role="tab" aria-selected="false" onclick="openViewOrPaywall('meds')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400">
           <i class="fa-solid fa-pills text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">SALUD</span>
           <div id="tab-meds-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
-        <button id="tab-baby-btn" onclick="openViewOrPaywall('baby')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-sky-400">
+        <button id="tab-baby-btn" role="tab" aria-selected="false" onclick="openViewOrPaywall('baby')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-sky-400">
           <i class="fa-solid fa-baby text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">BEBÉ</span>
           <div id="tab-baby-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
@@ -713,10 +715,11 @@
               <i class="fa-solid fa-chart-pie text-teal-400"></i>
               <span>ESTADÍSTICAS DE NOTAS</span>
             </h3>
-            <div class="grid grid-cols-3 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center shadow-inner">
-              <button id="summary-mode-month" onclick="setSummaryMode('month')" class="py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white transition-all shadow">Mes</button>
-              <button id="summary-mode-year" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Año</button>
-              <button id="summary-mode-all" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Histórico</button>
+            <div role="tablist" aria-label="Modo de estadísticas de notas" class="grid grid-cols-4 gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 text-center shadow-inner">
+              <button id="summary-mode-month" role="tab" aria-selected="true" onclick="setSummaryMode('month')" class="py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white transition-all shadow">Mes</button>
+              <button id="summary-mode-year" role="tab" aria-selected="false" onclick="setSummaryMode('year')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Año</button>
+              <button id="summary-mode-all" role="tab" aria-selected="false" onclick="setSummaryMode('all')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Histórico</button>
+              <button id="summary-mode-vehicles" role="tab" aria-selected="false" onclick="setSummaryMode('vehicles')" class="py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Vehículos</button>
             </div>
             <div id="summary-nav-banner" class="flex items-center justify-between bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-800">
               <button onclick="changeSummaryPeriod(-1)" aria-label="Anterior" class="p-1.5 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
@@ -729,12 +732,13 @@
               <div class="col-span-4 text-right" id="summary-header-time">Tiempo Total</div>
             </div>
             <div id="summary-stats-breakdown" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
-            <div class="pt-2.5 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-200">
+            <div id="summary-global-footer" class="pt-2.5 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-200">
               <span id="summary-global-time-wrapper">Tiempo Total: <span id="summary-global-time" class="text-amber-400 font-extrabold">0h 0m</span></span>
               <span id="summary-global-count-label">Global: <span id="summary-global-count" class="text-teal-400 font-extrabold">0 Notas</span></span>
             </div>
+            <div id="vehicles-list-container" class="hidden space-y-3 pt-1"></div>
           </div>
-          <div class="bg-gradient-to-br from-[#1e2733] to-[#17202c] p-3 rounded-2xl border border-slate-700/70 shadow-lg space-y-2 mt-3">
+          <div id="nearby-notes-card" class="bg-gradient-to-br from-[#1e2733] to-[#17202c] p-3 rounded-2xl border border-slate-700/70 shadow-lg space-y-2 mt-3">
             <h4 id="nearby-section-title" class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-clock text-teal-400"></i>
               <span>NOTAS CERCANAS</span>
@@ -743,6 +747,7 @@
           </div>
         </section>
       </div>
+
 
       <!-- VISTA 4: AGENDA DE TURNOS -->
       <div id="view-turns" class="hidden flex-1 flex flex-col py-2 space-y-3 view-transition">
@@ -1063,7 +1068,7 @@
           <!-- SELECTOR DE TIPO: BOTONES DE ICONO COMPACTOS (ARRIBA DEL TÍTULO) -->
           <div id="event-type-options" class="hidden flex-col gap-1 pb-1.5 border-b border-slate-700/60">
             <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Tipo de evento:</span>
-            <div class="grid grid-cols-3 gap-1.5">
+            <div class="grid grid-cols-2 gap-1.5">
               <button type="button" id="event-type-btn-note" onclick="selectFormEventType('note')" class="py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-teal-500/20 border-teal-400 text-teal-300 font-bold shadow-sm ring-1 ring-teal-400/50">
                 <i class="fa-solid fa-note-sticky text-xs"></i>
                 <span class="text-[10px] tracking-wide">Nota</span>
@@ -1075,6 +1080,10 @@
               <button type="button" id="event-type-btn-anniversary" onclick="selectFormEventType('anniversary')" class="py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-slate-900 border-slate-700/80 text-slate-400 font-medium hover:bg-slate-800 hover:text-slate-200">
                 <i class="fa-solid fa-champagne-glasses text-xs"></i>
                 <span class="text-[10px] tracking-wide">Aniversario</span>
+              </button>
+              <button type="button" id="event-type-btn-vehicle" onclick="closeDayDetailModal(); openVehicleModal();" class="py-1.5 px-2 rounded-lg border flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-sky-950/60 border-sky-500/40 text-sky-300 font-bold hover:bg-sky-900/70">
+                <span class="text-xs leading-none">🚗</span>
+                <span class="text-[10px] tracking-wide">+ Vehículo</span>
               </button>
             </div>
             <!-- Inputs ocultos para mantener 100% compatibilidad -->
@@ -1199,7 +1208,7 @@
               </div>
             </div>
             
-            <button type="button" onclick="closeDayModal(); openShiftCycleModal();" class="w-full py-1.5 px-2.5 bg-indigo-950/70 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-500/40 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+            <button type="button" onclick="closeDayDetailModal(); openShiftCycleModal();" class="w-full py-1.5 px-2.5 bg-indigo-950/70 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-500/40 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
               <i class="fa-solid fa-arrows-rotate"></i> Generar ciclo rotativo (4x4, 4to Turno, 7x7...)
             </button>
 
@@ -2872,6 +2881,30 @@
           </button>
         </div>
 
+        <!-- 2B. ALARMAS NATIVAS ANDROID (CON APP CERRADA) -->
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-amber-500/40 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] font-black uppercase tracking-wider text-amber-300"><i class="fa-solid fa-bell mr-1"></i>Notificaciones y Alarmas Nativas</span>
+            <span id="native-alarms-count-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Sin activar</span>
+          </div>
+          <p class="text-[10px] text-slate-400 leading-tight">Programa alertas reales en Android para Turnos, Eventos, Cumpleaños, Notas con hora, Controles, Medicinas y Vehículos aunque cierres la app.</p>
+          <div id="native-alarms-status-bar" class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-slate-950/70 border border-slate-800 text-[10px]">
+            <span id="native-alarms-perm-label" class="text-slate-400 font-semibold">Permiso: verificando...</span>
+            <span id="native-alarms-auto-label" class="text-slate-400 font-semibold">Auto: apagado</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="testNativeAlarm10s()" class="py-2 px-2 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
+              <i class="fa-solid fa-clock"></i> Probar en 10s
+            </button>
+            <button type="button" onclick="syncAllUpcomingNativeAlarms()" class="py-2 px-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
+              <i class="fa-solid fa-calendar-check"></i> Activar auto
+            </button>
+          </div>
+          <button type="button" onclick="disableAllNativeAlarms()" class="w-full py-1.5 px-2 bg-slate-950/70 hover:bg-rose-950/50 text-slate-400 hover:text-rose-300 border border-slate-800 rounded-lg text-[10px] font-bold transition-all">
+            Cancelar todas las alarmas nativas
+          </button>
+        </div>
+
         <!-- 3. RESPALDOS, EXPORTACIÓN E IMPORTACIÓN -->
         <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/80 space-y-3">
           <span class="text-[10px] font-black uppercase tracking-wider text-sky-300 block">Respaldos y Sincronización</span>
@@ -4072,26 +4105,22 @@
       const eventsPanel = document.getElementById('events-list-panel');
       const notesBtn = document.getElementById('notes-subtab-btn');
       const eventsBtn = document.getElementById('tab-birthdays-btn');
+      const inactiveCls = "py-2.5 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-slate-200 active:scale-95";
+
+      if (eventsPanel) eventsPanel.classList.toggle('hidden', subTab !== 'events');
+      if (notesPanel) notesPanel.classList.toggle('hidden', subTab !== 'notes');
+
+      if (eventsBtn) eventsBtn.className = subTab === 'events'
+        ? "py-2.5 px-2 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-md bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 active:scale-95"
+        : inactiveCls;
+      if (notesBtn) notesBtn.className = subTab === 'notes'
+        ? "py-2.5 px-2 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-md bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-teal-500/20 active:scale-95"
+        : inactiveCls;
 
       if (subTab === 'events') {
-        if (eventsPanel) eventsPanel.classList.remove('hidden');
-        if (notesPanel) notesPanel.classList.add('hidden');
-        if (eventsBtn) {
-          eventsBtn.className = "py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-amber-500/20 active:scale-95";
-        }
-        if (notesBtn) {
-          notesBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200 active:scale-95";
-        }
         renderBirthdaysView();
       } else {
-        if (notesPanel) notesPanel.classList.remove('hidden');
-        if (eventsPanel) eventsPanel.classList.add('hidden');
-        if (notesBtn) {
-          notesBtn.className = "py-2.5 px-3 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-teal-500/20 active:scale-95";
-        }
-        if (eventsBtn) {
-          eventsBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-400 hover:text-slate-200 active:scale-95";
-        }
+        if (typeof renderVehiclesView === 'function') renderVehiclesView();
         renderSummaryView();
       }
     }
@@ -4360,6 +4389,7 @@
         const ind = document.getElementById(`${prefix}-indicator`);
         const btn = document.getElementById(`${prefix}-btn`);
         if (ind) ind.className = "absolute bottom-0 left-0 right-0 h-1 bg-transparent";
+        if (btn) btn.setAttribute('aria-selected', 'false');
         if (btn && btn.parentElement && btn.parentElement.id === 'top-tab-header') {
           btn.className = "flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-slate-300";
         }
@@ -4395,7 +4425,10 @@
       if (activeIndEl) activeIndEl.className = `absolute bottom-0 left-0 right-0 h-1 ${activeBgClass}`;
 
       const activeBtnEl = document.getElementById(`tab-${tabView}-btn`);
-      if (activeBtnEl) activeBtnEl.classList.add(activeColorClass);
+      if (activeBtnEl) {
+        activeBtnEl.classList.add(activeColorClass);
+        activeBtnEl.setAttribute('aria-selected', 'true');
+      }
 
       renderAll();
     }
@@ -6268,6 +6301,7 @@
     function persistHealthControls() {
       try {
         localStorage.setItem(STORAGE_KEY_CONTROLS, JSON.stringify(healthControls));
+        if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
         return true;
       } catch (error) {
         console.error('No se pudieron guardar los controles de salud.', error);
@@ -7893,6 +7927,7 @@
     function saveToLocalStorage(options = {}) {
       try {
         localStorage.setItem('cal_day_details_map', JSON.stringify(dayDataMap));
+        if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
         if (!options.skipCloudPush && typeof window.scheduleShiftsCloudPush === 'function') {
           window.scheduleShiftsCloudPush();
         }
@@ -7908,6 +7943,7 @@
       try {
         localStorage.setItem(STORAGE_KEY_MEDS, JSON.stringify(medications));
         localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(medLogs));
+        if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
         return true;
       } catch (error) {
         console.error('No se pudieron guardar los datos de salud.', error);
@@ -9061,7 +9097,8 @@
         if (isCurrentMonth) {
           const medicationDoses = getDosesForMedDate(dateKey);
           const dayControls = getHealthControlsForDate(dateKey);
-          if (medicationDoses.length > 0 || dayControls.length > 0) {
+          const dayVehicles = (typeof getVehicleEventsForDate === 'function') ? getVehicleEventsForDate(dateKey) : [];
+          if (medicationDoses.length > 0 || dayControls.length > 0 || dayVehicles.length > 0) {
             const healthIndicators = document.createElement('div');
             healthIndicators.className = 'absolute bottom-1 left-1 flex items-center gap-1 z-20 pointer-events-none';
             if (medicationDoses.length > 0) {
@@ -9079,6 +9116,14 @@
               controlIndicator.setAttribute('aria-label', controlIndicator.title);
               controlIndicator.innerHTML = '<i class="fa-solid fa-house-medical"></i>';
               healthIndicators.appendChild(controlIndicator);
+            }
+            if (dayVehicles.length > 0) {
+              const vehicleIndicator = document.createElement('span');
+              vehicleIndicator.className = 'flex h-5 min-w-5 items-center justify-center rounded-md border border-white/70 bg-sky-500 px-1 text-[10px] font-black leading-none text-white shadow-md ring-1 ring-sky-950/60';
+              vehicleIndicator.title = dayVehicles.map(v => `${v.label}: ${v.vehicleName}`).join(' · ');
+              vehicleIndicator.setAttribute('aria-label', vehicleIndicator.title);
+              vehicleIndicator.textContent = '🚗';
+              healthIndicators.appendChild(vehicleIndicator);
             }
             cell.appendChild(healthIndicators);
           }
@@ -9191,7 +9236,8 @@
 
           const hasMedicationDoses = getDosesForMedDate(dKey).length > 0;
           const hasHealthControls = getHealthControlsForDate(dKey).length > 0;
-          if (hasMedicationDoses || hasHealthControls) {
+          const hasVehicleEvents = (typeof getVehicleEventsForDate === 'function') && getVehicleEventsForDate(dKey).length > 0;
+          if (hasMedicationDoses || hasHealthControls || hasVehicleEvents) {
             const healthIndicators = document.createElement('span');
             healthIndicators.className = 'absolute bottom-0.5 flex items-center gap-0.5';
             if (hasMedicationDoses) {
@@ -9205,6 +9251,12 @@
               controlDot.className = 'h-2.5 w-2.5 rounded-full border border-white bg-indigo-400 shadow-sm ring-1 ring-indigo-950';
               controlDot.title = 'Control de salud';
               healthIndicators.appendChild(controlDot);
+            }
+            if (hasVehicleEvents) {
+              const vehicleDot = document.createElement('span');
+              vehicleDot.className = 'h-2.5 w-2.5 rounded-full border border-white bg-sky-400 shadow-sm ring-1 ring-sky-950';
+              vehicleDot.title = 'Vencimiento de vehículo';
+              healthIndicators.appendChild(vehicleDot);
             }
             dayCell.appendChild(healthIndicators);
           }
@@ -10087,6 +10139,7 @@
       const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       const scheduledDoses = getDosesForMedDate(selectedDateKey);
       const scheduledControls = getHealthControlsForDate(selectedDateKey);
+      const scheduledVehicles = (typeof getVehicleEventsForDate === 'function') ? getVehicleEventsForDate(selectedDateKey) : [];
       const dayHoliday = getHolidayForDateKey(selectedDateKey);
       updatePasteNoteButton();
 
@@ -10134,7 +10187,7 @@
         container.appendChild(holidayItem);
       }
 
-      if (visibleNotes.length === 0 && scheduledDoses.length === 0 && scheduledControls.length === 0 && !dayHoliday) {
+      if (visibleNotes.length === 0 && scheduledDoses.length === 0 && scheduledControls.length === 0 && scheduledVehicles.length === 0 && !dayHoliday) {
         container.innerHTML = `
           <div class="text-center py-6 text-slate-400 text-xs italic bg-slate-900/50 rounded-lg border border-slate-800">
             ${getDayMarker(currentModalNotes) ? `Este día está marcado como ${escapeHtml((getDayMarker(currentModalNotes).title || DAY_MARKER_TYPES[getDayMarkerType(getDayMarker(currentModalNotes))].title).toLowerCase())}.` : 'No hay notas asignadas para este día.'}
@@ -10315,6 +10368,39 @@
             <i class="fa-solid ${isAttended ? 'fa-circle-check text-emerald-400' : 'fa-circle text-white'}"></i>
             <span>${isAttended ? 'Realizado' : 'Marcar'}</span>
           </button>
+        `;
+        container.appendChild(item);
+      });
+
+      scheduledVehicles.forEach(veh => {
+        const item = document.createElement('div');
+        item.className = 'bg-slate-900 p-2.5 rounded-lg border border-sky-800/60 hover:border-sky-500/70 flex items-center justify-between gap-2 shadow-sm cursor-pointer transition-colors';
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', `Vehículo ${veh.vehicleName}: ${veh.label}`);
+        const openVehEdit = () => {
+          closeDayDetailModal();
+          if (typeof openVehicleModal === 'function') openVehicleModal(veh.vehicleId);
+        };
+        item.onclick = openVehEdit;
+        item.onkeydown = event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openVehEdit();
+          }
+        };
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <span class="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sm shrink-0">🚗</span>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-xs text-slate-100 truncate">${escapeHtml(veh.label)}</span>
+                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">VEHÍCULO</span>
+              </div>
+              <span class="text-[10px] text-sky-200 font-semibold mt-0.5 truncate">${escapeHtml(veh.vehicleName)}${veh.plate ? ` · ${escapeHtml(veh.plate)}` : ''}</span>
+            </div>
+          </div>
+          <button type="button" onclick="event.stopPropagation(); renewVehicleItemOneYear(${jsArg(veh.vehicleId)}, ${jsArg(veh.field)}); openDayDetailModal();" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 font-bold text-[10px] transition-all active:scale-95">✓ +1 año</button>
         `;
         container.appendChild(item);
       });
@@ -10818,17 +10904,41 @@
 
     function setSummaryMode(mode) {
       summaryMode = mode;
-      document.querySelectorAll('#summary-mode-month, #summary-mode-year, #summary-mode-all').forEach(btn => {
-        btn.className = "py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all";
+      document.querySelectorAll('#summary-mode-month, #summary-mode-year, #summary-mode-all, #summary-mode-vehicles').forEach(btn => {
+        btn.className = "py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all";
+        btn.setAttribute('aria-selected', 'false');
       });
-      document.getElementById(`summary-mode-${mode}`).className = "py-1.5 text-xs font-bold rounded-md bg-slate-600 text-white transition-all shadow";
+      const activeBtn = document.getElementById(`summary-mode-${mode}`);
+      if (activeBtn) {
+        activeBtn.className = "py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white transition-all shadow";
+        activeBtn.setAttribute('aria-selected', 'true');
+      }
       renderSummaryView();
     }
 
     function renderSummaryView() {
       summaryCategory = 'labels';
-      const bannerTitle = document.getElementById('summary-period-title');
+      const navBanner = document.getElementById('summary-nav-banner');
+      const tableHeader = document.getElementById('summary-table-header');
       const breakdownContainer = document.getElementById('summary-stats-breakdown');
+      const globalFooter = document.getElementById('summary-global-footer');
+      const nearbyCard = document.getElementById('nearby-notes-card');
+      const vehiclesContainer = document.getElementById('vehicles-list-container');
+
+      const isVehiclesMode = summaryMode === 'vehicles';
+      if (navBanner) navBanner.classList.toggle('hidden', isVehiclesMode);
+      if (tableHeader) tableHeader.classList.toggle('hidden', isVehiclesMode);
+      if (breakdownContainer) breakdownContainer.classList.toggle('hidden', isVehiclesMode);
+      if (globalFooter) globalFooter.classList.toggle('hidden', isVehiclesMode);
+      if (nearbyCard) nearbyCard.classList.toggle('hidden', isVehiclesMode);
+      if (vehiclesContainer) vehiclesContainer.classList.toggle('hidden', !isVehiclesMode);
+
+      if (isVehiclesMode) {
+        if (typeof renderVehiclesView === 'function') renderVehiclesView();
+        return;
+      }
+
+      const bannerTitle = document.getElementById('summary-period-title');
       const headerName = document.getElementById('summary-header-name');
       const headerTime = document.getElementById('summary-header-time');
       if (headerName) {
@@ -11882,6 +11992,7 @@
       applyTabVisibility();
       updateStorageStatus();
       if (typeof syncUndoSafetyBackupButton === 'function') syncUndoSafetyBackupButton();
+      if (typeof window.updateNativeAlarmsStatusUI === 'function') window.updateNativeAlarmsStatusUI();
       document.getElementById('settings-modal').classList.remove('hidden');
       document.getElementById('settings-modal').classList.add('flex');
       const settingsBody = document.querySelector('#settings-modal .overflow-y-auto');
@@ -11938,7 +12049,8 @@
           holidaysEnabled: holidaysEnabled,
           tabVisibility: tabVis,
           gcalExportPrefs: typeof getGoogleCalExportPrefs === 'function' ? getGoogleCalExportPrefs() : undefined,
-          babyCloudSync: btCloudCfg
+          babyCloudSync: btCloudCfg,
+          vehicles: (() => { try { return JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]'); } catch (e) { return []; } })()
         }
       };
     }
@@ -11979,6 +12091,10 @@
         }
         if (settingsObj.babyCloudSync && typeof settingsObj.babyCloudSync === 'object' && settingsObj.babyCloudSync.dbUrl && settingsObj.babyCloudSync.roomCode) {
           localStorage.setItem('cal_baby_cloud_sync_v1', JSON.stringify(settingsObj.babyCloudSync));
+        }
+        if (Array.isArray(settingsObj.vehicles)) {
+          localStorage.setItem('cal_vehicles_v1', JSON.stringify(settingsObj.vehicles));
+          if (typeof renderVehiclesView === 'function') renderVehiclesView();
         }
       } catch (e) {}
     }
@@ -15822,6 +15938,7 @@
         }
         if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
         if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
+        if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
         if (!options.skipCloudPush && typeof scheduleBabyCloudPush === 'function') {
           scheduleBabyCloudPush();
         }
@@ -20412,6 +20529,8 @@
       const MODALS = {
         'year-picker-modal': { label: 'Seleccionar año', close: () => window.closeYearPicker && window.closeYearPicker() },
         'birthday-detail-modal': { label: 'Detalle de cumpleaños', close: () => window.closeBirthdayDetails && window.closeBirthdayDetails() },
+        'shiftsCloudSyncModal': { label: 'Sincronización de turnos', close: () => window.closeShiftsCloudSyncModal && window.closeShiftsCloudSyncModal() },
+        'vehicle-form-modal': { label: 'Vehículo', close: () => window.closeVehicleModal && window.closeVehicleModal() },
         'day-detail-modal': { label: 'Detalle del día', close: () => window.closeDayDetailModal && window.closeDayDetailModal() },
         'healthRegistrationChooser': { label: 'Registrar en salud', close: () => window.closeHealthRegistrationChooser && window.closeHealthRegistrationChooser() },
         'healthControlModal': { label: 'Control de salud', close: () => window.closeHealthControlForm && window.closeHealthControlForm() },
@@ -20610,7 +20729,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.5';
+      const OMNITASK_APP_VERSION = '1.1.6';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -20966,6 +21085,600 @@
       } else {
         startShiftsCloudListener();
       }
+    })();
+  </script>
+
+  <!-- MODAL AGREGAR / EDITAR VEHÍCULO -->
+  <div id="vehicle-form-modal" class="fixed inset-0 z-[90] bg-slate-950/85 backdrop-blur-sm hidden items-center justify-center p-4" onclick="if(event.target===this) closeVehicleModal()">
+    <section class="w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-sky-500/50 bg-[#1e293b] p-4 text-slate-100 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+        <h3 id="vehicle-modal-title" class="font-extrabold text-sm text-sky-300 flex items-center gap-2"><span>🚗</span> Nuevo Vehículo</h3>
+        <button type="button" onclick="closeVehicleModal()" aria-label="Cerrar" class="p-1.5 text-slate-400 hover:text-white rounded-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="vehicleForm" onsubmit="saveVehicleForm(event)" class="space-y-2.5">
+        <input type="hidden" id="veh-edit-id">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="veh-name" class="block text-[11px] font-semibold text-slate-300 mb-1">Nombre / Alias</label>
+            <input type="text" id="veh-name" required placeholder="Ej. Auto Familiar" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-bold focus:outline-none focus:border-sky-400">
+          </div>
+          <div>
+            <label for="veh-plate" class="block text-[11px] font-semibold text-slate-300 mb-1">Patente (calcula mes PRT)</label>
+            <input type="text" id="veh-plate" oninput="autoCalcVehiclePrtFromPlate()" placeholder="Ej. ABCD-18" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs text-slate-100 font-mono uppercase font-bold focus:outline-none focus:border-sky-400">
+          </div>
+        </div>
+        <div id="veh-prt-hint" class="hidden text-[10px] text-sky-300 bg-sky-950/50 border border-sky-500/30 rounded-lg px-2.5 py-1.5"></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="veh-prt-date" class="block text-[11px] font-semibold text-slate-300 mb-1">Revisión Técnica</label>
+            <input type="date" id="veh-prt-date" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          </div>
+          <div>
+            <label for="veh-permiso-date" class="block text-[11px] font-semibold text-slate-300 mb-1">Permiso Circulación</label>
+            <input type="date" id="veh-permiso-date" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="veh-soap-date" class="block text-[11px] font-semibold text-slate-300 mb-1">Vencimiento SOAP</label>
+            <input type="date" id="veh-soap-date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          </div>
+          <div>
+            <label for="veh-oil-date" class="block text-[11px] font-semibold text-slate-300 mb-1">Cambio Aceite (opcional)</label>
+            <input type="date" id="veh-oil-date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+          </div>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeVehicleModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Cancelar</button>
+          <button type="submit" class="flex-1 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold shadow-lg">Guardar Vehículo</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    // MÓDULO VEHÍCULOS Y VENCIMIENTOS ANUALES (Chile: Revisión Técnica por dígito, Permiso Circulación, SOAP y Mantención)
+    (function () {
+      const VEHICLES_KEY = 'cal_vehicles_v1';
+      // Calendario oficial MTT Chile según último dígito de patente (0-9 -> mes 1-12)
+      const PRT_DIGIT_MONTH = { '9': 1, '0': 2, '1': 4, '2': 5, '3': 6, '4': 7, '5': 8, '6': 9, '7': 10, '8': 11 };
+      const PRT_MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+      window.getVehicleEventsForDate = function (dateKey) {
+        if (!dateKey) return [];
+        const list = loadVehicles();
+        const events = [];
+        list.forEach(v => {
+          [
+            { field: 'prtDate', label: 'Revisión Técnica' },
+            { field: 'permisoDate', label: 'Permiso de Circulación' },
+            { field: 'soapDate', label: 'SOAP' },
+            { field: 'oilDate', label: 'Cambio de Aceite' }
+          ].forEach(it => {
+            if (v[it.field] === dateKey) {
+              events.push({
+                vehicleId: v.id,
+                vehicleName: v.name || 'Vehículo',
+                plate: v.plate || '',
+                field: it.field,
+                label: it.label,
+                date: dateKey
+              });
+            }
+          });
+        });
+        return events;
+      };
+
+      function refreshCalendarAfterVehicleChange() {
+        if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
+        if (typeof renderYearView === 'function') renderYearView();
+      }
+
+      function loadVehicles() {
+        try {
+          const arr = JSON.parse(localStorage.getItem(VEHICLES_KEY) || '[]');
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+
+      function saveVehicles(list) {
+        try { localStorage.setItem(VEHICLES_KEY, JSON.stringify(list)); } catch (e) { if (typeof showToast === 'function') showToast('Error al guardar', 'No hay espacio suficiente en el almacenamiento local.', 'fa-triangle-exclamation', 'text-rose-400'); }
+      }
+
+      function nextDateForMonthEnd(monthNum) {
+        const now = new Date();
+        let yr = now.getFullYear();
+        const curM = now.getMonth() + 1;
+        if (curM > monthNum) yr += 1;
+        const lastDay = new Date(yr, monthNum, 0).getDate();
+        return `${yr}-${String(monthNum).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      }
+
+      function daysUntilDate(dateStr) {
+        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const target = new Date(y, m - 1, d);
+        return Math.round((target - today) / 86400000);
+      }
+
+      function badgeForDays(days) {
+        if (days === null) return { text: 'Sin fecha', cls: 'bg-slate-800 text-slate-400 border-slate-700' };
+        if (days < 0) return { text: `Vencido hace ${Math.abs(days)}d`, cls: 'bg-rose-950/80 text-rose-300 border-rose-500/50' };
+        if (days === 0) return { text: 'Vence HOY', cls: 'bg-rose-950/80 text-rose-300 border-rose-500/50' };
+        if (days <= 30) return { text: `En ${days} días`, cls: 'bg-amber-950/70 text-amber-300 border-amber-500/50' };
+        return { text: `Al día (${days}d)`, cls: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40' };
+      }
+
+      window.autoCalcVehiclePrtFromPlate = function () {
+        const plate = (document.getElementById('veh-plate')?.value || '').trim().toUpperCase();
+        const hint = document.getElementById('veh-prt-hint');
+        const prtInput = document.getElementById('veh-prt-date');
+        const digits = plate.match(/\d/g);
+        const lastDigit = digits && digits.length ? digits[digits.length - 1] : null;
+        if (lastDigit !== null && PRT_DIGIT_MONTH[lastDigit]) {
+          const m = PRT_DIGIT_MONTH[lastDigit];
+          if (prtInput && !document.getElementById('veh-edit-id')?.value) {
+            prtInput.value = nextDateForMonthEnd(m);
+          }
+          if (hint) {
+            hint.textContent = `Dígito ${lastDigit}: Revisión Técnica oficial en ${PRT_MONTH_NAMES[m]}.`;
+            hint.classList.remove('hidden');
+          }
+        } else if (hint) {
+          hint.classList.add('hidden');
+        }
+      };
+
+      window.openVehicleModal = function (id = null) {
+        const modal = document.getElementById('vehicle-form-modal');
+        if (!modal) return;
+        const list = loadVehicles();
+        const item = id ? list.find(v => v.id === id) : null;
+        document.getElementById('vehicle-modal-title').innerHTML = item
+          ? '<i class="fa-solid fa-car"></i> Editar Vehículo'
+          : '<i class="fa-solid fa-car"></i> Nuevo Vehículo';
+        document.getElementById('veh-edit-id').value = item ? item.id : '';
+        document.getElementById('veh-name').value = item ? item.name : '';
+        document.getElementById('veh-plate').value = item ? item.plate : '';
+        document.getElementById('veh-prt-date').value = item ? (item.prtDate || '') : '';
+        document.getElementById('veh-permiso-date').value = item ? (item.permisoDate || '') : '';
+        document.getElementById('veh-soap-date').value = item ? (item.soapDate || '') : '';
+        document.getElementById('veh-oil-date').value = item ? (item.oilDate || '') : '';
+        window.autoCalcVehiclePrtFromPlate();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
+
+      window.closeVehicleModal = function () {
+        const modal = document.getElementById('vehicle-form-modal');
+        if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+      };
+
+      window.saveVehicleForm = function (e) {
+        if (e) e.preventDefault();
+        const id = document.getElementById('veh-edit-id').value || ('veh_' + Date.now());
+        const name = (document.getElementById('veh-name').value || '').trim();
+        const plate = (document.getElementById('veh-plate').value || '').trim().toUpperCase();
+        const prtDate = document.getElementById('veh-prt-date').value || '';
+        const permisoDate = document.getElementById('veh-permiso-date').value || '';
+        const soapDate = document.getElementById('veh-soap-date').value || '';
+        const oilDate = document.getElementById('veh-oil-date').value || '';
+        if (!name || !prtDate || !permisoDate) return;
+
+        const list = loadVehicles();
+        const idx = list.findIndex(v => v.id === id);
+        const obj = { id, name, plate, prtDate, permisoDate, soapDate, oilDate };
+        if (idx >= 0) list[idx] = obj;
+        else list.push(obj);
+        saveVehicles(list); if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
+        closeVehicleModal();
+        renderVehiclesView();
+        refreshCalendarAfterVehicleChange();
+        showToast('Vehículo guardado', `"${name}" actualizado con sus vencimientos.`, 'fa-car', 'text-sky-400');
+      };
+
+      window.renewVehicleItemOneYear = function (id, field) {
+        const list = loadVehicles();
+        const v = list.find(x => x.id === id);
+        if (!v || !v[field] || !/^\d{4}-\d{2}-\d{2}$/.test(v[field])) return;
+        const [y, m, d] = v[field].split('-').map(Number);
+        const nextY = y + 1;
+        const maxD = new Date(nextY, m, 0).getDate();
+        v[field] = `${nextY}-${String(m).padStart(2, '0')}-${String(Math.min(d, maxD)).padStart(2, '0')}`;
+        saveVehicles(list); if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
+        renderVehiclesView();
+        refreshCalendarAfterVehicleChange();
+        showToast('Renovado +1 año', 'Se actualizó el próximo vencimiento.', 'fa-circle-check', 'text-emerald-400');
+      };
+
+      window.deleteVehicleItem = function (id) {
+        const current = loadVehicles().find(v => v.id === id);
+        if (!current) return;
+        const doDelete = () => {
+          const list = loadVehicles().filter(v => v.id !== id);
+          saveVehicles(list);
+          if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
+          renderVehiclesView();
+          refreshCalendarAfterVehicleChange();
+          showToast('Vehículo eliminado', 'Se quitó de tu lista.', 'fa-trash-can', 'text-amber-400');
+        };
+        if (typeof showConfirmModal === 'function') {
+          showConfirmModal('Eliminar vehículo', `¿Deseas eliminar "${current.name}" y sus vencimientos?`, doDelete);
+        } else {
+          doDelete();
+        }
+      };
+
+      window.exportVehicleRemindersToCalendar = function (id) {
+        const v = loadVehicles().find(x => x.id === id);
+        if (!v) return;
+        const items = [
+          { title: `Revisión Técnica · ${v.name}${v.plate ? ' (' + v.plate + ')' : ''}`, date: v.prtDate },
+          { title: `Permiso de Circulación · ${v.name}${v.plate ? ' (' + v.plate + ')' : ''}`, date: v.permisoDate },
+          { title: `SOAP · ${v.name}${v.plate ? ' (' + v.plate + ')' : ''}`, date: v.soapDate },
+          { title: `Cambio de Aceite · ${v.name}${v.plate ? ' (' + v.plate + ')' : ''}`, date: v.oilDate }
+        ].filter(it => it.date && /^\d{4}-\d{2}-\d{2}$/.test(it.date));
+
+        if (items.length === 0) return;
+        const lines = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//OmniTask//Vehiculos//ES',
+          'CALSCALE:GREGORIAN',
+          'METHOD:PUBLISH'
+        ];
+        items.forEach((it, idx) => {
+          const compact = it.date.replace(/-/g, '');
+          lines.push(
+            'BEGIN:VEVENT',
+            `UID:veh-${encodeURIComponent(v.id)}-${idx}-${compact}@omnitask`,
+            `DTSTART;VALUE=DATE:${compact}`,
+            `SUMMARY:${typeof escapeIcsText === 'function' ? escapeIcsText(it.title) : it.title}`,
+            'DESCRIPTION:Recordatorio anual generado por OmniTask',
+            'BEGIN:VALARM',
+            'ACTION:DISPLAY',
+            `DESCRIPTION:${typeof escapeIcsText === 'function' ? escapeIcsText(it.title) : it.title}`,
+            'TRIGGER:-P15D',
+            'END:VALARM',
+            'BEGIN:VALARM',
+            'ACTION:DISPLAY',
+            `DESCRIPTION:${typeof escapeIcsText === 'function' ? escapeIcsText(it.title) : it.title}`,
+            'TRIGGER:-P3D',
+            'END:VALARM',
+            'END:VEVENT'
+          );
+        });
+        lines.push('END:VCALENDAR');
+        const ics = lines.join('\r\n') + '\r\n';
+        if (typeof deliverIcsFileToUser === 'function') {
+          deliverIcsFileToUser(ics, `omnitask_vehiculo_${v.plate || 'auto'}.ics`, `Alarmas de "${v.name}" enviadas a tu Calendario.`);
+        }
+      };
+
+      window.renderVehiclesView = function () {
+        const container = document.getElementById('vehicles-list-container');
+        if (!container) return;
+        const list = loadVehicles();
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-6 text-slate-400 text-xs space-y-1.5 bg-slate-900/50 rounded-xl border border-slate-800/80 px-4">
+              <i class="fa-solid fa-car text-sky-400/80 text-xl mb-1"></i>
+              <p class="font-bold text-slate-200">No hay vehículos registrados</p>
+              <p class="text-[11px] text-slate-400">Agrega uno desde <span class="text-teal-400 font-bold">+ Nota</span> en el tipo de evento <span class="text-sky-300 font-bold">Vehículo</span>.</p>
+            </div>
+          `;
+          return;
+        }
+        container.innerHTML = list.map(v => {
+          const rows = [
+            { label: 'Revisión Técnica', field: 'prtDate', date: v.prtDate },
+            { label: 'Permiso de Circulación', field: 'permisoDate', date: v.permisoDate },
+            ...(v.soapDate ? [{ label: 'SOAP', field: 'soapDate', date: v.soapDate }] : []),
+            ...(v.oilDate ? [{ label: 'Cambio de Aceite', field: 'oilDate', date: v.oilDate }] : [])
+          ].map(r => {
+            const b = badgeForDays(daysUntilDate(r.date));
+            return `<div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div class="min-w-0">
+                <span class="block text-[11px] font-bold text-slate-200">${escapeHtml(r.label)}</span>
+                <span class="block text-[10px] text-slate-400 font-mono">${escapeHtml(r.date)}</span>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.cls}">${escapeHtml(b.text)}</span>
+                <button type="button" onclick="renewVehicleItemOneYear('${escapeHtml(v.id)}','${r.field}')" title="Marcar realizado y avanzar +1 año" class="px-2 py-1 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold">✓ +1 año</button>
+              </div>
+            </div>`;
+          }).join('');
+
+          return `<div class="bg-[#1e2733] p-3 rounded-2xl border border-slate-700/70 shadow-lg space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 flex items-center justify-center text-base shrink-0">🚗</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-sm text-slate-100 truncate">${escapeHtml(v.name)}</h4>
+                  ${v.plate ? `<span class="text-[10px] font-mono font-bold text-sky-300 bg-sky-950/60 px-1.5 py-0.5 rounded">${escapeHtml(v.plate)}</span>` : ''}
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="openVehicleModal('${escapeHtml(v.id)}')" aria-label="Editar" class="p-1.5 text-slate-300 hover:text-sky-300 rounded-lg text-xs">✏️</button>
+                <button type="button" onclick="deleteVehicleItem('${escapeHtml(v.id)}')" aria-label="Eliminar" class="p-1.5 text-slate-300 hover:text-rose-400 rounded-lg text-xs">🗑️</button>
+              </div>
+            </div>
+            <div class="space-y-1.5">${rows}</div>
+          </div>`;
+        }).join('');
+      };
+    })();
+  </script>
+
+  <script>
+    // PROGRAMADOR DE ALARMAS NATIVAS ANDROID (AlarmManager + OmniTaskAlarmReceiver)
+    (function () {
+      function hashAlarmId(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (Math.abs(h) % 900000) + 10000;
+      }
+
+      let pendingNotifAction = null;
+      let autoAlarmRefreshTimer = null;
+
+      window.scheduleAutoNativeAlarmsRefresh = function () {
+        try {
+          if (localStorage.getItem('cal_native_alarms_enabled_v1') !== '1') return;
+        } catch (e) { return; }
+        if (autoAlarmRefreshTimer) clearTimeout(autoAlarmRefreshTimer);
+        autoAlarmRefreshTimer = setTimeout(() => {
+          if (typeof window.syncAllUpcomingNativeAlarms === 'function') {
+            window.syncAllUpcomingNativeAlarms({ silent: true });
+          }
+        }, 1200);
+      };
+
+      window.updateNativeAlarmsStatusUI = function () {
+        const badge = document.getElementById('native-alarms-count-badge');
+        const permEl = document.getElementById('native-alarms-perm-label');
+        const autoEl = document.getElementById('native-alarms-auto-label');
+        if (!badge && !permEl && !autoEl) return;
+
+        const isAndroidNative = !!(window.OmniTaskNative && typeof window.OmniTaskNative.scheduleNativeAlarm === 'function');
+        let enabled = false;
+        let lastCount = 0;
+        try {
+          enabled = localStorage.getItem('cal_native_alarms_enabled_v1') === '1';
+          lastCount = parseInt(localStorage.getItem('cal_native_alarms_count_v1') || '0', 10) || 0;
+        } catch (e) {}
+
+        if (permEl) {
+          if (!isAndroidNative) {
+            permEl.textContent = '📱 Disponible en app Android';
+            permEl.className = 'text-slate-400 font-semibold';
+          } else {
+            const hasPerm = typeof window.OmniTaskNative.hasNotificationPermission === 'function'
+              ? !!window.OmniTaskNative.hasNotificationPermission()
+              : true;
+            permEl.textContent = hasPerm ? '🔔 Permiso activo' : '⚠️ Permiso sin conceder';
+            permEl.className = hasPerm ? 'text-emerald-300 font-bold' : 'text-amber-300 font-bold';
+          }
+        }
+        if (autoEl) {
+          autoEl.textContent = enabled ? 'Auto: activo' : 'Auto: apagado';
+          autoEl.className = enabled ? 'text-emerald-300 font-bold' : 'text-slate-400 font-semibold';
+        }
+        if (badge) {
+          if (!enabled) {
+            badge.textContent = 'Desactivadas';
+            badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700';
+          } else {
+            badge.textContent = `${lastCount} ${lastCount === 1 ? 'alerta activa' : 'alertas activas'}`;
+            badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40';
+          }
+        }
+      };
+
+      window.onOmniTaskNotifPermissionResult = function (granted) {
+        const act = pendingNotifAction;
+        pendingNotifAction = null;
+        window.updateNativeAlarmsStatusUI();
+        if (!granted) {
+          showToast('Permiso denegado', 'Activa las Notificaciones en Ajustes del teléfono para recibir alarmas.', 'fa-triangle-exclamation', 'text-rose-400');
+          return;
+        }
+        if (act === 'test10s') window.testNativeAlarm10s();
+        else if (act === 'syncAll') window.syncAllUpcomingNativeAlarms();
+      };
+
+      function ensureNotifPermissionOrDefer(actionName) {
+        if (window.OmniTaskNative && typeof window.OmniTaskNative.hasNotificationPermission === 'function') {
+          if (!window.OmniTaskNative.hasNotificationPermission()) {
+            pendingNotifAction = actionName;
+            if (typeof window.OmniTaskNative.requestNotificationPermission === 'function') {
+              window.OmniTaskNative.requestNotificationPermission();
+            }
+            return false;
+          }
+        }
+        return true;
+      }
+
+      window.testNativeAlarm10s = function () {
+        if (!(window.OmniTaskNative && typeof window.OmniTaskNative.scheduleNativeAlarm === 'function')) {
+          showToast('Solo en Android APK', 'La alarma nativa con app cerrada funciona dentro de la app instalada en Android.', 'fa-circle-info', 'text-amber-400');
+          return;
+        }
+        if (!ensureNotifPermissionOrDefer('test10s')) return;
+        const triggerMs = Date.now() + 10000;
+        const ok = window.OmniTaskNative.scheduleNativeAlarm(
+          99901,
+          '🔔 Prueba de Alarma OmniTask',
+          '¡Funcionó! La alerta sonó con el sistema nativo de Android.',
+          triggerMs
+        );
+        if (ok) {
+          showToast('Alarma en 10 segundos', 'Cierra OmniTask por completo y bloquea la pantalla para probarla.', 'fa-bell', 'text-amber-400');
+        } else {
+          showToast('No se pudo programar', 'Verifica que las notificaciones estén activadas en tu teléfono.', 'fa-triangle-exclamation', 'text-rose-400');
+        }
+      };
+
+      window.disableAllNativeAlarms = function () {
+        try {
+          localStorage.setItem('cal_native_alarms_enabled_v1', '0');
+          localStorage.setItem('cal_native_alarms_count_v1', '0');
+        } catch (e) {}
+        if (window.OmniTaskNative && typeof window.OmniTaskNative.cancelAllNativeAlarms === 'function') {
+          window.OmniTaskNative.cancelAllNativeAlarms();
+        }
+        window.updateNativeAlarmsStatusUI();
+        showToast('Alarmas canceladas', 'Se desactivaron todas las alarmas nativas programadas.', 'fa-bell-slash', 'text-amber-400');
+      };
+
+      window.syncAllUpcomingNativeAlarms = function (opts = {}) {
+        const silent = !!(opts && opts.silent);
+        if (!(window.OmniTaskNative && typeof window.OmniTaskNative.scheduleNativeAlarm === 'function')) {
+          if (!silent) showToast('Solo en Android APK', 'Disponible en la versión Android instalada desde Play Store.', 'fa-circle-info', 'text-amber-400');
+          return;
+        }
+        if (!silent && !ensureNotifPermissionOrDefer('syncAll')) return;
+        if (silent && window.OmniTaskNative.hasNotificationPermission && !window.OmniTaskNative.hasNotificationPermission()) return;
+        try { localStorage.setItem('cal_native_alarms_enabled_v1', '1'); } catch (e) {}
+        if (typeof window.OmniTaskNative.cancelAllNativeAlarms === 'function') {
+          window.OmniTaskNative.cancelAllNativeAlarms();
+        }
+        let count = 0;
+        const now = Date.now();
+        const horizonMs = now + 30 * 86400000;
+
+        // 1. Turnos, Eventos/Cumpleaños y Notas con hora (próximos 30 días)
+        try {
+          if (typeof dayDataMap === 'object' && dayDataMap) {
+            Object.entries(dayDataMap).forEach(([dk, arr]) => {
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(dk) || !Array.isArray(arr)) return;
+              const [y, m, d] = dk.split('-').map(Number);
+              arr.forEach(item => {
+                if (!item) return;
+                // 1A. Turnos (30 min antes)
+                if (item.isShift && !item.shiftStatus && item.shiftStart) {
+                  const [hh, mm] = String(item.shiftStart).split(':').map(Number);
+                  if (Number.isFinite(hh) && Number.isFinite(mm)) {
+                    const ts = new Date(y, m - 1, d, hh, mm, 0).getTime() - (30 * 60000);
+                    if (ts > now && ts <= horizonMs) {
+                      const id = hashAlarmId(`shift_${dk}_${item.id || item.shiftStart}`);
+                      if (window.OmniTaskNative.scheduleNativeAlarm(id, `Turno: ${item.title || item.shiftType || 'Turno'}`, `Comienza a las ${item.shiftStart} hrs.`, ts)) count++;
+                    }
+                  }
+                  return;
+                }
+                // 1B. Cumpleaños, Aniversarios y Eventos (09:00 AM del día)
+                const isEvt = !!(item.isBirthday || item.isEvent || (Array.isArray(item.eventTypes) && item.eventTypes.length > 0));
+                if (isEvt) {
+                  const ts = new Date(y, m - 1, d, 9, 0, 0).getTime();
+                  if (ts > now && ts <= horizonMs) {
+                    const emoji = item.isBirthday ? '🎂' : '🥂';
+                    const title = item.title || item.text || 'Evento';
+                    const id = hashAlarmId(`evt_${dk}_${item.id || title}`);
+                    if (window.OmniTaskNative.scheduleNativeAlarm(id, `${emoji} ${title}`, `Hoy ${dk}`, ts)) count++;
+                  }
+                  return;
+                }
+                // 1C. Notas con hora (15 min antes, o a la hora exacta si falta menos de 15 min)
+                if (!item.isShift && !item.isDayMarker && !item.isDayOff && item.noteTime) {
+                  const [hh, mm] = String(item.noteTime).split(':').map(Number);
+                  if (Number.isFinite(hh) && Number.isFinite(mm)) {
+                    const exactTs = new Date(y, m - 1, d, hh, mm, 0).getTime();
+                    const ts = (exactTs - 15 * 60000) > now ? (exactTs - 15 * 60000) : exactTs;
+                    if (ts > now && ts <= horizonMs) {
+                      const title = item.title || item.text || 'Nota';
+                      const id = hashAlarmId(`note_${dk}_${item.id || item.noteTime}`);
+                      if (window.OmniTaskNative.scheduleNativeAlarm(id, `🗒 ${title}`, `Programada a las ${item.noteTime} hrs.`, ts)) count++;
+                    }
+                  }
+                }
+              });
+            });
+          }
+        } catch (e) {}
+
+        // 2. Controles de Salud próximos 7 días (aviso 2 horas antes)
+        try {
+          if (typeof getAllUnifiedHealthControls === 'function') {
+            getAllUnifiedHealthControls(true).forEach(ctrl => {
+              if (!ctrl || !ctrl.date || ctrl.attended) return;
+              const [y, m, d] = ctrl.date.split('-').map(Number);
+              const [hh, mm] = String(ctrl.time || '09:00').split(':').map(Number);
+              const ts = new Date(y, m - 1, d, hh || 9, mm || 0, 0).getTime() - (2 * 3600000);
+              if (ts > now && ts <= horizonMs) {
+                const id = hashAlarmId(`ctrl_${ctrl.id || ctrl.date}`);
+                if (window.OmniTaskNative.scheduleNativeAlarm(id, `Control: ${ctrl.person || ctrl.name}`, `Cita a las ${ctrl.time || '09:00'}${ctrl.location ? ' · ' + ctrl.location : ''}`, ts)) count++;
+              }
+            });
+          }
+        } catch (e) {}
+
+        // 3. Dosis de medicamentos hoy y próximos 3 días
+        try {
+          if (typeof getDosesForMedDate === 'function' && typeof formatDateKey === 'function') {
+            for (let offset = 0; offset <= 3; offset++) {
+              const dt = new Date(now + offset * 86400000);
+              const dk = formatDateKey(dt.getFullYear(), dt.getMonth(), dt.getDate());
+              getDosesForMedDate(dk, true).forEach(item => {
+                const [hh, mm] = String(item.time || '').split(':').map(Number);
+                if (!Number.isFinite(hh) || !Number.isFinite(mm)) return;
+                const ts = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), hh, mm, 0).getTime();
+                if (ts > now && ts <= horizonMs) {
+                  const id = hashAlarmId(`med_${dk}_${item.doseId}`);
+                  if (window.OmniTaskNative.scheduleNativeAlarm(id, `Medicina: ${item.med.name}`, `Dosis programada a las ${item.time} hrs.`, ts)) count++;
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 4. Vehículos próximos 7 días (aviso a las 09:00 AM el día y 3 días antes)
+        try {
+          const vList = JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]');
+          if (Array.isArray(vList)) {
+            vList.forEach(v => {
+              if (!v) return;
+              [
+                { lbl: 'Revisión Técnica', dt: v.prtDate },
+                { lbl: 'Permiso de Circulación', dt: v.permisoDate },
+                { lbl: 'SOAP', dt: v.soapDate },
+                { lbl: 'Cambio de Aceite', dt: v.oilDate }
+              ].forEach(it => {
+                if (!it.dt || !/^\d{4}-\d{2}-\d{2}$/.test(it.dt)) return;
+                const [y, m, d] = it.dt.split('-').map(Number);
+                const tsDay = new Date(y, m - 1, d, 9, 0, 0).getTime();
+                const ts3d = tsDay - (3 * 86400000);
+                [tsDay, ts3d].forEach((ts, idx) => {
+                  if (ts > now && ts <= horizonMs) {
+                    const id = hashAlarmId(`veh_${v.id}_${it.lbl}_${idx}`);
+                    if (window.OmniTaskNative.scheduleNativeAlarm(id, `🚗 ${it.lbl}: ${v.name}`, `${v.plate ? v.plate + ' · ' : ''}Vence el ${it.dt}`, ts)) count++;
+                  }
+                });
+              });
+            });
+          }
+        } catch (e) {}
+
+        try { localStorage.setItem('cal_native_alarms_count_v1', String(count)); } catch (e) {}
+        window.updateNativeAlarmsStatusUI();
+        if (!silent) showToast(count > 0 ? 'Alarmas programadas' : 'Sin alertas pendientes', count > 0 ? `Se activaron ${count} alertas nativas en Android (con actualización automática).` : 'No hay turnos, eventos, notas con hora, medicinas ni vencimientos próximos.', 'fa-bell', count > 0 ? 'text-emerald-400' : 'text-amber-400');
+      };
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          try {
+            if (localStorage.getItem('cal_native_alarms_enabled_v1') === '1') {
+              window.syncAllUpcomingNativeAlarms({ silent: true });
+            }
+          } catch (e) {}
+        }, 3500);
+      });
     })();
   </script>
 </body>

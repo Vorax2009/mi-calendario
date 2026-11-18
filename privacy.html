@@ -133,6 +133,7 @@
       <h2>3. Permisos y servicios externos</h2>
       <ul>
         <li><strong>Permiso de Calendario de Android (<code>READ_CALENDAR</code> y <code>WRITE_CALENDAR</code>) y Google Drive:</strong> Cuando el usuario pulsa voluntariamente <em>Exportar a Google Calendar</em>, la aplicación utiliza los permisos nativos de calendario de Android exclusivamente para insertar en el calendario del dispositivo los turnos, eventos, controles médicos, vacunas y recordatorios/alarmas de medicamentos seleccionados por el usuario (evitando duplicados), o bien generar un archivo estándar <code>.ics</code> / respaldo <code>.json</code> en Google Drive. OmniTask no lee, modifica ni transmite eventos ajenos a servidores externos.</li>
+        <li><strong>Notificaciones y alarmas locales (<code>POST_NOTIFICATIONS</code>):</strong> Si el usuario activa las alarmas nativas, OmniTask programa recordatorios localmente en el propio teléfono mediante el sistema operativo Android (sin servidores push externos).</li>
         <li><strong>Consulta opcional de feriados:</strong> La aplicación calcula los feriados localmente y puede consultar la API pública de feriados (<code>date.nager.at</code>) según el país seleccionado sin enviar identificadores personales.</li>
       </ul>
     </section>
