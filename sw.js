@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omnitask-pwa-v2026-11-17-v12';
+const CACHE_NAME = 'omnitask-pwa-v2026-11-17-v14';
 const OFFLINE_URL = './index.html';
 const APP_SHELL = [
   './',
