@@ -9,7 +9,6 @@
   "scope": "./",
   "display": "standalone",
   "display_override": [
-    "window-controls-overlay",
     "standalone",
     "minimal-ui"
   ],
@@ -24,72 +23,21 @@
     "utilities"
   ],
   "prefer_related_applications": false,
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario",
-      "id": "cl.vorax2009.micalendario"
-    }
-  ],
-  "scope_extensions": [
-    {
-      "origin": "https://vorax2009.github.io"
-    }
-  ],
-  "launch_handler": {
-    "client_mode": [
-      "navigate-existing",
-      "auto"
-    ]
-  },
-  "handle_links": "preferred",
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "note_taking": {
-    "new_note_url": "./?tab=notes"
-  },
-  "file_handlers": [
-    {
-      "action": "./",
-      "accept": {
-        "application/json": [
-          ".json"
-        ]
-      }
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+micalendario",
-      "url": "./?evento=%s"
-    }
-  ],
-  "share_target": {
-    "action": "./",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
   "icons": [
     {
-      "src": "./omnitask-icon-192.png?v=2",
+      "src": "./omnitask-icon-192.png?v=3",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./omnitask-icon-512.png?v=2",
+      "src": "./omnitask-icon-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./omnitask-icon-512.png?v=2",
+      "src": "./omnitask-icon-512.png?v=3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -147,7 +95,7 @@
       "url": "./?tab=calendar",
       "icons": [
         {
-          "src": "./omnitask-icon-192.png?v=2",
+          "src": "./omnitask-icon-192.png?v=3",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -160,7 +108,7 @@
       "url": "./?tab=turns",
       "icons": [
         {
-          "src": "./omnitask-icon-192.png?v=2",
+          "src": "./omnitask-icon-192.png?v=3",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -173,7 +121,7 @@
       "url": "./?tab=meds",
       "icons": [
         {
-          "src": "./omnitask-icon-192.png?v=2",
+          "src": "./omnitask-icon-192.png?v=3",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -186,7 +134,7 @@
       "url": "./?tab=baby",
       "icons": [
         {
-          "src": "./omnitask-icon-192.png?v=2",
+          "src": "./omnitask-icon-192.png?v=3",
           "sizes": "192x192",
           "type": "image/png"
         }

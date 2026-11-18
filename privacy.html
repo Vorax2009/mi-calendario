@@ -90,7 +90,7 @@
   <div class="container">
     <header>
       <h1>Política de Privacidad y Aviso Médico</h1>
-      <div class="meta">Aplicación: <strong>OmniTask (Calendario, Turnos, Salud y Bebé)</strong> &middot; Paquete Android: <code>cl.vorax2009.micalendario</code> &middot; Última actualización: 14 de noviembre de 2026</div>
+      <div class="meta">Aplicación: <strong>OmniTask (Calendario, Turnos, Salud y Bebé)</strong> &middot; Paquete Android: <code>cl.vorax2009.micalendario</code> &middot; Última actualización: 17 de noviembre de 2026</div>
     </header>
 
     <section class="card card-medical">
@@ -122,17 +122,17 @@
     <section class="card">
       <h2>2. Sincronización familiar opcional (Firebase Realtime Database)</h2>
       <p>
-        El módulo <strong>Bebé</strong> incluye una función opcional de sincronización familiar en tiempo real. Si el usuario decide activarla mediante un código de sala familiar, los registros del módulo Bebé se sincronizan a través de Google Firebase Realtime Database utilizando conexión cifrada HTTPS (TLS) únicamente para compartir el estado entre los cuidadores autorizados con dicho código.
+        Los módulos <strong>Bebé</strong> y <strong>Turnos</strong> incluyen una función opcional de sincronización familiar en tiempo real. Si el usuario decide activarla mediante un código de sala familiar, los registros del bebé y los turnos laborales compartidos se sincronizan a través de Google Firebase Realtime Database utilizando conexión cifrada HTTPS (TLS) únicamente para compartir el estado entre los dispositivos autorizados con dicho código.
       </p>
       <p>
-        Tus turnos laborales, notas personales del calendario y medicamentos del módulo general no se envían a la sala familiar a menos que decidas exportarlos o compartirlos manualmente mediante un archivo de respaldo JSON.
+        Tus notas personales del calendario y medicamentos del módulo general permanecen privados en tu celular y no se envían a la sala familiar a menos que decidas exportarlos o compartirlos manualmente mediante un archivo de respaldo JSON.
       </p>
     </section>
 
     <section class="card">
       <h2>3. Permisos y servicios externos</h2>
       <ul>
-        <li><strong>Notificaciones locales:</strong> Se utilizan únicamente si el usuario las autoriza en su dispositivo para recordar eventos, turnos o tomas de medicamentos.</li>
+        <li><strong>Permiso de Calendario de Android (<code>READ_CALENDAR</code> y <code>WRITE_CALENDAR</code>) y Google Drive:</strong> Cuando el usuario pulsa voluntariamente <em>Exportar a Google Calendar</em>, la aplicación utiliza los permisos nativos de calendario de Android exclusivamente para insertar en el calendario del dispositivo los turnos, eventos, controles médicos, vacunas y recordatorios/alarmas de medicamentos seleccionados por el usuario (evitando duplicados), o bien generar un archivo estándar <code>.ics</code> / respaldo <code>.json</code> en Google Drive. OmniTask no lee, modifica ni transmite eventos ajenos a servidores externos.</li>
         <li><strong>Consulta opcional de feriados:</strong> La aplicación calcula los feriados localmente y puede consultar la API pública de feriados (<code>date.nager.at</code>) según el país seleccionado sin enviar identificadores personales.</li>
       </ul>
     </section>
@@ -147,6 +147,13 @@
         <li><strong>Eliminación total:</strong> Puedes borrar de forma inmediata y permanente todos los registros guardados en el dispositivo desde <em>Ajustes y Respaldos &rarr; Zona de Peligro &rarr; Borrar Todos los Datos</em>, o desinstalando la aplicación.</li>
         <li><strong>Desconexión de sincronización familiar:</strong> Puedes desvincular o eliminar los datos de la sala familiar desde el panel de sincronización del módulo Bebé.</li>
       </ul>
+    </section>
+
+    <section class="card">
+      <h2>5. Contacto y soporte</h2>
+      <p>
+        Si tienes dudas sobre esta política de privacidad o deseas solicitar información sobre el manejo de tus datos en OmniTask, puedes escribirnos a: <a href="mailto:nobatek61@gmail.com" style="color:#38bdf8;">nobatek61@gmail.com</a>.
+      </p>
     </section>
 
     <a class="back-link" href="https://vorax2009.github.io/mi-calendario/">&larr; Volver a OmniTask</a>
