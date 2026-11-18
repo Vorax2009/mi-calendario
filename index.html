@@ -2892,6 +2892,9 @@
             <span id="native-alarms-perm-label" class="text-slate-400 font-semibold">Permiso: verificando...</span>
             <span id="native-alarms-auto-label" class="text-slate-400 font-semibold">Auto: apagado</span>
           </div>
+          <button type="button" id="native-exact-alarm-btn" onclick="requestExactAlarmFromSettings()" class="hidden w-full py-1.5 px-2.5 bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 border border-sky-500/40 rounded-lg text-[10px] font-bold transition-all">
+            ⚡ Activar precisión al segundo (Alarmas y recordatorios)
+          </button>
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="testNativeAlarm10s()" class="py-2 px-2 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95">
               <i class="fa-solid fa-clock"></i> Probar en 10s
@@ -20729,7 +20732,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.6';
+      const OMNITASK_APP_VERSION = '1.1.7';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -21478,6 +21481,17 @@
             badge.textContent = `${lastCount} ${lastCount === 1 ? 'alerta activa' : 'alertas activas'}`;
             badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40';
           }
+        }
+        const exactBtn = document.getElementById('native-exact-alarm-btn');
+        if (exactBtn) {
+          const needsExact = isAndroidNative && typeof window.OmniTaskNative.hasExactAlarmPermission === 'function' && !window.OmniTaskNative.hasExactAlarmPermission();
+          exactBtn.classList.toggle('hidden', !needsExact);
+        }
+      };
+
+      window.requestExactAlarmFromSettings = function () {
+        if (window.OmniTaskNative && typeof window.OmniTaskNative.requestExactAlarmPermission === 'function') {
+          window.OmniTaskNative.requestExactAlarmPermission();
         }
       };
 
