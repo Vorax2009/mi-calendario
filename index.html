@@ -754,10 +754,7 @@
           <div class="flex items-center gap-1.5 flex-wrap justify-end">
             <button type="button" onclick="openShiftsCloudSyncModal()" class="px-2.5 py-1 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow" title="Sincronizar Turnos entre dispositivos">
               <span id="shiftsCloudSyncStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-              <i class="fa-solid fa-cloud"></i> Sync
-            </button>
-            <button type="button" onclick="openShiftCycleModal()" class="px-2.5 py-1 bg-indigo-950/70 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow" title="Generar ciclo rotativo de turnos (4x4, Cuarto Turno, 7x7, etc.)">
-              <i class="fa-solid fa-arrows-rotate"></i> Ciclo
+              <span id="shiftsCloudSyncBtnLabel">Sync</span>
             </button>
             <button type="button" onclick="openDirectShiftModal()" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow">
               <i class="fa-solid fa-plus"></i> Añadir
@@ -1202,6 +1199,10 @@
               </div>
             </div>
             
+            <button type="button" onclick="closeDayModal(); openShiftCycleModal();" class="w-full py-1.5 px-2.5 bg-indigo-950/70 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-500/40 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-arrows-rotate"></i> Generar ciclo rotativo (4x4, 4to Turno, 7x7...)
+            </button>
+
             <div id="shift-work-details" class="flex flex-col gap-2">
               <div>
               <span class="text-[10px] text-slate-300 font-semibold block mb-0.5">Jornada:</span>
@@ -6526,13 +6527,12 @@
       const today = new Date();
       const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
       const upcomingControls = getAllUnifiedHealthControls(false)
-        .filter(control => control.date >= todayKey)
+        .filter(control => control.date >= todayKey && control.attended !== true)
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
-      const allCtrlsSorted = getAllUnifiedHealthControls(false).sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
-      const displayControls = upcomingControls.length > 0 ? upcomingControls : allCtrlsSorted.slice(0, 25);
+      const displayControls = upcomingControls;
       if (displayControls.length === 0) {
-        container.innerHTML = '<div class="text-center py-4 bg-slate-900/50 rounded-xl border border-slate-800"><p class="text-xs text-slate-500">No tienes controles de salud programados.</p></div>';
+        container.innerHTML = '<div class="text-center py-4 bg-slate-900/50 rounded-xl border border-slate-800"><p class="text-xs text-slate-500">No tienes próximos controles pendientes.</p></div>';
         return;
       }
 
@@ -15210,7 +15210,7 @@
             </label>
             <div class="flex gap-1.5">
               <input type="text" id="shiftsCloudSyncRoomCode" required placeholder="Ej. TR-8F3K-92QX-4M7P" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono font-bold focus:outline-none focus:border-purple-400">
-              <button type="button" onclick="generateStrongShiftsRoomCode()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 rounded-lg text-[10px] font-bold whitespace-nowrap">Generar</button>
+              <button type="button" id="shiftsCloudSyncGenBtn" onclick="generateStrongShiftsRoomCode()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 rounded-lg text-[10px] font-bold whitespace-nowrap">Generar</button>
             </div>
           </div>
           <div>
@@ -15234,6 +15234,9 @@
         <div class="flex gap-2 pt-1">
           <button type="button" id="shiftsCloudSyncDisconnectBtn" onclick="disconnectShiftsCloudSync()" class="hidden py-2.5 px-3 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 rounded-xl text-xs font-bold transition-all active:scale-95">
             Desconectar
+          </button>
+          <button type="button" id="shiftsCloudSyncDeleteCloudBtn" onclick="deleteShiftsCloudRoomFromFirebase()" class="hidden py-2.5 px-3 bg-red-950/80 hover:bg-red-900/80 text-red-300 border border-red-700/60 rounded-xl text-xs font-bold transition-all active:scale-95" title="Borra la sala de Turnos en Firebase sin borrar tus datos del teléfono">
+            Borrar nube
           </button>
           <button type="button" onclick="closeShiftsCloudSyncModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
             Cerrar
@@ -15308,7 +15311,7 @@
             <label for="babyCloudSyncRoomCode" class="block text-[11px] font-semibold text-slate-300 mb-1">
               🔑 Código de Sala Familiar
             </label>
-            <div class="flex gap-1.5"><input type="text" id="babyCloudSyncRoomCode" required placeholder="Ej. OT-8F3K-92QX-4M7P" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono font-bold focus:outline-none focus:border-emerald-400"><button type="button" onclick="generateStrongOmniTaskRoomCode()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold whitespace-nowrap">Generar</button></div>
+            <div class="flex gap-1.5"><input type="text" id="babyCloudSyncRoomCode" required placeholder="Ej. OT-8F3K-92QX-4M7P" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono font-bold focus:outline-none focus:border-emerald-400"><button type="button" id="babyCloudSyncGenBtn" onclick="generateStrongOmniTaskRoomCode()" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold whitespace-nowrap">Generar</button></div>
           </div>
           <div>
             <label for="babyCloudSyncDeviceName" class="block text-[11px] font-semibold text-slate-300 mb-1">
@@ -15381,6 +15384,9 @@
         <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
           <button type="button" id="babyCloudSyncDisconnectBtn" onclick="disconnectBabyCloudSync()" class="hidden py-2.5 px-3 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 rounded-xl text-xs font-bold transition-all active:scale-95">
             Desconectar
+          </button>
+          <button type="button" id="babyCloudSyncDeleteCloudBtn" onclick="deleteBabyCloudRoomFromFirebase()" class="hidden py-2.5 px-3 bg-red-950/80 hover:bg-red-900/80 text-red-300 border border-red-700/60 rounded-xl text-xs font-bold transition-all active:scale-95" title="Borra la sala en Firebase sin borrar tus datos del teléfono">
+            Borrar nube
           </button>
           <button type="button" onclick="closeBabyCloudSyncModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all active:scale-95">
             Cerrar
@@ -19876,9 +19882,10 @@
         if (modalDot) modalDot.className = dotClass.replace('w-2 h-2', 'w-2.5 h-2.5');
 
         if (btnLabel) {
+          const shortDev = (btCloudConfig.deviceName || 'Familia').trim().slice(0, 14);
           btnLabel.textContent = isEnabled
-            ? (state === 'syncing' ? '🔄 Sincronizando...' : `☁️ Sala: ${btCloudConfig.roomCode}`)
-            : '☁️ Sincronizar';
+            ? (state === 'syncing' ? 'Sincronizando...' : `En vivo · ${shortDev}`)
+            : 'Sincronizar';
         }
 
         if (modalStatus) {
@@ -19899,6 +19906,15 @@
 
         if (syncNowBtn) syncNowBtn.classList.toggle('hidden', !isEnabled);
         if (discBtn) discBtn.classList.toggle('hidden', !isEnabled);
+        const babyGenBtn = document.getElementById('babyCloudSyncGenBtn');
+        const babyRoomIn = document.getElementById('babyCloudSyncRoomCode');
+        if (babyGenBtn) babyGenBtn.classList.toggle('hidden', isEnabled);
+        const babyDelCloudBtn = document.getElementById('babyCloudSyncDeleteCloudBtn');
+        if (babyDelCloudBtn) babyDelCloudBtn.classList.toggle('hidden', !isEnabled);
+        if (babyRoomIn) {
+          babyRoomIn.readOnly = isEnabled;
+          babyRoomIn.classList.toggle('opacity-75', isEnabled);
+        }
         if (shareBox) {
           shareBox.classList.toggle('hidden', !isEnabled);
           if (isEnabled && genCodeInput) {
@@ -20238,6 +20254,32 @@
         }
       }
 
+      let babyDelConfirmAt = 0;
+      async function deleteBabyCloudRoomFromFirebase() {
+        const now = Date.now();
+        if (now - babyDelConfirmAt > 5000) {
+          babyDelConfirmAt = now;
+          showToast('Confirmar borrado en la nube', 'Toca "Borrar nube" otra vez para eliminar la sala en Firebase (tus datos locales NO se borran).', 'fa-triangle-exclamation', 'text-amber-400');
+          return;
+        }
+        babyDelConfirmAt = 0;
+        const endpoint = getBtCloudEndpointUrl();
+        stopBabyCloudRealtimeListener();
+        if (endpoint) {
+          try { await fetch(endpoint, { method: 'DELETE' }); } catch (e) {}
+        }
+        saveBtCloudConfigState({
+          enabled: false,
+          dbUrl: DEFAULT_OMNITASK_FIREBASE_URL || '',
+          roomCode: '',
+          deviceName: btCloudConfig.deviceName || ''
+        });
+        const rIn = document.getElementById('babyCloudSyncRoomCode');
+        if (rIn) rIn.value = '';
+        showToast('Sala borrada de la nube', 'Se eliminó la sala de Firebase. Tus datos del bebé siguen guardados en tu celular.', 'fa-circle-check', 'text-emerald-400');
+      }
+      window.deleteBabyCloudRoomFromFirebase = deleteBabyCloudRoomFromFirebase;
+
       function disconnectBabyCloudSync() {
         stopBabyCloudRealtimeListener();
         saveBtCloudConfigState({
@@ -20568,7 +20610,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.4';
+      const OMNITASK_APP_VERSION = '1.1.5';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -20701,6 +20743,11 @@
         const dotCls = effState === 'online' ? 'bg-emerald-400' : (effState === 'syncing' ? 'bg-amber-400 animate-pulse' : (effState === 'error' ? 'bg-rose-400' : 'bg-slate-500'));
 
         if (dot) dot.className = `w-2 h-2 rounded-full ${dotCls}`;
+        const sBtnLbl = document.getElementById('shiftsCloudSyncBtnLabel');
+        if (sBtnLbl) {
+          const shortDev = (shiftsCloudConfig.deviceName || 'Familia').trim().slice(0, 14);
+          sBtnLbl.textContent = active ? (effState === 'syncing' ? 'Sincronizando...' : `En vivo · ${shortDev}`) : 'Sync';
+        }
         if (mDot) mDot.className = `w-2.5 h-2.5 rounded-full ${dotCls}`;
         if (mTxt) {
           mTxt.textContent = effState === 'online'
@@ -20710,6 +20757,15 @@
         if (mLast && msg) mLast.textContent = msg;
         if (nowBtn) nowBtn.classList.toggle('hidden', !active);
         if (discBtn) discBtn.classList.toggle('hidden', !active);
+        const sGenBtn = document.getElementById('shiftsCloudSyncGenBtn');
+        const sRoomIn = document.getElementById('shiftsCloudSyncRoomCode');
+        if (sGenBtn) sGenBtn.classList.toggle('hidden', active);
+        const sDelCloudBtn = document.getElementById('shiftsCloudSyncDeleteCloudBtn');
+        if (sDelCloudBtn) sDelCloudBtn.classList.toggle('hidden', !active);
+        if (sRoomIn) {
+          sRoomIn.readOnly = active;
+          sRoomIn.classList.toggle('opacity-75', active);
+        }
         if (shareBox && genCode) {
           shareBox.classList.toggle('hidden', !active);
           if (active) {
@@ -20870,6 +20926,26 @@
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(val).then(() => showToast('Copiado', 'Código de Turnos copiado.', 'fa-copy', 'text-purple-300')).catch(() => {});
         }
+      };
+
+      let shiftsDelConfirmAt = 0;
+      window.deleteShiftsCloudRoomFromFirebase = async function () {
+        const now = Date.now();
+        if (now - shiftsDelConfirmAt > 5000) {
+          shiftsDelConfirmAt = now;
+          showToast('Confirmar borrado en la nube', 'Toca "Borrar nube" otra vez para eliminar la sala de Turnos en Firebase (tus turnos locales NO se borran).', 'fa-triangle-exclamation', 'text-amber-400');
+          return;
+        }
+        shiftsDelConfirmAt = 0;
+        const endpoint = getShiftsEndpoint();
+        stopShiftsCloudListener();
+        if (endpoint) {
+          try { await fetch(endpoint, { method: 'DELETE' }); } catch (e) {}
+        }
+        saveShiftsCloudConfigState({ enabled: false, roomCode: '', deviceName: shiftsCloudConfig.deviceName || '' });
+        const rIn = document.getElementById('shiftsCloudSyncRoomCode');
+        if (rIn) rIn.value = '';
+        showToast('Sala de Turnos borrada', 'Se eliminó la sala de Firebase. Tus turnos siguen guardados en tu celular.', 'fa-circle-check', 'text-purple-300');
       };
 
       window.disconnectShiftsCloudSync = function () {
