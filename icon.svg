@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#070C1B"/>
+  <polygon points="256,42 442,138 442,350 256,446 70,350 70,138" fill="#17315A" stroke="#D6B57A" stroke-width="14" stroke-linejoin="round"/>
+  <polygon points="256,88 396,160 396,328 256,400 116,328 116,160" fill="none" stroke="#CBD5E1" stroke-width="22" stroke-linejoin="round"/>
+  <rect x="176" y="168" width="160" height="148" rx="22" fill="#0F2342" stroke="#E2E8F0" stroke-width="12"/>
+  <rect x="176" y="168" width="160" height="44" rx="14" fill="#E2E8F0"/>
+  <path d="M204 256 l36 36 l92 -102" fill="none" stroke="#D6B57A" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="70" y="388" width="372" height="68" rx="20" fill="#17315A" stroke="#D6B57A" stroke-width="8"/>
+  <text x="256" y="434" text-anchor="middle" font-family="Georgia, serif" font-size="40" font-weight="bold" letter-spacing="4" fill="#D6B57A">OMNITASK</text>
+</svg>
