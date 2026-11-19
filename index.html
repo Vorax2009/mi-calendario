@@ -529,6 +529,11 @@
           <span class="block max-w-full text-center whitespace-normal break-words md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
+        <button id="tab-vehicles-btn" role="tab" aria-selected="false" onclick="switchView('vehicles', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-cyan-400">
+          <i class="fa-solid fa-car text-lg md:text-sm leading-none"></i>
+          <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">VEHÍCULOS</span>
+          <div id="tab-vehicles-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
+        </button>
         <button id="tab-turns-btn" role="tab" aria-selected="false" onclick="openViewOrPaywall('turns')" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-purple-300">
           <span class="text-lg md:text-sm leading-none">🕒</span>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">TURNOS</span>
@@ -543,11 +548,6 @@
           <i class="fa-solid fa-baby text-lg md:text-sm leading-none"></i>
           <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">BEBÉ</span>
           <div id="tab-baby-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
-        </button>
-        <button id="tab-vehicles-btn" role="tab" aria-selected="false" onclick="switchView('vehicles', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-cyan-400">
-          <i class="fa-solid fa-car text-lg md:text-sm leading-none"></i>
-          <span class="block max-w-full truncate text-[10px] md:text-sm leading-tight tracking-tight md:tracking-wider">VEHÍCULOS</span>
-          <div id="tab-vehicles-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
       </div>
     </header>
@@ -570,7 +570,7 @@
               <button onclick="goToToday()" class="px-2 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded font-bold uppercase transition-colors active:scale-95" title="Ir a hoy">
                 Hoy
               </button>
-              <button type="button" id="holiday-country-badge" onclick="openHolidaysModal()" data-premium-feature="holidays" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded font-bold transition-colors active:scale-95 flex items-center gap-1 shadow-sm" title="Feriados según el país donde se ejecuta la app">
+              <button type="button" id="holiday-country-badge" onclick="openHolidaysModal()" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded font-bold transition-colors active:scale-95 flex items-center gap-1 shadow-sm" title="Feriados según el país donde se ejecuta la app">
                 <span id="holiday-country-flag">🇨🇱</span>
                 <span id="holiday-country-code-label">CL</span>
               </button>
@@ -622,7 +622,7 @@
           
           <div class="flex items-center gap-1.5 shrink-0">
             <button type="button" id="year-title" onclick="openYearPicker()" aria-label="Elegir año" title="Elegir año" class="text-base font-extrabold tracking-widest text-teal-400 px-2 uppercase shrink-0 hover:text-teal-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 rounded">2026</button>
-            <button type="button" id="year-holiday-country-badge" onclick="openHolidaysModal()" data-premium-feature="holidays" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded-full font-bold transition-colors active:scale-95 flex items-center gap-1" title="Ver feriados del año según país">
+            <button type="button" id="year-holiday-country-badge" onclick="openHolidaysModal()" class="px-2 py-1 text-[10px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-200 border border-rose-500/40 rounded-full font-bold transition-colors active:scale-95 flex items-center gap-1" title="Ver feriados del año según país">
               <span id="year-holiday-country-flag">🇨🇱</span>
               <span id="year-holiday-country-code">CL</span>
             </button>
@@ -821,7 +821,7 @@
         <!-- HEADER DE SALUD / MEDICINAS -->
         <div class="bg-[#1e2733] p-3 rounded-xl border border-slate-700/60 shadow-lg flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <i class="fa-solid fa-pills text-blue-400 text-base"></i>
+            <span class="text-base leading-none">❤️‍🩹</span>
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-100">MiMedicina</h3>
           </div>
           <button onclick="openHealthRegistrationChooser()" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow active:scale-95">
@@ -1078,12 +1078,12 @@
             <i class="fa-solid fa-plus text-[10px]"></i>
             <span>Nota/Evento</span>
           </button>
-          <button type="button" id="day-add-turns-btn" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-user-doctor"></i>
+          <button type="button" id="day-add-turns-btn" data-premium-feature="turns" onclick="showCreateShiftFormInModal()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+            <span>🕒</span>
             <span>Turno</span>
           </button>
-          <button type="button" id="day-add-meds-btn" onclick="openHealthRegistrationChooserFromDay()" class="py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5" title="Registrar medicamento o control de salud">
-            <i class="fa-solid fa-pills"></i>
+          <button type="button" id="day-add-meds-btn" data-premium-feature="meds" onclick="openHealthRegistrationChooserFromDay()" class="py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-[11px] tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5" title="Registrar medicamento o control de salud">
+            <span>❤️‍🩹</span>
             <span>Salud</span>
           </button>
         </div>
@@ -1231,7 +1231,7 @@
               <span class="text-[10px] text-slate-300 font-semibold block mb-1">Tipo de turno:</span>
               <div class="grid grid-cols-2 gap-1.5">
                 <button type="button" data-shift-status="regular" onclick="selectShiftStatus('regular')" class="shift-status-option py-2 px-1 bg-purple-700 text-white rounded-lg font-bold text-[10px] leading-tight transition-all">
-                  <i class="fa-solid fa-user-doctor block mb-1"></i><span>Turno</span>
+                  <span class="block mb-1">🕒</span><span>Turno</span>
                 </button>
                 <button type="button" data-shift-status="dayOff" onclick="selectShiftStatus('dayOff')" class="shift-status-option py-2 px-1 bg-slate-800 text-slate-300 rounded-lg font-bold text-[10px] leading-tight transition-all">
                   <i class="fa-solid fa-umbrella-beach block mb-1"></i><span>Día libre</span>
@@ -2615,7 +2615,7 @@
           <input type="checkbox" id="share-opt-notes" checked onchange="updateShareModalPreviewCounts()" class="w-4 h-4 rounded text-teal-500 focus:ring-teal-400 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
-          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud (Citas y medicamentos)</span>
+          <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">❤️‍🩹</span>Salud (Citas y medicamentos)</span>
           <input type="checkbox" id="share-opt-health" checked onchange="updateShareModalPreviewCounts()" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-400 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
@@ -2667,7 +2667,7 @@
           <input type="checkbox" id="pdf-opt-events" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-amber-500 focus:ring-amber-400 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
-          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-400 text-xs"></i>Turnos</span>
+          <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🕒</span>Turnos</span>
           <input type="checkbox" id="pdf-opt-turns" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
@@ -2706,7 +2706,7 @@
         <span class="text-[10px] font-black uppercase tracking-wider text-emerald-300 block">1. ¿Qué deseas incluir en el archivo .ics?</span>
         <div class="bg-slate-900/90 border border-slate-800 rounded-xl divide-y divide-slate-800 text-xs shadow-inner">
           <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
-            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-400 text-xs"></i>Turnos laborales</span>
+            <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🕒</span>Turnos laborales</span>
             <input type="checkbox" id="gcal-opt-turns" checked class="w-4 h-4 rounded text-purple-600 bg-slate-800 border-slate-700">
           </label>
           <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
@@ -2868,7 +2868,7 @@
           <div id="settings-video-bar-wrap" class="hidden space-y-1">
             <div class="flex items-center justify-between text-[10px] font-bold text-cyan-300">
               <span>🎬 Horas por video acumuladas</span>
-              <span id="settings-video-hours-label">0h / 48h</span>
+              <span id="settings-video-hours-label">0h / 24h</span>
             </div>
             <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden border border-slate-700">
               <div id="settings-video-progress" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all" style="width: 0%;"></div>
@@ -2879,7 +2879,7 @@
               <span>⭐ Desbloquear para siempre — $3.990</span>
             </button>
             <button type="button" id="settings-watch-video-btn" onclick="startRewardedVideoUnlock()" class="w-full min-h-9 py-1.5 px-3 bg-cyan-600/25 hover:bg-cyan-600/35 text-cyan-200 border border-cyan-500/40 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1.5 active:scale-95">
-              <span>🎬 Ver 1 video (+12h gratis · máx. 48h)</span>
+              <span>🎬 Ver 1 video (+6h gratis · máx. 24h)</span>
             </button>
             <button type="button" onclick="restorePremiumPurchases()" class="w-full py-1 text-[10px] font-semibold text-sky-300 hover:text-sky-200 underline text-center">
               Ya compré Premium · Restaurar compra
@@ -2897,12 +2897,12 @@
             </label>
           </div>
           <p class="text-[10px] text-slate-300 leading-snug">
-            Activa el bloqueo <strong>solo en este teléfono</strong> para probar los 7 días, videos (+12h / tope 48h), límite de 1 vehículo y compra de prueba ($3.990) sin afectar a tus testers.
+            Activa el bloqueo <strong>solo en este teléfono</strong> para probar los 7 días, videos (+6h / tope 24h), límite de 1 vehículo y compra de prueba ($3.990) sin afectar a tus testers.
           </p>
           <div class="grid grid-cols-2 gap-1.5 text-[10px]">
             <button type="button" onclick="simMonetizationState('trial7')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 font-bold">🎁 Prueba 7 días</button>
             <button type="button" onclick="simMonetizationState('expired')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 font-bold">🔒 Prueba vencida</button>
-            <button type="button" onclick="simMonetizationState('add12h')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-bold">🎬 Sumar +12h</button>
+            <button type="button" onclick="simMonetizationState('add12h')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-bold">🎬 Sumar +6h</button>
             <button type="button" onclick="simMonetizationState('clearVideo')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold">🧹 Quitar horas</button>
             <button type="button" onclick="simMonetizationState('premiumOn')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold">⭐ Simular Premium</button>
             <button type="button" onclick="simMonetizationState('premiumOff')" class="py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold">↩ Quitar Premium</button>
@@ -2989,17 +2989,22 @@
             </div>
           </div>
 
-          <!-- Menús visibles -->
+          <!-- Menús visibles (Premium) -->
           <div>
-            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Pestañas visibles</span>
+            <span data-premium-feature="tabs" class="text-[10px] font-bold text-slate-400 flex items-center gap-1 mb-1.5">Pestañas visibles</span>
             <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
               <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
-                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-user-doctor text-purple-300 text-xs"></i>Turnos</span>
+                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-car text-cyan-400 text-xs"></i>Vehículos</span>
+                <input type="checkbox" id="tab-visible-vehicles" onchange="setTabVisibility('vehicles', this.checked)" class="peer sr-only" checked>
+                <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
+              </label>
+              <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
+                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🕒</span>Turnos</span>
                 <input type="checkbox" id="tab-visible-turns" onchange="setTabVisibility('turns', this.checked)" class="peer sr-only" checked>
                 <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
               </label>
               <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
-                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-pills text-blue-400 text-xs"></i>Salud</span>
+                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">❤️‍🩹</span>Salud</span>
                 <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only" checked>
                 <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
               </label>
@@ -3008,49 +3013,30 @@
                 <input type="checkbox" id="tab-visible-baby" onchange="setTabVisibility('baby', this.checked)" class="peer sr-only" checked>
                 <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
               </label>
-              <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
-                <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-car text-cyan-400 text-xs"></i>Vehículos</span>
-                <input type="checkbox" id="tab-visible-vehicles" onchange="setTabVisibility('vehicles', this.checked)" class="peer sr-only" checked>
-                <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
-              </label>
             </div>
           </div>
 
         </div>
 
-        <!-- 2. COMPARTIR -->
-        <div class="p-3 rounded-xl bg-gradient-to-br from-sky-950/40 to-teal-950/40 border border-sky-500/40 space-y-2">
-          <div class="flex items-center gap-2 text-sky-300 font-bold">
-            <i class="fa-solid fa-share-nodes text-sm"></i>
-            <span>Compartir con otra persona</span>
-          </div>
-          <p class="text-[11px] text-slate-300 leading-tight">
-            Envía tus turnos, eventos, notas, bebé o salud. Al cargarlo en su app, <strong>se combina sin borrar lo que ya tenga</strong>.
-          </p>
-          <button onclick="openShareModal()" class="w-full min-h-10 py-2 bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow active:scale-95">
-            <i class="fa-solid fa-share-nodes"></i> Elegir qué compartir
-          </button>
-        </div>
-
-        <!-- 3. RESPALDOS, EXPORTACIÓN E IMPORTACIÓN -->
+        <!-- 2. RESPALDOS, EXPORTACIÓN E IMPORTACIÓN -->
         <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/80 space-y-3">
-          <span class="text-[10px] font-black uppercase tracking-wider text-sky-300 block">Respaldos y Sincronización</span>
+          <span class="text-[10px] font-black uppercase tracking-wider text-sky-300 block">Respaldos, Compartir y Sincronización</span>
           <div id="storage-status" class="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800 space-y-1"></div>
 
           <div>
-            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Exportar</span>
+            <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Exportar y Compartir</span>
             <div class="grid grid-cols-2 gap-2">
-              <button onclick="exportDataJSON()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all">
-                <i class="fa-solid fa-download"></i> JSON
+              <button type="button" onclick="openShareModal()" class="min-h-10 py-2 bg-gradient-to-r from-sky-600/80 to-teal-600/80 hover:from-sky-500 hover:to-teal-500 text-white border border-sky-500/40 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all shadow active:scale-95" title="Compartir turnos, eventos, notas, bebé o salud con otra persona">
+                <i class="fa-solid fa-share-nodes"></i> Compartir
               </button>
               <button type="button" onclick="openPdfExportModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Elegir qué exportar en PDF">
                 <i class="fa-solid fa-file-pdf"></i> PDF
               </button>
-              <button type="button" onclick="shareBackupFileToDriveApp()" data-premium-feature="drive" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all relative" title="Guardar el respaldo en la app de Google Drive">
+              <button type="button" onclick="exportJsonOrDrive()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Guardar respaldo .json en tu teléfono o en Google Drive">
                 <i class="fa-brands fa-google-drive"></i>
-                <span>Google Drive</span>
+                <span>JSON / Drive</span>
               </button>
-              <button type="button" onclick="openGoogleCalExportModal()" data-premium-feature="gcal" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Configurar avisos y exportar a Google Calendar (.ics)">
+              <button type="button" onclick="openGoogleCalExportModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Configurar avisos y exportar a Google Calendar (.ics)">
                 <i class="fa-solid fa-calendar-plus"></i> Google Cal
               </button>
             </div>
@@ -3059,16 +3045,10 @@
           <div>
             <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Importar</span>
             <div>
-              <div class="grid grid-cols-2 gap-2">
-                <label class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer" title="Importar respaldo JSON o TXT desde tu dispositivo o Google Drive">
-                  <i class="fa-solid fa-upload"></i> Importar JSON
-                  <input type="file" accept=".json,.txt,application/json,text/plain,application/octet-stream" onchange="importDataJSON(event)" class="hidden">
-                </label>
-                <label class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer" title="Importar turnos y notas desde un archivo .shifter">
-                  <i class="fa-solid fa-file-import"></i> Importar .shifter
-                  <input type="file" id="import-shifter-file-input" accept=".shifter,.Shifter,.db,.sqlite,application/octet-stream" onchange="importShifterFile(event)" class="hidden">
-                </label>
-              </div>
+              <label class="w-full min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95" title="Importar respaldo .json, .txt o turnos .shifter desde tu dispositivo o Google Drive">
+                <i class="fa-solid fa-upload"></i> Importar (.json / .shifter)
+                <input type="file" id="import-unified-file-input" accept=".json,.txt,.shifter,.Shifter,.db,.sqlite,application/json,text/plain,application/octet-stream" onchange="importDataJSON(event)" class="hidden">
+              </label>
               <p class="mt-1 text-[10px] text-slate-400 leading-tight">Trae respaldos .json desde tu dispositivo o Google Drive, o importa turnos desde un archivo .shifter.</p>
             </div>
             <input type="file" id="import-ics-file-input" accept=".ics,text/calendar,application/octet-stream" class="hidden" onchange="handleImportICSFile(event, false)">
@@ -3100,7 +3080,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.9 · Toca 5 veces para modo prueba
+            OmniTask v1.1.11 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -3503,12 +3483,12 @@
     const PREMIUM_PRICE_LABEL = '$3.990';
     const TRIAL_DAYS = 7;
     const TRIAL_MS = TRIAL_DAYS * 24 * 60 * 60 * 1000;
-    const VIDEO_REWARD_HOURS = 12;
-    const VIDEO_MAX_CAP_HOURS = 48;
+    const VIDEO_REWARD_HOURS = 6;
+    const VIDEO_MAX_CAP_HOURS = 24;
     const FREE_VEHICLE_LIMIT = 1;
     const PREMIUM_VIEWS = ['turns', 'meds', 'baby'];
-    const PREMIUM_VIEW_NAMES = { turns: 'Turnos', meds: 'Salud', baby: 'Bebé', vehicles: 'Vehículos ilimitados', plan: 'OmniTask Premium' };
-    const PREMIUM_FEATURES = {};
+    const PREMIUM_VIEW_NAMES = { turns: 'Turnos', meds: 'Salud', baby: 'Bebé', vehicles: 'Vehículos ilimitados', tabs: 'Pestañas visibles', plan: 'OmniTask Premium' };
+    const PREMIUM_FEATURES = { tabs: 'Personalizar pestañas visibles', turns: 'Turnos', meds: 'Salud' };
     const PREMIUM_STORAGE_KEY = 'appPlanPremium';
     const TRIAL_START_STORAGE_KEY = 'omnitask_trial_start_v1';
     const VIDEO_UNLOCK_STORAGE_KEY = 'omnitask_video_unlock_until_v1';
@@ -3627,6 +3607,7 @@
 
     function isTabVisible(view) {
       if (view === 'birthdays') return true;
+      if (typeof hasFullAccess === 'function' && !hasFullAccess()) return true;
       return !Object.prototype.hasOwnProperty.call(tabVisibility, view) || tabVisibility[view] !== false;
     }
 
@@ -3649,6 +3630,11 @@
 
     function setTabVisibility(key, visible) {
       if (!Object.prototype.hasOwnProperty.call(tabVisibility, key)) return;
+      if (typeof requirePremiumFeature === 'function' && !requirePremiumFeature('tabs')) {
+        const cb = document.getElementById(`tab-visible-${key}`);
+        if (cb) cb.checked = true;
+        return;
+      }
       tabVisibility[key] = visible === true;
       try {
         localStorage.setItem(TAB_VISIBILITY_KEY, JSON.stringify(tabVisibility));
@@ -4288,6 +4274,11 @@
       const now = Date.now();
       let localTs = 0;
       try { localTs = parseInt(localStorage.getItem(TRIAL_START_STORAGE_KEY) || '0', 10) || 0; } catch (_) {}
+      try {
+        if (!PREMIUM_ENFORCED && localStorage.getItem(MONETIZATION_TEST_MODE_KEY) === '1' && localStorage.getItem('omnitask_trial_sim_override_v1') === '1' && localTs > 1700000000000) {
+          return localTs;
+        }
+      } catch (_) {}
       let nativeTs = 0;
       try {
         if (window.OmniTaskNative && typeof window.OmniTaskNative.getOrInitTrialStart === 'function') {
@@ -4437,7 +4428,7 @@
           pill.classList.remove('hidden');
           pill.classList.add('flex');
           if (videoMs > 0) {
-            pillText.textContent = `⏱️ ${formatRemainingHours(videoMs)} +12h`;
+            pillText.textContent = `⏱️ ${formatRemainingHours(videoMs)} +6h`;
             pill.className = 'flex bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 px-2 py-1 rounded-md font-extrabold text-[10px] transition-all items-center gap-1 active:scale-95';
           } else if (trialMs > 0) {
             const daysLeft = Math.max(1, Math.ceil(trialMs / 86400000));
@@ -4480,8 +4471,8 @@
             const atCap = videoMs >= (VIDEO_MAX_CAP_HOURS * 3600000 - 600000);
             vidBtn.disabled = atCap;
             vidBtn.textContent = atCap
-              ? '✅ Tope máximo alcanzado (48h acumuladas)'
-              : '🎬 Ver 1 video (+12h gratis · máx. 48h)';
+              ? '✅ Tope máximo alcanzado (24h acumuladas)'
+              : '🎬 Ver 1 video (+6h gratis · máx. 24h)';
           }
           if (barWrap) barWrap.classList.remove('hidden');
           if (barLbl) barLbl.textContent = `${formatRemainingHours(videoMs)} / ${VIDEO_MAX_CAP_HOURS}h`;
@@ -4490,16 +4481,16 @@
           if (videoMs > 0) {
             badge.textContent = `⏱️ ${formatRemainingHours(videoMs)} activos`;
             badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
-            desc.textContent = 'Acceso completo desbloqueado por videos. Puedes acumular hasta 48 horas o pasar a Premium vitalicio.';
+            desc.textContent = 'Acceso completo desbloqueado por videos. Puedes acumular hasta 24 horas o pasar a Premium vitalicio.';
           } else if (trialMs > 0) {
             const daysLeft = Math.max(1, Math.ceil(trialMs / 86400000));
             badge.textContent = `🎁 Prueba: ${daysLeft}d`;
             badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-            desc.textContent = `Te quedan ${daysLeft} día(s) de prueba gratis con todo desbloqueado. Luego puedes seguir viendo videos (+12h) o pagar ${PREMIUM_PRICE_LABEL} una sola vez.`;
+            desc.textContent = `Te quedan ${daysLeft} día(s) de prueba gratis con todo desbloqueado. Luego puedes seguir viendo videos (+6h) o pagar ${PREMIUM_PRICE_LABEL} una sola vez.`;
           } else {
             badge.textContent = '🔒 Plan Gratis';
             badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/40';
-            desc.textContent = `Tu prueba de 7 días finalizó. Calendario, Notas y 1 vehículo siguen gratis; desbloquea todo con 1 video (+12h) o pago único de ${PREMIUM_PRICE_LABEL}.`;
+            desc.textContent = `Tu prueba de 7 días finalizó. Calendario, Notas y 1 vehículo siguen gratis; desbloquea todo con 1 video (+6h) o pago único de ${PREMIUM_PRICE_LABEL}.`;
           }
         }
       }
@@ -4544,6 +4535,17 @@
           el.appendChild(lock);
         }
       });
+      if (typeof tabVisibility === 'object' && tabVisibility) {
+        Object.keys(tabVisibility).forEach(key => {
+          const vis = isTabVisible(key);
+          const button = document.getElementById(`tab-${key}-btn`);
+          if (button) button.style.display = vis ? '' : 'none';
+          const toggle = document.getElementById(`tab-visible-${key}`);
+          if (toggle) toggle.checked = vis;
+          const dayButton = document.getElementById(`day-add-${key}-btn`);
+          if (dayButton) dayButton.style.display = vis ? '' : 'none';
+        });
+      }
       updatePlanStatusUI();
     }
 
@@ -4641,7 +4643,9 @@
       if (desc) {
         desc.innerHTML = view === 'vehicles'
           ? 'Tu plan gratis incluye <strong>1 vehículo</strong>. Desbloquea vehículos ilimitados y todos los módulos con 1 video o pago único.'
-          : 'Desbloquea <strong>Turnos</strong>, <strong>Salud</strong>, <strong>Bebé</strong> y <strong>Vehículos ilimitados</strong>. Calendario, Notas y 1 vehículo son siempre gratis.';
+          : (view === 'tabs'
+            ? 'Ocultar o mostrar pestañas en la barra superior es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
+            : 'Desbloquea <strong>Turnos</strong>, <strong>Salud</strong>, <strong>Bebé</strong> y <strong>Vehículos ilimitados</strong>. Calendario, Notas y 1 vehículo son siempre gratis.');
       }
       if (testBadge) {
         const isTest = !PREMIUM_ENFORCED && isMonetizationEnforced();
@@ -4655,17 +4659,17 @@
       if (trialInfo) {
         if (trialMs > 0) {
           const dLeft = Math.max(1, Math.ceil(trialMs / 86400000));
-          trialInfo.textContent = `Aún tienes ${dLeft} día(s) de prueba gratis. También puedes sumar +12h por video (máx. 48h).`;
+          trialInfo.textContent = `Aún tienes ${dLeft} día(s) de prueba gratis. También puedes sumar +6h por video (máx. 24h).`;
         } else {
-          trialInfo.textContent = 'Cada video corto suma +12 horas de acceso completo (acumulable hasta 48h).';
+          trialInfo.textContent = 'Cada video corto suma +6 horas de acceso completo (acumulable hasta 24h).';
         }
       }
       if (vidBtn) {
         const atCap = videoMs >= (VIDEO_MAX_CAP_HOURS * 3600000 - 600000);
         vidBtn.disabled = atCap;
         vidBtn.innerHTML = atCap
-          ? '<span>✅ Tope máximo alcanzado (48h)</span>'
-          : '<span>🎬 Ver 1 video (+12 horas gratis)</span>';
+          ? '<span>✅ Tope máximo alcanzado (24h)</span>'
+          : '<span>🎬 Ver 1 video (+6 horas gratis)</span>';
       }
 
       modal.classList.remove('hidden');
@@ -4701,7 +4705,7 @@
       if (targetView && PREMIUM_VIEWS.includes(targetView)) {
         switchView(targetView, true);
       }
-      showToast('¡+12 horas desbloqueadas!', `Tienes ${formatRemainingHours(nextUntil - now)} de acceso completo acumulados (máx. 48h).`, 'fa-circle-check', 'text-emerald-400');
+      showToast('¡+6 horas desbloqueadas!', `Tienes ${formatRemainingHours(nextUntil - now)} de acceso completo acumulados (máx. 24h).`, 'fa-circle-check', 'text-emerald-400');
     }
 
     window.onOmniTaskRewardedAdResult = function(result) {
@@ -4709,7 +4713,7 @@
       if (result.ok) {
         grantRewardedVideoHours(result.rewardHours || VIDEO_REWARD_HOURS);
       } else if (result.cancelled) {
-        showToast('Video incompleto', 'Debes ver el video completo para recibir las +12 horas gratis.', 'fa-circle-info', 'text-slate-300');
+        showToast('Video incompleto', 'Debes ver el video completo para recibir las +6 horas gratis.', 'fa-circle-info', 'text-slate-300');
       } else {
         showToast('Video no disponible', result.error || 'No se pudo cargar el anuncio de prueba. Revisa tu conexión.', 'fa-triangle-exclamation', 'text-amber-400');
       }
@@ -4718,12 +4722,12 @@
     async function startRewardedVideoUnlock() {
       const remaining = getVideoUnlockRemainingMs();
       if (remaining >= (VIDEO_MAX_CAP_HOURS * 3600000 - 600000)) {
-        showToast('Tope de 48h alcanzado', 'Ya tienes el máximo de 48 horas acumuladas.', 'fa-circle-info', 'text-cyan-300');
+        showToast('Tope de 24h alcanzado', 'Ya tienes el máximo de 24 horas acumuladas.', 'fa-circle-info', 'text-cyan-300');
         return;
       }
       try {
         if (window.OmniTaskNative && typeof window.OmniTaskNative.showRewardedAd === 'function') {
-          showToast('Cargando video...', 'Preparando anuncio de prueba AdMob (+12h).', 'fa-circle-info', 'text-cyan-300');
+          showToast('Cargando video...', 'Preparando anuncio de prueba AdMob (+6h).', 'fa-circle-info', 'text-cyan-300');
           window.OmniTaskNative.showRewardedAd();
           return;
         }
@@ -4828,6 +4832,7 @@
       try { localStorage.setItem(MONETIZATION_TEST_MODE_KEY, enabled ? '1' : '0'); } catch (_) {}
       applyPlanLocks();
       if (!enabled) {
+        try { localStorage.removeItem('omnitask_trial_sim_override_v1'); } catch (_) {}
         clearPaywallTeaserBlur();
       } else if (!canUseView(activeView)) {
         switchView('month');
@@ -4846,12 +4851,14 @@
       }
       if (action === 'trial7') {
         const now = Date.now();
+        try { localStorage.setItem('omnitask_trial_sim_override_v1', '1'); } catch (_) {}
         try { localStorage.setItem(TRIAL_START_STORAGE_KEY, String(now)); } catch (_) {}
         try { localStorage.setItem(PREMIUM_STORAGE_KEY, '0'); } catch (_) {}
         saveVideoUnlockUntilMs(0);
         showToast('🧪 Simulación: Prueba 7 días', 'Reloj reiniciado a 7 días gratis.', 'fa-circle-check', 'text-emerald-400');
       } else if (action === 'expired') {
         const expiredStart = Date.now() - (TRIAL_MS + 3600000);
+        try { localStorage.setItem('omnitask_trial_sim_override_v1', '1'); } catch (_) {}
         try { localStorage.setItem(TRIAL_START_STORAGE_KEY, String(expiredStart)); } catch (_) {}
         try { localStorage.setItem(PREMIUM_STORAGE_KEY, '0'); } catch (_) {}
         saveVideoUnlockUntilMs(0);
@@ -4863,6 +4870,10 @@
         saveVideoUnlockUntilMs(0);
         showToast('🧪 Horas de video limpiadas', 'Horas acumuladas en 0h.', 'fa-circle-info', 'text-slate-300');
       } else if (action === 'premiumOn') {
+        if (typeof tabVisibility === 'object' && tabVisibility) {
+          Object.keys(tabVisibility).forEach(k => { tabVisibility[k] = true; });
+          try { localStorage.setItem(TAB_VISIBILITY_KEY, JSON.stringify(tabVisibility)); } catch (_) {}
+        }
         setPremium(true);
         showToast('🧪 Simulación: Premium ON', 'Acceso vitalicio sin anuncios activo.', 'fa-star', 'text-amber-300');
         return;
@@ -5025,6 +5036,7 @@
     }
 
     function openHealthRegistrationChooserFromDay() {
+      if (typeof requirePremium === 'function' && !requirePremium('meds')) return;
       if (!requirePremium('meds')) return;
       const selectedDateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       openHealthRegistrationChooser(selectedDateKey);
@@ -10172,6 +10184,7 @@
     }
 
     function showCreateShiftFormInModal() {
+      if (typeof requirePremium === 'function' && !requirePremium('turns')) return;
       if (!requirePremium('turns')) return;
       // Primero limpiar y configurar campos antes de llamar a showCreateFormInModal
       hideTitleSuggestions();
@@ -10701,6 +10714,112 @@
       if (minsInput) minsInput.value = diffMins % 60;
     }
 
+    function isVisibleModalNoteItem(n) {
+      return !!(n &&
+        !n.isHiddenCounter &&
+        !String(n.id || '').startsWith('bday_cnt_') &&
+        (!n.birthdayOwnerId || n.isBirthday || n.isEvent || (Array.isArray(n.eventTypes) && n.eventTypes.includes('anniversary'))) &&
+        (isCalendarNote(n) || n.isDayMarker || n.isDayOff || DAY_MARKER_TYPES[n.markerType] || (n.isShift && DAY_MARKER_TYPES[n.shiftStatus])));
+    }
+
+    function applyDayNotesOrderFromIds(orderedIds) {
+      if (!Array.isArray(orderedIds) || orderedIds.length < 2) return;
+      const dateKey = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      const arr = Array.isArray(dayDataMap[dateKey]) ? [...dayDataMap[dateKey]] : [];
+      const visIndices = [];
+      const visMap = new Map();
+      arr.forEach((n, idx) => {
+        if (isVisibleModalNoteItem(n)) {
+          visIndices.push(idx);
+          visMap.set(n.id, n);
+        }
+      });
+      if (visIndices.length < 2) return;
+      const reordered = [];
+      orderedIds.forEach(id => {
+        if (visMap.has(id)) {
+          reordered.push(visMap.get(id));
+          visMap.delete(id);
+        }
+      });
+      visMap.forEach(n => reordered.push(n));
+      visIndices.forEach((idx, i) => { arr[idx] = reordered[i]; });
+      dayDataMap[dateKey] = arr;
+      if (!saveToLocalStorage()) return;
+      currentModalNotes = JSON.parse(JSON.stringify(dayDataMap[dateKey]));
+      renderAll();
+    }
+
+    function initDayNoteTouchDrag(container) {
+      if (!container || container._touchDragBound) return;
+      container._touchDragBound = true;
+      container._suppressClickUntil = 0;
+      let dragItem = null;
+      let moved = false;
+
+      container.addEventListener('click', ev => {
+        if (Date.now() < (container._suppressClickUntil || 0)) {
+          ev.stopPropagation();
+          ev.preventDefault();
+        }
+      }, true);
+
+      const getClientY = ev => (ev.touches && ev.touches[0] ? ev.touches[0].clientY : ev.clientY);
+
+      const onStart = ev => {
+        const handle = ev.target && ev.target.closest ? ev.target.closest('[data-note-drag-handle]') : null;
+        if (!handle) return;
+        const row = handle.closest('.day-note-sortable-item');
+        if (!row) return;
+        dragItem = row;
+        moved = false;
+        dragItem.classList.add('ring-2', 'ring-teal-400', 'bg-slate-800', 'opacity-90', 'scale-[1.02]');
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (_) {}
+      };
+
+      const onMove = ev => {
+        if (!dragItem) return;
+        if (ev.cancelable) ev.preventDefault();
+        const y = getClientY(ev);
+        const rows = Array.from(container.querySelectorAll('.day-note-sortable-item'));
+        for (const row of rows) {
+          if (row === dragItem) continue;
+          const rect = row.getBoundingClientRect();
+          const mid = rect.top + rect.height / 2;
+          if (y < mid && dragItem.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_PRECEDING) {
+            container.insertBefore(dragItem, row);
+            moved = true;
+            break;
+          } else if (y > mid && dragItem.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING) {
+            container.insertBefore(dragItem, row.nextSibling);
+            moved = true;
+            break;
+          }
+        }
+      };
+
+      const onEnd = () => {
+        if (!dragItem) return;
+        dragItem.classList.remove('ring-2', 'ring-teal-400', 'bg-slate-800', 'opacity-90', 'scale-[1.02]');
+        dragItem = null;
+        if (moved) {
+          container._suppressClickUntil = Date.now() + 350;
+          const orderedIds = Array.from(container.querySelectorAll('.day-note-sortable-item'))
+            .map(el => el.getAttribute('data-note-id'))
+            .filter(Boolean);
+          applyDayNotesOrderFromIds(orderedIds);
+        }
+      };
+
+      container.addEventListener('touchstart', onStart, { passive: true });
+      container.addEventListener('touchmove', onMove, { passive: false });
+      container.addEventListener('touchend', onEnd);
+      container.addEventListener('touchcancel', onEnd);
+      container.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+    }
+
     function renderModalNotesList() {
       const container = document.getElementById('modal-notes-list');
       if (!container) return;
@@ -10773,9 +10892,17 @@
         return;
       }
 
+      if (visibleNotes.length >= 2) {
+        const dragHint = document.createElement('p');
+        dragHint.className = 'text-[10px] text-slate-400 px-1 flex items-center gap-1.5';
+        dragHint.innerHTML = '<span>⠿</span><span>Mantén y arrastra con el dedo para ordenar las notas del día</span>';
+        container.appendChild(dragHint);
+      }
+
       visibleNotes.forEach(note => {
         const item = document.createElement('div');
-        item.className = 'bg-slate-900 p-2.5 rounded-lg border border-slate-700/80 flex items-center justify-between gap-2 shadow-sm cursor-pointer hover:border-teal-500/60 transition-colors';
+        item.className = 'day-note-sortable-item bg-slate-900 p-2.5 rounded-lg border border-slate-700/80 flex items-center justify-between gap-2 shadow-sm cursor-pointer hover:border-teal-500/60 transition-all';
+        item.setAttribute('data-note-id', note.id || '');
         item.setAttribute('role', 'button');
         item.setAttribute('tabindex', '0');
         item.setAttribute('aria-label', `Vista previa de ${note.title || note.text || 'nota'}`);
@@ -10802,7 +10929,8 @@
         const safeNoteJSON = escapeHtml(JSON.stringify(editableNote));
 
         item.innerHTML = `
-          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-1 min-w-0">
+            ${visibleNotes.length >= 2 ? `<span data-note-drag-handle="1" onclick="event.stopPropagation()" title="Arrastra para ordenar" aria-label="Arrastrar para ordenar" style="touch-action:none;" class="px-1.5 py-2 -ml-1 text-slate-400 hover:text-teal-300 cursor-grab active:cursor-grabbing select-none text-sm leading-none shrink-0">⠿</span>` : ''}
             <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${safeColor(note.color, '#14B8A6')}"></span>
             <div class="flex flex-col min-w-0">
               <div class="flex items-center gap-1.5 flex-wrap">
@@ -10827,6 +10955,8 @@
         `;
         container.appendChild(item);
       });
+
+      initDayNoteTouchDrag(container);
 
       scheduledDoses.forEach(({ med, time, doseId, isBaby, rawDoseId, babyId }) => {
         let isTaken = false;
@@ -12547,6 +12677,7 @@
     }
 
     function openSettingsModal() {
+      if (typeof applyTabVisibility === 'function') applyTabVisibility();
       if (typeof updatePlanStatusUI === 'function') updatePlanStatusUI();
       document.getElementById('time-format-setting').value = timeFormat;
       const themeSel = document.getElementById('app-theme-setting');
@@ -13735,6 +13866,14 @@
         }
       };
     })();
+
+    async function exportJsonOrDrive() {
+      const isNativeAndroid = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !!window.OmniTaskNative;
+      if (isNativeAndroid && typeof shareBackupFileToDriveApp === 'function') {
+        return shareBackupFileToDriveApp();
+      }
+      return exportDataJSON();
+    }
 
     async function shareBackupFileToDriveApp() {
       if (!requirePremiumFeature('drive')) return false;
@@ -15596,7 +15735,7 @@
       reader.onload = function(e) {
         try {
           const buffer = e.target.result;
-          if (/\.shifter$/i.test(file.name) || isSQLite3Buffer(buffer)) {
+          if (/\.(shifter|db|sqlite)$/i.test(file.name) || isSQLite3Buffer(buffer)) {
             importShifterBuffer(buffer);
             return;
           }
@@ -16103,12 +16242,12 @@
       <div id="paywall-video-progress-box" class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-1.5">
         <div class="flex items-center justify-between text-[11px] font-bold">
           <span class="text-cyan-300">🎬 Tiempo acumulado por videos</span>
-          <span id="paywall-video-hours-text" class="text-slate-200">0h / 48h</span>
+          <span id="paywall-video-hours-text" class="text-slate-200">0h / 24h</span>
         </div>
         <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
           <div id="paywall-video-progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all" style="width: 0%;"></div>
         </div>
-        <p id="paywall-trial-info" class="text-[10px] text-slate-400">Cada video corto suma +12 horas de acceso completo (máximo 48h).</p>
+        <p id="paywall-trial-info" class="text-[10px] text-slate-400">Cada video corto suma +6 horas de acceso completo (máximo 24h).</p>
       </div>
 
       <div class="space-y-2 pt-0.5">
@@ -16118,7 +16257,7 @@
         </button>
 
         <button type="button" id="paywallWatchVideoBtn" onclick="startRewardedVideoUnlock()" class="w-full min-h-11 py-2 px-3 bg-cyan-600/25 hover:bg-cyan-600/35 text-cyan-200 border border-cyan-500/50 rounded-xl text-xs font-extrabold active:scale-95 transition-all flex items-center justify-center gap-2">
-          <span>🎬 Ver 1 video (+12 horas gratis)</span>
+          <span>🎬 Ver 1 video (+6 horas gratis)</span>
         </button>
 
         <button type="button" id="premiumPaywallCloseBtn" onclick="closePremiumPaywall()" class="w-full min-h-9 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold active:scale-95">
@@ -21328,7 +21467,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.9';
+      const OMNITASK_APP_VERSION = '1.1.11';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
