@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omnitask-pwa-v2026-11-19-v18';
+const CACHE_NAME = 'omnitask-pwa-v2026-11-20-v24';
 const OFFLINE_URL = './index.html';
 const APP_SHELL = [
   './',
@@ -6,8 +6,8 @@ const APP_SHELL = [
   './privacy.html',
   './manifest.webmanifest',
   './icon.svg',
-  './omnitask-icon-192.png?v=4',
-  './omnitask-icon-512.png?v=4'
+  './omnitask-icon-192.png?v=5',
+  './omnitask-icon-512.png?v=5'
 ];
 
 // Servicios externos que nunca se guardan en caché (Firebase de sincronización y feriados)
@@ -24,7 +24,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('omnitask-pwa-') && key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -65,7 +65,7 @@ self.addEventListener('fetch', (event) => {
             }
             return res;
           })
-          .catch(() => cached || caches.match(OFFLINE_URL));
+          .catch(() => cached || Response.error());
         return cached || networkFetch;
       })
     );

@@ -90,7 +90,7 @@
   <div class="container">
     <header>
       <h1>Política de Privacidad y Aviso Médico</h1>
-      <div class="meta">Aplicación: <strong>OmniTask (Calendario, Turnos, Salud y Bebé)</strong> &middot; Paquete Android: <code>cl.vorax2009.micalendario</code> &middot; Última actualización: 17 de noviembre de 2026</div>
+      <div class="meta">Aplicación: <strong>OmniTask (Calendario, Turnos, Salud y Bebé)</strong> &middot; Paquete Android: <code>cl.vorax2009.micalendario</code> &middot; Última actualización: 20 de noviembre de 2026</div>
     </header>
 
     <section class="card card-medical">
@@ -115,7 +115,7 @@
         <li>Registros de cuidado del bebé (alimentación, pañales, sueño, vacunas, controles pediátricos, crecimiento e inventario).</li>
       </ul>
       <p>
-        El desarrollador no opera servidores propios de recolección de datos personales, no incluye SDKs publicitarios ni vende o cede datos a terceros.
+        El desarrollador no opera servidores propios de recolección de datos personales ni vende datos a terceros. La versión Android integra opcionalmente <strong>Google AdMob</strong> (videos recompensados opcionales para extender acceso temporal) y <strong>Google Play Billing</strong> (compra única de por vida), servicios que pueden procesar el ID de publicidad de Android y el historial de compras conforme a las políticas de Google.
       </p>
     </section>
 
@@ -132,8 +132,9 @@
     <section class="card">
       <h2>3. Permisos y servicios externos</h2>
       <ul>
-        <li><strong>Permiso de Calendario de Android (<code>READ_CALENDAR</code> y <code>WRITE_CALENDAR</code>) y Google Drive:</strong> Cuando el usuario pulsa voluntariamente <em>Exportar a Google Calendar</em>, la aplicación utiliza los permisos nativos de calendario de Android exclusivamente para insertar en el calendario del dispositivo los turnos, eventos, controles médicos, vacunas y recordatorios/alarmas de medicamentos seleccionados por el usuario (evitando duplicados), o bien generar un archivo estándar <code>.ics</code> / respaldo <code>.json</code> en Google Drive. OmniTask no lee, modifica ni transmite eventos ajenos a servidores externos.</li>
+        <li><strong>Permiso de Calendario de Android (<code>READ_CALENDAR</code> y <code>WRITE_CALENDAR</code>) y Google Drive:</strong> Cuando el usuario pulsa voluntariamente <em>Exportar a Google Calendar</em>, la aplicación utiliza los permisos nativos de calendario de Android exclusivamente para insertar en el calendario del dispositivo los turnos, eventos, controles médicos, vacunas y recordatorios/alarmas de medicamentos seleccionados por el usuario (evitando duplicados), o bien generar un archivo estándar <code>.ics</code> / respaldo <code>.json</code> en Google Drive. <code>READ_CALENDAR</code> se utiliza únicamente para comprobar si un evento ya existe en el calendario del dispositivo y evitar duplicados al exportar; OmniTask no transmite eventos ajenos a servidores externos.</li>
         <li><strong>Notificaciones y alarmas locales (<code>POST_NOTIFICATIONS</code>):</strong> Si el usuario activa las alarmas nativas, OmniTask programa recordatorios localmente en el propio teléfono mediante el sistema operativo Android (sin servidores push externos).</li>
+        <li><strong>Control antifraude de prueba gratuita:</strong> Para evitar el reinicio abusivo de la prueba gratuita de 7 días al reinstalar la app, se calcula un hash unidireccional (SHA-256) del identificador del dispositivo Android y se consulta en Firebase Realtime Database (<code>/trial_devices/</code>) sin almacenar datos personales identificables.</li>
         <li><strong>Consulta opcional de feriados:</strong> La aplicación calcula los feriados localmente y puede consultar la API pública de feriados (<code>date.nager.at</code>) según el país seleccionado sin enviar identificadores personales.</li>
       </ul>
     </section>

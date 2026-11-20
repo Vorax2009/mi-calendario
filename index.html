@@ -6,8 +6,8 @@
   <title>OmniTask: Turnos, Salud y Bebé</title>
   <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
   
-  <link rel="icon" href="./omnitask-icon-192.png?v=3" type="image/png">
-  <link rel="apple-touch-icon" href="./omnitask-icon-192.png?v=3">
+  <link rel="icon" href="./omnitask-icon-192.png?v=5" type="image/png">
+  <link rel="apple-touch-icon" href="./omnitask-icon-192.png?v=5">
 
 
   <style>
@@ -361,7 +361,7 @@
   </style>
 
   <!-- PWA Meta Tags -->
-  <link rel="manifest" href="./manifest.webmanifest?v=3">
+  <link rel="manifest" href="./manifest.webmanifest?v=5">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3100,7 +3100,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.12 · Toca 5 veces para modo prueba
+            OmniTask v1.1.13 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -10200,20 +10200,7 @@
       }
     }
 
-    function updateSelectedDateInfo() {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = selectedDate.toLocaleDateString('es-ES', options);
-      const key = formatDateKey(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-      const dayNotes = dayDataMap[key];
-      const visibleNotes = Array.isArray(dayNotes) ? dayNotes.filter(isCalendarNote) : [];
-      const dayMarker = getDayMarker(dayNotes);
-
-      const selectedHoliday = getHolidayForDateKey(key);
-      const holidaySuffix = selectedHoliday ? ` · ${getActiveCountryMeta().flag} Feriado: ${selectedHoliday.name}${selectedHoliday.irrenunciable ? ' (Irrenunciable)' : ''}` : '';
-      const capitalizedStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-      const el = document.getElementById('selected-date-info');
-      if (el) el.textContent = `${capitalizedStr}${dayMarker ? ` (${dayMarker.title || DAY_MARKER_TYPES[getDayMarkerType(dayMarker)].title})` : (visibleNotes.length > 0 ? ` (${visibleNotes.length} etiqueta${visibleNotes.length > 1 ? 's' : ''})` : '')}${holidaySuffix}`;
-    }
+    function updateSelectedDateInfo() { /* Barra inferior removida */ }
 
     function selectNoteColor(color) {
       selectedColor = color.toUpperCase();
@@ -13134,14 +13121,22 @@
           localStorage.setItem('cal_tab_visibility', JSON.stringify(settingsObj.tabVisibility));
           if (typeof applyTabVisibility === 'function') applyTabVisibility();
         }
+        const safeSetBackupKey = (k, val) => {
+          try {
+            localStorage.setItem(k, JSON.stringify(val));
+          } catch (err) {
+            console.warn('Error guardando clave de respaldo:', k, err);
+            if (typeof showToast === 'function') showToast('Espacio lleno', 'No se pudo guardar ' + k + ' por límite de almacenamiento.', 'fa-triangle-exclamation', 'text-amber-400');
+          }
+        };
         if (settingsObj.gcalExportPrefs && typeof settingsObj.gcalExportPrefs === 'object') {
-          localStorage.setItem('cal_gcal_export_prefs_v1', JSON.stringify(settingsObj.gcalExportPrefs));
+          safeSetBackupKey('cal_gcal_export_prefs_v1', settingsObj.gcalExportPrefs);
         }
         if (settingsObj.babyCloudSync && typeof settingsObj.babyCloudSync === 'object' && settingsObj.babyCloudSync.dbUrl && settingsObj.babyCloudSync.roomCode) {
-          localStorage.setItem('cal_baby_cloud_sync_v1', JSON.stringify(settingsObj.babyCloudSync));
+          safeSetBackupKey('cal_baby_cloud_sync_v1', settingsObj.babyCloudSync);
         }
         if (Array.isArray(settingsObj.vehicles)) {
-          localStorage.setItem('cal_vehicles_v1', JSON.stringify(settingsObj.vehicles));
+          safeSetBackupKey('cal_vehicles_v1', settingsObj.vehicles);
           if (typeof renderVehiclesView === 'function') renderVehiclesView();
         }
       } catch (e) {}
@@ -16155,7 +16150,8 @@
         if (installBtn) installBtn.classList.remove('hidden');
       });
 
-      if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      const isNativeCap = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+      if (!isNativeCap && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
             .then((registration) => {
@@ -20790,7 +20786,7 @@
 
       window.generateStrongOmniTaskRoomCode = function () {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        const seg = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        const seg = (n) => Array.from({ length: n }, () => { const arr = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(arr); return chars[arr[0] % chars.length]; }).join('');
         const code = `OT-${seg(4)}-${seg(4)}-${seg(4)}`;
         const input = document.getElementById('babyCloudSyncRoomCode');
         if (input) input.value = code;
@@ -21773,6 +21769,18 @@
       // Soporte nativo y web para botón/gesto "Atrás" en Android APK (cierra el modal activo o vuelve al calendario sin cerrar la app)
       window.handleOmniTaskBackButton = function () {
         try {
+          const paywallEl = document.getElementById('premium-paywall-modal');
+          if (paywallEl && !paywallEl.classList.contains('hidden')) {
+            if (typeof closePremiumPaywallModal === 'function') closePremiumPaywallModal();
+            else paywallEl.classList.add('hidden');
+            return true;
+          }
+          const welcomeEl = document.getElementById('welcome-onboarding-modal');
+          if (welcomeEl && !welcomeEl.classList.contains('hidden')) {
+            if (typeof closeWelcomeOnboarding === 'function') closeWelcomeOnboarding();
+            else welcomeEl.classList.add('hidden');
+            return true;
+          }
           const modal = topModal();
           if (modal && MODALS[modal.id]) {
             MODALS[modal.id].close(modal);
@@ -21845,7 +21853,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.12';
+      const OMNITASK_APP_VERSION = '1.1.13';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -22014,7 +22022,7 @@
 
       window.generateStrongShiftsRoomCode = function () {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        const seg = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        const seg = (n) => Array.from({ length: n }, () => { const arr = new Uint32Array(1); (window.crypto || window.msCrypto).getRandomValues(arr); return chars[arr[0] % chars.length]; }).join('');
         const code = `TR-${seg(4)}-${seg(4)}-${seg(4)}`;
         const input = document.getElementById('shiftsCloudSyncRoomCode');
         if (input) input.value = code;

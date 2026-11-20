@@ -1,5 +1,5 @@
 {
-  "version": "1.1.12",
-  "notes": "Olas 1 y 2: botones Apagar/Posponer 10 min en alarmas, Modo Diurno completo, Bienvenida, Resumen de Hoy, Kilometraje y gastos ($) en Vehículos, y aviso de respaldo.",
+  "version": "1.1.13",
+  "notes": "Nuevo ícono oficial (halo cian-esmeralda), manifest ?v=5, SVG renovado y limpieza DOM.",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }
