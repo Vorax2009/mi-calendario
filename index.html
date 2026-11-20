@@ -572,16 +572,16 @@
       <!-- VISTA 1: CALENDARIO MENSUAL -->
       <div id="view-month" class="flex-1 flex flex-col view-transition">
         <!-- FRANJA COLAPSABLE: RESUMEN DE HOY -->
-        <div id="today-summary-strip" class="mb-2 rounded-xl bg-[#1e293b] border border-slate-700/70 overflow-hidden shadow-sm">
-          <button type="button" onclick="toggleTodaySummaryStrip()" class="w-full px-3 py-2 flex items-center justify-between gap-2 text-left hover:bg-slate-800/40 transition-colors">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-sm shrink-0">📌</span>
-              <span class="text-[11px] font-extrabold text-teal-300 uppercase tracking-wide shrink-0">Hoy</span>
-              <span id="today-summary-inline" class="text-[11px] text-slate-300 truncate">Sin pendientes urgentes</span>
+        <div id="today-summary-strip" class="mb-1.5 rounded-xl bg-[#1e293b] border border-slate-700/70 overflow-hidden shadow-sm">
+          <button type="button" onclick="toggleTodaySummaryStrip()" class="w-full px-2.5 py-1.5 flex items-center justify-between gap-2 text-left hover:bg-slate-800/40 transition-colors">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-xs shrink-0">📌</span>
+              <span class="text-[10px] font-extrabold text-teal-300 uppercase tracking-wide shrink-0">Hoy</span>
+              <span id="today-summary-inline" class="text-[10px] text-slate-300 truncate">Sin pendientes urgentes</span>
             </div>
-            <span id="today-summary-chevron" class="text-xs text-slate-400 shrink-0 transition-transform">▾</span>
+            <span id="today-summary-chevron" class="text-[11px] text-slate-400 shrink-0 transition-transform">▾</span>
           </button>
-          <div id="today-summary-body" class="hidden px-3 pb-2.5 pt-1 border-t border-slate-700/50 flex flex-wrap gap-1.5"></div>
+          <div id="today-summary-body" class="hidden px-2.5 pb-2 pt-1.5 border-t border-slate-700/50 flex flex-wrap items-center gap-1"></div>
         </div>
         
         <!-- MONTH & YEAR CONTROL HEADER -->
@@ -624,17 +624,7 @@
           <!-- Dynamic Content -->
         </div>
 
-        <!-- EVENT QUICK INFO BAR -->
-        <div class="mt-4 bg-[#1e293b] p-3 rounded-lg border border-slate-700/60 flex items-center justify-between shadow-lg gap-2">
-          <div class="flex items-center space-x-2.5 overflow-hidden">
-            <span class="w-3 h-3 rounded-full bg-teal-400 shrink-0 animate-pulse"></span>
-            <span id="selected-date-info" class="text-xs sm:text-sm font-medium text-slate-200 leading-tight break-words min-w-0">Selecciona un día para abrir detalles</span>
-          </div>
-          <button onclick="openDayDetailModal()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md text-xs font-bold tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 shrink-0">
-            <i class="fa-solid fa-pen-to-square"></i>
-            <span>Gestionar Día</span>
-          </button>
-        </div>
+
 
       </div>
 
@@ -2322,7 +2312,7 @@
       <!-- Sección Salud Adultos / General -->
       <div class="space-y-1.5">
         <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block px-1 flex items-center gap-1.5">
-          <i class="fa-solid fa-user text-blue-400"></i> Salud General / Adulto
+          <i class="fa-solid fa-user text-blue-400"></i> Salud
         </span>
         <div class="grid gap-2">
           <button type="button" onclick="openHealthControlForm(null, currentHealthPresetDate)" class="min-h-11 rounded-lg bg-indigo-600 hover:bg-indigo-500 px-3 text-left text-xs font-bold flex items-center gap-2 text-white shadow transition-all active:scale-95">
@@ -2334,22 +2324,6 @@
         </div>
       </div>
 
-      <!-- Sección Bebé -->
-      <div class="space-y-1.5 pt-2 border-t border-slate-800">
-        <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 block px-1 flex items-center gap-1.5">
-          <span>👶</span> Bebé (Baby Tracker)
-        </span>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="openBabyControlModal(currentHealthPresetDate)" class="p-2.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-left font-bold text-xs flex flex-col gap-1 shadow transition-all active:scale-95">
-            <span class="flex items-center gap-1.5 text-purple-100"><i class="fa-solid fa-user-doctor"></i> Control Bebé</span>
-            <span class="text-[10px] text-purple-200 font-normal">Pediatría / Cita</span>
-          </button>
-          <button type="button" onclick="openBabyMedModal(currentHealthPresetDate)" class="p-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-left font-bold text-xs flex flex-col gap-1 shadow transition-all active:scale-95">
-            <span class="flex items-center gap-1.5 text-sky-100"><i class="fa-solid fa-prescription-bottle-medical"></i> Med Bebé</span>
-            <span class="text-[10px] text-sky-200 font-normal">Dosis y tomas</span>
-          </button>
-        </div>
-      </div>
     </section>
   </div>
 
@@ -3692,41 +3666,59 @@
       if (sel) sel.value = getNavFeedbackMode();
     }
 
+    let _lastNavFeedbackTs = 0;
+
     function playSubtleNavSound() {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         if (!_navAudioCtx) _navAudioCtx = new AudioCtx();
-        if (_navAudioCtx.state === 'suspended') _navAudioCtx.resume();
-        const now = _navAudioCtx.currentTime;
-        const osc = _navAudioCtx.createOscillator();
-        const gain = _navAudioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(640, now);
-        osc.frequency.exponentialRampToValueAtTime(420, now + 0.045);
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.008);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
-        osc.connect(gain);
-        gain.connect(_navAudioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.06);
+        const triggerTone = () => {
+          try {
+            const now = _navAudioCtx.currentTime;
+            const osc = _navAudioCtx.createOscillator();
+            const gain = _navAudioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(720, now);
+            osc.frequency.exponentialRampToValueAtTime(440, now + 0.055);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.exponentialRampToValueAtTime(0.32, now + 0.008);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+            osc.connect(gain);
+            gain.connect(_navAudioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+          } catch (_) {}
+        };
+        if (_navAudioCtx.state === 'suspended') {
+          _navAudioCtx.resume().then(triggerTone).catch(() => {});
+        } else {
+          triggerTone();
+        }
       } catch (_) {}
     }
 
     function playNavFeedback(forceMode) {
       const mode = forceMode || getNavFeedbackMode();
       if (mode === 'off') return;
+      const nowMs = Date.now();
+      if (!forceMode && nowMs - _lastNavFeedbackTs < 65) return;
+      _lastNavFeedbackTs = nowMs;
       if (mode === 'vibrate' || mode === 'both') {
         try {
           if (window.OmniTaskNative && typeof window.OmniTaskNative.performHapticTap === 'function') {
             window.OmniTaskNative.performHapticTap();
           } else if (navigator.vibrate) {
-            navigator.vibrate(12);
+            navigator.vibrate(25);
           }
         } catch (_) {}
       }
       if (mode === 'sound' || mode === 'both') {
+        try {
+          if (window.OmniTaskNative && typeof window.OmniTaskNative.playNativeClickSound === 'function') {
+            window.OmniTaskNative.playNativeClickSound();
+          }
+        } catch (_) {}
         playSubtleNavSound();
       }
     }
@@ -4235,34 +4227,69 @@
         topTabHeader.addEventListener('touchstart', (e) => handleTouchStart(e, 'header'), { passive: true });
         topTabHeader.addEventListener('touchend', handleTouchEnd, { passive: true });
       }
+
+      const mainEl = document.querySelector('main');
+      if (mainEl) {
+        mainEl.addEventListener('touchstart', (e) => {
+          if (!e.touches || e.touches.length !== 1) return;
+          const tgt = e.target;
+          if (tgt && tgt.closest) {
+            if (tgt.closest('#calendar-grid, #year-months-grid, input, select, textarea, canvas, [data-note-drag-handle], .overflow-x-auto')) return;
+          }
+          // Ignorar si hay algún modal abierto
+          const openModal = document.querySelector('.fixed.inset-0:not(.hidden)');
+          if (openModal) return;
+          handleTouchStart(e, 'main');
+        }, { passive: true });
+        mainEl.addEventListener('touchend', (e) => {
+          if (touchTargetId === 'main') handleTouchEnd(e);
+        }, { passive: true });
+      }
+    }
+
+    function navigateBySwipeTab(direction) {
+      const views = ['calendar', 'summary', 'vehicles', 'turns', 'meds', 'baby'].filter(isTabVisible);
+      const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
+      const currentIndex = views.indexOf(currentView);
+      if (currentIndex === -1) return;
+      const targetIndex = currentIndex + direction;
+      if (targetIndex < 0 || targetIndex >= views.length) return;
+      const nextView = views[targetIndex];
+      if (typeof playNavFeedback === 'function') playNavFeedback();
+      if (nextView === 'calendar') {
+        openCurrentCalendarView();
+      } else if (typeof openViewOrPaywall === 'function' && PREMIUM_VIEWS.includes(nextView)) {
+        openViewOrPaywall(nextView);
+      } else {
+        switchView(nextView, true);
+      }
     }
 
     function handleSwipeGesture() {
       const diffX = touchEndX - touchStartX;
       const diffY = touchEndY - touchStartY;
 
+      if (touchTargetId === 'header' || touchTargetId === 'main') {
+        const minDist = touchTargetId === 'main' ? 65 : 50;
+        if (Math.abs(diffX) > minDist && Math.abs(diffX) > Math.abs(diffY) * 1.35) {
+          navigateBySwipeTab(diffX < 0 ? 1 : -1);
+        }
+        touchTargetId = '';
+        return;
+      }
+
       if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-        if (touchTargetId === 'header') {
-          const views = ['calendar', 'summary', 'turns', 'meds', 'baby'].filter(isTabVisible);
-          const currentView = activeView === 'month' || activeView === 'year' ? 'calendar' : activeView;
-          const currentIndex = views.indexOf(currentView);
-          if (diffX < 0) {
-            if (currentIndex < views.length - 1) switchView(views[currentIndex + 1], true);
-          } else {
-            if (currentIndex > 0) {
-              const previousView = views[currentIndex - 1];
-              if (previousView === 'calendar') openCurrentCalendarView();
-              else switchView(previousView, true);
-            }
-          }
-        } else if (activeView === 'month') {
+        if (activeView === 'month') {
+          if (typeof playNavFeedback === 'function') playNavFeedback();
           if (diffX < 0) changeMonth(1);
           else changeMonth(-1);
         } else if (activeView === 'year') {
+          if (typeof playNavFeedback === 'function') playNavFeedback();
           if (diffX < 0) changeYear(1);
           else changeYear(-1);
         }
       }
+      touchTargetId = '';
     }
 
     const TODAY_SUMMARY_OPEN_KEY = 'omnitask_today_summary_open_v1';
@@ -4302,10 +4329,21 @@
       const todayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
       const dayItems = Array.isArray(dayDataMap[todayKey]) ? dayDataMap[todayKey] : [];
       const shifts = dayItems.filter(n => n && n.isShift);
-      const notes = dayItems.filter(n => n && !n.isShift && !n.isHiddenCounter && !String(n.id || '').startsWith('bday_cnt_'));
+      const isBdayItem = n => !!(n && (n.isBirthday || (Array.isArray(n.eventTypes) && n.eventTypes.includes('birthday'))));
+      const isAnivItem = n => !!(n && !isBdayItem(n) && (n.isAnniversary || (Array.isArray(n.eventTypes) && n.eventTypes.includes('anniversary'))));
+      const birthdaysToday = dayItems.filter(n => n && !n.isShift && !n.isHiddenCounter && !String(n.id || '').startsWith('bday_cnt_') && isBdayItem(n));
+      const anniversariesToday = dayItems.filter(n => n && !n.isShift && !n.isHiddenCounter && !String(n.id || '').startsWith('bday_cnt_') && isAnivItem(n));
+      const notes = dayItems.filter(n => n && !n.isShift && !n.isHiddenCounter && !String(n.id || '').startsWith('bday_cnt_') && !isBdayItem(n) && !isAnivItem(n));
+
       const doses = typeof getDosesForMedDate === 'function' ? getDosesForMedDate(todayKey) : [];
       const controls = typeof getHealthControlsForDate === 'function' ? getHealthControlsForDate(todayKey) : [];
-      let vehDueSoon = 0;
+      const adultDoses = doses.filter(d => d && !d.isBaby);
+      const babyDoses = doses.filter(d => d && d.isBaby);
+      const adultControls = controls.filter(c => c && !c.isBaby);
+      const babyControls = controls.filter(c => c && c.isBaby);
+
+      const vehDueList = [];
+      const vehLabels = { prtDate: 'Rev. Técnica', permisoDate: 'Permiso', soapDate: 'SOAP', oilDate: 'Cambio de Aceite' };
       try {
         const vList = JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]');
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -4314,10 +4352,11 @@
             if (v && v[f] && /^\d{4}-\d{2}-\d{2}$/.test(v[f])) {
               const [y, m, d] = v[f].split('-').map(Number);
               const diff = Math.round((new Date(y, m - 1, d).getTime() - todayStart) / 86400000);
-              if (diff <= 30) vehDueSoon++;
+              if (diff <= 30) vehDueList.push({ label: vehLabels[f] || 'Trámite', diff });
             }
           });
         });
+        vehDueList.sort((a, b) => a.diff - b.diff);
       } catch (_) {}
 
       const parts = [];
@@ -4325,21 +4364,49 @@
 
       if (shifts.length > 0) {
         const sLbl = shifts[0].shiftType || shifts[0].title || 'Turno';
-        parts.push(`🕒 ${sLbl}`);
-        chips.push(`<button type="button" onclick="openViewOrPaywall('turns')" class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[11px] font-bold active:scale-95">🕒 ${escapeHtml(sLbl)}</button>`);
+        parts.push('🕒 Turno');
+        chips.push(`<button type="button" onclick="openViewOrPaywall('turns')" class="px-2 py-0.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-bold active:scale-95">🕒 ${escapeHtml(sLbl)}</button>`);
       }
       if (notes.length > 0) {
-        parts.push(`📝 ${notes.length} ${notes.length === 1 ? 'nota' : 'notas'}`);
-        chips.push(`<button type="button" onclick="selectedDate = new Date(); openDayDetailModal();" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold active:scale-95">📝 ${notes.length} ${notes.length === 1 ? 'nota hoy' : 'notas hoy'}</button>`);
+        const nTxt = `${notes.length} ${notes.length === 1 ? 'nota' : 'notas'}`;
+        parts.push(`📝 ${nTxt}`);
+        chips.push(`<button type="button" onclick="selectedDate = new Date(); openDayDetailModal();" class="px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold active:scale-95">📝 ${nTxt}</button>`);
       }
-      const healthCount = doses.length + controls.length;
-      if (healthCount > 0) {
-        parts.push(`❤️‍🩹 ${healthCount} salud`);
-        chips.push(`<button type="button" onclick="openViewOrPaywall('meds')" class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[11px] font-bold active:scale-95">❤️‍🩹 ${healthCount} ${healthCount === 1 ? 'pendiente' : 'pendientes'}</button>`);
+      if (birthdaysToday.length > 0) {
+        const bTxt = `${birthdaysToday.length} cumple`;
+        parts.push(`🎂 ${bTxt}`);
+        chips.push(`<button type="button" onclick="selectedDate = new Date(); openDayDetailModal();" class="px-2 py-0.5 rounded-lg bg-pink-500/20 text-pink-300 border border-pink-500/40 text-[10px] font-bold active:scale-95">🎂 ${bTxt}</button>`);
       }
-      if (vehDueSoon > 0) {
-        parts.push(`🚗 ${vehDueSoon} próx.`);
-        chips.push(`<button type="button" onclick="switchView('vehicles', true)" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px] font-bold active:scale-95">🚗 ${vehDueSoon} ${vehDueSoon === 1 ? 'vencimiento ≤30d' : 'vencimientos ≤30d'}</button>`);
+      if (anniversariesToday.length > 0) {
+        const aTxt = `${anniversariesToday.length} aniv.`;
+        parts.push(`💍 ${aTxt}`);
+        chips.push(`<button type="button" onclick="selectedDate = new Date(); openDayDetailModal();" class="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-bold active:scale-95">💍 ${aTxt}</button>`);
+      }
+      const adultTotal = adultControls.length + adultDoses.length;
+      if (adultTotal > 0) {
+        parts.push(`❤️‍🩹 ${adultTotal} salud`);
+        if (adultControls.length > 0) {
+          chips.push(`<button type="button" onclick="openViewOrPaywall('meds')" class="px-2 py-0.5 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40 text-[10px] font-bold active:scale-95">❤️‍🩹 ${adultControls.length} ${adultControls.length === 1 ? 'control' : 'controles'}</button>`);
+        }
+        if (adultDoses.length > 0) {
+          chips.push(`<button type="button" onclick="openViewOrPaywall('meds')" class="px-2 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold active:scale-95">💊 ${adultDoses.length} ${adultDoses.length === 1 ? 'toma' : 'tomas'}</button>`);
+        }
+      }
+      const babyTotal = babyControls.length + babyDoses.length;
+      if (babyTotal > 0) {
+        parts.push(`👶 ${babyTotal} bebé`);
+        if (babyControls.length > 0) {
+          chips.push(`<button type="button" onclick="openViewOrPaywall('baby')" class="px-2 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold active:scale-95">👶 ${babyControls.length} ${babyControls.length === 1 ? 'control' : 'controles'}</button>`);
+        }
+        if (babyDoses.length > 0) {
+          chips.push(`<button type="button" onclick="openViewOrPaywall('baby')" class="px-2 py-0.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40 text-[10px] font-bold active:scale-95">👶 ${babyDoses.length} ${babyDoses.length === 1 ? 'toma' : 'tomas'} med.</button>`);
+        }
+      }
+      if (vehDueList.length > 0) {
+        parts.push(`🚗 ${vehDueList.length} por vencer`);
+        const first = vehDueList[0];
+        const extraTxt = vehDueList.length > 1 ? ` (+${vehDueList.length - 1})` : '';
+        chips.push(`<button type="button" onclick="switchView('vehicles', true)" class="px-2 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold active:scale-95">🚗 ${escapeHtml(first.label)}${extraTxt}</button>`);
       }
 
       if (parts.length === 0) {
@@ -9796,7 +9863,8 @@
         };
 
         if (isToday) {
-          cell.classList.add('border-2', 'border-amber-400', 'shadow-[0_0_10px_rgba(251,191,36,0.3)]');
+          cell.classList.add('border-2', 'border-amber-400', 'z-10');
+          cell.style.boxShadow = 'inset 0 0 0 2px #f59e0b, 0 0 10px rgba(245,158,11,0.35)';
         }
 
         if (isSelected && isCurrentMonth) {
@@ -9815,10 +9883,13 @@
         }
 
         const dayHeader = document.createElement('div');
-        dayHeader.className = `absolute top-0.5 right-1 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'text-amber-400 font-black' : (dayHoliday && isCurrentMonth ? 'text-rose-400 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600'))}`;
+        dayHeader.className = `absolute top-0.5 right-0.5 text-xs font-bold z-10 pointer-events-none flex items-center gap-1 ${isToday ? 'font-black' : (dayHoliday && isCurrentMonth ? 'text-rose-400 font-black drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]' : (isCurrentMonth ? 'text-slate-300' : 'text-slate-600'))}`;
+        if (isToday) {
+          dayHeader.style.cssText = 'background:#f59e0b;color:#020617;border-radius:9999px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1;border:1.5px solid #ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.4);';
+        }
         
         if (isToday) {
-          dayHeader.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-ping"></span><span>${dayNum}</span>`;
+          dayHeader.textContent = dayNum;
         } else if (dayHoliday && isCurrentMonth) {
           dayHeader.innerHTML = `<span>${dayNum}</span>`;
         } else {

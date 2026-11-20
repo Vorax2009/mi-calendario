@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omnitask-pwa-v2026-11-19-v17';
+const CACHE_NAME = 'omnitask-pwa-v2026-11-19-v18';
 const OFFLINE_URL = './index.html';
 const APP_SHELL = [
   './',
@@ -6,8 +6,8 @@ const APP_SHELL = [
   './privacy.html',
   './manifest.webmanifest',
   './icon.svg',
-  './omnitask-icon-192.png?v=3',
-  './omnitask-icon-512.png?v=3'
+  './omnitask-icon-192.png?v=4',
+  './omnitask-icon-512.png?v=4'
 ];
 
 // Servicios externos que nunca se guardan en caché (Firebase de sincronización y feriados)
