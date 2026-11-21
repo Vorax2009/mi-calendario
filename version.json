@@ -1,5 +1,5 @@
 {
-  "version": "1.1.16",
-  "notes": "Menús unificados (Mantenciones/Finanzas y Familia/Salud), Cuentas y Mascotas, animaciones nativas, In-App Review y recompensa +2h (máx. 12h).",
+  "version": "1.1.17",
+  "notes": "Buscador global instantáneo, Widget Android 4x2, auto-renovación de cuentas y gasto mensual combinado, bloqueo PIN/Huella para Familia y Salud, y resumen dominical a las 20:00.",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }
