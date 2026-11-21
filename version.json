@@ -1,5 +1,5 @@
 {
-  "version": "1.1.15",
-  "notes": "Nuevos módulos integrados: Cuentas por Pagar y Mascotas (activables en Pestañas visibles) con respaldo JSON.",
+  "version": "1.1.16",
+  "notes": "Menús unificados (Mantenciones/Finanzas y Familia/Salud), Cuentas y Mascotas, animaciones nativas, In-App Review y recompensa +2h (máx. 12h).",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }

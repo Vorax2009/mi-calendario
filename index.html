@@ -543,6 +543,177 @@
       color: #475569 !important;
     }
     html.theme-light .ot-text-orange { color: #c2410c !important; }
+    /* Modo Diurno para botón Sync de Turnos y #shiftsCloudSyncModal */
+    html.theme-light button[onclick*="openShiftsCloudSyncModal"] {
+      background-color: #d1fae5 !important;
+      border-color: #34d399 !important;
+      color: #065f46 !important;
+    }
+    html.theme-light #shiftsCloudSyncModal section {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .bg-slate-900,
+    html.theme-light #shiftsCloudSyncModal .bg-slate-900\/80,
+    html.theme-light #shiftsCloudSyncModal .bg-slate-800 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light #shiftsCloudSyncModal input,
+    html.theme-light #shiftsCloudSyncModal textarea {
+      background-color: #ffffff !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .text-slate-100,
+    html.theme-light #shiftsCloudSyncModal .text-slate-200,
+    html.theme-light #shiftsCloudSyncModal .text-slate-300 {
+      color: #0f172a !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .text-slate-400 {
+      color: #475569 !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .text-purple-300,
+    html.theme-light #shiftsCloudSyncModal .text-purple-400 {
+      color: #7e22ce !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .text-sky-300,
+    html.theme-light #shiftsCloudSyncModal .text-sky-400 {
+      color: #0369a1 !important;
+    }
+    html.theme-light #shiftsCloudSyncModal .text-emerald-300,
+    html.theme-light #shiftsCloudSyncModal .text-emerald-400 {
+      color: #047857 !important;
+    }
+  </style>
+  <style id="omnitask-native-motion-css">
+    /* Pack de Animaciones Nativas OmniTask (GPU transform/opacity, 160-240ms) */
+    @keyframes otSlideInRight {
+      from { opacity: 0; transform: translate3d(22px, 0, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes otSlideInLeft {
+      from { opacity: 0; transform: translate3d(-22px, 0, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes otFadeUp {
+      from { opacity: 0; transform: translate3d(0, 10px, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes otBackdropIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes otSheetUp {
+      from { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.985); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes otIconPop {
+      0%   { transform: scale(0.86); }
+      55%  { transform: scale(1.14); }
+      100% { transform: scale(1); }
+    }
+    @keyframes otConfirmPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); transform: scale(0.985); }
+      60%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); transform: scale(1.01); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+    }
+
+    .ot-anim-slide-right { animation: otSlideInRight 0.22s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .ot-anim-slide-left  { animation: otSlideInLeft  0.22s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .ot-anim-fade-up     { animation: otFadeUp       0.20s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .ot-confirm-pulse    { animation: otConfirmPulse 0.38s ease-out; }
+
+    /* Modales tipo Bottom Sheet nativo */
+    div.fixed[id*="modal"]:not(.hidden),
+    #premiumPaywallModal:not(.hidden),
+    #shiftsCloudSyncModal:not(.hidden),
+    #healthRegistrationChooserModal:not(.hidden) {
+      animation: otBackdropIn 0.18s ease-out both;
+    }
+    div.fixed[id*="modal"]:not(.hidden) > div,
+    div.fixed[id*="modal"]:not(.hidden) > section,
+    #premiumPaywallModal:not(.hidden) > section,
+    #shiftsCloudSyncModal:not(.hidden) > section,
+    #healthRegistrationChooserModal:not(.hidden) > div {
+      animation: otSheetUp 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+      will-change: transform, opacity;
+    }
+
+    /* Rebote táctil en pestañas del menú principal y submenús */
+    #top-tab-header [role="tab"] {
+      transition: transform 0.14s ease, color 0.18s ease, background-color 0.18s ease;
+    }
+    #top-tab-header [role="tab"]:active {
+      transform: scale(0.93);
+    }
+    #top-tab-header [role="tab"][aria-selected="true"] > span:first-child,
+    #top-tab-header [role="tab"][aria-selected="true"] > i:first-child {
+      animation: otIconPop 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #top-tab-header [id$="-indicator"] {
+      transition: background-color 0.2s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Respuesta táctil suave en celdas del calendario y botones */
+    #calendar-grid > div {
+      transition: transform 0.12s ease, background-color 0.15s ease;
+    }
+    #calendar-grid > div:active {
+      transform: scale(0.95);
+    }
+
+    /* Entrada suave de tarjetas en listas */
+    #bills-list-container > div,
+    #pets-active-container > div,
+    #birthdays-list-container > div,
+    #vehicles-upcoming-container > div,
+    #vehicles-list-container > div {
+      animation: otFadeUp 0.20s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+
+    /* Onda táctil Material ripple + indicador deslizante de pestaña */
+    @keyframes otRipple {
+      from { transform: scale(0); opacity: 0.35; }
+      to   { transform: scale(2.4); opacity: 0; }
+    }
+    .ot-ripple-el {
+      position: absolute;
+      border-radius: 9999px;
+      background: currentColor;
+      pointer-events: none;
+      animation: otRipple 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #top-tab-header [role="tablist"] { position: relative; }
+    #ot-nav-slider {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 9999px;
+      pointer-events: none;
+      z-index: 5;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), width 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+    }
+    html.nav-bottom #ot-nav-slider {
+      bottom: auto;
+      top: 0;
+    }
+    /* Ocultar rayitas individuales estáticas cuando el deslizador está activo */
+    #top-tab-header.ot-slider-ready [id$="-indicator"] {
+      opacity: 0 !important;
+    }
+    /* Respeta preferencia del sistema de reducir movimiento */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans overflow-x-hidden bg-slate-950 text-slate-100">
@@ -606,17 +777,17 @@
         </button>
         <button id="tab-summary-btn" role="tab" aria-selected="false" onclick="switchView('summary', true)" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-amber-400" title="Eventos y Notas">
           <span class="text-lg md:text-sm leading-none">📝</span>
-          <span class="block max-w-full text-center whitespace-normal break-words md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">EVENTOS Y NOTAS</span>
+          <span class="block max-w-full text-center whitespace-normal md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">EVENTOS<br class="md:hidden"> NOTAS</span>
           <div id="tab-summary-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
         <button id="tab-vehicles-btn" role="tab" aria-selected="false" onclick="openMaintFinanceHub()" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-cyan-400" title="Mantenimiento y Finanzas">
           <span class="text-lg md:text-sm leading-none">💼</span>
-          <span class="block max-w-full text-center whitespace-normal md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">MANT. Y<br class="md:hidden"> FINANZAS</span>
+          <span class="block max-w-full text-center whitespace-normal md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">MANTENCIONES<br class="md:hidden"> FINANZAS</span>
           <div id="tab-vehicles-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
         <button id="tab-meds-btn" role="tab" aria-selected="false" onclick="openCareHub()" class="flex-1 min-w-0 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 pt-2 pb-2.5 md:py-3.5 px-0.5 relative font-semibold transition-all hover:bg-slate-800/40 focus:outline-none active:bg-slate-800/60 text-blue-400" title="Salud y Familia">
           <span class="text-lg md:text-sm leading-none">🩺</span>
-          <span class="block max-w-full text-center whitespace-normal md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">SALUD Y<br class="md:hidden"> FAMILIA</span>
+          <span class="block max-w-full text-center whitespace-normal md:whitespace-nowrap text-[10px] md:text-sm leading-[1.05] tracking-tight md:tracking-wider">FAMILIA<br class="md:hidden"> SALUD</span>
           <div id="tab-meds-indicator" class="absolute bottom-0 left-0 right-0 h-1 bg-transparent"></div>
         </button>
       </div>
@@ -2847,7 +3018,7 @@
           <input type="checkbox" id="pdf-opt-turns" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
-          <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🩺</span>Salud y Familia (Salud, Bebé y Mascotas)</span>
+          <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🩺</span>Familia y Salud (Salud, Bebé y Mascotas)</span>
           <input type="checkbox" id="pdf-opt-health" checked onchange="syncPdfAllCheckbox()" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-400 bg-slate-800 border-slate-700">
         </label>
         <label class="flex items-center justify-between gap-3 px-3 py-2 cursor-pointer">
@@ -3194,12 +3365,12 @@
             <span data-premium-feature="tabs" class="text-[10px] font-bold text-slate-400 flex items-center gap-1 mb-1.5">Pestañas visibles</span>
             <div class="bg-slate-800 border border-slate-700 rounded-lg divide-y divide-slate-700/70">
               <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
-                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">💼</span>Mant. y Finanzas (Turnos, Finanzas y Vehículos)</span>
+                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">💼</span>Mantenciones y Finanzas (Turnos, Finanzas y Vehículos)</span>
                 <input type="checkbox" id="tab-visible-vehicles" onchange="setTabVisibility('vehicles', this.checked)" class="peer sr-only" checked>
                 <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
               </label>
               <label class="flex items-center justify-between gap-3 px-3 min-h-10 py-1.5 cursor-pointer">
-                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🩺</span>Salud y Familia (Salud, Bebé y Mascotas)</span>
+                <span class="flex items-center gap-2 text-slate-200"><span class="text-xs leading-none">🩺</span>Familia y Salud (Salud, Bebé y Mascotas)</span>
                 <input type="checkbox" id="tab-visible-meds" onchange="setTabVisibility('meds', this.checked)" class="peer sr-only">
                 <span class="relative w-9 h-5 shrink-0 rounded-full bg-slate-600 transition-colors peer-checked:bg-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4"></span>
               </label>
@@ -3270,7 +3441,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.15 · Toca 5 veces para modo prueba
+            OmniTask v1.1.16 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -3817,6 +3988,9 @@
       if (dayActions) {
         const visibleButtons = Array.from(dayActions.children).filter(child => child.style.display !== 'none').length;
         dayActions.style.gridTemplateColumns = `repeat(${Math.max(visibleButtons, 1)}, minmax(0, 1fr))`;
+      }
+      if (typeof window.updateOmniTaskNavSlider === 'function') {
+        requestAnimationFrame(() => window.updateOmniTaskNavSlider());
       }
     }
 
@@ -22189,7 +22363,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.15';
+      const OMNITASK_APP_VERSION = '1.1.16';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -23769,12 +23943,7 @@
         else switchView(s, true);
       };
       window.openCareHub = function () {
-        let last = 'meds';
-        try {
-          const saved = localStorage.getItem(CARE_SUBTAB_KEY);
-          if (saved === 'meds' || saved === 'baby' || saved === 'pets') last = saved;
-        } catch (_) {}
-        window.setCareSubTab(last);
+        window.setCareSubTab('meds');
       };
 
       window._activeMaintFinanceSubTab = 'turns';
@@ -23816,12 +23985,7 @@
         if (s === 'bills' && typeof renderBillsView === 'function') renderBillsView();
       };
       window.openMaintFinanceHub = function () {
-        let last = 'turns';
-        try {
-          const saved = localStorage.getItem(MF_SUBTAB_KEY);
-          if (saved === 'turns' || saved === 'bills' || saved === 'vehicles') last = saved;
-        } catch (_) {}
-        window.setMaintFinanceSubTab(last);
+        window.setMaintFinanceSubTab('turns');
       };
       window.setBillsFilter = function (f) {
         currentBillsFilter = f;
@@ -24299,6 +24463,184 @@
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { window.maybeRequestInAppReview(); }, 2500);
       });
+    })();
+  </script>
+
+
+  <script>
+    (function () {
+      const VIEW_ORDER = ['month', 'year', 'summary', 'turns', 'vehicles', 'bills', 'meds', 'baby', 'pets'];
+      let lastAnimatedView = 'month';
+
+      window.playOmniTaskViewMotion = function (targetEl, dir) {
+        if (!targetEl) return;
+        targetEl.classList.remove('ot-anim-slide-right', 'ot-anim-slide-left', 'ot-anim-fade-up');
+        void targetEl.offsetWidth;
+        targetEl.classList.add(dir > 0 ? 'ot-anim-slide-right' : (dir < 0 ? 'ot-anim-slide-left' : 'ot-anim-fade-up'));
+      };
+
+      // Wrap switchView to apply directional slide automatically
+      if (typeof window.switchView === 'function' && !window._otSwitchViewWrapped) {
+        window._otSwitchViewWrapped = true;
+        const origSwitch = window.switchView;
+        window.switchView = function (view, resetSubTabs) {
+          const prevIdx = VIEW_ORDER.indexOf(lastAnimatedView);
+          const nextIdx = VIEW_ORDER.indexOf(view);
+          const dir = (prevIdx !== -1 && nextIdx !== -1 && prevIdx !== nextIdx) ? (nextIdx > prevIdx ? 1 : -1) : 0;
+          const res = origSwitch.apply(this, arguments);
+          const actual = typeof activeView !== 'undefined' ? activeView : view;
+          const el = document.getElementById('view-' + actual);
+          if (el && actual !== lastAnimatedView) window.playOmniTaskViewMotion(el, dir);
+          lastAnimatedView = actual;
+          return res;
+        };
+      }
+
+      // Wrap sub-tab switches for snappy slide feedback
+      if (typeof window.setNotesEventsSubTab === 'function' && !window._otSubEvWrapped) {
+        window._otSubEvWrapped = true;
+        const origEv = window.setNotesEventsSubTab;
+        window.setNotesEventsSubTab = function (sub) {
+          const res = origEv.apply(this, arguments);
+          const panel = document.getElementById(sub === 'notes' ? 'notes-stats-panel' : 'events-list-panel');
+          window.playOmniTaskViewMotion(panel, sub === 'notes' ? 1 : -1);
+          return res;
+        };
+      }
+
+      // Add subtle green pulse when toggling paid/done on Bills or Pets
+      document.addEventListener('click', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('button[onclick*="toggleBillPaid"], button[onclick*="togglePetEventDone"], button[onclick*="openVehicleCompleteModal"]') : null;
+        if (!btn) return;
+        const card = btn.closest('div.rounded-xl');
+        if (card) {
+          card.classList.remove('ot-confirm-pulse');
+          void card.offsetWidth;
+          card.classList.add('ot-confirm-pulse');
+        }
+      }, true);
+
+      // 1. Deslizamiento direccional al cambiar de mes en el calendario
+      if (typeof window.changeMonth === 'function' && !window._otChangeMonthWrapped) {
+        window._otChangeMonthWrapped = true;
+        const origChangeMonth = window.changeMonth;
+        window.changeMonth = function (delta) {
+          const res = origChangeMonth.apply(this, arguments);
+          const grid = document.getElementById('calendar-grid');
+          if (grid && delta) window.playOmniTaskViewMotion(grid, delta > 0 ? 1 : -1);
+          return res;
+        };
+      }
+
+      // 2. Barra indicadora deslizante (#ot-nav-slider) en el menú principal
+      const TAB_COLORS = {
+        'tab-calendar-btn': '#818cf8',
+        'tab-summary-btn': '#fbbf24',
+        'tab-vehicles-btn': '#22d3ee',
+        'tab-meds-btn': '#60a5fa'
+      };
+      window.updateOmniTaskNavSlider = function () {
+        const hdr = document.getElementById('top-tab-header');
+        const list = hdr ? hdr.querySelector('[role="tablist"]') : null;
+        if (!list) return;
+        let slider = document.getElementById('ot-nav-slider');
+        if (!slider) {
+          slider = document.createElement('div');
+          slider.id = 'ot-nav-slider';
+          list.appendChild(slider);
+          hdr.classList.add('ot-slider-ready');
+        }
+        const activeBtn = list.querySelector('[role="tab"][aria-selected="true"]');
+        if (!activeBtn || activeBtn.offsetWidth === 0) return;
+        slider.style.width = activeBtn.offsetWidth + 'px';
+        slider.style.transform = `translate3d(${activeBtn.offsetLeft}px, 0, 0)`;
+        slider.style.backgroundColor = TAB_COLORS[activeBtn.id] || '#14b8a6';
+      };
+
+      // Enganchar actualización del deslizador tras switchView, applyTabVisibility y resize
+      const origSwForSlider = window.switchView;
+      if (typeof origSwForSlider === 'function' && !window._otSliderWrapped) {
+        window._otSliderWrapped = true;
+        window.switchView = function () {
+          const r = origSwForSlider.apply(this, arguments);
+          requestAnimationFrame(() => window.updateOmniTaskNavSlider());
+          return r;
+        };
+      }
+      window.addEventListener('resize', () => requestAnimationFrame(() => window.updateOmniTaskNavSlider()));
+      window.addEventListener('DOMContentLoaded', () => setTimeout(() => window.updateOmniTaskNavSlider(), 120));
+
+      // 3. Efecto ripple táctil sutil en pestañas y botones con clase active:scale-95
+      document.addEventListener('pointerdown', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('#top-tab-header [role="tab"], #mf-subtabs-bar button, #care-subtabs-bar button') : null;
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const rip = document.createElement('span');
+        rip.className = 'ot-ripple-el';
+        rip.style.width = rip.style.height = size + 'px';
+        rip.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        rip.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+        btn.style.overflow = 'hidden';
+        btn.appendChild(rip);
+        setTimeout(() => rip.remove(), 380);
+      }, { passive: true });
+
+      // 4. Arrastrar hacia abajo para cerrar modales (Bottom Sheet drag-to-dismiss)
+      let dragModalBox = null;
+      let dragStartY = 0;
+      let dragDeltaY = 0;
+      document.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const modal = e.target && e.target.closest ? e.target.closest('div.fixed[id*="modal"]:not(.hidden), #premiumPaywallModal:not(.hidden), #shiftsCloudSyncModal:not(.hidden)') : null;
+        if (!modal) return;
+        const box = modal.querySelector(':scope > div, :scope > section');
+        if (!box || box.scrollTop > 2) return;
+        // No interferir con inputs, selects, textareas ni con contenedores internos con scroll activo
+        if (e.target.closest('input, textarea, select')) return;
+        let cur = e.target;
+        while (cur && cur !== box && cur !== document.body) {
+          if (cur.scrollTop > 2) return;
+          cur = cur.parentElement;
+        }
+        dragModalBox = box;
+        dragStartY = e.touches[0].clientY;
+        dragDeltaY = 0;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!dragModalBox || !e.touches || e.touches.length !== 1) return;
+        const dy = e.touches[0].clientY - dragStartY;
+        if (dy > 8 && dragModalBox.scrollTop <= 2) {
+          dragDeltaY = Math.min(dy, 180);
+          dragModalBox.style.transition = 'none';
+          dragModalBox.style.transform = `translate3d(0, ${dragDeltaY}px, 0)`;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', () => {
+        if (!dragModalBox) return;
+        const box = dragModalBox;
+        const dy = dragDeltaY;
+        dragModalBox = null;
+        dragDeltaY = 0;
+        if (dy > 75 && typeof window.handleOmniTaskBackButton === 'function') {
+          box.style.transition = 'transform 0.16s ease-in, opacity 0.16s ease-in';
+          box.style.transform = 'translate3d(0, 120px, 0)';
+          box.style.opacity = '0';
+          setTimeout(() => {
+            window.handleOmniTaskBackButton();
+            box.style.transition = '';
+            box.style.transform = '';
+            box.style.opacity = '';
+          }, 150);
+        } else {
+          box.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+          box.style.transform = '';
+          setTimeout(() => { box.style.transition = ''; }, 190);
+        }
+      }, { passive: true });
     })();
   </script>
 
