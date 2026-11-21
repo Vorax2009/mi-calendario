@@ -523,48 +523,30 @@
     .ot-pet-avatar { background-color: rgba(249, 115, 22, 0.16); border: 1px solid rgba(249, 115, 22, 0.45); }
     .ot-line-through { text-decoration: line-through !important; }
 
-    /* === OMNITASK v1.1.17: SEARCH, UNIFIED SPEND, PIN LOCK & WEEKLY SUMMARY === */
+    /* === OMNITASK v1.1.17-v2: FINANZAS+ & WEEKLY SUMMARY === */
     .ot-v117-modal-bg { position: fixed; inset: 0; z-index: 95; background: rgba(2, 6, 23, 0.84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; padding: 12px; }
     .ot-v117-modal-bg.hidden { display: none !important; }
     @media (min-width: 640px) { .ot-v117-modal-bg { align-items: center; } }
     .ot-v117-card { background: #1e2733; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 18px; width: 100%; max-width: 440px; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 54px rgba(0, 0, 0, 0.55); color: #f1f5f9; }
-    .ot-v117-search-bar { display: flex; align-items: center; gap: 8px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.38); border-radius: 12px; padding: 8px 12px; }
-    .ot-v117-search-bar input { flex: 1; background: transparent; border: none; outline: none; color: #f8fafc; font-size: 13px; font-weight: 600; min-width: 0; }
-    .ot-v117-search-bar input::placeholder { color: #64748b; }
-    .ot-v117-pill { padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; border: 1px solid #334155; background: #0f172a; color: #cbd5e1; cursor: pointer; transition: all 0.15s ease; }
-    .ot-v117-pill.active { background: #0284c7; border-color: #38bdf8; color: #ffffff; }
-    .ot-v117-hit { width: 100%; text-align: left; background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; transition: transform 0.12s ease, border-color 0.15s ease; }
-    .ot-v117-hit:active { transform: scale(0.985); }
-    .ot-v117-hit:hover { border-color: rgba(56, 189, 248, 0.45); }
+    .ot-v117-row { width: 100%; text-align: left; background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .ot-weekly-note-box { padding: 10px 12px; border-radius: 12px; background: rgba(99, 102, 241, 0.14); border: 1px solid rgba(129, 140, 248, 0.35); font-size: 11px; color: #c7d2fe; line-height: 1.45; }
+    .ot-weekly-bday-val { color: #f9a8d4; }
+    .ot-weekly-primary-btn { width: 100%; padding: 9px 12px; border-radius: 12px; background: #4f46e5; color: #ffffff; font-size: 12px; font-weight: 800; border: none; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease; }
+    .ot-weekly-primary-btn:hover { background: #6366f1; }
+    .ot-weekly-primary-btn:active { transform: scale(0.97); }
     .ot-spend-bar-wrap { width: 100%; height: 10px; border-radius: 999px; background: #0f172a; overflow: hidden; display: flex; gap: 2px; }
     .ot-spend-seg-bills { background: linear-gradient(90deg, #10b981, #34d399); height: 100%; transition: width 0.35s ease; }
     .ot-spend-seg-veh { background: linear-gradient(90deg, #06b6d4, #38bdf8); height: 100%; transition: width 0.35s ease; }
     .ot-spend-seg-pets { background: linear-gradient(90deg, #f97316, #fbbf24); height: 100%; transition: width 0.35s ease; }
-    .ot-pin-dots { display: flex; justify-content: center; gap: 14px; margin: 14px 0 10px; }
-    .ot-pin-dot { width: 14px; height: 14px; border-radius: 999px; border: 2px solid #475569; background: transparent; transition: all 0.15s ease; }
-    .ot-pin-dot.filled { background: #38bdf8; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-    .ot-pin-dot.error { background: #f43f5e; border-color: #f43f5e; }
-    .ot-pin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 252px; margin: 0 auto; }
-    .ot-pin-key { height: 52px; border-radius: 14px; background: #0f172a; border: 1px solid #334155; color: #f8fafc; font-size: 19px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s ease, background 0.15s ease; user-select: none; }
-    .ot-pin-key:active { transform: scale(0.93); background: #1e293b; }
-    .ot-pin-key-alt { font-size: 14px; font-weight: 700; color: #38bdf8; }
-    @keyframes otPinShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
-    .ot-pin-shake { animation: otPinShake 0.32s ease; }
     .ot-toggle-switch { position: relative; display: inline-flex; align-items: center; width: 42px; height: 24px; border-radius: 999px; background: #334155; cursor: pointer; transition: background 0.2s ease; border: none; padding: 2px; flex-shrink: 0; }
     .ot-toggle-switch.on { background: #10b981; }
     .ot-toggle-knob { width: 20px; height: 20px; border-radius: 999px; background: #ffffff; transition: transform 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
     .ot-toggle-switch.on .ot-toggle-knob { transform: translateX(18px); }
     body.theme-light .ot-v117-card { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-    body.theme-light .ot-v117-search-bar { background: #f1f5f9 !important; border-color: #0284c7 !important; }
-    body.theme-light .ot-v117-search-bar input { color: #0f172a !important; }
-    body.theme-light .ot-v117-pill { background: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #334155 !important; }
-    body.theme-light .ot-v117-pill.active { background: #0284c7 !important; border-color: #0284c7 !important; color: #ffffff !important; }
-    body.theme-light .ot-v117-hit { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+    body.theme-light .ot-v117-row { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+    body.theme-light .ot-weekly-note-box { background: #eef2ff !important; border-color: #c7d2fe !important; color: #312e81 !important; }
+    body.theme-light .ot-weekly-bday-val { color: #be185d !important; }
     body.theme-light .ot-spend-bar-wrap { background: #e2e8f0 !important; }
-    body.theme-light .ot-pin-key { background: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-    body.theme-light .ot-pin-key:active { background: #e2e8f0 !important; }
-    body.theme-light .ot-pin-key-alt { color: #0284c7 !important; }
-    body.theme-light #global-search-btn { background: #e2e8f0 !important; color: #0369a1 !important; border-color: #cbd5e1 !important; }
 
     #settings-video-progress, #paywall-video-progress-bar, #bills-progress-bar {
       background: linear-gradient(90deg, #06b6d4 0%, #10b981 100%) !important;
@@ -825,12 +807,6 @@
         <!-- Plan Status Pill (Visible solo en modo prueba / cuando monetización está activa) -->
         <button id="plan-status-pill" type="button" onclick="openPremiumPaywall('plan')" class="hidden bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 px-2 py-1 rounded-md font-extrabold text-[10px] transition-all items-center gap-1 active:scale-95" title="Ver estado de tu plan OmniTask">
           <span id="plan-status-pill-text">🎁 7d</span>
-        </button>
-
-        <!-- Global Search Trigger (v1.1.17) -->
-        <button id="global-search-btn" type="button" onclick="openGlobalSearchModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95" title="Buscar en toda la app" aria-label="Buscar en OmniTask">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span class="hidden sm:inline text-[11px]">Buscar</span>
         </button>
 
         <!-- Theme Mode Toggle Button (Oscuro / Diurno) -->
@@ -3502,7 +3478,7 @@
               <button type="button" onclick="openShareModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95" title="Compartir turnos, eventos, notas, bebé o salud con otra persona">
                 <i class="fa-solid fa-share-nodes"></i> Compartir
               </button>
-              <button type="button" onclick="openPdfExportModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Elegir qué exportar en PDF">
+              <button type="button" data-premium-feature="pdf" onclick="openPdfExportModal()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Elegir qué exportar en PDF">
                 <i class="fa-solid fa-file-pdf"></i> PDF
               </button>
               <button type="button" onclick="exportJsonOrDrive()" class="min-h-10 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all" title="Guardar respaldo .json en tu teléfono o en Google Drive">
@@ -3533,37 +3509,9 @@
           </div>
         </div>
 
-        <!-- 3B. SEGURIDAD Y RESUMEN SEMANAL (v1.1.17) -->
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-3">
-          <div class="flex items-center gap-2 text-sky-300 font-bold">
-            <i class="fa-solid fa-lock text-sm"></i>
-            <span>Privacidad Familia/Salud y Resumen Semanal</span>
-          </div>
-
-          <div class="flex items-center justify-between gap-2 py-1 border-b border-slate-800/80">
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-100">🔐 Bloqueo PIN en Familia y Salud</div>
-              <div id="ot-pin-status-sub" class="text-[10px] text-slate-400">Protege Salud, Bebé y Mascotas con un PIN de 4 dígitos</div>
-            </div>
-            <button id="ot-pin-enabled-toggle" type="button" role="switch" aria-checked="false" onclick="toggleFamilyPinLock()" class="ot-toggle-switch">
-              <span class="ot-toggle-knob"></span>
-            </button>
-          </div>
-
-          <div id="ot-pin-extra-controls" class="hidden space-y-2 pb-1 border-b border-slate-800/80">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[11px] font-semibold text-slate-300">👆 Desbloquear con huella / rostro</span>
-              <button id="ot-pin-bio-toggle" type="button" role="switch" aria-checked="true" onclick="toggleFamilyBiometric()" class="ot-toggle-switch on">
-                <span class="ot-toggle-knob"></span>
-              </button>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <button type="button" onclick="openFamilyPinSetup()" class="py-1.5 px-2.5 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[11px] font-bold">Cambiar PIN</button>
-              <button type="button" onclick="lockFamilySessionNow()" class="py-1.5 px-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-[11px] font-bold">🔒 Bloquear ahora</button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between gap-2 pt-0.5">
+        <!-- 3B. RESUMEN SEMANAL (v1.1.17) -->
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/80 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
               <div class="text-xs font-bold text-slate-100">📅 Resumen dominical (Dom 20:00)</div>
               <div class="text-[10px] text-slate-400">Notificación con turnos, cuentas y pendientes de tu semana</div>
@@ -3572,7 +3520,6 @@
               <span class="ot-toggle-knob"></span>
             </button>
           </div>
-
           <button type="button" onclick="openWeeklySummaryModal()" class="w-full min-h-9 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95">
             <i class="fa-solid fa-calendar-week"></i> Ver resumen de mis próximos 7 días
           </button>
@@ -3598,7 +3545,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.17 · Toca 5 veces para modo prueba
+            OmniTask v1.1.18 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -4006,7 +3953,9 @@
     const FREE_VEHICLE_LIMIT = 1;
     const PREMIUM_VIEWS = ['vehicles', 'bills', 'turns', 'meds', 'baby', 'pets'];
     const PREMIUM_VIEW_NAMES = { vehicles: 'Mantenimiento y Finanzas', bills: 'Mantenimiento y Finanzas', turns: 'Turnos', meds: 'Salud y Familia', baby: 'Bebé', pets: 'Mascotas', tabs: 'Pestañas visibles', plan: 'OmniTask Premium' };
-    const PREMIUM_FEATURES = { tabs: 'Personalizar pestañas visibles', turns: 'Turnos', meds: 'Salud' };
+    const PREMIUM_FEATURES = { tabs: 'Personalizar pestañas visibles', turns: 'Turnos', meds: 'Salud' ,
+      pdf: 'Reportes en PDF'
+    };
     const PREMIUM_STORAGE_KEY = 'appPlanPremium';
     const TRIAL_START_STORAGE_KEY = 'omnitask_trial_start_v1';
     const VIDEO_UNLOCK_STORAGE_KEY = 'omnitask_video_unlock_until_v1';
@@ -5558,9 +5507,11 @@
       if (desc) {
         desc.innerHTML = view === 'vehicles'
           ? 'Desbloquea <strong>Mantenimiento y Finanzas</strong> (Vehículos y Cuentas) y todos los módulos con 1 video o pago único.'
-          : (view === 'tabs'
-            ? 'Ocultar o mostrar pestañas en la barra superior es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
-            : 'Desbloquea <strong>Turnos</strong>, <strong>Salud</strong>, <strong>Bebé</strong> y <strong>Vehículos ilimitados</strong>. Calendario, Notas y 1 vehículo son siempre gratis.');
+          : (view === 'pdf'
+            ? 'Exportar reportes visuales en <strong>PDF</strong> es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
+            : (view === 'tabs'
+              ? 'Ocultar o mostrar pestañas en la barra superior es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
+              : 'Desbloquea <strong>Turnos</strong>, <strong>Finanzas</strong>, <strong>Salud</strong>, <strong>Bebé</strong>, <strong>Reportes PDF</strong> y <strong>Vehículos ilimitados</strong>. Calendario, Notas y 1 vehículo son siempre gratis.'));
       }
       if (testBadge) {
         const isTest = !PREMIUM_ENFORCED && isMonetizationEnforced();
@@ -5849,9 +5800,6 @@
 
     function switchView(view, resetSubTabs) {
       if (!canUseView(view)) view = 'month';
-      if ((view === 'meds' || view === 'baby' || view === 'pets') && typeof window.requireFamilyPinUnlock === 'function') {
-        if (!window.requireFamilyPinUnlock(view, resetSubTabs)) return;
-      }
       const isViewChange = view !== activeView;
       if (resetSubTabs === true && isViewChange) resetViewSubTabs(view);
       if (isViewChange && typeof window !== 'undefined') {
@@ -13737,7 +13685,7 @@
           navFeedback: (() => { try { return localStorage.getItem('omnitask_nav_feedback_v1') || 'both'; } catch (e) { return 'both'; } })(),
           shiftsCloudSync: (() => { try { const raw = localStorage.getItem('cal_shifts_cloud_sync_v1'); return raw ? JSON.parse(raw) : undefined; } catch (e) { return undefined; } })(),
           weeklySummaryEnabled: (() => { try { return localStorage.getItem('omnitask_weekly_summary_v1') !== '0'; } catch (e) { return true; } })(),
-          privacyLock: (() => { try { const raw = localStorage.getItem('omnitask_privacy_lock_v1'); return raw ? JSON.parse(raw) : undefined; } catch (e) { return undefined; } })()
+          weeklyHoursGoal: (() => { try { const v = localStorage.getItem('cal_weekly_hours_goal_v1'); return v !== null ? Number(v) : undefined; } catch (e) { return undefined; } })()
         }
       };
     }
@@ -13806,8 +13754,8 @@
         if (typeof settingsObj.weeklySummaryEnabled === 'boolean') {
           try { localStorage.setItem('omnitask_weekly_summary_v1', settingsObj.weeklySummaryEnabled ? '1' : '0'); } catch (e) {}
         }
-        if (settingsObj.privacyLock && typeof settingsObj.privacyLock === 'object') {
-          safeSetBackupKey('omnitask_privacy_lock_v1', settingsObj.privacyLock);
+        if (typeof settingsObj.weeklyHoursGoal === 'number' && !Number.isNaN(settingsObj.weeklyHoursGoal)) {
+          try { localStorage.setItem('cal_weekly_hours_goal_v1', String(settingsObj.weeklyHoursGoal)); } catch (e) {}
         }
         if (typeof settingsObj.navFeedback === 'string') {
           try { localStorage.setItem('omnitask_nav_feedback_v1', settingsObj.navFeedback); } catch (e) {}
@@ -14471,6 +14419,7 @@
     }
 
     function exportBabyMedicalPDF() {
+      if (typeof canUseFeature === 'function' && !canUseFeature('pdf')) { openPremiumPaywall('pdf'); return; }
       try {
         const now = new Date();
         const dateStr = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
@@ -14511,6 +14460,11 @@
     }
 
     function openPdfExportModal() {
+      if (typeof canUseFeature === 'function' && !canUseFeature('pdf')) {
+        if (typeof closeSettingsModal === 'function') closeSettingsModal();
+        openPremiumPaywall('pdf');
+        return;
+      }
       const m = document.getElementById('pdf-export-modal');
       if (!m) {
         exportDataPDF();
@@ -14562,6 +14516,7 @@
     }
 
     function exportDataPDF(opts = null) {
+      if (typeof canUseFeature === 'function' && !canUseFeature('pdf')) { openPremiumPaywall('pdf'); return; }
       try {
         const now = new Date();
         const dateStr = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
@@ -16786,9 +16741,18 @@
         medLogs = {};
         healthControls = [];
         if (typeof window.resetBabyTrackerState === 'function') window.resetBabyTrackerState();
+        try {
+          ['cal_bills_v1', 'cal_pets_v1', 'cal_vehicles_v1', 'omnitask_weekly_summary_v1', 'cal_weekly_hours_goal_v1', 'cal_deleted_shift_ids_v1'].forEach(k => localStorage.removeItem(k));
+        } catch (_) {}
         saveToLocalStorage();
         persistMedicationData();
         persistHealthControls();
+        if (typeof window.renderBillsView === 'function') window.renderBillsView();
+        if (typeof window.renderPetsView === 'function') window.renderPetsView();
+        if (typeof window.renderVehiclesView === 'function') window.renderVehiclesView();
+        if (typeof window.renderUnifiedMonthlySpend === 'function') window.renderUnifiedMonthlySpend([]);
+        if (typeof window.syncOmniTaskWidgetData === 'function') window.syncOmniTaskWidgetData();
+        if (typeof window.syncAllUpcomingNativeAlarms === 'function') window.syncAllUpcomingNativeAlarms({ silent: true });
         renderAll();
         closeSettingsModal();
         showToast('Datos Borrados', 'Se han restablecido todos los registros.', 'fa-trash-can', 'text-amber-400');
@@ -22479,6 +22443,12 @@
           if (window.history && typeof window.history.pushState === 'function') {
             window.history.pushState({ appRoot: true }, '');
             window.addEventListener('popstate', function () {
+              const wsModal = document.getElementById('ot-weekly-summary-modal');
+              if (wsModal && !wsModal.classList.contains('hidden')) {
+                if (typeof window.closeWeeklySummaryModal === 'function') window.closeWeeklySummaryModal();
+                try { window.history.pushState({ appRoot: true }, ''); } catch (e) {}
+                return;
+              }
               if (window.handleOmniTaskBackButton()) {
                 try { window.history.pushState({ appRoot: true }, ''); } catch (e) {}
               }
@@ -22533,7 +22503,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.17';
+      const OMNITASK_APP_VERSION = '1.1.18';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -23748,6 +23718,7 @@
           }
           const vList = JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]');
           if (Array.isArray(vList) && vList.some(v => v && v.alarmEnabled)) return true;
+          if (localStorage.getItem('omnitask_weekly_summary_v1') !== '0') return true;
         } catch (e) {}
         return false;
       }
@@ -24330,6 +24301,12 @@
               }
             }
           }
+        } else {
+          const cleaned = list.filter(x => !(x && !x.paid && x.autoRenewedFrom === b.id));
+          if (cleaned.length !== list.length) {
+            list.length = 0;
+            cleaned.forEach(item => list.push(item));
+          }
         }
         saveBills(list);
         window.renderBillsView();
@@ -24875,68 +24852,6 @@
   </script>
 
 
-  <!-- MODAL v1.1.17: BUSCADOR GLOBAL INSTANTÁNEO -->
-  <div id="ot-global-search-modal" class="ot-v117-modal-bg hidden" onclick="if(event.target===this) closeGlobalSearchModal()">
-    <div role="dialog" aria-modal="true" aria-label="Buscador global OmniTask" class="ot-v117-card p-3.5 space-y-3">
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-magnifying-glass"></i> Buscador Global
-        </span>
-        <button type="button" onclick="closeGlobalSearchModal()" class="text-slate-400 hover:text-white px-2 py-0.5 text-sm font-bold" aria-label="Cerrar buscador">✕</button>
-      </div>
-      <div class="ot-v117-search-bar">
-        <i class="fa-solid fa-magnifying-glass text-sky-400 text-xs"></i>
-        <input id="ot-global-search-input" type="search" autocomplete="off" placeholder="Buscar notas, turnos, cuentas, auto, salud, mascotas..." oninput="runGlobalSearch()">
-        <button id="ot-global-search-clear" type="button" onclick="clearGlobalSearch()" class="hidden text-slate-400 hover:text-white text-xs font-bold px-1" aria-label="Limpiar">✕</button>
-      </div>
-      <div id="ot-search-filter-bar" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-        <button type="button" class="ot-v117-pill active" data-sf="all" onclick="setGlobalSearchFilter('all')">Todo</button>
-        <button type="button" class="ot-v117-pill" data-sf="notes" onclick="setGlobalSearchFilter('notes')">📝 Notas</button>
-        <button type="button" class="ot-v117-pill" data-sf="turns" onclick="setGlobalSearchFilter('turns')">🕒 Turnos</button>
-        <button type="button" class="ot-v117-pill" data-sf="bills" onclick="setGlobalSearchFilter('bills')">💸 Cuentas</button>
-        <button type="button" class="ot-v117-pill" data-sf="vehicles" onclick="setGlobalSearchFilter('vehicles')">🚗 Vehículos</button>
-        <button type="button" class="ot-v117-pill" data-sf="health" onclick="setGlobalSearchFilter('health')">❤️‍🩹 Salud</button>
-        <button type="button" class="ot-v117-pill" data-sf="pets" onclick="setGlobalSearchFilter('pets')">🐾 Mascotas</button>
-      </div>
-      <div id="ot-global-search-results" class="space-y-2 overflow-y-auto pr-0.5" style="max-height: 52dvh;"></div>
-    </div>
-  </div>
-
-  <!-- MODAL v1.1.17: BLOQUEO PIN / HUELLA PARA FAMILIA Y SALUD -->
-  <div id="ot-pin-lock-modal" class="ot-v117-modal-bg hidden" onclick="if(event.target===this) closeFamilyPinModal()">
-    <div role="dialog" aria-modal="true" aria-label="Bloqueo de privacidad" class="ot-v117-card p-5 text-center space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-[11px] font-extrabold uppercase tracking-wider text-sky-400">🔐 Familia y Salud</span>
-        <button type="button" onclick="closeFamilyPinModal()" class="text-slate-400 hover:text-white px-2 py-0.5 text-sm font-bold" aria-label="Cancelar">✕</button>
-      </div>
-      <div>
-        <div id="ot-pin-modal-title" class="text-base font-black">Ingresa tu PIN</div>
-        <div id="ot-pin-modal-sub" class="text-[11px] text-slate-400 mt-0.5">Sección protegida</div>
-      </div>
-      <div id="ot-pin-dots-row" class="ot-pin-dots">
-        <span class="ot-pin-dot"></span>
-        <span class="ot-pin-dot"></span>
-        <span class="ot-pin-dot"></span>
-        <span class="ot-pin-dot"></span>
-      </div>
-      <div id="ot-pin-error-msg" class="text-[11px] font-bold text-rose-400 min-h-[16px]"></div>
-      <div class="ot-pin-grid">
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('1')">1</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('2')">2</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('3')">3</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('4')">4</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('5')">5</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('6')">6</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('7')">7</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('8')">8</button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('9')">9</button>
-        <button id="ot-pin-bio-btn" type="button" class="ot-pin-key ot-pin-key-alt" onclick="triggerNativeBiometricUnlock()" title="Usar huella o rostro" aria-label="Usar huella o rostro"><i class="fa-solid fa-fingerprint text-lg"></i></button>
-        <button type="button" class="ot-pin-key" onclick="pressFamilyPinDigit('0')">0</button>
-        <button type="button" class="ot-pin-key ot-pin-key-alt" onclick="backspaceFamilyPin()" aria-label="Borrar dígito"><i class="fa-solid fa-delete-left"></i></button>
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL v1.1.17: RESUMEN DE PRÓXIMOS 7 DÍAS -->
   <div id="ot-weekly-summary-modal" class="ot-v117-modal-bg hidden" onclick="if(event.target===this) closeWeeklySummaryModal()">
     <div role="dialog" aria-modal="true" aria-label="Resumen semanal" class="ot-v117-card p-4 space-y-3">
@@ -24946,54 +24861,23 @@
         </span>
         <button type="button" onclick="closeWeeklySummaryModal()" class="text-slate-400 hover:text-white px-2 py-0.5 text-sm font-bold" aria-label="Cerrar">✕</button>
       </div>
-      <div id="ot-weekly-summary-body" class="space-y-2 overflow-y-auto pr-0.5" style="max-height: 58dvh;"></div>
-      <div class="flex gap-2 pt-1">
-        <button type="button" onclick="closeWeeklySummaryModal()" class="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black active:scale-95">Entendido</button>
+      <div id="ot-weekly-summary-body" class="space-y-2 overflow-y-auto" style="max-height: 58dvh; padding-right: 2px;"></div>
+      <div class="pt-1">
+        <button type="button" onclick="closeWeeklySummaryModal()" class="ot-weekly-primary-btn">Entendido</button>
       </div>
     </div>
   </div>
 
   <script>
     (function () {
-      const PRIVACY_LOCK_KEY = 'omnitask_privacy_lock_v1';
       const WEEKLY_SUMMARY_KEY = 'omnitask_weekly_summary_v1';
-      let searchFilter = 'all';
-      let pinBuffer = '';
-      let pinMode = 'unlock'; // 'unlock' | 'setup1' | 'setup2'
-      let pinTempFirst = '';
-      let pendingProtectedView = null;
-      let pendingProtectedReset = false;
-      let hiddenAtTs = 0;
-      window._otFamilyUnlocked = false;
+      let lastWidgetActionTs = 0;
 
       function fmtCLP(n) {
         return '$' + Math.round(Number(n) || 0).toLocaleString('es-CL');
       }
       function isoFromDate(d) {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      }
-      function simpleHashPin(pin) {
-        const s = 'ot_pin_salt_2026_' + String(pin || '');
-        let h = 2166136261;
-        for (let i = 0; i < s.length; i++) {
-          h ^= s.charCodeAt(i);
-          h = Math.imul(h, 16777619);
-        }
-        return 'h1_' + (h >>> 0).toString(16).padStart(8, '0');
-      }
-      function getLockCfg() {
-        try {
-          const raw = localStorage.getItem(PRIVACY_LOCK_KEY);
-          if (raw) {
-            const p = JSON.parse(raw);
-            return { enabled: !!p.enabled, pinHash: String(p.pinHash || ''), biometricEnabled: p.biometricEnabled !== false };
-          }
-        } catch (_) {}
-        return { enabled: false, pinHash: '', biometricEnabled: true };
-      }
-      function saveLockCfg(cfg) {
-        try { localStorage.setItem(PRIVACY_LOCK_KEY, JSON.stringify(cfg)); } catch (_) {}
-        window.refreshV117SettingsUI();
       }
 
       // ---------------------------------------------------------
@@ -25054,330 +24938,7 @@
       };
 
       // ---------------------------------------------------------
-      // 2. BUSCADOR GLOBAL INSTANTÁNEO
-      // ---------------------------------------------------------
-      window.openGlobalSearchModal = function () {
-        const m = document.getElementById('ot-global-search-modal');
-        if (!m) return;
-        m.classList.remove('hidden');
-        const inp = document.getElementById('ot-global-search-input');
-        window.runGlobalSearch();
-        setTimeout(() => { if (inp) inp.focus(); }, 80);
-      };
-      window.closeGlobalSearchModal = function () {
-        const m = document.getElementById('ot-global-search-modal');
-        if (m) m.classList.add('hidden');
-      };
-      window.clearGlobalSearch = function () {
-        const inp = document.getElementById('ot-global-search-input');
-        if (inp) { inp.value = ''; inp.focus(); }
-        window.runGlobalSearch();
-      };
-      window.setGlobalSearchFilter = function (f) {
-        searchFilter = f || 'all';
-        document.querySelectorAll('#ot-search-filter-bar .ot-v117-pill').forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-sf') === searchFilter);
-        });
-        window.runGlobalSearch();
-      };
-
-      function collectSearchItems() {
-        const items = [];
-        try {
-          if (typeof dayDataMap === 'object' && dayDataMap) {
-            Object.keys(dayDataMap).forEach(dateKey => {
-              const arr = Array.isArray(dayDataMap[dateKey]) ? dayDataMap[dateKey] : [];
-              arr.forEach(n => {
-                if (!n || n.isHiddenCounter || String(n.id || '').startsWith('bday_cnt_')) return;
-                if (n.isShift) {
-                  const title = n.shiftType || n.title || 'Turno';
-                  items.push({ cat: 'turns', icon: '🕒', badge: 'Turno', title, sub: `${dateKey}${n.time ? ' · ' + n.time : ''}${n.note ? ' · ' + n.note : ''}`, text: `${title} ${n.note || ''} ${dateKey}`, action: 'turns', dateKey });
-                } else {
-                  const isBday = !!(n.isBirthday || (Array.isArray(n.eventTypes) && n.eventTypes.includes('birthday')));
-                  const isAniv = !!(n.isAnniversary || (Array.isArray(n.eventTypes) && n.eventTypes.includes('anniversary')));
-                  const icon = isBday ? '🎂' : (isAniv ? '💍' : '📝');
-                  const badge = isBday ? 'Cumple' : (isAniv ? 'Aniversario' : 'Nota');
-                  const title = n.title || n.text || 'Nota';
-                  items.push({ cat: 'notes', icon, badge, title, sub: `${dateKey}${n.time ? ' · ' + n.time : ''}`, text: `${title} ${n.text || ''} ${n.details || ''} ${dateKey}`, action: 'day', dateKey });
-                }
-              });
-            });
-          }
-        } catch (_) {}
-
-        try {
-          const bills = JSON.parse(localStorage.getItem('cal_bills_v1') || '[]');
-          bills.forEach(b => {
-            if (!b) return;
-            items.push({ cat: 'bills', icon: '💸', badge: b.paid ? 'Pagada' : 'Cuenta', title: b.name || 'Cuenta', sub: `${fmtCLP(b.amount)} · Vence ${b.due || '—'}`, text: `${b.name || ''} ${b.cat || ''} ${b.due || ''}`, action: 'bills' });
-          });
-        } catch (_) {}
-
-        try {
-          const vehs = JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]');
-          vehs.forEach(v => {
-            if (!v) return;
-            const subParts = [v.plate, v.prtDate ? 'PRT ' + v.prtDate : '', v.permisoDate ? 'Permiso ' + v.permisoDate : ''].filter(Boolean);
-            items.push({ cat: 'vehicles', icon: '🚗', badge: 'Vehículo', title: v.name || 'Vehículo', sub: subParts.join(' · ') || 'Ver mantenciones', text: `${v.name || ''} ${v.plate || ''} ${v.brand || ''} ${v.model || ''}`, action: 'vehicles' });
-          });
-        } catch (_) {}
-
-        try {
-          const meds = JSON.parse(localStorage.getItem('mimedicina_meds_v2') || '[]');
-          meds.forEach(m => {
-            if (!m) return;
-            items.push({ cat: 'health', icon: '💊', badge: 'Medicina', title: m.name || 'Medicamento', sub: `${m.dose || ''} ${m.notes || ''}`.trim() || 'Salud', text: `${m.name || ''} ${m.dose || ''} ${m.notes || ''}`, action: 'meds' });
-          });
-          const ctrls = JSON.parse(localStorage.getItem('mimedicina_controls_v1') || '[]');
-          ctrls.forEach(c => {
-            if (!c) return;
-            items.push({ cat: 'health', icon: '🩺', badge: 'Control', title: c.title || c.specialty || 'Control médico', sub: `${c.date || ''} ${c.doctor || ''}`.trim() || 'Salud', text: `${c.title || ''} ${c.specialty || ''} ${c.doctor || ''} ${c.date || ''}`, action: 'meds' });
-          });
-        } catch (_) {}
-
-        try {
-          const pets = JSON.parse(localStorage.getItem('cal_pets_v1') || '[]');
-          pets.forEach(p => {
-            if (!p) return;
-            items.push({ cat: 'pets', icon: p.emoji || '🐾', badge: 'Mascota', title: p.name || 'Mascota', sub: `${p.breed || 'Mascota'}${p.weight ? ' · ' + p.weight : ''}`, text: `${p.name || ''} ${p.breed || ''}`, action: 'pets' });
-            (Array.isArray(p.events) ? p.events : []).forEach(ev => {
-              items.push({ cat: 'pets', icon: '💉', badge: p.name || 'Mascota', title: ev.title || 'Registro vet', sub: `${ev.type || ''} · ${ev.date || ''}`, text: `${p.name || ''} ${ev.title || ''} ${ev.type || ''} ${ev.date || ''}`, action: 'pets' });
-            });
-          });
-        } catch (_) {}
-
-        return items;
-      }
-
-      window.openGlobalSearchResult = function (action, dateKey) {
-        window.closeGlobalSearchModal();
-        if (action === 'day' && dateKey && /^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
-          const [y, m, d] = dateKey.split('-').map(Number);
-          if (typeof switchView === 'function') switchView('month');
-          if (typeof selectedDate !== 'undefined') {
-            selectedDate = new Date(y, m - 1, d);
-            if (typeof currentDate !== 'undefined') currentDate = new Date(y, m - 1, 1);
-            if (typeof renderCalendar === 'function') renderCalendar();
-            if (typeof openDayDetailModal === 'function') openDayDetailModal();
-          }
-          return;
-        }
-        if (action === 'bills') {
-          if (typeof setMaintFinanceSubTab === 'function') setMaintFinanceSubTab('bills');
-          else if (typeof openViewOrPaywall === 'function') openViewOrPaywall('bills');
-          return;
-        }
-        if (action === 'vehicles') {
-          if (typeof setMaintFinanceSubTab === 'function') setMaintFinanceSubTab('vehicles');
-          else if (typeof openViewOrPaywall === 'function') openViewOrPaywall('vehicles');
-          return;
-        }
-        if (action === 'turns' || action === 'meds' || action === 'pets') {
-          if (typeof openViewOrPaywall === 'function') openViewOrPaywall(action);
-          else if (typeof switchView === 'function') switchView(action, true);
-        }
-      };
-
-      window.runGlobalSearch = function () {
-        const inp = document.getElementById('ot-global-search-input');
-        const clr = document.getElementById('ot-global-search-clear');
-        const box = document.getElementById('ot-global-search-results');
-        if (!box) return;
-        const q = (inp ? inp.value : '').trim().toLowerCase();
-        if (clr) clr.classList.toggle('hidden', q.length === 0);
-
-        const all = collectSearchItems().filter(it => searchFilter === 'all' || it.cat === searchFilter);
-        const matches = q ? all.filter(it => it.text.toLowerCase().includes(q)) : all.slice(0, 12);
-
-        if (matches.length === 0) {
-          box.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">${q ? 'Sin coincidencias para "' + escapeHtml(q) + '"' : 'Escribe para buscar en tus notas, turnos, cuentas, vehículos, salud y mascotas.'}</div>`;
-          return;
-        }
-        box.innerHTML = matches.slice(0, 30).map(it => `
-          <button type="button" class="ot-v117-hit" onclick="openGlobalSearchResult('${escapeHtml(it.action)}','${escapeHtml(it.dateKey || '')}')">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <span class="text-base shrink-0">${escapeHtml(it.icon)}</span>
-              <div class="min-w-0">
-                <div class="text-xs font-extrabold truncate">${escapeHtml(it.title)}</div>
-                <div class="text-[10px] text-slate-400 truncate">${escapeHtml(it.sub)}</div>
-              </div>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30 shrink-0">${escapeHtml(it.badge)}</span>
-          </button>
-        `).join('');
-      };
-
-      // ---------------------------------------------------------
-      // 3. BLOQUEO PIN / HUELLA (Familia y Salud)
-      // ---------------------------------------------------------
-      function renderPinDots(isErr) {
-        const dots = document.querySelectorAll('#ot-pin-dots-row .ot-pin-dot');
-        dots.forEach((d, idx) => {
-          d.classList.toggle('filled', !isErr && idx < pinBuffer.length);
-          d.classList.toggle('error', !!isErr);
-        });
-      }
-      function openPinModalInternal(mode) {
-        pinMode = mode;
-        pinBuffer = '';
-        if (mode === 'setup1') pinTempFirst = '';
-        const m = document.getElementById('ot-pin-lock-modal');
-        const title = document.getElementById('ot-pin-modal-title');
-        const sub = document.getElementById('ot-pin-modal-sub');
-        const err = document.getElementById('ot-pin-error-msg');
-        const bioBtn = document.getElementById('ot-pin-bio-btn');
-        if (err) err.textContent = '';
-        if (mode === 'setup1') {
-          if (title) title.textContent = 'Crea tu PIN de 4 dígitos';
-          if (sub) sub.textContent = 'Protegerá Salud, Bebé y Mascotas';
-        } else if (mode === 'setup2') {
-          if (title) title.textContent = 'Confirma tu nuevo PIN';
-          if (sub) sub.textContent = 'Ingrésalo nuevamente para guardar';
-        } else {
-          if (title) title.textContent = 'Ingresa tu PIN';
-          if (sub) sub.textContent = 'Desbloquea Familia y Salud';
-        }
-        const cfg = getLockCfg();
-        const canBio = mode === 'unlock' && cfg.biometricEnabled && window.OmniTaskNative && typeof window.OmniTaskNative.canUseBiometric === 'function' && window.OmniTaskNative.canUseBiometric();
-        if (bioBtn) bioBtn.style.visibility = canBio ? 'visible' : 'hidden';
-        renderPinDots(false);
-        if (m) m.classList.remove('hidden');
-        if (canBio) {
-          setTimeout(() => { window.triggerNativeBiometricUnlock(); }, 220);
-        }
-      }
-      window.closeFamilyPinModal = function () {
-        const m = document.getElementById('ot-pin-lock-modal');
-        if (m) m.classList.add('hidden');
-        pinBuffer = '';
-        pendingProtectedView = null;
-      };
-      window.requireFamilyPinUnlock = function (targetView, resetSubTabs) {
-        const cfg = getLockCfg();
-        if (!cfg.enabled || !cfg.pinHash || window._otFamilyUnlocked) return true;
-        pendingProtectedView = targetView;
-        pendingProtectedReset = !!resetSubTabs;
-        openPinModalInternal('unlock');
-        return false;
-      };
-      window.openFamilyPinSetup = function () {
-        if (typeof closeSettingsModal === 'function') closeSettingsModal();
-        openPinModalInternal('setup1');
-      };
-      window.toggleFamilyPinLock = function () {
-        const cfg = getLockCfg();
-        if (!cfg.enabled) {
-          if (!cfg.pinHash) {
-            window.openFamilyPinSetup();
-            return;
-          }
-          cfg.enabled = true;
-          saveLockCfg(cfg);
-          if (typeof showToast === 'function') showToast('Bloqueo activado', 'Familia y Salud ahora pide PIN.', 'fa-lock', 'text-emerald-400');
-        } else {
-          cfg.enabled = false;
-          window._otFamilyUnlocked = true;
-          saveLockCfg(cfg);
-          if (typeof showToast === 'function') showToast('Bloqueo desactivado', 'Acceso libre a Familia y Salud.', 'fa-lock-open', 'text-amber-400');
-        }
-      };
-      window.toggleFamilyBiometric = function () {
-        const cfg = getLockCfg();
-        cfg.biometricEnabled = !cfg.biometricEnabled;
-        saveLockCfg(cfg);
-      };
-      window.lockFamilySessionNow = function () {
-        window._otFamilyUnlocked = false;
-        if (typeof closeSettingsModal === 'function') closeSettingsModal();
-        if (typeof activeView !== 'undefined' && (activeView === 'meds' || activeView === 'baby' || activeView === 'pets')) {
-          if (typeof switchView === 'function') switchView('month');
-        }
-        if (typeof showToast === 'function') showToast('Sesión bloqueada', 'Se pedirá PIN al volver a Familia y Salud.', 'fa-lock', 'text-sky-400');
-      };
-      window.pressFamilyPinDigit = function (digit) {
-        if (pinBuffer.length >= 4) return;
-        pinBuffer += String(digit);
-        renderPinDots(false);
-        if (pinBuffer.length === 4) {
-          setTimeout(handleCompletePinEntry, 110);
-        }
-      };
-      window.backspaceFamilyPin = function () {
-        pinBuffer = pinBuffer.slice(0, -1);
-        renderPinDots(false);
-      };
-      function showPinError(msg) {
-        const err = document.getElementById('ot-pin-error-msg');
-        const row = document.getElementById('ot-pin-dots-row');
-        if (err) err.textContent = msg;
-        renderPinDots(true);
-        if (row) {
-          row.classList.remove('ot-pin-shake');
-          void row.offsetWidth;
-          row.classList.add('ot-pin-shake');
-        }
-        setTimeout(() => { pinBuffer = ''; renderPinDots(false); }, 420);
-      }
-      function finishPinUnlock() {
-        window._otFamilyUnlocked = true;
-        const target = pendingProtectedView;
-        const reset = pendingProtectedReset;
-        window.closeFamilyPinModal();
-        if (target && typeof switchView === 'function') switchView(target, reset);
-      }
-      function handleCompletePinEntry() {
-        const cfg = getLockCfg();
-        if (pinMode === 'setup1') {
-          pinTempFirst = pinBuffer;
-          openPinModalInternal('setup2');
-          return;
-        }
-        if (pinMode === 'setup2') {
-          if (pinBuffer !== pinTempFirst) {
-            showPinError('Los PIN no coinciden. Intenta otra vez.');
-            setTimeout(() => openPinModalInternal('setup1'), 650);
-            return;
-          }
-          cfg.enabled = true;
-          cfg.pinHash = simpleHashPin(pinBuffer);
-          window._otFamilyUnlocked = true;
-          saveLockCfg(cfg);
-          window.closeFamilyPinModal();
-          if (typeof showToast === 'function') showToast('PIN guardado ✓', 'Familia y Salud quedó protegida.', 'fa-shield-halved', 'text-emerald-400');
-          return;
-        }
-        if (simpleHashPin(pinBuffer) === cfg.pinHash) {
-          finishPinUnlock();
-        } else {
-          showPinError('PIN incorrecto');
-        }
-      }
-      window.triggerNativeBiometricUnlock = function () {
-        try {
-          if (window.OmniTaskNative && typeof window.OmniTaskNative.authenticateBiometric === 'function') {
-            window.OmniTaskNative.authenticateBiometric();
-          }
-        } catch (_) {}
-      };
-      window.onNativeBiometricResult = function (ok, msg) {
-        if (ok) {
-          finishPinUnlock();
-        } else if (msg) {
-          const err = document.getElementById('ot-pin-error-msg');
-          if (err) err.textContent = String(msg);
-        }
-      };
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          hiddenAtTs = Date.now();
-        } else if (hiddenAtTs && (Date.now() - hiddenAtTs) > 30000) {
-          window._otFamilyUnlocked = false;
-        }
-      });
-
-      // ---------------------------------------------------------
-      // 4. RESUMEN DOMINICAL (Dom 20:00)
+      // 2. RESUMEN DOMINICAL (Dom 20:00)
       // ---------------------------------------------------------
       function collectNext7DaysData(startDateOpt) {
         const base = startDateOpt ? new Date(startDateOpt.getFullYear(), startDateOpt.getMonth(), startDateOpt.getDate()) : new Date();
@@ -25465,21 +25026,21 @@
           { icon: '🕒', label: 'Turnos programados', val: String(s.shifts), cls: 'text-purple-300' },
           { icon: '💸', label: 'Cuentas por vencer', val: s.billsCount > 0 ? `${s.billsCount} (${fmtCLP(s.billsTotal)})` : '0', cls: 'text-emerald-400' },
           { icon: '📝', label: 'Notas y eventos', val: String(s.notes), cls: 'text-amber-300' },
-          { icon: '🎂', label: 'Cumpleaños', val: String(s.bdays), cls: 'text-pink-300' },
+          { icon: '🎂', label: 'Cumpleaños', val: String(s.bdays), cls: 'ot-weekly-bday-val' },
           { icon: '🚗', label: 'Trámites de vehículos', val: String(s.vehDue), cls: 'text-cyan-300' },
           { icon: '🐾', label: 'Controles de mascotas', val: String(s.petDue), cls: 'text-amber-400' }
         ];
         body.innerHTML = `
           <div class="text-[11px] text-slate-400">Próximos 7 días (${escapeHtml(s.from)} al ${escapeHtml(s.to)})</div>
-          <div class="space-y-1.5">
+          <div class="space-y-2">
             ${rows.map(r => `
-              <div class="ot-v117-hit" style="cursor:default;">
+              <div class="ot-v117-row">
                 <span class="text-xs font-bold">${r.icon} ${r.label}</span>
                 <span class="text-xs font-black ${r.cls}">${r.val}</span>
               </div>
             `).join('')}
           </div>
-          <div class="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-[11px] text-indigo-200">
+          <div class="ot-weekly-note-box">
             <strong>Resumen notificación:</strong> ${escapeHtml(window.buildWeeklySummaryText())}
           </div>`;
         m.classList.remove('hidden');
@@ -25490,7 +25051,7 @@
       };
 
       // ---------------------------------------------------------
-      // 5. WIDGET ANDROID 4×2 (Sincronización JS -> Native)
+      // 3. WIDGET ANDROID 4×2 (Sincronización JS -> Native)
       // ---------------------------------------------------------
       window.syncOmniTaskWidgetData = function () {
         try {
@@ -25545,6 +25106,10 @@
 
       window.handleOmniTaskWidgetAction = function (action) {
         if (action === 'quick_note') {
+          const nowTs = Date.now();
+          if (nowTs - lastWidgetActionTs < 1500) return;
+          lastWidgetActionTs = nowTs;
+          window._otPendingWidgetAction = null;
           try {
             if (typeof switchView === 'function') switchView('month');
             if (typeof selectedDate !== 'undefined') selectedDate = new Date();
@@ -25553,30 +25118,14 @@
         }
       };
 
-      // Sync Settings switches
       window.refreshV117SettingsUI = function () {
-        const cfg = getLockCfg();
-        const pinSw = document.getElementById('ot-pin-enabled-toggle');
-        const bioSw = document.getElementById('ot-pin-bio-toggle');
-        const extra = document.getElementById('ot-pin-extra-controls');
-        const sub = document.getElementById('ot-pin-status-sub');
-        if (pinSw) { pinSw.classList.toggle('on', cfg.enabled); pinSw.setAttribute('aria-checked', String(cfg.enabled)); }
-        if (bioSw) { bioSw.classList.toggle('on', cfg.biometricEnabled); bioSw.setAttribute('aria-checked', String(cfg.biometricEnabled)); }
-        if (extra) extra.classList.toggle('hidden', !cfg.enabled);
-        if (sub) sub.textContent = cfg.enabled ? 'Activo · PIN de 4 dígitos configurado' : 'Protege Salud, Bebé y Mascotas con un PIN de 4 dígitos';
-
         const wsOn = localStorage.getItem(WEEKLY_SUMMARY_KEY) !== '0';
         const wsSw = document.getElementById('ot-weekly-summary-toggle');
         if (wsSw) { wsSw.classList.toggle('on', wsOn); wsSw.setAttribute('aria-checked', String(wsOn)); }
       };
 
-      // Escape key & Android back handling for new modals
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          window.closeGlobalSearchModal();
-          window.closeFamilyPinModal();
-          window.closeWeeklySummaryModal();
-        }
+        if (e.key === 'Escape') window.closeWeeklySummaryModal();
       });
 
       window.addEventListener('DOMContentLoaded', () => {
@@ -25586,9 +25135,10 @@
           window.syncOmniTaskWidgetData();
           try {
             const p = new URLSearchParams(window.location.search);
-            if (p.get('action') === 'quick_note') window.handleOmniTaskWidgetAction('quick_note');
+            const queued = window._otPendingWidgetAction || p.get('action');
+            if (queued === 'quick_note') window.handleOmniTaskWidgetAction('quick_note');
           } catch (_) {}
-        }, 1200);
+        }, 900);
       });
     })();
   </script>

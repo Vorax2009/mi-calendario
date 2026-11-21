@@ -1,5 +1,5 @@
 {
-  "version": "1.1.17",
-  "notes": "Buscador global instantáneo, Widget Android 4x2, auto-renovación de cuentas y gasto mensual combinado, bloqueo PIN/Huella para Familia y Salud, y resumen dominical a las 20:00.",
+  "version": "1.1.18",
+  "notes": "Widget Android 4x2 con refresco tras reinicio, Finanzas+ (auto-renovación con reversa al desmarcar y gasto mensual combinado), Resumen Dominical (Dom 20:00), Reportes PDF en Premium y mejoras de borrado y respaldo.",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }
