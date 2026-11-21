@@ -883,7 +883,7 @@
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-base shrink-0">🎁</span>
           <p class="text-[11px] text-amber-200 font-semibold leading-snug">
-            <strong class="text-amber-300">Te queda 1 día de prueba gratis.</strong> Conserva todo para siempre por $3.990 (pago único).
+            <strong class="text-amber-300">Te queda 1 día de prueba gratis.</strong> Conserva todo para siempre por $4.990 (pago único · precio de lanzamiento).
           </p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
@@ -3311,7 +3311,7 @@
           </div>
           <div id="settings-plan-actions" class="grid grid-cols-1 gap-1.5 pt-0.5">
             <button type="button" id="settings-buy-premium-btn" onclick="startPremiumPurchase()" class="w-full min-h-10 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 rounded-lg font-black text-xs flex items-center justify-center gap-1.5 shadow active:scale-95">
-              <span>⭐ Desbloquear para siempre — $3.990</span>
+              <span>⭐ Desbloquear para siempre — $4.990</span>
             </button>
             <button type="button" id="settings-watch-video-btn" onclick="startRewardedVideoUnlock()" class="w-full min-h-9 py-1.5 px-3 bg-cyan-600/25 hover:bg-cyan-600/35 text-cyan-200 border border-cyan-500/40 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1.5 active:scale-95">
               <span>🎬 Ver 1 video (+2h gratis · máx. 12h)</span>
@@ -3545,7 +3545,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.18 · Toca 5 veces para modo prueba
+            OmniTask v1.1.19 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -3945,7 +3945,7 @@
     // PREMIUM_ENFORCED = false mantiene la app 100% libre para testers de Prueba cerrada.
     const PREMIUM_ENFORCED = false;
     const PLAY_BILLING_PRODUCT_ID = 'omnitask_premium_lifetime';
-    const PREMIUM_PRICE_LABEL = '$3.990';
+    const PREMIUM_PRICE_LABEL = '$4.990';
     const TRIAL_DAYS = 7;
     const TRIAL_MS = TRIAL_DAYS * 24 * 60 * 60 * 1000;
     const VIDEO_REWARD_HOURS = 2;
@@ -3953,8 +3953,16 @@
     const FREE_VEHICLE_LIMIT = 1;
     const PREMIUM_VIEWS = ['vehicles', 'bills', 'turns', 'meds', 'baby', 'pets'];
     const PREMIUM_VIEW_NAMES = { vehicles: 'Mantenimiento y Finanzas', bills: 'Mantenimiento y Finanzas', turns: 'Turnos', meds: 'Salud y Familia', baby: 'Bebé', pets: 'Mascotas', tabs: 'Pestañas visibles', plan: 'OmniTask Premium' };
-    const PREMIUM_FEATURES = { tabs: 'Personalizar pestañas visibles', turns: 'Turnos', meds: 'Salud' ,
-      pdf: 'Reportes en PDF'
+    const PAID_ONLY_FEATURES = ['pdf', 'cloud_sync', 'multi_vehicle', 'multi_pet', 'multi_baby'];
+    const PREMIUM_FEATURES = {
+      tabs: 'Personalizar pestañas visibles',
+      turns: 'Turnos',
+      meds: 'Salud',
+      pdf: 'Reportes en PDF',
+      cloud_sync: 'Sincronización en la Nube',
+      multi_vehicle: 'Vehículos ilimitados',
+      multi_pet: 'Mascotas ilimitadas',
+      multi_baby: 'Bebés ilimitados'
     };
     const PREMIUM_STORAGE_KEY = 'appPlanPremium';
     const TRIAL_START_STORAGE_KEY = 'omnitask_trial_start_v1';
@@ -5189,6 +5197,13 @@
       return false;
     }
 
+    function hasPaidOrTrialProAccess() {
+      if (!isMonetizationEnforced()) return true;
+      if (isLifetimePremium()) return true;
+      if (getTrialRemainingMs() > 0) return true;
+      return false;
+    }
+
     function hasFullAccess() {
       return isPremium();
     }
@@ -5198,6 +5213,7 @@
     }
 
     function canUseFeature(feature) {
+      if (PAID_ONLY_FEATURES.includes(feature)) return hasPaidOrTrialProAccess();
       return !PREMIUM_FEATURES[feature] || hasFullAccess();
     }
 
@@ -5504,14 +5520,23 @@
           ? 'Tu Plan OmniTask'
           : `Desbloquea ${name}`;
       }
+      const isPaidOnly = PAID_ONLY_FEATURES.includes(view);
+      const vidBox = document.getElementById('paywall-video-progress-box');
+      if (vidBox) vidBox.classList.toggle('hidden', isPaidOnly);
+      if (vidBtn) vidBtn.classList.toggle('hidden', isPaidOnly);
       if (desc) {
-        desc.innerHTML = view === 'vehicles'
-          ? 'Desbloquea <strong>Mantenimiento y Finanzas</strong> (Vehículos y Cuentas) y todos los módulos con 1 video o pago único.'
-          : (view === 'pdf'
-            ? 'Exportar reportes visuales en <strong>PDF</strong> es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
-            : (view === 'tabs'
-              ? 'Ocultar o mostrar pestañas en la barra superior es parte de <strong>OmniTask Premium</strong>. Desbloquéalo con 1 video o pago único.'
-              : 'Desbloquea <strong>Turnos</strong>, <strong>Finanzas</strong>, <strong>Salud</strong>, <strong>Bebé</strong>, <strong>Reportes PDF</strong> y <strong>Vehículos ilimitados</strong>. Calendario, Notas y 1 vehículo son siempre gratis.'));
+        if (view === 'pdf') {
+          desc.innerHTML = 'Los <strong>Reportes PDF con gráficos</strong> son exclusivos del <strong>Pago Único ($4.990)</strong> (también disponibles en tu prueba de 7 días). Incluye perfiles ilimitados, Sync en la Nube y cero anuncios para siempre.';
+        } else if (view === 'cloud_sync') {
+          desc.innerHTML = 'La <strong>Sincronización Familiar en la Nube</strong> (Turnos y Bebé en tiempo real) es exclusiva del <strong>Pago Único ($4.990)</strong>. Paga una sola vez y compártelo sin límites.';
+        } else if (view === 'multi_vehicle' || view === 'multi_pet' || view === 'multi_baby') {
+          const itemLbl = view === 'multi_vehicle' ? 'vehículos' : (view === 'multi_pet' ? 'mascotas' : 'bebés');
+          desc.innerHTML = `Con videos puedes gestionar <strong>1 perfil</strong>. Para agregar <strong>${itemLbl} ilimitados</strong> (además de Reportes PDF, Sync en la Nube y cero anuncios) desbloquea el <strong>Pago Único ($4.990)</strong>.`;
+        } else if (view === 'tabs') {
+          desc.innerHTML = 'Ocultar o mostrar pestañas es parte de <strong>OmniTask Premium</strong>. Desbloquéalo temporalmente con 1 video (+2h) o para siempre con el pago único ($4.990).';
+        } else {
+          desc.innerHTML = 'Con <strong>1 video (+2h)</strong> accedes a Turnos, Finanzas, Salud y hasta <strong>1 vehículo, 1 mascota y 1 bebé</strong>. Con <strong>Pago Único ($4.990)</strong> tienes perfiles ilimitados, <strong>Reportes PDF</strong>, <strong>Sync en la Nube</strong> y cero videos para siempre.';
+        }
       }
       if (testBadge) {
         const isTest = !PREMIUM_ENFORCED && isMonetizationEnforced();
@@ -17265,8 +17290,8 @@
 
       <div class="space-y-2 pt-0.5">
         <button type="button" id="paywallBuyBtn" onclick="startPremiumPurchase()" class="w-full min-h-12 py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 rounded-xl shadow-lg active:scale-95 transition-all flex flex-col items-center justify-center leading-tight">
-          <span class="text-xs font-black">⭐ OmniTask Premium — $3.990</span>
-          <span class="text-[10px] font-bold text-slate-900/80">Pago único · Para siempre · Sin anuncios</span>
+          <span class="text-xs font-black">⭐ OmniTask Premium — $4.990</span>
+          <span class="text-[10px] font-bold text-slate-900/80">Precio de lanzamiento · Pago único · Para siempre</span>
         </button>
 
         <button type="button" id="paywallWatchVideoBtn" onclick="startRewardedVideoUnlock()" class="w-full min-h-11 py-2 px-3 bg-cyan-600/25 hover:bg-cyan-600/35 text-cyan-200 border border-cyan-500/50 rounded-xl text-xs font-extrabold active:scale-95 transition-all flex items-center justify-center gap-2">
@@ -17713,6 +17738,10 @@
       }
 
       function addNewBaby() {
+        if (typeof hasPaidOrTrialProAccess === 'function' && !hasPaidOrTrialProAccess() && Array.isArray(btStore.babies) && btStore.babies.length >= 1) {
+          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('multi_baby');
+          return;
+        }
         const nextNum = btStore.babies.length + 1;
         const newBaby = createEmptyBabyRecord('baby_' + Date.now(), nextNum);
         btStore.babies.push(newBaby);
@@ -22018,6 +22047,10 @@
       }
 
       function openBabyCloudSyncModal() {
+        if (typeof hasPaidOrTrialProAccess === 'function' && !hasPaidOrTrialProAccess()) {
+          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('cloud_sync');
+          return;
+        }
         const modal = document.getElementById('babyCloudSyncModal');
         if (!modal) return;
         const urlInput = document.getElementById('babyCloudSyncDbUrl');
@@ -22503,7 +22536,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.18';
+      const OMNITASK_APP_VERSION = '1.1.19';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -22680,6 +22713,10 @@
       };
 
       window.openShiftsCloudSyncModal = function () {
+        if (typeof hasPaidOrTrialProAccess === 'function' && !hasPaidOrTrialProAccess()) {
+          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('cloud_sync');
+          return;
+        }
         const modal = document.getElementById('shiftsCloudSyncModal');
         if (!modal) return;
         const rIn = document.getElementById('shiftsCloudSyncRoomCode');
@@ -23107,8 +23144,8 @@
         const modal = document.getElementById('vehicle-form-modal');
         if (!modal) return;
         const list = loadVehicles();
-        if (!id && typeof hasFullAccess === 'function' && !hasFullAccess() && list.length >= FREE_VEHICLE_LIMIT) {
-          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('vehicles');
+        if (!id && typeof hasPaidOrTrialProAccess === 'function' && !hasPaidOrTrialProAccess() && list.length >= FREE_VEHICLE_LIMIT) {
+          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('multi_vehicle');
           return;
         }
         const item = id ? list.find(v => v.id === id) : null;
@@ -24404,6 +24441,10 @@
       window.openPetProfileModal = function (editId) {
         const m = document.getElementById('pet-profile-modal');
         if (!m) return;
+        if (!editId && typeof hasPaidOrTrialProAccess === 'function' && !hasPaidOrTrialProAccess() && loadPets().length >= 1) {
+          if (typeof openPremiumPaywall === 'function') openPremiumPaywall('multi_pet');
+          return;
+        }
         const p = editId ? loadPets().find(x => x.id === editId) : null;
         document.getElementById('pet-edit-id').value = p ? p.id : '';
         document.getElementById('pet-profile-modal-title').textContent = p ? '✏️ Editar Mascota' : '🐾 Nueva Mascota';
