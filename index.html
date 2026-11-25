@@ -3694,7 +3694,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.44 · Toca 5 veces para modo prueba
+            OmniTask v1.1.48 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -4167,10 +4167,18 @@
               expiresAt: Date.now() + (Number(sd.expiresIn || 3600) * 1000)
             };
             localStorage.setItem(FB_AUTH_CACHE_KEY, JSON.stringify(next));
+            window._otLastAuthError = '';
             return next.idToken;
           }
+        } else {
+          try {
+            const errBody = await sRes.json();
+            window._otLastAuthError = (errBody && errBody.error && errBody.error.message) || ('HTTP ' + sRes.status);
+          } catch (_) { window._otLastAuthError = 'HTTP ' + sRes.status; }
         }
-      } catch (_) {}
+      } catch (err) {
+        window._otLastAuthError = (err && err.message) ? err.message : 'Red';
+      }
       return '';
     };
 
@@ -22986,7 +22994,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.44';
+      const OMNITASK_APP_VERSION = '1.1.48';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -24881,7 +24889,7 @@
         const doneCnt = events.filter(e => !!e.done).length;
         const spend = events.reduce((s, e) => s + (Number(e.cost) || 0), 0);
         const petRooms = (typeof window.getRoomsForSyncItem === 'function') ? window.getRoomsForSyncItem('pet', pet.id) : [];
-        const isSynced = petRooms.length > 0;
+        const isSynced = petRooms.some(r => r && r.lastSyncOk === true);
         const petSubTab = window._otPetSubTab === 'stats' ? 'stats' : 'events';
         const sorted = [...events].sort((a, b) => Number(!!a.done) - Number(!!b.done) || String(a.date || '').localeCompare(String(b.date || '')));
 
@@ -25863,7 +25871,7 @@
         const syncEl = document.getElementById('health-patient-sync-badge');
         const delBtn = document.getElementById('health-patient-quick-del-btn');
         const patRooms = (typeof window.getRoomsForSyncItem === 'function') ? window.getRoomsForSyncItem('pat', active.id) : [];
-        const isSynced = patRooms.length > 0;
+        const isSynced = patRooms.some(r => r && r.lastSyncOk === true);
         if (emojiEl) emojiEl.textContent = active.emoji || '🧑';
         if (nameEl) nameEl.textContent = (active.name && active.name !== 'Paciente 1') ? active.name : `${active.name || 'Paciente 1'} (Sin nombre)`;
         if (syncEl) {
@@ -26334,32 +26342,39 @@
 
       function refreshAllLivePillsUI(onlyBadges) {
         const rooms = loadRooms();
+        const hasLiveRoom = rooms.some(r => r && r.lastSyncOk === true);
         const topBtn = document.getElementById('top-sync-center-btn');
         const topDot = document.getElementById('top-sync-live-dot');
-        if (topBtn) topBtn.classList.toggle('sync-live', rooms.length > 0);
-        if (topDot) topDot.classList.toggle('hidden', rooms.length === 0);
+        if (topBtn) topBtn.classList.toggle('sync-live', hasLiveRoom);
+        if (topDot) topDot.classList.toggle('hidden', !hasLiveRoom);
 
         const setSyncBadge = (elId, rList) => {
           const el = document.getElementById(elId);
           if (!el) return;
-          const on = rList.length > 0;
-          el.textContent = on ? `☁️ ${rList.map(r => r.name).join(' · ')}` : '📱 Solo en este celular';
+          const liveList = rList.filter(r => r && r.lastSyncOk === true);
+          const on = liveList.length > 0;
+          const pending = !on && rList.length > 0;
+          el.textContent = on
+            ? `☁️ ${liveList.map(r => r.name).join(' · ')}`
+            : (pending ? `⏳ ${rList.map(r => r.name).join(' · ')} (sin sincronizar)` : '📱 Solo en este celular');
           el.className = on
             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]'
-            : 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]';
+            : (pending
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2 py-0.5 rounded text-[10px]'
+              : 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]');
         };
         try {
           const actSp = typeof window.getActiveShiftProfileId === 'function' ? window.getActiveShiftProfileId() : 'sp_1';
           const tRooms = window.getRoomsForSyncItem('sp', actSp);
           const tBtn = document.getElementById('turns-live-sync-btn');
-          if (tBtn) tBtn.classList.toggle('hidden', tRooms.length === 0);
+          if (tBtn) tBtn.classList.toggle('hidden', !tRooms.some(r => r && r.lastSyncOk === true));
           setSyncBadge('turns-hero-sync-badge', tRooms);
         } catch (_) {}
         try {
           const actBp = typeof window.getActiveBillProfileId === 'function' ? window.getActiveBillProfileId() : 'fin_1';
           const bRooms = window.getRoomsForSyncItem('bp', actBp);
           const blBtn = document.getElementById('bills-live-sync-btn');
-          if (blBtn) blBtn.classList.toggle('hidden', bRooms.length === 0);
+          if (blBtn) blBtn.classList.toggle('hidden', !bRooms.some(r => r && r.lastSyncOk === true));
           setSyncBadge('bills-hero-sync-badge', bRooms);
         } catch (_) {}
         try {
@@ -26371,14 +26386,14 @@
           });
           const vRooms = Array.from(vRoomMap.values());
           const vBtn = document.getElementById('vehicles-live-sync-btn');
-          if (vBtn) vBtn.classList.toggle('hidden', vRooms.length === 0);
+          if (vBtn) vBtn.classList.toggle('hidden', !vRooms.some(r => r && r.lastSyncOk === true));
           setSyncBadge('veh-hero-sync-badge', vRooms);
         } catch (_) {}
         window.updateMaintFinanceHeroStats();
         try {
           const bt = JSON.parse(localStorage.getItem('baby_tracker_multi_v1') || '{}');
           const activeBId = (bt && bt.activeBabyId) || 'baby_1';
-          const babyLive = window.getRoomsForSyncItem('baby', activeBId).length > 0;
+          const babyLive = window.getRoomsForSyncItem('baby', activeBId).some(r => r && r.lastSyncOk === true);
           const bBtn = document.getElementById('btCloudSyncBtn');
           if (bBtn) {
             bBtn.classList.toggle('hidden', !babyLive);
@@ -26985,7 +27000,11 @@
             headers: { 'Accept': 'application/json' },
             cache: 'no-store'
           });
-          if (!res.ok) return { ok: false, status: res.status };
+          if (!res.ok) {
+            room.lastSyncOk = false;
+            if (res.status === 401) { try { localStorage.removeItem('omnitask_fb_auth_v1'); } catch (_) {} }
+            return { ok: false, status: res.status };
+          }
           try {
             const srvDate = res.headers.get('Date');
             if (srvDate) {
@@ -27278,16 +27297,22 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(fullPayload)
             });
-            if (!putRes.ok) return { ok: false, status: putRes.status };
+            if (!putRes.ok) {
+              room.lastSyncOk = false;
+              if (putRes.status === 401) { try { localStorage.removeItem('omnitask_fb_auth_v1'); } catch (_) {} }
+              return { ok: false, status: putRes.status };
+            }
             scLastPushedHash[room.roomCode] = coreHash;
             scLastHeartbeat[room.roomCode] = nowMs;
             room.hasSyncedOnce = true;
           }
 
           const now = new Date();
+          room.lastSyncOk = true;
           room.lastSyncStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
           return { ok: true };
         } catch (_) {
+          room.lastSyncOk = false;
           return { ok: false };
         }
       }
@@ -27332,7 +27357,15 @@
           const m = document.getElementById('ot-sync-center-modal');
           if (m && !m.classList.contains('hidden')) renderSyncCenter();
           if (manualFeedback && typeof showToast === 'function') {
-            if (anyFail) showToast(failStatus === 401 || failStatus === 403 ? 'Acceso bloqueado (' + failStatus + ')' : 'Sin conexión', failStatus ? 'Firebase respondió código ' + failStatus + '.' : 'No se pudo completar la sincronización.', 'fa-wifi', 'text-amber-400');
+            if (anyFail) {
+              const authHint = window._otLastAuthError ? ' (' + window._otLastAuthError + ')' : '';
+              showToast(
+                failStatus === 401 || failStatus === 403 ? 'Acceso bloqueado (' + failStatus + ')' : 'Sin conexión',
+                failStatus ? 'Firebase respondió código ' + failStatus + authHint + '.' : 'No se pudo completar la sincronización.',
+                'fa-wifi',
+                'text-amber-400'
+              );
+            }
             else showToast('Sincronizado ✓', 'Todas tus salas están al día.', 'fa-cloud', 'text-emerald-400');
           }
         } finally {
