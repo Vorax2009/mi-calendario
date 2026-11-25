@@ -1,0 +1,1717 @@
+name: Android APK y AAB Firmado (OmniTask Play Store)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configurar Java 17 (Compatible con Gradle de Capacitor 6)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Armar carpetas web y recursos
+        run: |
+          mkdir -p www assets
+          cp index.html privacy.html sw.js manifest.webmanifest icon.svg version.json www/
+          cp omnitask-icon-*.png screenshot-*.png www/
+          cp icon-only.png assets/icon-only.png
+          cp icon-only.png assets/icon.png
+          cp icon-only.png assets/icon-foreground.png
+
+      - name: Precompilar Tailwind CSS (regenera todas las clases del index.html)
+        continue-on-error: true
+        run: |
+          cat > tailwind.config.js << 'TWCFG'
+          module.exports = {
+            content: ["./www/index.html"],
+            theme: {
+              extend: {
+                fontFamily: {
+                  sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                }
+              }
+            }
+          }
+          TWCFG
+          printf '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n' > tailwind-input.css
+
+          npx --yes tailwindcss@3.4.17 -c tailwind.config.js -i tailwind-input.css -o www/tailwind-compiled.css --minify
+
+          if [ -s www/tailwind-compiled.css ]; then
+            node -e '
+              const fs = require("fs");
+              const html = fs.readFileSync("www/index.html", "utf8");
+              const css = fs.readFileSync("www/tailwind-compiled.css", "utf8");
+              if (css.length < 5000) { console.log("CSS demasiado corto, se conserva el del index.html"); process.exit(0); }
+              const re = /<style id="tailwind-compiled">[\s\S]*?<\/style>/;
+              if (!re.test(html)) { console.log("No se encontró el bloque tailwind-compiled"); process.exit(0); }
+              const updated = html.replace(re, () => `<style id="tailwind-compiled">${css}</style>`);
+              fs.writeFileSync("www/index.html", updated, "utf8");
+              console.log("Tailwind CSS regenerado:", css.length, "bytes");
+            '
+            rm -f www/tailwind-compiled.css
+          fi
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Crear proyecto Android Capacitor
+        run: npx cap add android
+
+      - name: Generar iconos nativos Android
+        run: |
+          if command -v convert >/dev/null 2>&1; then
+            convert -size 1024x1024 xc:"#070C1B" assets/icon-background.png
+          fi
+          npx capacitor-assets generate --android --iconBackgroundColor "#070C1B" --iconBackgroundColorDark "#070C1B" || true
+          if command -v convert >/dev/null 2>&1; then
+            for pair in "mdpi:48:108" "hdpi:72:162" "xhdpi:96:216" "xxhdpi:144:324" "xxxhdpi:192:432"; do
+              IFS=':' read -r dens sz fg <<< "$pair"
+              dir="android/app/src/main/res/mipmap-$dens"
+              mkdir -p "$dir"
+              convert icon-only.png -resize "${sz}x${sz}" "$dir/ic_launcher.png"
+              convert icon-only.png -resize "${sz}x${sz}" "$dir/ic_launcher_round.png"
+              convert icon-only.png -resize "${fg}x${fg}" "$dir/ic_launcher_foreground.png"
+            done
+          fi
+
+      - name: Sincronizar Capacitor
+        run: npx cap sync android
+
+      - name: Instalar Android SDK Platform 35 si no está presente
+        run: |
+          if [ -n "$ANDROID_HOME" ] && [ ! -d "$ANDROID_HOME/platforms/android-35" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35"
+          fi
+
+      - name: Configurar Target SDK 36, Márgenes de Sistema, Sincronización Directa con Google Calendar y Firma Keystore
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'omnitask' }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          # 1. Cargar Keystore (.jks): prioridad GitHub Secrets, respaldo archivo del repo privado
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | tr -d '\n\r ' | base64 --decode > android/app/omnitask-upload-keystore.jks
+            echo "Keystore cargado de forma segura desde GitHub Secrets"
+          elif [ -f "omnitask-upload-keystore.jks" ]; then
+            cp omnitask-upload-keystore.jks android/app/omnitask-upload-keystore.jks
+            echo "Keystore cargado desde el repositorio privado"
+          else
+            echo "ERROR: No se encontró KEYSTORE_BASE64 en Secrets ni omnitask-upload-keystore.jks en el repo privado."
+            exit 1
+          fi
+
+          # 2. Agregar permisos READ_CALENDAR / WRITE_CALENDAR y <queries> en AndroidManifest.xml
+          node -e '
+            const fs = require("fs");
+            const mfPath = "android/app/src/main/AndroidManifest.xml";
+            let mf = fs.readFileSync(mfPath, "utf8");
+            const calAddition = `
+              <uses-permission android:name="android.permission.READ_CALENDAR" />
+              <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+              <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+              <uses-permission android:name="android.permission.WAKE_LOCK" />
+              <uses-permission android:name="android.permission.VIBRATE" />
+              <queries>
+                <package android:name="com.google.android.calendar" />
+                <package android:name="com.samsung.android.app.calendar" />
+                <intent>
+                  <action android:name="android.intent.action.VIEW" />
+                  <data android:mimeType="text/calendar" />
+                </intent>
+              </queries>
+            </manifest>`;
+            if (!mf.includes("WRITE_CALENDAR")) {
+              mf = mf.replace("</manifest>", calAddition);
+            }
+            if (!mf.includes("OmniTaskAlarmReceiver")) {
+              mf = mf.replace("</application>", `    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713" />\n        <receiver android:name=".OmniTaskAlarmReceiver" android:enabled="true" android:exported="false" />\n        <receiver android:name=".OmniTaskBootReceiver" android:enabled="true" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /><action android:name="android.intent.action.TIME_SET" /><action android:name="android.intent.action.TIMEZONE_CHANGED" /><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter></receiver>\n        <receiver android:name=".OmniTaskWidgetProvider" android:exported="true" android:label="OmniTask Hoy"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/omnitask_widget_info" /></receiver>\n    </application>`);
+            }
+            fs.writeFileSync(mfPath, mf, "utf8");
+            console.log("AndroidManifest.xml actualizado con permisos de Calendario y Alarmas.");
+          '
+
+          # 3. Configurar MainActivity.java:
+          #    - Respetar barra superior (hora/batería) e inferior en Android 15/16 (WindowInsets)
+          #    - Puente nativo OmniTaskNative.syncIcsToCalendar que guarda eventos y alarmas (Reminders.METHOD_ALERT)
+          #      directamente en Google Calendar / Calendario del teléfono y abre la app de Calendario al instante
+          MAIN_ACT=$(find android/app/src/main/java -name "MainActivity.java" | head -n 1)
+          if [ -n "$MAIN_ACT" ]; then
+            cat > "$MAIN_ACT" << 'JAVAEOF'
+          package cl.vorax2009.micalendario;
+
+          import android.Manifest;
+          import android.app.AlarmManager;
+          import android.app.PendingIntent;
+          import android.content.Context;
+          import android.content.SharedPreferences;
+          import android.media.AudioManager;
+          import android.os.Build;
+          import android.os.VibrationEffect;
+          import android.os.Vibrator;
+          import android.os.VibratorManager;
+          import android.provider.Settings;
+          import android.content.ContentResolver;
+          import android.content.ContentUris;
+          import android.content.ContentValues;
+          import android.content.Intent;
+          import android.content.pm.PackageManager;
+          import android.database.Cursor;
+          import android.graphics.Color;
+          import android.net.Uri;
+          import android.os.Bundle;
+          import org.json.JSONObject;
+          import com.google.android.play.core.review.ReviewInfo;
+          import com.google.android.play.core.review.ReviewManager;
+          import com.google.android.play.core.review.ReviewManagerFactory;
+          import android.provider.CalendarContract;
+          import android.view.HapticFeedbackConstants;
+          import android.view.View;
+          import android.view.Window;
+          import android.webkit.JavascriptInterface;
+          import android.webkit.WebView;
+          import android.widget.Toast;
+          import androidx.annotation.NonNull;
+          import androidx.core.app.ActivityCompat;
+          import androidx.core.content.ContextCompat;
+          import androidx.core.graphics.Insets;
+          import androidx.core.view.ViewCompat;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+          import androidx.core.view.WindowInsetsControllerCompat;
+          import com.android.billingclient.api.AcknowledgePurchaseParams;
+          import com.android.billingclient.api.BillingClient;
+          import com.android.billingclient.api.BillingClientStateListener;
+          import com.android.billingclient.api.BillingFlowParams;
+          import com.android.billingclient.api.BillingResult;
+          import com.android.billingclient.api.PendingPurchasesParams;
+          import com.android.billingclient.api.ProductDetails;
+          import com.android.billingclient.api.Purchase;
+          import com.android.billingclient.api.PurchasesUpdatedListener;
+          import com.android.billingclient.api.QueryProductDetailsParams;
+          import com.android.billingclient.api.QueryPurchasesParams;
+          import com.getcapacitor.BridgeActivity;
+          import com.google.android.gms.ads.AdError;
+          import com.google.android.gms.ads.AdRequest;
+          import com.google.android.gms.ads.FullScreenContentCallback;
+          import com.google.android.gms.ads.LoadAdError;
+          import com.google.android.gms.ads.MobileAds;
+          import com.google.android.gms.ads.rewarded.RewardedAd;
+          import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
+          import java.security.MessageDigest;
+          import java.util.ArrayList;
+          import java.util.Collections;
+          import java.util.Calendar;
+          import java.util.List;
+          import java.util.TimeZone;
+          import java.util.regex.Matcher;
+          import java.util.regex.Pattern;
+
+          public class MainActivity extends BridgeActivity {
+              private static final int REQ_CALENDAR_PERM = 7001;
+              private static final String TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
+              private String pendingIcsContent = null;
+              private BillingClient billingClient = null;
+              private RewardedAd cachedRewardedAd = null;
+              private boolean rewardedAdLoading = false;
+
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  Window window = getWindow();
+                  if (window != null) {
+                      WindowCompat.setDecorFitsSystemWindows(window, false);
+                      window.setStatusBarColor(Color.parseColor("#020617"));
+                      window.setNavigationBarColor(Color.parseColor("#020617"));
+                      View decor = window.getDecorView();
+                      WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, decor);
+                      controller.setAppearanceLightStatusBars(false);
+                      controller.setAppearanceLightNavigationBars(false);
+                  }
+                  View content = findViewById(android.R.id.content);
+                  if (content != null) {
+                      content.setBackgroundColor(Color.parseColor("#020617"));
+                      ViewCompat.setOnApplyWindowInsetsListener(content, (v, windowInsets) -> {
+                          Insets insets = windowInsets.getInsets(
+                              WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
+                          );
+                          v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+                          return WindowInsetsCompat.CONSUMED;
+                      });
+                      ViewCompat.requestApplyInsets(content);
+                  }
+                  getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+                      @Override
+                      public void handleOnBackPressed() {
+                          if (getBridge() != null && getBridge().getWebView() != null) {
+                              getBridge().getWebView().evaluateJavascript(
+                                  "(function(){ return !!(window.handleOmniTaskBackButton && window.handleOmniTaskBackButton()); })()",
+                                  result -> {
+                                      if (!"true".equals(result)) {
+                                          runOnUiThread(() -> {
+                                              setEnabled(false);
+                                              getOnBackPressedDispatcher().onBackPressed();
+                                              setEnabled(true);
+                                          });
+                                      }
+                                  }
+                              );
+                          } else {
+                              setEnabled(false);
+                              getOnBackPressedDispatcher().onBackPressed();
+                              setEnabled(true);
+                          }
+                      }
+                  });
+                  try {
+                      MobileAds.initialize(this, status -> preloadRewardedAd());
+                  } catch (Exception ignored) {}
+                  initBillingClient();
+                  if (getBridge() != null && getBridge().getWebView() != null) {
+                      WebView webView = getBridge().getWebView();
+                      webView.addJavascriptInterface(new Object() {
+                          @JavascriptInterface
+                          public boolean hasNotificationPermission() {
+                              if (Build.VERSION.SDK_INT >= 33) {
+                                  return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+                              }
+                              return true;
+                          }
+
+                          @JavascriptInterface
+                          public void requestNotificationPermission() {
+                              if (Build.VERSION.SDK_INT >= 33) {
+                                  runOnUiThread(() -> ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 7002));
+                              }
+                          }
+
+                          @JavascriptInterface
+                          public boolean hasExactAlarmPermission() {
+                              if (Build.VERSION.SDK_INT < 31) return true;
+                              AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                              return am != null && am.canScheduleExactAlarms();
+                          }
+
+                          @JavascriptInterface
+                          public void requestExactAlarmPermission() {
+                              if (Build.VERSION.SDK_INT >= 31) {
+                                  runOnUiThread(() -> {
+                                      try {
+                                          Intent i = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                                          i.setData(Uri.parse("package:" + getPackageName()));
+                                          startActivity(i);
+                                      } catch (Exception ignored) {}
+                                  });
+                              }
+                          }
+
+                          @JavascriptInterface
+                          public boolean scheduleNativeAlarm(int alarmId, String title, String body, long triggerAtMillis) {
+                              if (triggerAtMillis <= System.currentTimeMillis()) return false;
+                              if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                                  runOnUiThread(() -> ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 7002));
+                                  return false;
+                              }
+                              try {
+                                  AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                                  if (am == null) return false;
+                                  String safeTitle = (title != null && !title.isEmpty()) ? title : "Recordatorio OmniTask";
+                                  String safeBody = (body != null && !body.isEmpty()) ? body : "Tienes una alerta programada.";
+                                  Intent rxIntent = new Intent(MainActivity.this, OmniTaskAlarmReceiver.class);
+                                  rxIntent.putExtra("alarmId", alarmId);
+                                  rxIntent.putExtra("title", safeTitle);
+                                  rxIntent.putExtra("body", safeBody);
+                                  PendingIntent pi = PendingIntent.getBroadcast(
+                                      MainActivity.this, alarmId, rxIntent,
+                                      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                                  );
+                                  Intent showInt = new Intent(MainActivity.this, MainActivity.class);
+                                  PendingIntent showPi = PendingIntent.getActivity(
+                                      MainActivity.this, alarmId, showInt,
+                                      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                                  );
+                                  if (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()) {
+                                      am.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAtMillis, showPi), pi);
+                                  } else if (Build.VERSION.SDK_INT >= 23) {
+                                      am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi);
+                                  } else {
+                                      am.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi);
+                                  }
+
+                                  SharedPreferences sp = getSharedPreferences("omnitask_native_alarms_v1", Context.MODE_PRIVATE);
+                                  org.json.JSONObject obj = new org.json.JSONObject();
+                                  obj.put("id", alarmId);
+                                  obj.put("title", safeTitle);
+                                  obj.put("body", safeBody);
+                                  obj.put("ts", triggerAtMillis);
+                                  sp.edit().putString("a_" + alarmId, obj.toString()).apply();
+                                  return true;
+                              } catch (Exception e) {
+                                  e.printStackTrace();
+                                  return false;
+                              }
+                          }
+
+                          @JavascriptInterface
+                          public boolean cancelNativeAlarm(int alarmId) {
+                              try {
+                                  AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                                  if (am != null) {
+                                      Intent rxIntent = new Intent(MainActivity.this, OmniTaskAlarmReceiver.class);
+                                      PendingIntent pi = PendingIntent.getBroadcast(
+                                          MainActivity.this, alarmId, rxIntent,
+                                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                                      );
+                                      am.cancel(pi);
+                                  }
+                                  getSharedPreferences("omnitask_native_alarms_v1", Context.MODE_PRIVATE).edit().remove("a_" + alarmId).apply();
+                                  return true;
+                              } catch (Exception e) { return false; }
+                          }
+
+                          @JavascriptInterface
+                          public int cancelAllNativeAlarms() {
+                              int cleared = 0;
+                              try {
+                                  AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                                  SharedPreferences sp = getSharedPreferences("omnitask_native_alarms_v1", Context.MODE_PRIVATE);
+                                  for (String key : sp.getAll().keySet()) {
+                                      if (key.startsWith("a_")) {
+                                          try {
+                                              int aid = Integer.parseInt(key.substring(2));
+                                              if (am != null) {
+                                                  Intent rxIntent = new Intent(MainActivity.this, OmniTaskAlarmReceiver.class);
+                                                  PendingIntent pi = PendingIntent.getBroadcast(
+                                                      MainActivity.this, aid, rxIntent,
+                                                      PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                                                  );
+                                                  am.cancel(pi);
+                                              }
+                                              cleared++;
+                                          } catch (Exception ignored) {}
+                                      }
+                                  }
+                                  sp.edit().clear().apply();
+                              } catch (Exception ignored) {}
+                              return cleared;
+                          }
+
+                          @JavascriptInterface
+                          public void performHapticTap() {
+                              runOnUiThread(() -> {
+                                  try {
+                                      Vibrator vib = null;
+                                      if (Build.VERSION.SDK_INT >= 31) {
+                                          VibratorManager vm = (VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                                          if (vm != null) vib = vm.getDefaultVibrator();
+                                      } else {
+                                          vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                      }
+                                      if (vib != null && vib.hasVibrator()) {
+                                          if (Build.VERSION.SDK_INT >= 26) {
+                                              vib.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE));
+                                          } else {
+                                              vib.vibrate(30);
+                                          }
+                                          return;
+                                      }
+                                      if (getBridge() != null && getBridge().getWebView() != null) {
+                                          getBridge().getWebView().performHapticFeedback(
+                                              HapticFeedbackConstants.VIRTUAL_KEY,
+                                              HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                                          );
+                                      }
+                                  } catch (Exception ignored) {}
+                              });
+                          }
+
+                          @JavascriptInterface
+                          public void playNativeClickSound() {
+                              runOnUiThread(() -> {
+                                  try {
+                                      AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                                      if (am != null) {
+                                          am.playSoundEffect(AudioManager.FX_KEY_CLICK, 1.0f);
+                                      }
+                                  } catch (Exception ignored) {}
+                              });
+                          }
+
+                          @JavascriptInterface
+                          public String getDeviceTrialHash() {
+                              try {
+                                  String aid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                                  if (aid == null || aid.isEmpty()) return "";
+                                  MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                  byte[] digest = md.digest(("omnitask_v1:" + aid).getBytes("UTF-8"));
+                                  StringBuilder sb = new StringBuilder();
+                                  for (byte b : digest) sb.append(String.format("%02x", b));
+                                  return sb.toString();
+                              } catch (Exception e) { return ""; }
+                          }
+
+                          @JavascriptInterface
+                          public long getOrInitTrialStart() {
+                              SharedPreferences sp = getSharedPreferences("omnitask_plan_v1", Context.MODE_PRIVATE);
+                              long existing = sp.getLong("trial_start_ms", 0L);
+                              if (existing > 1700000000000L) return existing;
+                              long now = System.currentTimeMillis();
+                              sp.edit().putLong("trial_start_ms", now).apply();
+                              return now;
+                          }
+
+                          @JavascriptInterface
+                          public void syncTrialStart(long ts) {
+                              if (ts <= 1700000000000L) return;
+                              SharedPreferences sp = getSharedPreferences("omnitask_plan_v1", Context.MODE_PRIVATE);
+                              long existing = sp.getLong("trial_start_ms", 0L);
+                              if (existing <= 0L || ts < existing) {
+                                  sp.edit().putLong("trial_start_ms", ts).apply();
+                              }
+                          }
+
+                          @JavascriptInterface
+                          public long getVideoUnlockUntil() {
+                              SharedPreferences sp = getSharedPreferences("omnitask_plan_v1", Context.MODE_PRIVATE);
+                              return sp.getLong("video_unlock_until_ms", 0L);
+                          }
+
+                          @JavascriptInterface
+                          public void saveVideoUnlockUntil(long ts) {
+                              SharedPreferences sp = getSharedPreferences("omnitask_plan_v1", Context.MODE_PRIVATE);
+                              sp.edit().putLong("video_unlock_until_ms", Math.max(0L, ts)).apply();
+                          }
+
+                          @JavascriptInterface
+                          public void showRewardedAd() {
+                              runOnUiThread(() -> displayRewardedAd());
+                          }
+
+                          @JavascriptInterface
+                          public void purchasePremium(String productId) {
+                              runOnUiThread(() -> launchOneTimePurchase(productId));
+                          }
+
+                          @JavascriptInterface
+                          public void requestInAppReview() {
+                              runOnUiThread(() -> {
+                                  try {
+                                      ReviewManager manager = ReviewManagerFactory.create(MainActivity.this);
+                                      manager.requestReviewFlow().addOnCompleteListener(task -> {
+                                          if (task.isSuccessful() && task.getResult() != null) {
+                                              ReviewInfo info = task.getResult();
+                                              manager.launchReviewFlow(MainActivity.this, info);
+                                          }
+                                      });
+                                  } catch (Exception ignored) {}
+                              });
+                          }
+
+                          @JavascriptInterface
+                          public void updateWidgetData(String jsonStr) {
+                              try {
+                                  if (jsonStr == null) return;
+                                  SharedPreferences sp = getSharedPreferences("omnitask_widget_prefs", Context.MODE_PRIVATE);
+                                  sp.edit().putString("widget_json", jsonStr).apply();
+                                  OmniTaskWidgetProvider.refreshAllWidgets(MainActivity.this);
+                              } catch (Exception ignored) {}
+                          }
+
+                          @JavascriptInterface
+                          public void openPlayStoreReview() {
+                              runOnUiThread(() -> {
+                                  try {
+                                      Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+                                      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                      startActivity(i);
+                                  } catch (Exception e) {
+                                      try {
+                                          Intent web = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+                                          web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                          startActivity(web);
+                                      } catch (Exception ignored) {}
+                                  }
+                              });
+                          }
+
+                          @JavascriptInterface
+                          public void restorePurchases(String productId) {
+                              runOnUiThread(() -> queryOwnedOneTimePurchases(productId, true));
+                          }
+
+                          @JavascriptInterface
+                          public void checkPremiumStatus(String productId) {
+                              runOnUiThread(() -> queryOwnedOneTimePurchases(productId, false));
+                          }
+
+                          @JavascriptInterface
+                          public boolean syncIcsToCalendar(String icsContent, String fileName) {
+                              if (icsContent == null || icsContent.isEmpty()) return false;
+                              runOnUiThread(() -> {
+                                  if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED ||
+                                      ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                                      pendingIcsContent = icsContent;
+                                      ActivityCompat.requestPermissions(
+                                          MainActivity.this,
+                                          new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR},
+                                          REQ_CALENDAR_PERM
+                                      );
+                                  } else {
+                                      insertIcsEventsAndOpenCalendar(icsContent);
+                                  }
+                              });
+                              return true;
+                          }
+                      }, "OmniTaskNative");
+                  }
+              }
+
+              private void notifyJs(final String jsCode) {
+                  runOnUiThread(() -> {
+                      if (getBridge() != null && getBridge().getWebView() != null) {
+                          getBridge().getWebView().evaluateJavascript(jsCode, null);
+                      }
+                  });
+              }
+
+              private void preloadRewardedAd() {
+                  if (rewardedAdLoading || cachedRewardedAd != null) return;
+                  rewardedAdLoading = true;
+                  runOnUiThread(() -> {
+                      try {
+                          AdRequest req = new AdRequest.Builder().build();
+                          RewardedAd.load(MainActivity.this, TEST_REWARDED_AD_UNIT_ID, req, new RewardedAdLoadCallback() {
+                              @Override
+                              public void onAdLoaded(@NonNull RewardedAd ad) {
+                                  cachedRewardedAd = ad;
+                                  rewardedAdLoading = false;
+                              }
+                              @Override
+                              public void onAdFailedToLoad(@NonNull LoadAdError err) {
+                                  cachedRewardedAd = null;
+                                  rewardedAdLoading = false;
+                              }
+                          });
+                      } catch (Exception e) {
+                          rewardedAdLoading = false;
+                      }
+                  });
+              }
+
+              private void displayRewardedAd() {
+                  if (cachedRewardedAd != null) {
+                      showLoadedRewardedAd(cachedRewardedAd);
+                      cachedRewardedAd = null;
+                      return;
+                  }
+                  try {
+                      AdRequest req = new AdRequest.Builder().build();
+                      RewardedAd.load(MainActivity.this, TEST_REWARDED_AD_UNIT_ID, req, new RewardedAdLoadCallback() {
+                          @Override
+                          public void onAdLoaded(@NonNull RewardedAd ad) {
+                              showLoadedRewardedAd(ad);
+                          }
+                          @Override
+                          public void onAdFailedToLoad(@NonNull LoadAdError err) {
+                              String safeErr = JSONObject.quote(err.getMessage() != null ? err.getMessage() : "Error al cargar anuncio");
+                              notifyJs("window.onOmniTaskRewardedAdResult && window.onOmniTaskRewardedAdResult({ok:false,error:" + safeErr + "});");
+                          }
+                      });
+                  } catch (Exception e) {
+                      notifyJs("window.onOmniTaskRewardedAdResult && window.onOmniTaskRewardedAdResult({ok:false,error:'AdMob no disponible'});");
+                  }
+              }
+
+              private void showLoadedRewardedAd(RewardedAd ad) {
+                  final boolean[] earned = new boolean[]{false};
+                  ad.setFullScreenContentCallback(new FullScreenContentCallback() {
+                      @Override
+                      public void onAdDismissedFullScreenContent() {
+                          preloadRewardedAd();
+                          if (!earned[0]) {
+                              notifyJs("window.onOmniTaskRewardedAdResult && window.onOmniTaskRewardedAdResult({ok:false,cancelled:true});");
+                          }
+                      }
+                      @Override
+                      public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                          preloadRewardedAd();
+                          notifyJs("window.onOmniTaskRewardedAdResult && window.onOmniTaskRewardedAdResult({ok:false,error:'No se pudo mostrar el video'});");
+                      }
+                  });
+                  ad.show(MainActivity.this, rewardItem -> {
+                      earned[0] = true;
+                      notifyJs("window.onOmniTaskRewardedAdResult && window.onOmniTaskRewardedAdResult({ok:true,rewardHours:2,source:'admob_test'});");
+                  });
+              }
+
+              private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
+                  int code = billingResult.getResponseCode();
+                  if (code == BillingClient.BillingResponseCode.OK && purchases != null) {
+                      for (Purchase p : purchases) {
+                          handleOneTimePurchase(p);
+                      }
+                  } else if (code == BillingClient.BillingResponseCode.USER_CANCELED) {
+                      notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,cancelled:true});");
+                  } else {
+                      String msg = JSONObject.quote(billingResult.getDebugMessage() != null ? billingResult.getDebugMessage() : ("Código " + code));
+                      notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:" + msg + "});");
+                  }
+              };
+
+              private void initBillingClient() {
+                  if (billingClient != null) return;
+                  try {
+                      billingClient = BillingClient.newBuilder(this)
+                          .setListener(purchasesUpdatedListener)
+                          .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                          .build();
+                  } catch (Exception ignored) {}
+              }
+
+              private void ensureBillingConnected(Runnable onReady) {
+                  initBillingClient();
+                  if (billingClient == null) {
+                      notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:'BillingClient no disponible'});");
+                      return;
+                  }
+                  if (billingClient.isReady()) {
+                      onReady.run();
+                      return;
+                  }
+                  billingClient.startConnection(new BillingClientStateListener() {
+                      @Override
+                      public void onBillingSetupFinished(@NonNull BillingResult br) {
+                          if (br.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                              onReady.run();
+                          } else {
+                              notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:'Google Play Billing no listo (" + br.getResponseCode() + ")'});");
+                          }
+                      }
+                      @Override
+                      public void onBillingServiceDisconnected() { billingClient = null; }
+                  });
+              }
+
+              private void handleOneTimePurchase(Purchase purchase) {
+                  if (purchase.getProducts() == null || !purchase.getProducts().contains("omnitask_premium_lifetime")) return;
+                  if (purchase.getPurchaseState() == Purchase.PurchaseState.PENDING) {
+                      notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,pending:true,error:'Compra pendiente de confirmación en Google Play'});");
+                      return;
+                  }
+                  if (purchase.getPurchaseState() != Purchase.PurchaseState.PURCHASED) return;
+                  if (!purchase.isAcknowledged()) {
+                      final BillingClient client = billingClient;
+                      if (client == null) return;
+                      AcknowledgePurchaseParams ackParams = AcknowledgePurchaseParams.newBuilder()
+                          .setPurchaseToken(purchase.getPurchaseToken())
+                          .build();
+                      client.acknowledgePurchase(ackParams, ackRes -> {
+                          if (ackRes.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                              notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:true,isPremium:true});");
+                          } else {
+                              String ackMsg = JSONObject.quote(ackRes.getDebugMessage() != null ? ackRes.getDebugMessage() : "Error al confirmar compra");
+                              notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:" + ackMsg + "});");
+                          }
+                      });
+                  } else {
+                      notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:true,isPremium:true});");
+                  }
+              }
+
+              private void launchOneTimePurchase(String productId) {
+                  final String pid = (productId != null && !productId.isEmpty()) ? productId : "omnitask_premium_lifetime";
+                  ensureBillingConnected(() -> {
+                      final BillingClient client = billingClient;
+                      if (client == null) return;
+                      QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                          .setProductList(Collections.singletonList(
+                              QueryProductDetailsParams.Product.newBuilder()
+                                  .setProductId(pid)
+                                  .setProductType(BillingClient.ProductType.INAPP)
+                                  .build()
+                          ))
+                          .build();
+                      client.queryProductDetailsAsync(params, (br, result) -> {
+                          if (br.getResponseCode() != BillingClient.BillingResponseCode.OK || result == null || result.getProductDetailsList().isEmpty()) {
+                              notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:'Producto " + pid + " aún no activo en Google Play Console'});");
+                              return;
+                          }
+                          ProductDetails pd = result.getProductDetailsList().get(0);
+                          BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                              .setProductDetailsParamsList(Collections.singletonList(
+                                  BillingFlowParams.ProductDetailsParams.newBuilder()
+                                      .setProductDetails(pd)
+                                      .build()
+                              ))
+                              .build();
+                          runOnUiThread(() -> { final BillingClient c = billingClient; if (c != null) c.launchBillingFlow(MainActivity.this, flowParams); });
+                      });
+                  });
+              }
+
+              private void queryOwnedOneTimePurchases(String productId, boolean notifyIfEmpty) {
+                  final String pid = (productId != null && !productId.isEmpty()) ? productId : "omnitask_premium_lifetime";
+                  ensureBillingConnected(() -> {
+                      final BillingClient client = billingClient;
+                      if (client == null) return;
+                      QueryPurchasesParams qp = QueryPurchasesParams.newBuilder()
+                          .setProductType(BillingClient.ProductType.INAPP)
+                          .build();
+                      client.queryPurchasesAsync(qp, (br, purchases) -> {
+                          boolean found = false;
+                          if (br.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+                              for (Purchase p : purchases) {
+                                  if (p.getPurchaseState() == Purchase.PurchaseState.PURCHASED && p.getProducts().contains(pid)) {
+                                      found = true;
+                                      handleOneTimePurchase(p);
+                                  }
+                              }
+                          }
+                          if (!found && notifyIfEmpty) {
+                              notifyJs("window.onOmniTaskBillingResult && window.onOmniTaskBillingResult({ok:false,error:'No se encontró una compra Premium previa en esta cuenta de Google.'});");
+                          }
+                      });
+                  });
+              }
+
+              @Override
+              public void onResume() {
+                  super.onResume();
+                  handleWidgetQuickActionIntent(getIntent());
+                  if (billingClient != null && billingClient.isReady()) {
+                      queryOwnedOneTimePurchases("omnitask_premium_lifetime", false);
+                  }
+              }
+
+              @Override
+              public void onDestroy() {
+                  final BillingClient client = billingClient;
+                  billingClient = null;
+                  if (client != null) {
+                      try { client.endConnection(); } catch (Exception ignored) {}
+                  }
+                  super.onDestroy();
+              }
+
+              @Override
+              public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+                  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                  if (requestCode == 7002) {
+                      boolean grantedNotif = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                      if (getBridge() != null && getBridge().getWebView() != null) {
+                          final String jsCall = "window.onOmniTaskNotifPermissionResult && window.onOmniTaskNotifPermissionResult(" + grantedNotif + ")";
+                          getBridge().getWebView().evaluateJavascript(jsCall, null);
+                      }
+                  }
+                  if (requestCode == REQ_CALENDAR_PERM) {
+                      boolean granted = grantResults.length >= 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                      if (granted && pendingIcsContent != null) {
+                          String toSync = pendingIcsContent;
+                          pendingIcsContent = null;
+                          insertIcsEventsAndOpenCalendar(toSync);
+                      } else {
+                          Toast.makeText(this, "Permiso de Calendario requerido para guardar eventos y alarmas.", Toast.LENGTH_LONG).show();
+                      }
+                  }
+              }
+
+              private long findTargetCalendarId(ContentResolver cr) {
+                  Uri uri = CalendarContract.Calendars.CONTENT_URI;
+                  String[] proj = new String[]{
+                      CalendarContract.Calendars._ID,
+                      CalendarContract.Calendars.ACCOUNT_TYPE,
+                      CalendarContract.Calendars.IS_PRIMARY,
+                      CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+                      CalendarContract.Calendars.VISIBLE
+                  };
+                  long fallbackId = -1;
+                  long googleId = -1;
+                  try (Cursor c = cr.query(uri, proj, null, null, null)) {
+                      if (c != null) {
+                          while (c.moveToNext()) {
+                              long id = c.getLong(0);
+                              String accType = c.getString(1);
+                              int isPrimary = c.getInt(2);
+                              int access = c.getInt(3);
+                              int visible = c.getInt(4);
+                              if (access >= CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR && visible == 1) {
+                                  if (fallbackId == -1) fallbackId = id;
+                                  if ("com.google".equalsIgnoreCase(accType)) {
+                                      if (isPrimary == 1) return id;
+                                      if (googleId == -1) googleId = id;
+                                  } else if (isPrimary == 1) {
+                                      fallbackId = id;
+                                  }
+                              }
+                          }
+                      }
+                  } catch (Exception ignored) {}
+                  return googleId != -1 ? googleId : fallbackId;
+              }
+
+              private int parseTriggerMinutes(String trig) {
+                  if (trig == null) return 30;
+                  String t = trig.trim().toUpperCase();
+                  boolean isBefore = t.startsWith("-");
+                  if (t.contains("P1D")) return isBefore ? 1440 : -1440;
+                  Matcher mMin = Pattern.compile("-?PT(\\d+)M").matcher(t);
+                  if (mMin.find()) {
+                      try {
+                          int mins = Integer.parseInt(mMin.group(1));
+                          return isBefore ? mins : -mins;
+                      } catch (Exception ignored) {}
+                  }
+                  Matcher mHr = Pattern.compile("-?PT(\\d+)H").matcher(t);
+                  if (mHr.find()) {
+                      try {
+                          int mins = Integer.parseInt(mHr.group(1)) * 60;
+                          return isBefore ? mins : -mins;
+                      } catch (Exception ignored) {}
+                  }
+                  return 30;
+              }
+
+              private long parseIcsDateMillis(String raw, boolean isAllDay) {
+                  try {
+                      String clean = raw.trim();
+                      int y = Integer.parseInt(clean.substring(0, 4));
+                      int m = Integer.parseInt(clean.substring(4, 6)) - 1;
+                      int d = Integer.parseInt(clean.substring(6, 8));
+                      if (isAllDay || clean.length() < 13 || !clean.contains("T")) {
+                          Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                          cal.set(y, m, d, 0, 0, 0);
+                          cal.set(Calendar.MILLISECOND, 0);
+                          return cal.getTimeInMillis();
+                      }
+                      int tIdx = clean.indexOf('T');
+                      int hh = Integer.parseInt(clean.substring(tIdx + 1, tIdx + 3));
+                      int mm = Integer.parseInt(clean.substring(tIdx + 3, tIdx + 5));
+                      Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+                      cal.set(y, m, d, hh, mm, 0);
+                      cal.set(Calendar.MILLISECOND, 0);
+                      return cal.getTimeInMillis();
+                  } catch (Exception e) {
+                      return System.currentTimeMillis();
+                  }
+              }
+
+              private String unescapeIcs(String val) {
+                  if (val == null) return "";
+                  return val.replace("\\n", "\n")
+                            .replace("\\,", ",")
+                            .replace("\\;", ";")
+                            .replace("\\\\", "\\")
+                            .trim();
+              }
+
+              private void insertIcsEventsAndOpenCalendar(String icsContent) {
+                  new Thread(() -> {
+                      int insertedCount = 0;
+                      int alarmCount = 0;
+                      try {
+                          ContentResolver cr = getContentResolver();
+                          long calId = findTargetCalendarId(cr);
+                          if (calId == -1) {
+                              runOnUiThread(() -> Toast.makeText(MainActivity.this, "No se encontró una cuenta de calendario activa en el teléfono.", Toast.LENGTH_LONG).show());
+                              return;
+                          }
+
+                          String unfolded = icsContent.replaceAll("\\r?\\n[ \\t]", "");
+                          String[] lines = unfolded.split("\\r?\\n");
+
+                          boolean inEvent = false;
+                          boolean inAlarm = false;
+                          String summary = "";
+                          String description = "";
+                          String location = "";
+                          String dtStartRaw = "";
+                          String dtEndRaw = "";
+                          boolean isAllDay = false;
+                          List<Integer> alarmMinutes = new ArrayList<>();
+
+                          for (String line : lines) {
+                              if ("BEGIN:VEVENT".equals(line)) {
+                                  inEvent = true;
+                                  inAlarm = false;
+                                  summary = "";
+                                  description = "";
+                                  location = "";
+                                  dtStartRaw = "";
+                                  dtEndRaw = "";
+                                  isAllDay = false;
+                                  alarmMinutes.clear();
+                                  continue;
+                              }
+                              if ("BEGIN:VALARM".equals(line)) {
+                                  inAlarm = true;
+                                  continue;
+                              }
+                              if ("END:VALARM".equals(line)) {
+                                  inAlarm = false;
+                                  continue;
+                              }
+                              if ("END:VEVENT".equals(line)) {
+                                  if (inEvent && !dtStartRaw.isEmpty() && !summary.isEmpty()) {
+                                      long startMs = parseIcsDateMillis(dtStartRaw, isAllDay);
+                                      long endMs = dtEndRaw.isEmpty() ? (startMs + (isAllDay ? 86400000L : 3600000L)) : parseIcsDateMillis(dtEndRaw, isAllDay);
+                                      if (endMs <= startMs) endMs = startMs + (isAllDay ? 86400000L : 1800000L);
+
+                                      long existingEventId = -1;
+                                      String sel = CalendarContract.Events.CALENDAR_ID + "=? AND " +
+                                                   CalendarContract.Events.TITLE + "=? AND " +
+                                                   CalendarContract.Events.DTSTART + "=? AND " +
+                                                   CalendarContract.Events.DELETED + "=0";
+                                      String[] selArgs = new String[]{String.valueOf(calId), summary, String.valueOf(startMs)};
+                                      try (Cursor ec = cr.query(CalendarContract.Events.CONTENT_URI, new String[]{CalendarContract.Events._ID}, sel, selArgs, null)) {
+                                          if (ec != null && ec.moveToFirst()) {
+                                              existingEventId = ec.getLong(0);
+                                          }
+                                      } catch (Exception ignored) {}
+
+                                      long eventId = existingEventId;
+                                      if (eventId == -1) {
+                                          ContentValues ev = new ContentValues();
+                                          ev.put(CalendarContract.Events.CALENDAR_ID, calId);
+                                          ev.put(CalendarContract.Events.TITLE, summary);
+                                          ev.put(CalendarContract.Events.DESCRIPTION, description);
+                                          if (!location.isEmpty()) ev.put(CalendarContract.Events.EVENT_LOCATION, location);
+                                          ev.put(CalendarContract.Events.DTSTART, startMs);
+                                          ev.put(CalendarContract.Events.DTEND, endMs);
+                                          ev.put(CalendarContract.Events.ALL_DAY, isAllDay ? 1 : 0);
+                                          ev.put(CalendarContract.Events.HAS_ALARM, alarmMinutes.isEmpty() ? 0 : 1);
+                                          ev.put(CalendarContract.Events.EVENT_TIMEZONE, isAllDay ? "UTC" : TimeZone.getDefault().getID());
+                                          Uri insertedUri = cr.insert(CalendarContract.Events.CONTENT_URI, ev);
+                                          if (insertedUri != null) {
+                                              eventId = ContentUris.parseId(insertedUri);
+                                              insertedCount++;
+                                          }
+                                      } else {
+                                          insertedCount++;
+                                      }
+
+                                      if (eventId != -1 && !alarmMinutes.isEmpty()) {
+                                          try {
+                                              cr.delete(CalendarContract.Reminders.CONTENT_URI, CalendarContract.Reminders.EVENT_ID + "=?", new String[]{String.valueOf(eventId)});
+                                          } catch (Exception ignored) {}
+                                          for (Integer mins : alarmMinutes) {
+                                              ContentValues rem = new ContentValues();
+                                              rem.put(CalendarContract.Reminders.EVENT_ID, eventId);
+                                              rem.put(CalendarContract.Reminders.MINUTES, mins);
+                                              rem.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+                                              cr.insert(CalendarContract.Reminders.CONTENT_URI, rem);
+                                              alarmCount++;
+                                          }
+                                      }
+                                  }
+                                  inEvent = false;
+                                  continue;
+                              }
+                              if (!inEvent) continue;
+                              int colon = line.indexOf(':');
+                              if (colon == -1) continue;
+                              String keyPart = line.substring(0, colon).toUpperCase();
+                              String valPart = line.substring(colon + 1);
+                              if (inAlarm) {
+                                  if (keyPart.startsWith("TRIGGER")) {
+                                      alarmMinutes.add(parseTriggerMinutes(valPart));
+                                  }
+                              } else {
+                                  if (keyPart.startsWith("SUMMARY")) {
+                                      summary = unescapeIcs(valPart);
+                                  } else if (keyPart.startsWith("DESCRIPTION")) {
+                                      description = unescapeIcs(valPart);
+                                  } else if (keyPart.startsWith("LOCATION")) {
+                                      location = unescapeIcs(valPart);
+                                  } else if (keyPart.startsWith("DTSTART")) {
+                                      isAllDay = keyPart.contains("VALUE=DATE") || valPart.trim().length() == 8;
+                                      dtStartRaw = valPart.trim();
+                                  } else if (keyPart.startsWith("DTEND")) {
+                                      dtEndRaw = valPart.trim();
+                                  }
+                              }
+                          }
+
+                          final int finalInserted = insertedCount;
+                          final int finalAlarms = alarmCount;
+                          final long openTimeMs = System.currentTimeMillis();
+                          runOnUiThread(() -> {
+                              Toast.makeText(
+                                  MainActivity.this,
+                                  "OmniTask: " + finalInserted + " eventos y " + finalAlarms + " alarmas guardados en tu Calendario.",
+                                  Toast.LENGTH_LONG
+                              ).show();
+                              try {
+                                  Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
+                                  builder.appendPath("time");
+                                  ContentUris.appendId(builder, openTimeMs);
+                                  Intent calIntent = new Intent(Intent.ACTION_VIEW).setData(builder.build());
+                                  calIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                  startActivity(calIntent);
+                              } catch (Exception e) {
+                                  e.printStackTrace();
+                              }
+                          });
+                      } catch (Exception e) {
+                          e.printStackTrace();
+                          runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error al guardar en Calendario: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                      }
+                  }).start();
+              }
+              @Override
+              protected void onNewIntent(Intent intent) {
+                  super.onNewIntent(intent);
+                  setIntent(intent);
+                  handleWidgetQuickActionIntent(intent);
+              }
+
+              private void handleWidgetQuickActionIntent(Intent intent) {
+                  try {
+                      if (intent != null && "quick_note".equals(intent.getStringExtra("omnitask_action"))) {
+                          intent.removeExtra("omnitask_action");
+                          WebView wv = getBridge() != null ? getBridge().getWebView() : null;
+                          if (wv != null) {
+                              String js = "window._otPendingWidgetAction='quick_note';if(window.handleOmniTaskWidgetAction){window.handleOmniTaskWidgetAction('quick_note');}";
+                              wv.postDelayed(() -> wv.evaluateJavascript(js, null), 750);
+                          }
+                      }
+                  } catch (Exception ignored) {}
+              }
+          }
+          JAVAEOF
+            RECEIVER_PATH="$(dirname "$MAIN_ACT")/OmniTaskAlarmReceiver.java"
+            cat > "$RECEIVER_PATH" << 'RXEOF'
+          package cl.vorax2009.micalendario;
+
+          import android.app.AlarmManager;
+          import android.app.Notification;
+          import android.app.NotificationChannel;
+          import android.app.NotificationManager;
+          import android.app.PendingIntent;
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.media.AudioAttributes;
+          import android.media.RingtoneManager;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.PowerManager;
+          import android.widget.Toast;
+          import androidx.core.app.NotificationCompat;
+
+          public class OmniTaskAlarmReceiver extends BroadcastReceiver {
+              private static final String CHANNEL_ID = "omnitask_alarms_v2";
+              public static final String ACTION_DISMISS = "cl.vorax2009.micalendario.ALARM_DISMISS";
+              public static final String ACTION_SNOOZE = "cl.vorax2009.micalendario.ALARM_SNOOZE";
+
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  if (intent == null) return;
+                  NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                  int alarmId = intent.getIntExtra("alarmId", (int) (System.currentTimeMillis() % 100000));
+                  String action = intent.getAction();
+
+                  if (ACTION_DISMISS.equals(action)) {
+                      if (nm != null) nm.cancel(alarmId);
+                      return;
+                  }
+
+                  if (ACTION_SNOOZE.equals(action)) {
+                      if (nm != null) nm.cancel(alarmId);
+                      String title = intent.getStringExtra("title");
+                      String body = intent.getStringExtra("body");
+                      if (title == null || title.isEmpty()) title = "OmniTask · Alarma";
+                      if (body == null || body.isEmpty()) body = "Recordatorio pospuesto.";
+                      long snoozeAt = System.currentTimeMillis() + 10L * 60L * 1000L;
+                      try {
+                          AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                          if (am != null) {
+                              Intent rxIntent = new Intent(context, OmniTaskAlarmReceiver.class);
+                              rxIntent.putExtra("alarmId", alarmId);
+                              rxIntent.putExtra("title", title);
+                              rxIntent.putExtra("body", body);
+                              PendingIntent pi = PendingIntent.getBroadcast(
+                                  context, alarmId, rxIntent,
+                                  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                              );
+                              Intent showInt = new Intent(context, MainActivity.class);
+                              PendingIntent showPi = PendingIntent.getActivity(
+                                  context, alarmId, showInt,
+                                  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                              );
+                              if (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()) {
+                                  am.setAlarmClock(new AlarmManager.AlarmClockInfo(snoozeAt, showPi), pi);
+                              } else if (Build.VERSION.SDK_INT >= 23) {
+                                  am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, snoozeAt, pi);
+                              } else {
+                                  am.set(AlarmManager.RTC_WAKEUP, snoozeAt, pi);
+                              }
+                          }
+                          Toast.makeText(context, "OmniTask: Alarma pospuesta 10 min", Toast.LENGTH_SHORT).show();
+                      } catch (Exception ignored) {}
+                      return;
+                  }
+
+                  PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                  PowerManager.WakeLock wl = null;
+                  if (pm != null) {
+                      wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "OmniTask:AlarmWake");
+                      wl.acquire(10000L);
+                  }
+                  try {
+                      String title = intent.getStringExtra("title");
+                      String body = intent.getStringExtra("body");
+                      if (title == null || title.isEmpty()) title = "OmniTask · Alarma";
+                      if (body == null || body.isEmpty()) body = "Tienes un recordatorio programado.";
+                      if (nm == null) return;
+
+                      Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                      if (soundUri == null) soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                          NotificationChannel ch = new NotificationChannel(
+                              CHANNEL_ID,
+                              "Alarmas y Recordatorios OmniTask",
+                              NotificationManager.IMPORTANCE_HIGH
+                          );
+                          ch.setDescription("Alertas exactas aunque la app esté cerrada");
+                          ch.enableVibration(true);
+                          ch.setVibrationPattern(new long[]{0, 600, 300, 600, 300});
+                          if (soundUri != null) {
+                              AudioAttributes aa = new AudioAttributes.Builder()
+                                  .setUsage(AudioAttributes.USAGE_ALARM)
+                                  .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                  .build();
+                              ch.setSound(soundUri, aa);
+                          }
+                          nm.createNotificationChannel(ch);
+                      }
+
+                      Intent openInt = new Intent(context, MainActivity.class);
+                      openInt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                      PendingIntent pi = PendingIntent.getActivity(
+                          context, alarmId, openInt,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                      );
+
+                      Intent dismissInt = new Intent(context, OmniTaskAlarmReceiver.class);
+                      dismissInt.setAction(ACTION_DISMISS);
+                      dismissInt.putExtra("alarmId", alarmId);
+                      PendingIntent dismissPi = PendingIntent.getBroadcast(
+                          context, alarmId + 100000, dismissInt,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                      );
+
+                      Intent snoozeInt = new Intent(context, OmniTaskAlarmReceiver.class);
+                      snoozeInt.setAction(ACTION_SNOOZE);
+                      snoozeInt.putExtra("alarmId", alarmId);
+                      snoozeInt.putExtra("title", title);
+                      snoozeInt.putExtra("body", body);
+                      PendingIntent snoozePi = PendingIntent.getBroadcast(
+                          context, alarmId + 200000, snoozeInt,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                      );
+
+                      NotificationCompat.Builder nb = new NotificationCompat.Builder(context, CHANNEL_ID)
+                          .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+                          .setContentTitle(title)
+                          .setContentText(body)
+                          .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                          .setPriority(NotificationCompat.PRIORITY_MAX)
+                          .setCategory(NotificationCompat.CATEGORY_ALARM)
+                          .setAutoCancel(true)
+                          .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                          .setContentIntent(pi)
+                          .addAction(0, "🔇 Apagar", dismissPi)
+                          .addAction(0, "⏰ Posponer 10 min", snoozePi);
+                      if (soundUri != null) nb.setSound(soundUri);
+
+                      Notification notif = nb.build();
+                      notif.flags |= Notification.FLAG_INSISTENT;
+                      nm.notify(alarmId, notif);
+                  } finally {
+                      if (wl != null && wl.isHeld()) {
+                          try { wl.release(); } catch (Exception ignored) {}
+                      }
+                  }
+              }
+          }
+          RXEOF
+            BOOT_PATH="$(dirname "$MAIN_ACT")/OmniTaskBootReceiver.java"
+            cat > "$BOOT_PATH" << 'BOOTEOF'
+          package cl.vorax2009.micalendario;
+
+          import android.app.AlarmManager;
+          import android.app.PendingIntent;
+          import android.content.BroadcastReceiver;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.os.Build;
+          import org.json.JSONObject;
+          import java.util.Map;
+
+          public class OmniTaskBootReceiver extends BroadcastReceiver {
+              @Override
+              public void onReceive(Context context, Intent intent) {
+                  String act = intent != null ? intent.getAction() : null;
+                  if (!Intent.ACTION_BOOT_COMPLETED.equals(act)
+                      && !Intent.ACTION_TIME_CHANGED.equals(act)
+                      && !Intent.ACTION_TIMEZONE_CHANGED.equals(act)
+                      && !Intent.ACTION_MY_PACKAGE_REPLACED.equals(act)) return;
+                  AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                  if (am == null) return;
+                  SharedPreferences sp = context.getSharedPreferences("omnitask_native_alarms_v1", Context.MODE_PRIVATE);
+                  long now = System.currentTimeMillis();
+                  for (Map.Entry<String, ?> entry : sp.getAll().entrySet()) {
+                      if (!entry.getKey().startsWith("a_")) continue;
+                      try {
+                          JSONObject obj = new JSONObject(String.valueOf(entry.getValue()));
+                          long ts = obj.optLong("ts", 0);
+                          if (ts <= now) {
+                              sp.edit().remove(entry.getKey()).apply();
+                              continue;
+                          }
+                          int id = obj.getInt("id");
+                          String title = obj.optString("title", "OmniTask · Alarma");
+                          String body = obj.optString("body", "Recordatorio programado");
+                          Intent rxIntent = new Intent(context, OmniTaskAlarmReceiver.class);
+                          rxIntent.putExtra("alarmId", id);
+                          rxIntent.putExtra("title", title);
+                          rxIntent.putExtra("body", body);
+                          PendingIntent pi = PendingIntent.getBroadcast(
+                              context, id, rxIntent,
+                              PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                          );
+                          Intent showInt = new Intent(context, MainActivity.class);
+                          PendingIntent showPi = PendingIntent.getActivity(
+                              context, id, showInt,
+                              PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                          );
+                          if (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()) {
+                              am.setAlarmClock(new AlarmManager.AlarmClockInfo(ts, showPi), pi);
+                          } else if (Build.VERSION.SDK_INT >= 23) {
+                              am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, ts, pi);
+                          } else {
+                              am.set(AlarmManager.RTC_WAKEUP, ts, pi);
+                          }
+                      } catch (Exception ignored) {}
+                  }
+                  OmniTaskWidgetProvider.refreshAllWidgets(context);
+              }
+          }
+          BOOTEOF
+            WIDGET_PATH="$(dirname "$MAIN_ACT")/OmniTaskWidgetProvider.java"
+            cat > "$WIDGET_PATH" << 'WIDGETEOF'
+          package cl.vorax2009.micalendario;
+
+          import android.app.PendingIntent;
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.widget.RemoteViews;
+          import org.json.JSONObject;
+
+          public class OmniTaskWidgetProvider extends AppWidgetProvider {
+
+              @Override
+              public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+                  for (int id : appWidgetIds) {
+                      updateSingleWidget(context, appWidgetManager, id);
+                  }
+              }
+
+              public static void refreshAllWidgets(Context context) {
+                  try {
+                      AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+                      ComponentName cn = new ComponentName(context, OmniTaskWidgetProvider.class);
+                      int[] ids = mgr.getAppWidgetIds(cn);
+                      if (ids != null) {
+                          for (int id : ids) {
+                              updateSingleWidget(context, mgr, id);
+                          }
+                      }
+                  } catch (Exception ignored) {}
+              }
+
+              private static void updateSingleWidget(Context context, AppWidgetManager mgr, int appWidgetId) {
+                  try {
+                      SharedPreferences sp = context.getSharedPreferences("omnitask_widget_prefs", Context.MODE_PRIVATE);
+                      String raw = sp.getString("widget_json", "");
+                      String todayLabel = "OmniTask Hoy";
+                      String shift = "Sin turno hoy";
+                      String nextBill = "Sin cuentas próximas";
+                      String reminder = "Todo al día";
+                      if (raw != null && !raw.isEmpty()) {
+                          JSONObject obj = new JSONObject(raw);
+                          todayLabel = obj.optString("todayLabel", todayLabel);
+                          shift = obj.optString("shift", shift);
+                          nextBill = obj.optString("nextBill", nextBill);
+                          reminder = obj.optString("reminder", reminder);
+                      }
+
+                      java.util.Calendar cal = java.util.Calendar.getInstance();
+                      String[] meses = {"ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"};
+                      String[] dias = {"","domingo","lunes","martes","miércoles","jueves","viernes","sábado"};
+                      String dayNum = String.valueOf(cal.get(java.util.Calendar.DAY_OF_MONTH));
+                      String monthShort = meses[cal.get(java.util.Calendar.MONTH)];
+                      String weekdayName = dias[cal.get(java.util.Calendar.DAY_OF_WEEK)];
+
+                      RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.omnitask_widget);
+                      views.setTextViewText(R.id.ot_widget_day_num, dayNum);
+                      views.setTextViewText(R.id.ot_widget_month_short, monthShort);
+                      views.setTextViewText(R.id.ot_widget_weekday, weekdayName);
+                      views.setTextViewText(R.id.ot_widget_shift, "🕒 " + shift);
+                      views.setTextViewText(R.id.ot_widget_bill, "💸 " + nextBill);
+                      views.setTextViewText(R.id.ot_widget_reminder, "📌 " + reminder);
+
+                      Intent openApp = new Intent(context, MainActivity.class);
+                      openApp.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                      PendingIntent openPi = PendingIntent.getActivity(
+                          context, 9100 + appWidgetId, openApp,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                      );
+                      views.setOnClickPendingIntent(R.id.ot_widget_root, openPi);
+
+                      Intent quickNote = new Intent(context, MainActivity.class);
+                      quickNote.putExtra("omnitask_action", "quick_note");
+                      quickNote.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                      PendingIntent notePi = PendingIntent.getActivity(
+                          context, 9200 + appWidgetId, quickNote,
+                          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                      );
+                      views.setOnClickPendingIntent(R.id.ot_widget_add_btn, notePi);
+
+                      mgr.updateAppWidget(appWidgetId, views);
+                  } catch (Exception ignored) {}
+              }
+          }
+          WIDGETEOF
+
+            mkdir -p android/app/src/main/res/drawable android/app/src/main/res/layout android/app/src/main/res/xml
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_bg.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <gradient android:startColor="#E80F172A" android:endColor="#E61E1B4B" android:angle="135" />
+              <stroke android:width="1.2dp" android:color="#5938BDF8" />
+              <corners android:radius="24dp" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_day_circle.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+              <solid android:color="#FF020617" />
+              <stroke android:width="1.2dp" android:color="#2EFFFFFF" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_btn.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <gradient android:startColor="#06B6D4" android:endColor="#3B82F6" android:angle="135" />
+              <corners android:radius="999dp" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_pill_purple.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <solid android:color="#2EA855F7" />
+              <stroke android:width="1dp" android:color="#52A855F7" />
+              <corners android:radius="11dp" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_pill_green.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <solid android:color="#2910B981" />
+              <stroke android:width="1dp" android:color="#4D10B981" />
+              <corners android:radius="11dp" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/drawable/omnitask_widget_pill_sky.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <solid android:color="#2638BDF8" />
+              <stroke android:width="1dp" android:color="#4738BDF8" />
+              <corners android:radius="11dp" />
+          </shape>
+          XMLEOF
+
+            cat > android/app/src/main/res/layout/omnitask_widget.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/ot_widget_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="12dp"
+              android:background="@drawable/omnitask_widget_bg">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center_vertical"
+                  android:layout_marginBottom="8dp">
+
+                  <TextView
+                      android:id="@+id/ot_widget_day_num"
+                      android:layout_width="38dp"
+                      android:layout_height="38dp"
+                      android:gravity="center"
+                      android:text="25"
+                      android:textColor="#FFFFFF"
+                      android:textSize="15sp"
+                      android:textStyle="bold"
+                      android:background="@drawable/omnitask_widget_day_circle"
+                      android:layout_marginEnd="9dp" />
+
+                  <LinearLayout
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:orientation="vertical">
+
+                      <TextView
+                          android:id="@+id/ot_widget_month_short"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="NOV"
+                          android:textColor="#FFFFFF"
+                          android:textSize="13sp"
+                          android:textStyle="bold"
+                          android:maxLines="1" />
+
+                      <TextView
+                          android:id="@+id/ot_widget_weekday"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="miércoles"
+                          android:textColor="#CBD5E1"
+                          android:textSize="11sp"
+                          android:maxLines="1"
+                          android:ellipsize="end" />
+                  </LinearLayout>
+
+                  <TextClock
+                      android:id="@+id/ot_widget_clock"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:format24Hour="HH:mm"
+                      android:format12Hour="h:mm"
+                      android:textColor="#FFFFFF"
+                      android:textSize="17sp"
+                      android:textStyle="bold"
+                      android:layout_marginEnd="8dp" />
+
+                  <TextView
+                      android:id="@+id/ot_widget_add_btn"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="+ Nota"
+                      android:textColor="#FFFFFF"
+                      android:textSize="11sp"
+                      android:textStyle="bold"
+                      android:paddingLeft="12dp"
+                      android:paddingRight="12dp"
+                      android:paddingTop="6dp"
+                      android:paddingBottom="6dp"
+                      android:background="@drawable/omnitask_widget_btn" />
+              </LinearLayout>
+
+              <TextView
+                  android:id="@+id/ot_widget_shift"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="🕒 Sin turno hoy"
+                  android:textColor="#F3E8FF"
+                  android:textSize="12sp"
+                  android:textStyle="bold"
+                  android:paddingLeft="9dp"
+                  android:paddingRight="9dp"
+                  android:paddingTop="5dp"
+                  android:paddingBottom="5dp"
+                  android:background="@drawable/omnitask_widget_pill_purple"
+                  android:maxLines="1"
+                  android:ellipsize="end"
+                  android:layout_marginBottom="5dp" />
+
+              <TextView
+                  android:id="@+id/ot_widget_bill"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="💸 Sin cuentas próximas"
+                  android:textColor="#D1FAE5"
+                  android:textSize="11.5sp"
+                  android:textStyle="bold"
+                  android:paddingLeft="9dp"
+                  android:paddingRight="9dp"
+                  android:paddingTop="5dp"
+                  android:paddingBottom="5dp"
+                  android:background="@drawable/omnitask_widget_pill_green"
+                  android:maxLines="1"
+                  android:ellipsize="end"
+                  android:layout_marginBottom="5dp" />
+
+              <TextView
+                  android:id="@+id/ot_widget_reminder"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="📌 Todo al día"
+                  android:textColor="#E0F2FE"
+                  android:textSize="11.5sp"
+                  android:textStyle="bold"
+                  android:paddingLeft="9dp"
+                  android:paddingRight="9dp"
+                  android:paddingTop="5dp"
+                  android:paddingBottom="5dp"
+                  android:background="@drawable/omnitask_widget_pill_sky"
+                  android:maxLines="1"
+                  android:ellipsize="end" />
+          </LinearLayout>
+          XMLEOF
+
+            cat > android/app/src/main/res/xml/omnitask_widget_info.xml << 'XMLEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="110dp"
+              android:minHeight="48dp"
+              android:minResizeWidth="110dp"
+              android:minResizeHeight="48dp"
+              android:targetCellWidth="4"
+              android:targetCellHeight="2"
+              android:updatePeriodMillis="1800000"
+              android:initialLayout="@layout/omnitask_widget"
+              android:resizeMode="horizontal|vertical"
+              android:widgetCategory="home_screen" />
+          XMLEOF
+
+            echo "MainActivity.java, OmniTaskAlarmReceiver.java, OmniTaskBootReceiver.java y OmniTaskWidgetProvider.java actualizados."
+          fi
+
+          # 4. Actualizar variables.gradle (minSdk 24, compileSdk 36, targetSdk 36 exigido por Google Play)
+          node -e '
+            const fs = require("fs");
+            let vars = fs.readFileSync("android/variables.gradle", "utf8");
+            vars = vars.replace(/minSdkVersion\s*=\s*\d+/, "minSdkVersion = 24");
+            vars = vars.replace(/compileSdkVersion\s*=\s*\d+/, "compileSdkVersion = 36");
+            vars = vars.replace(/targetSdkVersion\s*=\s*\d+/, "targetSdkVersion = 36");
+            fs.writeFileSync("android/variables.gradle", vars, "utf8");
+          '
+
+          # 5. Suprimir advertencias de versión AGP en gradle.properties
+          printf "\nandroid.suppressUnsupportedCompileSdk=35,36\n" >> android/gradle.properties
+
+          # 6. Configurar versionCode, versionName y signingConfigs.release en android/app/build.gradle
+          node -e '
+            const fs = require("fs");
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            const versionName = pkg.version || "1.1.0";
+            const runNum = parseInt(process.env.RUN_NUMBER || "1", 10) + 1;
+            const ksPass = process.env.KS_PASS;
+            const keyAlias = process.env.KEY_ALIAS;
+            const keyPass = process.env.KEY_PASS;
+
+            let gradle = fs.readFileSync("android/app/build.gradle", "utf8");
+            gradle = gradle.replace(/versionCode\s+\d+/, `versionCode ${runNum}`);
+            gradle = gradle.replace(/versionName\s+"[^"]+"/, `versionName "${versionName}"`);
+
+            const signingBlock = `
+                signingConfigs {
+                    release {
+                        storeFile file("omnitask-upload-keystore.jks")
+                        storePassword "${ksPass}"
+                        keyAlias "${keyAlias}"
+                        keyPassword "${keyPass}"
+                    }
+                }
+                lintOptions {
+                    checkReleaseBuilds false
+                    abortOnError false
+                }
+                buildTypes {
+                    release {
+                        signingConfig signingConfigs.release`;
+
+            gradle = gradle.replace(/buildTypes\s*\{\s*release\s*\{/, signingBlock);
+            gradle = gradle.replace(/minifyEnabled\s+false/g, "minifyEnabled true\n            shrinkResources true");
+            if (!gradle.includes("minifyEnabled")) {
+              gradle = gradle.replace("signingConfig signingConfigs.release", "signingConfig signingConfigs.release\n                        minifyEnabled true\n                        shrinkResources true\n                        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'");
+            }
+            if (!gradle.includes("com.android.billingclient:billing")) {
+              gradle = gradle.replace(/dependencies\s*\{/, `dependencies {\n    implementation "com.android.billingclient:billing:8.3.0"\n    implementation "com.google.android.play:review:2.0.2"\n    implementation "com.google.android.gms:play-services-ads:23.6.0"`);
+            }
+            fs.writeFileSync("android/app/build.gradle", gradle, "utf8");
+
+            const pgRules = `
+# OmniTask R8 Keep Rules (Play Console DEX Optimization)
+-keepattributes *Annotation*,JavascriptInterface
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keep class cl.vorax2009.micalendario.** { *; }
+-keep class com.getcapacitor.** { *; }
+-keep class com.android.billingclient.** { *; }
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.android.play.core.** { *; }
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn javax.annotation.**
+`;
+            fs.appendFileSync("android/app/proguard-rules.pro", pgRules);
+          '
+
+      - name: Compilar APK Debug, APK Release y AAB Release Firmado
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug assembleRelease bundleRelease
+
+      - name: Verificar firma criptográfica del AAB Release
+        run: |
+          set -o pipefail
+          jarsigner -verify -verbose -certs android/app/build/outputs/bundle/release/app-release.aab | head -n 25
+
+      - name: Guardar APK Debug y Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: omnitask-apks
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Guardar AAB Release Firmado (Para Google Play Console)
+        uses: actions/upload-artifact@v4
+        with:
+          name: omnitask-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
