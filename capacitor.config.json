@@ -1,9 +1,0 @@
-{
-  "appId": "cl.vorax2009.micalendario",
-  "appName": "OmniTask",
-  "webDir": "www",
-  "backgroundColor": "#020617",
-  "android": {
-    "backgroundColor": "#020617"
-  }
-}
