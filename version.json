@@ -1,5 +1,5 @@
 {
-  "version": "1.1.51",
+  "version": "1.1.58",
   "notes": "Regla de 1 perfil por sala (cero duplicados en Firebase con bloqueo visual 🔒) y aporte bidireccional de invitados (cada participante puede sumar sus propios turnos, autos, mascotas o pacientes a la sala compartida sin pisarse).",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }

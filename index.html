@@ -1426,16 +1426,16 @@
                 <div class="flex items-center gap-2 flex-wrap">
                   <h4 id="btProfileName" class="text-sm font-black text-slate-100 leading-tight break-words">Registrar Bebé</h4>
                   <span id="btProfileAgeBadge" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">Sin fecha</span>
-                  <span id="btLocalOnlyBadge" class="hidden bg-slate-800 text-slate-300 border border-slate-600 font-bold px-2 py-0.5 rounded text-[10px]">📱 Solo local</span>
+                  <span id="btLocalOnlyBadge" class="bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]">📱 Solo en este celular</span>
                 </div>
                 <p id="btProfileAgeText" class="text-[11px] text-slate-300 font-semibold mt-0.5">Completa los datos en el botón Perfil</p>
                 <p id="btProfileDaysText" class="text-[10px] text-slate-400">Edad y signos se calculan automáticamente</p>
               </div>
             </div>
             <div class="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 shrink-0">
-              <button type="button" id="btCloudSyncBtn" onclick="openOmniTaskSyncCenter()" class="px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95" title="Sincronizar apartado Bebé entre varios celulares">
-                <span id="btCloudSyncDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-                <span id="btCloudSyncBtnLabel">☁️ Sincronizar</span>
+              <button type="button" id="btCloudSyncBtn" onclick="openOmniTaskSyncCenter()" class="hidden ot-sync-pill-btn" title="En vivo en tu sala">
+                <span id="btCloudSyncDot" class="ot-sync-dot-on"></span>
+                <span id="btCloudSyncBtnLabel">En vivo</span>
               </button>
               <div class="flex items-center gap-1.5">
                 <button type="button" id="btBtnEditProfile" class="px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold transition-all shrink-0 shadow active:scale-95">
@@ -3694,7 +3694,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.51 · Toca 5 veces para modo prueba
+            OmniTask v1.1.58 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -15250,6 +15250,13 @@
         try { localStorage.setItem(LAST_BACKUP_KEY, String(Date.now())); } catch (e) {}
         updateStorageStatus();
 
+        if (window.OmniTaskNative && typeof window.OmniTaskNative.shareFileToDrive === 'function') {
+          if (window.OmniTaskNative.shareFileToDrive(jsonText, jsonFileName)) {
+            showToast('Abriendo Google Drive', 'Confirma guardar tu respaldo en Drive.', 'fa-brands fa-google-drive', 'text-emerald-400');
+            return true;
+          }
+        }
+
         if (typeof window.deliverOmniTaskFile === 'function') {
           const res = await window.deliverOmniTaskFile({
             content: jsonText,
@@ -22163,15 +22170,8 @@
             ? 'w-2 h-2 rounded-full bg-emerald-400'
             : (state === 'error' ? 'w-2 h-2 rounded-full bg-rose-400' : 'w-2 h-2 rounded-full bg-slate-500'));
 
-        if (dot) dot.className = dotClass;
         if (modalDot) modalDot.className = dotClass.replace('w-2 h-2', 'w-2.5 h-2.5');
-
-        if (btnLabel) {
-          const shortDev = (btCloudConfig.deviceName || 'Familia').trim().slice(0, 14);
-          btnLabel.textContent = isEnabled
-            ? (state === 'syncing' ? 'Sincronizando...' : `En vivo · ${shortDev}`)
-            : 'Sincronizar';
-        }
+        if (typeof window.refreshAllLivePillsUI === 'function') window.refreshAllLivePillsUI(true);
 
         if (modalStatus) {
           if (!isEnabled) {
@@ -22994,7 +22994,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.51';
+      const OMNITASK_APP_VERSION = '1.1.58';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -24889,7 +24889,9 @@
         const doneCnt = events.filter(e => !!e.done).length;
         const spend = events.reduce((s, e) => s + (Number(e.cost) || 0), 0);
         const petRooms = (typeof window.getRoomsForSyncItem === 'function') ? window.getRoomsForSyncItem('pet', pet.id) : [];
-        const isSynced = petRooms.some(r => r && r.lastSyncOk === true);
+        const petLiveRooms = petRooms.filter(r => r && r.lastSyncOk === true);
+        const isSynced = petLiveRooms.length > 0;
+        const isPetPending = !isSynced && petRooms.length > 0;
         const petSubTab = window._otPetSubTab === 'stats' ? 'stats' : 'events';
         const sorted = [...events].sort((a, b) => Number(!!a.done) - Number(!!b.done) || String(a.date || '').localeCompare(String(b.date || '')));
 
@@ -24901,7 +24903,7 @@
                 <div class="min-w-0 flex-1">
                   <h3 class="text-sm font-black text-slate-100 leading-tight truncate">${escapeHtml(pet.name)}</h3>
                   <div class="mt-1">
-                    <span class="${isSynced ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'} font-bold px-2 py-0.5 rounded text-[10px]">${isSynced ? ('☁️ ' + escapeHtml(petRooms.map(r => r.name).join(' · '))) : '📱 Solo en este celular'}</span>
+                    <span class="${isSynced ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : (isPetPending ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-sky-500/20 text-sky-300 border border-sky-500/40')} font-bold px-2 py-0.5 rounded text-[10px]">${isSynced ? ('☁️ ' + escapeHtml(petLiveRooms.map(r => r.name).join(' · '))) : (isPetPending ? ('⏳ ' + escapeHtml(petRooms.map(r => r.name).join(' · ')) + ' (sin sincronizar)') : '📱 Solo en este celular')}</span>
                   </div>
                   <p class="text-[11px] text-slate-300 font-semibold mt-1 truncate">${escapeHtml(pet.breed || 'Mascota')}</p>
                   <p class="text-[10px] text-slate-400">Vacunas, antiparasitarios y controles</p>
@@ -25716,11 +25718,57 @@
             } catch (_) {}
           }
 
+          let birthdayTxt = '';
+          try {
+            const arrToday = (typeof dayDataMap === 'object' && dayDataMap && Array.isArray(dayDataMap[todayIso])) ? dayDataMap[todayIso] : [];
+            const bd = arrToday.find(n => n && n.isBirthday);
+            if (bd) birthdayTxt = '🎂 Cumpleaños de ' + (bd.title || bd.text || 'Hoy');
+          } catch (_) {}
+
+          let healthTxt = '';
+          try {
+            const hParts = [];
+            if (Array.isArray(healthControls)) {
+              const hc = healthControls.find(c => c && c.date === todayIso);
+              if (hc) hParts.push('🩺 ' + (hc.person || 'Control') + (hc.time ? ' ' + hc.time : ''));
+            }
+            if (Array.isArray(medications)) {
+              const medToday = medications.find(m => m && (!m.endDate || m.endDate >= todayIso) && (!m.startDate || m.startDate <= todayIso) && Array.isArray(m.times) && m.times.length > 0);
+              if (medToday) hParts.push('💊 ' + (medToday.name || 'Medicamento') + ' ' + (medToday.times[0] || ''));
+            }
+            if (hParts.length > 0) healthTxt = hParts.join(' · ');
+          } catch (_) {}
+
+          let vehicleTxt = '';
+          try {
+            const vList = JSON.parse(localStorage.getItem('cal_vehicles_v1') || '[]');
+            const vLabels = { prtDate: 'Rev. Técnica', permisoDate: 'Permiso Circ.', soapDate: 'SOAP', oilDate: 'Aceite' };
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            let bestVeh = null;
+            vList.forEach(v => {
+              if (!v) return;
+              Object.keys(vLabels).forEach(f => {
+                if (v[f] && /^\d{4}-\d{2}-\d{2}$/.test(v[f])) {
+                  const [yy, mm, dd] = v[f].split('-').map(Number);
+                  const diff = Math.round((new Date(yy, mm - 1, dd).getTime() - todayStart) / 86400000);
+                  if (!bestVeh || diff < bestVeh.diff) bestVeh = { diff, label: vLabels[f], name: v.name || 'Auto' };
+                }
+              });
+            });
+            if (bestVeh) {
+              const when = bestVeh.diff < 0 ? 'Vencido' : (bestVeh.diff === 0 ? 'Hoy' : `En ${bestVeh.diff}d`);
+              vehicleTxt = `🚗 ${bestVeh.label} · ${bestVeh.name} (${when})`;
+            }
+          } catch (_) {}
+
           const payload = {
             todayLabel,
             shift: shiftTxt,
             nextBill: nextBillTxt,
             reminder: reminderTxt,
+            birthday: birthdayTxt,
+            health: healthTxt,
+            vehicle: vehicleTxt,
             updatedAt: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
           };
           window.OmniTaskNative.updateWidgetData(JSON.stringify(payload));
@@ -25871,14 +25919,20 @@
         const syncEl = document.getElementById('health-patient-sync-badge');
         const delBtn = document.getElementById('health-patient-quick-del-btn');
         const patRooms = (typeof window.getRoomsForSyncItem === 'function') ? window.getRoomsForSyncItem('pat', active.id) : [];
-        const isSynced = patRooms.some(r => r && r.lastSyncOk === true);
+        const patLiveRooms = patRooms.filter(r => r && r.lastSyncOk === true);
+        const isSynced = patLiveRooms.length > 0;
+        const isPatPending = !isSynced && patRooms.length > 0;
         if (emojiEl) emojiEl.textContent = active.emoji || '🧑';
         if (nameEl) nameEl.textContent = (active.name && active.name !== 'Paciente 1') ? active.name : `${active.name || 'Paciente 1'} (Sin nombre)`;
         if (syncEl) {
-          syncEl.textContent = isSynced ? `☁️ ${patRooms.map(r => r.name).join(' · ')}` : '📱 Solo en este celular';
+          syncEl.textContent = isSynced
+            ? `☁️ ${patLiveRooms.map(r => r.name).join(' · ')}`
+            : (isPatPending ? `⏳ ${patRooms.map(r => r.name).join(' · ')} (sin sincronizar)` : '📱 Solo en este celular');
           syncEl.className = isSynced
             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2 py-0.5 rounded text-[10px]'
-            : 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]';
+            : (isPatPending
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2 py-0.5 rounded text-[10px]'
+              : 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold px-2 py-0.5 rounded text-[10px]');
         }
         const liveBtn = document.getElementById('health-live-sync-btn');
         if (liveBtn) liveBtn.classList.toggle('hidden', !isSynced);
@@ -26393,13 +26447,15 @@
         try {
           const bt = JSON.parse(localStorage.getItem('baby_tracker_multi_v1') || '{}');
           const activeBId = (bt && bt.activeBabyId) || 'baby_1';
-          const babyLive = window.getRoomsForSyncItem('baby', activeBId).some(r => r && r.lastSyncOk === true);
+          const bRooms = window.getRoomsForSyncItem('baby', activeBId);
+          const babyLive = bRooms.some(r => r && r.lastSyncOk === true);
           const bBtn = document.getElementById('btCloudSyncBtn');
           if (bBtn) {
             bBtn.classList.toggle('hidden', !babyLive);
             const lbl = document.getElementById('btCloudSyncBtnLabel');
             if (lbl) lbl.textContent = 'En vivo';
           }
+          setSyncBadge('btLocalOnlyBadge', bRooms);
         } catch (_) {}
         if (!onlyBadges) {
           if (typeof window.renderHealthPatientsBar === 'function') window.renderHealthPatientsBar();
@@ -26425,8 +26481,12 @@
         return all.find(r => r && r.roomCode !== currentCode && isItemActiveInRoom(r, type, key)) || null;
       }
 
-      function ensureUniqueShareableId(type, key) {
-        const shortDev = getDeviceId().replace(/^dev_/, '').slice(0, 6);
+      function ensureUniqueShareableId(type, key, room) {
+        const myDevId = getDeviceId();
+        const own = room && room.itemOwners ? room.itemOwners[`${type}:${key}`] : null;
+        const ownedByOther = !!(own && own.devId && own.devId !== myDevId);
+        if (room && room.role !== 'guest' && !ownedByOther) return key;
+        const shortDev = myDevId.replace(/^dev_/, '').slice(0, 6);
         if (type === 'sp' && key === 'sp_1') {
           const newId = 'sp_' + shortDev;
           try {
@@ -26593,8 +26653,14 @@
 
       window.shareSharedRoomInvite = async function (roomName, code) {
         const msg = `Únete a mi sala "${roomName}" en OmniTask para sincronizar en tiempo real. Código: ${code}`;
+        try {
+          if (window.OmniTaskNative && typeof window.OmniTaskNative.shareText === 'function') {
+            if (window.OmniTaskNative.shareText('Invitación OmniTask', msg)) return;
+          }
+        } catch (_) {}
         try { if (navigator.share) { await navigator.share({ title: 'Invitación OmniTask', text: msg }); return; } } catch (_) {}
         window.copySharedRoomCode(code);
+        try { window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener'); } catch (_) {}
       };
 
       window.openOmniTaskSyncCenter = function () {
@@ -26727,7 +26793,7 @@
             }
             return;
           }
-          const safeKey = ensureUniqueShareableId(type, key);
+          const safeKey = ensureUniqueShareableId(type, key, room);
           if (type === 'mod') sm[safeKey] = true;
           else if (type === 'veh') sm.vehicles[safeKey] = true;
           else if (type === 'sp') sm.shiftProfiles[safeKey] = true;
@@ -27190,6 +27256,34 @@
               const bt = JSON.parse(prevBtRaw);
               bt.deletedIds = mergedDel.babies;
               bt.babies = mergeByIdWithTimestamp(bt.babies || [], remote.babies, mergedDel.babies);
+              // Deduplicate babies with identical name (e.g. legacy baby_1 vs migrated baby_xxx)
+              if (bt.babies.length > 1) {
+                const byName = new Map();
+                const scoreBaby = (b) => {
+                  const feed = (b.feeding && Array.isArray(b.feeding.entries)) ? b.feeding.entries.length : 0;
+                  const diap = (b.diapers && Array.isArray(b.diapers.entries)) ? b.diapers.entries.length : 0;
+                  const slp = (b.sleep && Array.isArray(b.sleep.entries)) ? b.sleep.entries.length : 0;
+                  return (feed + diap + slp) * 1000000000 + Number(b.updatedAt || 0);
+                };
+                bt.babies.forEach(b => {
+                  if (!b || !b.id) return;
+                  const nm = String((b.profile && b.profile.name) || '').trim().toLowerCase();
+                  if (!nm) { byName.set('__id_' + b.id, b); return; }
+                  const prev = byName.get(nm);
+                  if (!prev) { byName.set(nm, b); return; }
+                  const keep = scoreBaby(b) >= scoreBaby(prev) ? b : prev;
+                  const drop = keep === b ? prev : b;
+                  mergedDel.babies[drop.id] = nowMs;
+                  if (bt.activeBabyId === drop.id) bt.activeBabyId = keep.id;
+                  if (room.sharedModules.babies && room.sharedModules.babies[drop.id]) {
+                    room.sharedModules.babies[keep.id] = true;
+                    delete room.sharedModules.babies[drop.id];
+                  }
+                  byName.set(nm, keep);
+                });
+                bt.babies = Array.from(byName.values());
+                bt.deletedIds = mergedDel.babies;
+              }
               remote.babies.forEach(rb => { if (rb && rb.id && !mergedDel.babies[rb.id]) { const ts = Number(rMTs['baby:' + rb.id] || 0); if (ts >= Number(lMTs['baby:' + rb.id] || 0)) room.sharedModules.babies[rb.id] = true; } });
               const nextBtRaw = JSON.stringify(bt);
               if (nextBtRaw !== prevBtRaw) {
