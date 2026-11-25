@@ -120,12 +120,15 @@
     </section>
 
     <section class="card">
-      <h2>2. Sincronización familiar opcional (Firebase Realtime Database)</h2>
+      <h2>2. Sincronización opcional en la nube y sesión anónima (Firebase)</h2>
       <p>
-        Los módulos <strong>Bebé</strong> y <strong>Turnos</strong> incluyen una función opcional de sincronización familiar en tiempo real. Si el usuario decide activarla mediante un código de sala familiar, los registros del bebé y los turnos laborales compartidos se sincronizan a través de Google Firebase Realtime Database utilizando conexión cifrada HTTPS (TLS) únicamente para compartir el estado entre los dispositivos autorizados con dicho código.
+        El <strong>Centro de Sincronización</strong> permite compartir de forma opcional y selectiva perfiles de <strong>Turnos, Finanzas, Vehículos, Salud, Bebé y Mascotas</strong> mediante salas privadas con código de invitación. Los datos elegidos se sincronizan a través de Google Firebase Realtime Database utilizando conexión cifrada HTTPS (TLS) únicamente entre los dispositivos vinculados a dicha sala.
       </p>
       <p>
-        Tus notas personales del calendario y medicamentos del módulo general permanecen privados en tu celular y no se envían a la sala familiar a menos que decidas exportarlos o compartirlos manualmente mediante un archivo de respaldo JSON.
+        <strong>Autenticación técnica anónima:</strong> Para proteger tus salas y el control de acceso sin pedirte crear cuenta, correo ni contraseña, OmniTask genera automáticamente un token de sesión técnica anónima mediante <strong>Firebase Anonymous Authentication</strong>. Este identificador anónimo se utiliza exclusivamente para validar la comunicación con la base de datos y no se vincula a tu identidad personal.
+      </p>
+      <p>
+        Tus <strong>Eventos, Notas del calendario y cuentas marcadas como personales</strong> permanecen siempre privados en tu dispositivo (respaldados localmente en IndexedDB/localStorage) y nunca se suben a la nube salvo que tú exportes manualmente un respaldo JSON.
       </p>
     </section>
 

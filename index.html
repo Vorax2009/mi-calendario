@@ -567,6 +567,7 @@
     .ot-profile-bar-shell { background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(51, 65, 85, 0.75); border-radius: 16px; padding: 6px; display: flex; align-items: center; gap: 6px; overflow-x: auto; }
     .ot-profile-bar-shell.hidden, .ot-profile-bar-shell:empty { display: none !important; }
     .ot-sync-pill-btn { padding: 6px 10px; border-radius: 10px; background: rgba(16, 185, 129, 0.14); border: 1px solid rgba(16, 185, 129, 0.38); color: #6ee7b7; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; cursor: pointer; }
+    .ot-sync-pill-btn.hidden, .ot-sync-dot-on.hidden { display: none !important; }
     .ot-sync-pill-btn:active { transform: scale(0.96); }
     .ot-sync-dot-on { width: 8px; height: 8px; border-radius: 999px; background: #10b981; box-shadow: 0 0 6px #10b981; }
     .ot-sync-dot-off { width: 8px; height: 8px; border-radius: 999px; background: #64748b; }
@@ -574,10 +575,10 @@
     body.theme-light .ot-sync-pill-btn { background: #ecfdf5 !important; border-color: #6ee7b7 !important; color: #047857 !important; }
 
     /* === OMNITASK v1.1.17-v2: FINANZAS+ & WEEKLY SUMMARY === */
-    .ot-v117-modal-bg { position: fixed; inset: 0; z-index: 95; background: rgba(2, 6, 23, 0.84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; padding: 12px; }
+    .ot-v117-modal-bg { position: fixed; inset: 0; z-index: 95; background: rgba(2, 6, 23, 0.84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-start; justify-content: center; padding: max(20px, env(safe-area-inset-top)) 12px 12px; overflow-y: auto; }
     .ot-v117-modal-bg.hidden { display: none !important; }
-    @media (min-width: 640px) { .ot-v117-modal-bg { align-items: center; } }
-    .ot-v117-card { background: #1e2733; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 18px; width: 100%; max-width: 440px; max-height: 86dvh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 54px rgba(0, 0, 0, 0.55); color: #f1f5f9; }
+    @media (min-width: 640px) { .ot-v117-modal-bg { align-items: center; padding-top: 12px; } }
+    .ot-v117-card { background: #1e2733; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 18px; width: 100%; max-width: 440px; max-height: 86dvh; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 0 24px 54px rgba(0, 0, 0, 0.55); color: #f1f5f9; }
     .ot-v117-row { width: 100%; text-align: left; background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .ot-weekly-note-box { padding: 10px 12px; border-radius: 12px; background: rgba(99, 102, 241, 0.14); border: 1px solid rgba(129, 140, 248, 0.35); font-size: 11px; color: #c7d2fe; line-height: 1.45; }
     .ot-weekly-bday-val { color: #f9a8d4; }
@@ -3693,7 +3694,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.38 · Toca 5 veces para modo prueba
+            OmniTask v1.1.44 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -15117,6 +15118,110 @@
       };
     })();
 
+    // === MOTOR HÍBRIDO INDEXEDDB + LOCALSTORAGE (v1.1.40: SIN LÍMITE DE 5 MB) ===
+    (function () {
+      const OT_IDB_KEYS = new Set([
+        'cal_day_details_map',
+        'baby_tracker_multi_v1',
+        'mimedicina_meds_v2',
+        'mimedicina_meds_logs_v2',
+        'mimedicina_controls_v1',
+        'cal_bills_v1',
+        'cal_vehicles_v1',
+        'cal_pets_v1',
+        'omnitask_shared_rooms_v1'
+      ]);
+      const IDB_SENTINEL = '__OT_IDB__';
+      const memKV = new Map();
+      const origGet = Storage.prototype.getItem;
+      const origSet = Storage.prototype.setItem;
+      const origDel = Storage.prototype.removeItem;
+
+      // Precargar en memoria lo que ya exista en localStorage
+      OT_IDB_KEYS.forEach(k => {
+        try {
+          const v = origGet.call(window.localStorage, k);
+          if (v && v !== IDB_SENTINEL) memKV.set(k, v);
+        } catch (_) {}
+      });
+
+      Storage.prototype.getItem = function (key) {
+        if (this === window.localStorage && OT_IDB_KEYS.has(key)) {
+          if (memKV.has(key)) return memKV.get(key);
+          const raw = origGet.call(this, key);
+          return raw === IDB_SENTINEL ? null : raw;
+        }
+        return origGet.call(this, key);
+      };
+
+      Storage.prototype.setItem = function (key, val) {
+        const str = String(val);
+        if (this === window.localStorage && OT_IDB_KEYS.has(key)) {
+          memKV.set(key, str);
+          if (typeof OmniTaskIDB !== 'undefined') OmniTaskIDB.set(key, str);
+          try {
+            origSet.call(this, key, str);
+          } catch (err) {
+            // Si localStorage supera los ~5 MB del WebView, queda guardado en IndexedDB + memoria sin perder datos
+            try { origSet.call(this, key, IDB_SENTINEL); } catch (_) {}
+          }
+          return;
+        }
+        return origSet.call(this, key, str);
+      };
+
+      Storage.prototype.removeItem = function (key) {
+        if (this === window.localStorage && OT_IDB_KEYS.has(key)) {
+          memKV.delete(key);
+          if (typeof OmniTaskIDB !== 'undefined') OmniTaskIDB.del(key);
+        }
+        return origDel.call(this, key);
+      };
+
+      async function hydrateLargeKeysFromIDB() {
+        if (typeof OmniTaskIDB === 'undefined') return;
+        let hydratedAny = false;
+        for (const k of OT_IDB_KEYS) {
+          try {
+            const lsVal = origGet.call(window.localStorage, k);
+            const idbVal = await OmniTaskIDB.get(k);
+            if (typeof idbVal === 'string' && idbVal.length > 0) {
+              if (!lsVal || lsVal === IDB_SENTINEL || idbVal.length > lsVal.length) {
+                memKV.set(k, idbVal);
+                if (lsVal === IDB_SENTINEL || !lsVal) hydratedAny = true;
+              }
+            } else if (lsVal && lsVal !== IDB_SENTINEL) {
+              // Respaldo inicial silencioso en IndexedDB para usuarios existentes
+              await OmniTaskIDB.set(k, lsVal);
+            }
+          } catch (_) {}
+        }
+        if (hydratedAny) {
+          try {
+            const dRaw = memKV.get('cal_day_details_map');
+            if (dRaw && typeof dayDataMap !== 'undefined') { dayDataMap = JSON.parse(dRaw); }
+            const mRaw = memKV.get('mimedicina_meds_v2');
+            if (mRaw && typeof medications !== 'undefined') { medications = JSON.parse(mRaw); }
+            const lRaw = memKV.get('mimedicina_meds_logs_v2');
+            if (lRaw && typeof medLogs !== 'undefined') { medLogs = JSON.parse(lRaw); }
+            const cRaw = memKV.get('mimedicina_controls_v1');
+            if (cRaw && typeof healthControls !== 'undefined') { healthControls = JSON.parse(cRaw); }
+            const bRaw = memKV.get('baby_tracker_multi_v1');
+            if (bRaw && typeof window.setBabyTrackerState === 'function') { window.setBabyTrackerState(JSON.parse(bRaw)); }
+            if (typeof renderAll === 'function') renderAll();
+            if (typeof renderMedsView === 'function') renderMedsView();
+            if (typeof window.renderBillsView === 'function') window.renderBillsView();
+            if (typeof window.renderPetsView === 'function') window.renderPetsView();
+            if (typeof window.renderVehiclesView === 'function') window.renderVehiclesView();
+          } catch (_) {}
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(hydrateLargeKeysFromIDB, 120);
+      });
+    })();
+
     async function exportJsonOrDrive() {
       const isNativeAndroid = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !!window.OmniTaskNative;
       if (isNativeAndroid && typeof shareBackupFileToDriveApp === 'function') {
@@ -17017,7 +17122,8 @@
         healthControls = [];
         if (typeof window.resetBabyTrackerState === 'function') window.resetBabyTrackerState();
         try {
-          ['cal_bills_v1', 'cal_bill_profiles_v1', 'cal_pets_v1', 'cal_pets_deleted_v1', 'cal_vehicles_v1', 'omnitask_weekly_summary_v1', 'cal_weekly_hours_goal_v1', 'cal_deleted_shift_ids_v1', 'mimedicina_patients_v1', 'omnitask_shared_rooms_v1', 'cal_shift_profiles_v1', 'omnitask_hub_deleted_v1'].forEach(k => localStorage.removeItem(k));
+          ['cal_bills_v1', 'cal_bill_profiles_v1', 'cal_pets_v1', 'cal_pets_deleted_v1', 'cal_vehicles_v1', 'omnitask_weekly_summary_v1', 'cal_weekly_hours_goal_v1', 'cal_deleted_shift_ids_v1', 'mimedicina_patients_v1', 'omnitask_shared_rooms_v1', 'cal_baby_cloud_sync_v1', 'cal_shift_profiles_v1', 'omnitask_hub_deleted_v1'].forEach(k => localStorage.removeItem(k));
+          if (typeof window.refreshAllLivePillsUI === 'function') window.refreshAllLivePillsUI(false);
         } catch (_) {}
         saveToLocalStorage();
         persistMedicationData();
@@ -22880,7 +22986,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.38';
+      const OMNITASK_APP_VERSION = '1.1.44';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -25001,7 +25107,7 @@
 
 
       <!-- MODALES CUENTAS Y MASCOTAS -->
-      <div id="bill-modal" class="hidden fixed inset-0 z-[85] bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+      <div id="bill-modal" class="hidden fixed inset-0 z-[85] bg-slate-950/80 backdrop-blur-sm flex items-start pt-6 sm:items-center sm:pt-3 justify-center p-3 overflow-y-auto">
         <div class="bg-[#1e2733] border border-slate-700 rounded-2xl w-full max-w-md p-4 space-y-3 shadow-2xl">
           <div class="flex items-center justify-between">
             <h3 id="bill-modal-title" class="text-sm font-black text-slate-100">💸 Nueva Cuenta</h3>
@@ -25051,7 +25157,7 @@
         </div>
       </div>
 
-      <div id="pet-profile-modal" class="hidden fixed inset-0 z-[85] bg-slate-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+      <div id="pet-profile-modal" class="hidden fixed inset-0 z-[85] bg-slate-950/80 backdrop-blur-sm flex items-start pt-6 sm:items-center sm:pt-3 justify-center p-3 overflow-y-auto">
         <div class="bg-[#1e2733] border border-slate-700 rounded-2xl w-full max-w-md p-4 space-y-3 shadow-2xl">
           <div class="flex items-center justify-between">
             <h3 id="pet-profile-modal-title" class="text-sm font-black text-slate-100">🐾 Nueva Mascota</h3>
@@ -26285,6 +26391,7 @@
           if (typeof window.renderPetsView === 'function') window.renderPetsView();
         }
       }
+      window.refreshAllLivePillsUI = refreshAllLivePillsUI;
 
       function isItemActiveInRoom(r, type, key) {
         const sm = (r && r.sharedModules) || {};
@@ -26875,10 +26982,10 @@
         try {
           const res = await fetch(url, {
             method: 'GET',
-            headers: { 'Accept': 'application/json', 'X-Firebase-ETag': 'true' },
+            headers: { 'Accept': 'application/json' },
             cache: 'no-store'
           });
-          if (!res.ok) return { ok: false };
+          if (!res.ok) return { ok: false, status: res.status };
           try {
             const srvDate = res.headers.get('Date');
             if (srvDate) {
@@ -27166,13 +27273,12 @@
               updatedBy: room.userName || getSavedAlias() || 'Usuario',
               members: room.members
             }, corePayload);
-            const putHeaders = { 'Content-Type': 'application/json' };
-            if (etag && remote !== null) putHeaders['If-Match'] = etag;
-            const putRes = await fetch(url, { method: 'PUT', headers: putHeaders, body: JSON.stringify(fullPayload) });
-            if (putRes.status === 412 && (retryDepth || 0) < 1) {
-              return await syncSingleHubRoom(room, true, (retryDepth || 0) + 1);
-            }
-            if (!putRes.ok) return { ok: false };
+            const putRes = await fetch(url, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(fullPayload)
+            });
+            if (!putRes.ok) return { ok: false, status: putRes.status };
             scLastPushedHash[room.roomCode] = coreHash;
             scLastHeartbeat[room.roomCode] = nowMs;
             room.hasSyncedOnce = true;
@@ -27192,11 +27298,12 @@
         if (rooms.length === 0) return;
         scSyncRunning = true;
         let anyFail = false;
+        let failStatus = 0;
         const removedCodes = [];
         try {
           for (const r of rooms) {
             const res = await syncSingleHubRoom(r, !!forcePush, 0);
-            if (!res || !res.ok) anyFail = true;
+            if (!res || !res.ok) { anyFail = true; failStatus = (res && res.status) || failStatus; }
             else if (res.kicked || res.removedByCreator) {
               removedCodes.push({ code: res.roomCode, name: res.roomName, kicked: !!res.kicked });
             }
@@ -27225,7 +27332,7 @@
           const m = document.getElementById('ot-sync-center-modal');
           if (m && !m.classList.contains('hidden')) renderSyncCenter();
           if (manualFeedback && typeof showToast === 'function') {
-            if (anyFail) showToast('Sin conexión', 'No se pudo completar la sincronización.', 'fa-wifi', 'text-amber-400');
+            if (anyFail) showToast(failStatus === 401 || failStatus === 403 ? 'Acceso bloqueado (' + failStatus + ')' : 'Sin conexión', failStatus ? 'Firebase respondió código ' + failStatus + '.' : 'No se pudo completar la sincronización.', 'fa-wifi', 'text-amber-400');
             else showToast('Sincronizado ✓', 'Todas tus salas están al día.', 'fa-cloud', 'text-emerald-400');
           }
         } finally {
@@ -27610,6 +27717,31 @@
 
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { window.renderBillProfilesBar(); }, 650);
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      document.addEventListener('focusin', function (e) {
+        const t = e.target;
+        if (!t || !t.matches('input, textarea, select')) return;
+        const dlg = t.closest('.ot-v117-modal-bg, [role="dialog"], #bill-modal, #pet-profile-modal');
+        if (!dlg) return;
+        setTimeout(() => {
+          try {
+            if (window.visualViewport && dlg.classList.contains('ot-v117-modal-bg')) {
+              const kbH = Math.max(0, window.innerHeight - window.visualViewport.height);
+              dlg.style.paddingBottom = kbH > 60 ? (kbH + 16) + 'px' : '';
+            }
+            t.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          } catch (_) {}
+        }, 220);
+      });
+      document.addEventListener('focusout', function (e) {
+        const dlg = e.target && e.target.closest && e.target.closest('.ot-v117-modal-bg');
+        if (dlg) setTimeout(() => {
+          if (!dlg.contains(document.activeElement)) dlg.style.paddingBottom = '';
+        }, 180);
       });
     })();
   </script>
