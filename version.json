@@ -1,5 +1,5 @@
 {
-  "version": "1.1.19",
-  "notes": "Widget Android 4x2, Finanzas+ con auto-renovación y gasto combinado, Resumen Dominical (Dom 20:00), nuevo modelo híbrido (video +2h hasta 12h con 1 vehículo/mascota/bebé; Pago Único $4.990 con perfiles ilimitados, Reportes PDF y Sync en la Nube).",
+  "version": "1.1.38",
+  "notes": "Regla de 1 perfil por sala (cero duplicados en Firebase con bloqueo visual 🔒) y aporte bidireccional de invitados (cada participante puede sumar sus propios turnos, autos, mascotas o pacientes a la sala compartida sin pisarse).",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario"
 }
