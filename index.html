@@ -1345,6 +1345,15 @@
             </div>
             <div id="upcomingHealthControlsList" class="space-y-2"></div>
           </div>
+          <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <h3 class="text-xs font-black text-slate-300 uppercase tracking-wider">📋 Historial de controles</h3>
+                <p class="text-[10px] text-slate-400">Controles realizados o pasados de este perfil</p>
+              </div>
+            </div>
+            <div id="pastHealthControlsList" class="space-y-2"></div>
+          </div>
         </div><div id="medicationViewToday" class="space-y-3 hidden">
           <section class="rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-4 shadow-lg">
             <div class="flex items-start justify-between gap-2">
@@ -1375,6 +1384,7 @@
           </div>
           <div id="controlStatsOverview" class="grid grid-cols-2 gap-2"></div>
           <p class="px-1 text-[10px] text-slate-500">Un registro que incluye ambos tipos se cuenta en Citas médicas y Exámenes.</p>
+          <div id="controlStatsBreakdown" class="space-y-2"></div>
         </div>
 
         <!-- ESTADÍSTICAS DE MEDICAMENTOS -->
@@ -1391,6 +1401,7 @@
           </div>
           <div id="medStatsOverview" class="grid grid-cols-2 gap-2"></div>
           <p class="px-1 text-[10px] text-slate-500">Las tomas cuya hora aún no llega cuentan como próximas.</p>
+          <div id="medStatsBreakdown" class="space-y-2"></div>
         </div>
 
         <!-- REGISTRO DE MEDICAMENTOS -->
@@ -3694,7 +3705,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.58 · Toca 5 veces para modo prueba
+            OmniTask v1.1.60 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -6278,6 +6289,11 @@
     function persistBabyTrackerStoreSafe(store) {
       if (!store) return;
       try {
+        store.lastUpdatedAt = Date.now();
+        if (Array.isArray(store.babies)) {
+          const ab = store.babies.find(b => b && b.id === store.activeBabyId) || store.babies[0];
+          if (ab) ab.updatedAt = Date.now();
+        }
         localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(store));
         if (typeof window.setBabyTrackerState === 'function') {
           window.setBabyTrackerState(store);
@@ -8329,6 +8345,7 @@
         .filter(control => control.date >= todayKey && control.attended !== true && ((control.patientId || 'pat_1') === activePatId))
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
+      renderPastHealthControls(activePatId, todayKey);
       const displayControls = upcomingControls;
       if (displayControls.length === 0) {
         container.innerHTML = '<div class="text-center py-4 bg-slate-900/50 rounded-xl border border-slate-800"><p class="text-xs text-slate-500">No tienes próximos controles pendientes.</p></div>';
@@ -8360,6 +8377,46 @@
           </button>
         </div>
       `;
+      }).join('');
+    }
+
+    function renderPastHealthControls(activePatId, todayKey) {
+      const pastContainer = document.getElementById('pastHealthControlsList');
+      if (!pastContainer) return;
+      const pastControls = getAllUnifiedHealthControls(false)
+        .filter(control => (control.date < todayKey || control.attended === true) && ((control.patientId || 'pat_1') === activePatId))
+        .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+      if (pastControls.length === 0) {
+        pastContainer.innerHTML = '<div class="text-center py-3 bg-slate-900/50 rounded-xl border border-slate-800"><p class="text-xs text-slate-500">Aún no hay controles realizados o pasados para este perfil.</p></div>';
+        return;
+      }
+      pastContainer.innerHTML = pastControls.map(control => {
+        const attended = control.attended === true;
+        const label = escapeHtml(control.person || control.name);
+        const typeDesc = escapeHtml(formatHealthControlTypes(control));
+        return `
+        <div class="p-3 rounded-xl border ${attended ? 'border-emerald-500/40 bg-emerald-950/15' : 'border-slate-700/70 bg-slate-900/70'}">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4 class="font-bold text-xs text-slate-100"><i class="fa-solid fa-user text-indigo-300 mr-1"></i>${label}</h4>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${attended ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-slate-700/60 text-slate-300'}">${attended ? '✔ Asistió' : 'Pasado'}</span>
+              </div>
+              ${typeDesc ? `<p class="mt-1 text-[11px] text-indigo-300">${typeDesc}</p>` : ''}
+              <p class="mt-1 text-[11px] text-slate-200">${escapeHtml(formatHealthControlDate(control.date))} · ${escapeHtml(formatTime(control.time))}</p>
+              ${control.location ? `<p class="mt-1 text-[11px] text-slate-300"><i class="fa-solid fa-location-dot mr-1 text-indigo-300"></i>${escapeHtml(control.location)}</p>` : ''}
+              ${control.notes ? `<p class="mt-1 text-[11px] text-slate-400 whitespace-pre-wrap">${escapeHtml(control.notes)}</p>` : ''}
+            </div>
+            <div class="flex shrink-0 items-center">
+              <button type="button" onclick="openHealthControlForm(${jsArg(control.id)})" aria-label="Editar control de ${label}" class="p-2 text-slate-400 hover:text-indigo-300"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" onclick="deleteHealthControl(${jsArg(control.id)}, false, '')" aria-label="Eliminar control de ${label}" class="p-2 text-slate-400 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+          <button type="button" onclick="toggleHealthControlAttended(${jsArg(control.id)}, false, '')" aria-pressed="${attended}" class="mt-2 w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold border transition-all active:scale-95 ${attended ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}">
+            <i class="fa-solid ${attended ? 'fa-circle-check' : 'fa-circle'}"></i>
+            <span>${attended ? 'Asistió al control' : 'Marcar como asistido'}</span>
+          </button>
+        </div>`;
       }).join('');
     }
 
@@ -9179,7 +9236,8 @@
           : String(selectedYear);
       }
 
-      const allUnifiedControls = getAllUnifiedHealthControls(false);
+      const activePatId = typeof window.getActiveHealthPatientId === 'function' ? window.getActiveHealthPatientId() : 'pat_1';
+      const allUnifiedControls = getAllUnifiedHealthControls(false).filter(control => (control.patientId || 'pat_1') === activePatId);
       let periodControls = allUnifiedControls;
       if (healthControlStatsMode === 'month') {
         let monthKey = formatDateKey(selectedYear, selectedMonth, 1).slice(0, 7);
@@ -9246,7 +9304,7 @@
       breakdown.innerHTML = Array.from(groups.entries())
         .sort((a, b) => b[1].controls.length - a[1].controls.length || a[1].name.localeCompare(b[1].name, 'es'))
         .map(([key, group]) => {
-          const expanded = expandedControlStatsPeople.has(key);
+          const expanded = true;
           const isSelected = selectedControlStatsPerson === key;
           const count = group.controls.length;
           const itemsHTML = [...group.controls]
@@ -9397,8 +9455,10 @@
       if (medStatsMode === 'month') {
         rangeStart = new Date(selectedYear, selectedMonth, 1);
         rangeEnd = new Date(selectedYear, selectedMonth + 1, 0);
-        if (medications.length > 0 && !window._manualMedStatsNav) {
-          const hasAnyInMonth = medications.some(m => {
+        const activePatIdForRange = typeof window.getActiveHealthPatientId === 'function' ? window.getActiveHealthPatientId() : 'pat_1';
+        const patMedsForRange = medications.filter(m => !m.isBaby && ((m && m.patientId) || 'pat_1') === activePatIdForRange);
+        if (patMedsForRange.length > 0 && !window._manualMedStatsNav) {
+          const hasAnyInMonth = patMedsForRange.some(m => {
             const [y, mo, d] = String(m.startDate || '').split('-').map(Number);
             if (!y || !mo || !d) return false;
             const st = new Date(y, mo - 1, d);
@@ -9406,7 +9466,7 @@
             return st <= rangeEnd && en >= rangeStart;
           });
           if (!hasAnyInMonth) {
-            const latestMed = medications.map(m => m.startDate).filter(Boolean).sort().pop();
+            const latestMed = patMedsForRange.map(m => m.startDate).filter(Boolean).sort().pop();
             if (latestMed) {
               const [ly, lm] = latestMed.split('-').map(Number);
               medStatsDate = new Date(ly, lm - 1, 1);
@@ -9435,13 +9495,14 @@
         rangeEnd = latest || rangeStart;
       }
 
+      const activePatId = typeof window.getActiveHealthPatientId === 'function' ? window.getActiveHealthPatientId() : 'pat_1';
       const btForStats = getBabyTrackerDataSafe();
       const groups = new Map();
       const cursor = new Date(rangeStart);
       let guard = 0;
       while (cursor <= rangeEnd && guard < 4000) {
         const dateKey = formatDateKey(cursor.getFullYear(), cursor.getMonth(), cursor.getDate());
-        getDosesForMedDate(dateKey, false).forEach(item => {
+        getDosesForMedDate(dateKey, false).filter(item => !item.isBaby && ((item.med && item.med.patientId) || 'pat_1') === activePatId).forEach(item => {
           const { med, doseId, time } = item;
           const [hours, minutes] = time.split(':').map(Number);
           const scheduled = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate(), hours, minutes);
@@ -18071,7 +18132,12 @@
       function saveBtState(options = {}) {
         let saved = true;
         if (!options.skipCloudPush) {
-          btStore.lastUpdatedAt = Date.now();
+          const nowTs = Date.now();
+          btStore.lastUpdatedAt = nowTs;
+          try {
+            const ab = getActiveBaby();
+            if (ab) ab.updatedAt = nowTs;
+          } catch (_) {}
         }
         try {
           localStorage.setItem(BT_STORAGE_KEY, JSON.stringify(btStore));
@@ -18397,8 +18463,7 @@
         }
         const quickDelBtn = document.getElementById('btBtnQuickDeleteBaby');
         if (quickDelBtn) quickDelBtn.classList.toggle('hidden', !(btStore && Array.isArray(btStore.babies) && btStore.babies.length > 1));
-        const localBadge = document.getElementById('btLocalOnlyBadge');
-        if (localBadge) localBadge.classList.toggle('hidden', btState.cloudSyncEnabled !== false);
+        if (typeof window.refreshAllLivePillsUI === 'function') window.refreshAllLivePillsUI(true);
         document.getElementById('btStatZodiac').textContent = computed.zodiac;
         document.getElementById('btStatChinese').textContent = computed.chinese;
         const hCm = btState.health && btState.health.heightCm;
@@ -22151,8 +22216,8 @@
       }
 
       function updateBtCloudSyncUI(statusState = null, detailText = null) {
-        const dot = document.getElementById('btCloudSyncDot');
-        const btnLabel = document.getElementById('btCloudSyncBtnLabel');
+        const dot = null;
+        const btnLabel = null;
         const modalDot = document.getElementById('babyCloudSyncModalStatusDot');
         const modalStatus = document.getElementById('babyCloudSyncModalStatusText');
         const modalLastTime = document.getElementById('babyCloudSyncLastTime');
@@ -22994,7 +23059,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.58';
+      const OMNITASK_APP_VERSION = '1.1.60';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -23127,11 +23192,7 @@
         const dotCls = effState === 'online' ? 'bg-emerald-400' : (effState === 'syncing' ? 'bg-amber-400 animate-pulse' : (effState === 'error' ? 'bg-rose-400' : 'bg-slate-500'));
 
         if (dot) dot.className = `w-2 h-2 rounded-full ${dotCls}`;
-        const sBtnLbl = document.getElementById('shiftsCloudSyncBtnLabel');
-        if (sBtnLbl) {
-          const shortDev = (shiftsCloudConfig.deviceName || 'Familia').trim().slice(0, 14);
-          sBtnLbl.textContent = active ? (effState === 'syncing' ? 'Sincronizando...' : `En vivo · ${shortDev}`) : 'Sync';
-        }
+        if (typeof window.refreshAllLivePillsUI === 'function') window.refreshAllLivePillsUI(true);
         if (mDot) mDot.className = `w-2.5 h-2.5 rounded-full ${dotCls}`;
         if (mTxt) {
           mTxt.textContent = effState === 'online'
@@ -26457,10 +26518,8 @@
           }
           setSyncBadge('btLocalOnlyBadge', bRooms);
         } catch (_) {}
-        if (!onlyBadges) {
-          if (typeof window.renderHealthPatientsBar === 'function') window.renderHealthPatientsBar();
-          if (typeof window.renderPetsView === 'function') window.renderPetsView();
-        }
+        if (typeof window.renderHealthPatientsBar === 'function') window.renderHealthPatientsBar();
+        if (typeof window.renderPetsView === 'function') window.renderPetsView();
       }
       window.refreshAllLivePillsUI = refreshAllLivePillsUI;
 
@@ -27219,8 +27278,9 @@
                 if (typeof window.renderPetsView === 'function') window.renderPetsView();
               }
             }
-            // 4. Health Patients + Meds + Controls (with real tombstones!)
+            // 4. Health Patients + Meds + Controls + MedLogs (with real tombstones!)
             if (Array.isArray(remote.patients) && remote.patients.length > 0) {
+              const patIdsPullSet = new Set(Object.keys(room.sharedModules.patients || {}).filter(k => room.sharedModules.patients[k]));
               let healthChanged = false;
               const prevPatRaw = localStorage.getItem(PATIENTS_KEY) || '{"activePatientId":"pat_1","patients":[],"deletedIds":{}}';
               const ps = JSON.parse(prevPatRaw);
@@ -27248,14 +27308,82 @@
                   healthChanged = true;
                 }
               }
+              if (remote.medLogs && typeof remote.medLogs === 'object' && typeof medLogs === 'object' && medLogs) {
+                const patMedIds = new Set((Array.isArray(medications) ? medications : []).filter(m => m && patIdsPullSet.has(m.patientId || 'pat_1')).map(m => m.id));
+                const prevLogs = JSON.stringify(medLogs);
+                Object.keys(remote.medLogs).forEach(lk => {
+                  const parts = String(lk).split('_');
+                  const mId = parts.length >= 3 ? parts.slice(1, -1).join('_') : '';
+                  if (!mId || patMedIds.size === 0 || patMedIds.has(mId)) {
+                    if (remote.medLogs[lk]) medLogs[lk] = true;
+                  }
+                });
+                if (JSON.stringify(medLogs) !== prevLogs) {
+                  try { localStorage.setItem('mimedicina_meds_logs_v2', JSON.stringify(medLogs)); } catch (_) {}
+                  healthChanged = true;
+                }
+              }
               if (healthChanged && typeof renderMedsView === 'function') renderMedsView();
             }
-            // 5. Babies (with tombstones + live UI refresh!)
+            // 5. Babies (deep item-level merge with tombstones + live UI refresh!)
+            const mergeSubArr = (lArr, rArr, delObj) => {
+              const map = new Map();
+              const del = delObj || {};
+              (Array.isArray(lArr) ? lArr : []).forEach(it => {
+                if (!it || !it.id || del[it.id]) return;
+                map.set(it.id, it);
+              });
+              (Array.isArray(rArr) ? rArr : []).forEach(it => {
+                if (!it || !it.id || del[it.id]) return;
+                const ex = map.get(it.id);
+                if (!ex) { map.set(it.id, it); return; }
+                const lTs = Number(ex.updatedAt || 0);
+                const rTs = Number(it.updatedAt || 0);
+                if (rTs > lTs) map.set(it.id, it);
+              });
+              return Array.from(map.values());
+            };
+            const mergeSingleBabyDeep = (lb, rb, delObj) => {
+              if (!lb) return rb;
+              if (!rb) return lb;
+              const lTs = Number(lb.updatedAt || 0);
+              const rTs = Number(rb.updatedAt || 0);
+              const newer = rTs > lTs ? rb : lb;
+              const older = rTs > lTs ? lb : rb;
+              const out = JSON.parse(JSON.stringify(newer));
+              out.updatedAt = Math.max(lTs, rTs);
+              out.feeding = Object.assign({}, older.feeding || {}, newer.feeding || {});
+              out.feeding.entries = mergeSubArr(lb.feeding && lb.feeding.entries, rb.feeding && rb.feeding.entries, delObj);
+              out.feeding.milkPickups = mergeSubArr(lb.feeding && lb.feeding.milkPickups, rb.feeding && rb.feeding.milkPickups, delObj);
+              out.feeding.formulaCans = mergeSubArr(lb.feeding && lb.feeding.formulaCans, rb.feeding && rb.feeding.formulaCans, delObj);
+              out.diapers = Object.assign({}, older.diapers || {}, newer.diapers || {});
+              out.diapers.entries = mergeSubArr(lb.diapers && lb.diapers.entries, rb.diapers && rb.diapers.entries, delObj);
+              out.diapers.purchases = mergeSubArr(lb.diapers && lb.diapers.purchases, rb.diapers && rb.diapers.purchases, delObj);
+              out.sleep = Object.assign({}, older.sleep || {}, newer.sleep || {});
+              out.sleep.entries = mergeSubArr(lb.sleep && lb.sleep.entries, rb.sleep && rb.sleep.entries, delObj);
+              out.growth = mergeSubArr(lb.growth, rb.growth, delObj);
+              out.health = Object.assign({}, older.health || {}, newer.health || {});
+              out.health.logs = mergeSubArr(lb.health && lb.health.logs, rb.health && rb.health.logs, delObj);
+              out.health.medicalControls = mergeSubArr(lb.health && lb.health.medicalControls, rb.health && rb.health.medicalControls, delObj);
+              out.health.medications = mergeSubArr(lb.health && lb.health.medications, rb.health && rb.health.medications, delObj);
+              out.health.vaccines = mergeSubArr(lb.health && lb.health.vaccines, rb.health && rb.health.vaccines, delObj);
+              out.health.medLogs = Object.assign({}, (older.health && older.health.medLogs) || {}, (newer.health && newer.health.medLogs) || {});
+              out.development = Object.assign({}, older.development || {}, newer.development || {});
+              out.development.milestones = mergeSubArr(lb.development && lb.development.milestones, rb.development && rb.development.milestones, delObj);
+              return out;
+            };
             if (Array.isArray(remote.babies) && remote.babies.length > 0) {
               const prevBtRaw = localStorage.getItem('baby_tracker_multi_v1') || '{"babies":[],"deletedIds":{}}';
               const bt = JSON.parse(prevBtRaw);
               bt.deletedIds = mergedDel.babies;
-              bt.babies = mergeByIdWithTimestamp(bt.babies || [], remote.babies, mergedDel.babies);
+              const bMap = new Map();
+              (bt.babies || []).forEach(lb => { if (lb && lb.id && !mergedDel.babies[lb.id]) bMap.set(lb.id, lb); });
+              remote.babies.forEach(rb => {
+                if (!rb || !rb.id || mergedDel.babies[rb.id]) return;
+                const ex = bMap.get(rb.id);
+                bMap.set(rb.id, ex ? mergeSingleBabyDeep(ex, rb, mergedDel.babies) : rb);
+              });
+              bt.babies = Array.from(bMap.values());
               // Deduplicate babies with identical name (e.g. legacy baby_1 vs migrated baby_xxx)
               if (bt.babies.length > 1) {
                 const byName = new Map();
@@ -27353,8 +27481,20 @@
           if (patIds.size > 0) {
             const ps = JSON.parse(localStorage.getItem(PATIENTS_KEY) || '{"patients":[]}');
             corePayload.patients = (ps.patients || []).filter(p => p && patIds.has(p.id));
-            corePayload.medications = (Array.isArray(medications) ? medications : []).filter(m => m && patIds.has(m.patientId || 'pat_1'));
+            const sharedMeds = (Array.isArray(medications) ? medications : []).filter(m => m && patIds.has(m.patientId || 'pat_1'));
+            corePayload.medications = sharedMeds;
             corePayload.healthControls = (Array.isArray(healthControls) ? healthControls : []).filter(c => c && patIds.has(c.patientId || 'pat_1'));
+            const sharedMedIdSet = new Set(sharedMeds.map(m => m.id));
+            const outLogs = {};
+            if (typeof medLogs === 'object' && medLogs) {
+              Object.keys(medLogs).forEach(lk => {
+                if (!medLogs[lk]) return;
+                const parts = String(lk).split('_');
+                const mId = parts.length >= 3 ? parts.slice(1, -1).join('_') : '';
+                if (sharedMedIdSet.has(mId)) outLogs[lk] = true;
+              });
+            }
+            corePayload.medLogs = outLogs;
           }
 
           const bIds = new Set(Object.keys(room.sharedModules.babies || {}).filter(k => room.sharedModules.babies[k]));
