@@ -3694,7 +3694,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.49 · Toca 5 veces para modo prueba
+            OmniTask v1.1.51 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -4121,7 +4121,7 @@
     const MONETIZATION_TEST_MODE_KEY = 'omnitask_monetization_test_mode';
     const OMNITASK_TRIAL_FIREBASE_URL = 'https://omnitask-12556-default-rtdb.firebaseio.com';
     // Pega aquí tu Web API Key de Firebase (Configuración del proyecto -> General) para activar Anonymous Auth:
-    const OMNITASK_FIREBASE_WEB_API_KEY = 'AIzaSyAVawL6o-gkf02pMw-mzK7EurNz1LIk034';
+    const OMNITASK_FIREBASE_WEB_API_KEY = 'AIzaSyAVawL6o-gkfO2pMw-mzK7EurNz1LIk034';
     const FB_AUTH_CACHE_KEY = 'omnitask_fb_auth_v1';
 
     window.otGetFirebaseAuthToken = async function () {
@@ -22994,7 +22994,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.49';
+      const OMNITASK_APP_VERSION = '1.1.51';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -26949,7 +26949,11 @@
             </div>
           </div>
 
-          <button type="button" data-sc-action="leave-delete" data-code="${escapeHtml(room.roomCode)}" data-name="${escapeHtml(room.name)}" data-creator="${isCreator ? 'true' : 'false'}" class="w-full pt-2 text-[11px] font-bold text-rose-400 hover:text-rose-300 text-center">
+          <button type="button" data-sc-action="sync-now" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow active:scale-95 flex items-center justify-center gap-2">
+            <span>☁️</span><span>${room.lastSyncOk ? 'Sincronizar sala ahora' : 'Conectar y sincronizar sala'}</span>
+          </button>
+
+          <button type="button" data-sc-action="leave-delete" data-code="${escapeHtml(room.roomCode)}" data-name="${escapeHtml(room.name)}" data-creator="${isCreator ? 'true' : 'false'}" class="w-full pt-1 text-[11px] font-bold text-rose-400 hover:text-rose-300 text-center">
             ${isCreator ? '🗑 Eliminar esta sala de la nube' : 'Salir de esta sala'}
           </button>`;
       }
