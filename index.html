@@ -2,6 +2,7 @@
 <html lang="es" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://omnitask-12556-default-rtdb.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.googleapis.com;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>OmniTask: Turnos, Salud y Bebé</title>
   <meta name="description" content="Calendario personal con turnos, notas, cumpleaños y control de medicamentos.">
@@ -3705,7 +3706,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.60 · Toca 5 veces para modo prueba
+            OmniTask v1.1.63 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -4101,7 +4102,7 @@
 
     // ===== PLAN FREE / PREMIUM (MODELO C HÍBRIDO) =====
     // Free siempre: Calendario, Eventos y Notas, Cumpleaños y 1 vehículo.
-    // 7 días de prueba gratis -> luego 1 video (+12h, tope 48h) o Pago Único $3.990 CLP.
+    // 7 días de prueba gratis -> luego 1 video (+2h, tope 12h) o Pago Único $4.990 CLP.
     // PREMIUM_ENFORCED = false mantiene la app 100% libre para testers de Prueba cerrada.
     const PREMIUM_ENFORCED = false;
     const PLAY_BILLING_PRODUCT_ID = 'omnitask_premium_lifetime';
@@ -5589,7 +5590,7 @@
           if (videoMs > 0) {
             badge.textContent = `⏱️ ${formatRemainingHours(videoMs)} activos`;
             badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
-            desc.textContent = 'Acceso completo desbloqueado por videos. Puedes acumular hasta 24 horas o pasar a Premium vitalicio.';
+            desc.textContent = 'Acceso completo desbloqueado por videos. Puedes acumular hasta 12 horas o pasar a Premium vitalicio.';
           } else if (trialMs > 0) {
             const daysLeft = Math.max(1, Math.ceil(trialMs / 86400000));
             badge.textContent = `🎁 Prueba: ${daysLeft}d`;
@@ -6297,6 +6298,9 @@
         localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(store));
         if (typeof window.setBabyTrackerState === 'function') {
           window.setBabyTrackerState(store);
+        }
+        if (typeof window.syncOmniTaskWidgetData === 'function') {
+          setTimeout(window.syncOmniTaskWidgetData, 50);
         }
       } catch (err) {
         console.error('Error saving baby tracker store:', err);
@@ -8633,10 +8637,22 @@
       return /comprimidos?|tabletas?|pastillas?|comp\b/i.test(formType) ? 'tablet' : 'liquid';
     }
 
+    function parseDoseNum(str) {
+      let s = String(str || '').trim();
+      if (/^\d{1,3}(?:\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+      s = s.replace(/(\d)\.(?=\d{3}(?!\d))/g, '$1').replace(',', '.');
+      return parseFloat(s);
+    }
+
     function getDoseCalculation(doseValue, doseUnit, formType) {
-      const dose = parseFloat(String(doseValue).replace(',', '.'));
-      const normalizedForm = formType.toLowerCase().replace(/,/g, '.');
+      const dose = parseDoseNum(doseValue);
+      const rawForm = String(formType || '');
+      const normalizedForm = rawForm.toLowerCase().replace(/(\d)\.(?=\d{3}(?!\d))/g, '$1').replace(/,/g, '.');
       if (!Number.isFinite(dose) || dose <= 0 || doseUnit !== 'mg') return null;
+
+      // Rechazar presentaciones compuestas (ej: 400 mg / 57 mg / 5 ml) para evitar usar el componente secundario
+      const mgMatches = normalizedForm.match(/\d+(?:\.\d+)?\s*mg\b/gi);
+      if (mgMatches && mgMatches.length > 1) return null;
 
       if (inferMedFormKind(normalizedForm) === 'tablet') {
         const tabletMatch = normalizedForm.match(/(\d+(?:\.\d+)?)\s*mg\s*(?:\/|\bpor\b|\bde\b)?\s*(?:(\d+(?:\.\d+)?)\s*)?(comprimidos?|tabletas?|pastillas?|comp)\b/i);
@@ -8646,20 +8662,22 @@
           if (mgPerPack > 0 && tabletsPerPack > 0) {
             const mgPerTablet = mgPerPack / tabletsPerPack;
             const calculatedTablets = dose / mgPerTablet;
+            if (!Number.isFinite(calculatedTablets) || calculatedTablets <= 0 || calculatedTablets > 20) return null;
             const tabletsText = Number(calculatedTablets.toFixed(3)).toString();
             return {
               equivalence: `${tabletsText} comprimidos de ${mgPerTablet.toFixed(2)} mg`,
               warning: 'Es una equivalencia matemática; no partas ni tritures el comprimido sin confirmarlo con un profesional.'
             };
-          };
+          }
         }
       } else {
-        const liquidMatch = normalizedForm.match(/(\d+(?:\.\d+)?)\s*mg\s*[\/,a-z\s]*?\s*(?:(\d+(?:\.\d+)?)\s*)?ml\b/i);
+        const liquidMatch = normalizedForm.match(/(\d+(?:\.\d+)?)\s*mg\s*(?:\/|\bpor\b|\ben\b)\s*(?:(\d+(?:\.\d+)?)\s*)?ml\b/i);
         if (liquidMatch) {
           const mgPerPack = parseFloat(liquidMatch[1]);
           const mlPerPack = liquidMatch[2] ? parseFloat(liquidMatch[2]) : 1;
           if (mgPerPack > 0 && mlPerPack > 0) {
             const calculatedMl = (dose * mlPerPack) / mgPerPack;
+            if (!Number.isFinite(calculatedMl) || calculatedMl <= 0 || calculatedMl > 50) return null;
             const calculatedDrops = calculatedMl * 20;
             const dropsText = Number.isInteger(calculatedDrops) ? calculatedDrops : calculatedDrops.toFixed(2);
             return {
@@ -8842,6 +8860,11 @@
 
       const logKey = `${dateKey}_${doseId}`;
       medLogs[logKey] = !medLogs[logKey];
+      try {
+        const tsMap = JSON.parse(localStorage.getItem('cal_medlog_ts_v1') || '{}');
+        tsMap[logKey] = typeof window.otNowMs === 'function' ? window.otNowMs() : Date.now();
+        localStorage.setItem('cal_medlog_ts_v1', JSON.stringify(tsMap));
+      } catch (_) {}
       persistMedicationData();
       
       showToast(medLogs[logKey] ? 'Completado' : 'Pendiente', medLogs[logKey] ? 'Toma registrada como completada.' : 'Toma marcada como pendiente.', 'fa-pills', medLogs[logKey] ? 'text-emerald-400' : 'text-blue-400');
@@ -15193,7 +15216,7 @@
         'cal_day_details_map',
         'baby_tracker_multi_v1',
         'mimedicina_meds_v2',
-        'mimedicina_meds_logs_v2',
+        'mimedicina_logs_v2',
         'mimedicina_controls_v1',
         'cal_bills_v1',
         'cal_vehicles_v1',
@@ -15271,7 +15294,7 @@
             if (dRaw && typeof dayDataMap !== 'undefined') { dayDataMap = JSON.parse(dRaw); }
             const mRaw = memKV.get('mimedicina_meds_v2');
             if (mRaw && typeof medications !== 'undefined') { medications = JSON.parse(mRaw); }
-            const lRaw = memKV.get('mimedicina_meds_logs_v2');
+            const lRaw = memKV.get('mimedicina_logs_v2');
             if (lRaw && typeof medLogs !== 'undefined') { medLogs = JSON.parse(lRaw); }
             const cRaw = memKV.get('mimedicina_controls_v1');
             if (cRaw && typeof healthControls !== 'undefined') { healthControls = JSON.parse(cRaw); }
@@ -17198,7 +17221,27 @@
         healthControls = [];
         if (typeof window.resetBabyTrackerState === 'function') window.resetBabyTrackerState();
         try {
-          ['cal_bills_v1', 'cal_bill_profiles_v1', 'cal_pets_v1', 'cal_pets_deleted_v1', 'cal_vehicles_v1', 'omnitask_weekly_summary_v1', 'cal_weekly_hours_goal_v1', 'cal_deleted_shift_ids_v1', 'mimedicina_patients_v1', 'omnitask_shared_rooms_v1', 'cal_baby_cloud_sync_v1', 'cal_shift_profiles_v1', 'omnitask_hub_deleted_v1'].forEach(k => localStorage.removeItem(k));
+          try {
+            const roomsDel = JSON.parse(localStorage.getItem('omnitask_shared_rooms_v1') || '[]');
+            if (Array.isArray(roomsDel) && typeof window.otGetFirebaseAuthToken === 'function') {
+              window.otGetFirebaseAuthToken().then(tok => {
+                roomsDel.forEach(rm => {
+                  if (rm && rm.role === 'creator' && rm.roomCode) {
+                    const url = `https://omnitask-12556-default-rtdb.firebaseio.com/omnitask_hub/${encodeURIComponent(rm.roomCode)}.json` + (tok ? `?auth=${encodeURIComponent(tok)}` : '');
+                    fetch(url, { method: 'DELETE' }).catch(() => {});
+                  }
+                });
+              }).catch(() => {});
+            }
+          } catch (_) {}
+          ['cal_bills_v1', 'cal_bill_profiles_v1', 'cal_pets_v1', 'cal_pets_deleted_v1', 'cal_vehicles_v1', 'omnitask_weekly_summary_v1', 'cal_weekly_hours_goal_v1', 'cal_deleted_shift_ids_v1', 'mimedicina_patients_v1', 'mimedicina_logs_v2', 'mimedicina_meds_logs_v2', 'cal_medlog_ts_v1', 'cal_safety_undo_backup_v1', 'omnitask_shared_rooms_v1', 'cal_baby_cloud_sync_v1', 'cal_shifts_cloud_sync_v1', 'cal_shift_profiles_v1', 'omnitask_hub_deleted_v1', 'omnitask_device_id_v1', 'omnitask_user_alias_v1', 'omnitask_fb_auth_cache_v1', 'omnitask_widget_theme_v1'].forEach(k => localStorage.removeItem(k));
+          if (typeof OmniTaskIDB !== 'undefined') {
+            try { OmniTaskIDB.del(SAFETY_UNDO_BACKUP_KEY); OmniTaskIDB.del('mimedicina_logs_v2'); OmniTaskIDB.del('mimedicina_meds_logs_v2'); } catch (_) {}
+          }
+          if (window.OmniTaskNative) {
+            try { if (typeof window.OmniTaskNative.updateWidgetData === 'function') window.OmniTaskNative.updateWidgetData('{}'); } catch (_) {}
+            try { if (typeof window.OmniTaskNative.updateBabyWidgetData === 'function') window.OmniTaskNative.updateBabyWidgetData('{}'); } catch (_) {}
+          }
           if (typeof window.refreshAllLivePillsUI === 'function') window.refreshAllLivePillsUI(false);
         } catch (_) {}
         saveToLocalStorage();
@@ -18149,6 +18192,7 @@
           }
         }
         if (typeof refreshPrimaryCalendarMarkers === 'function') refreshPrimaryCalendarMarkers();
+        if (!options.skipCloudPush && typeof window.syncOmniTaskWidgetData === 'function') setTimeout(window.syncOmniTaskWidgetData, 50);
         if (typeof renderMonthCalendar === 'function') renderMonthCalendar();
         if (typeof window.scheduleAutoNativeAlarmsRefresh === 'function') window.scheduleAutoNativeAlarmsRefresh();
         if (!options.skipCloudPush && typeof scheduleBabyCloudPush === 'function') {
@@ -18894,7 +18938,7 @@
                     ${todayDiapers.length > 0 ? todayDiapers.map(dp => `
                       <div class="p-2.5 rounded-xl bg-slate-900 border border-teal-900/40 flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">${dp.icon || '🚼'}</span>
+                          <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">${escapeHtml(dp.icon || '🚼')}</span>
                           <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                               <span class="font-bold text-slate-100">Pañal ${escapeHtml(dp.type)}</span>
@@ -18977,7 +19021,7 @@
                               </div>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
-                              <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
+                              <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', ${jsArg(p.id)})" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
                               <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                           </div>
@@ -18991,7 +19035,7 @@
                     ${periodDiapers.length > 0 ? periodDiapers.map(dp => `
                       <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                          <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">${dp.icon || '🚼'}</span>
+                          <span class="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 flex items-center justify-center text-sm shrink-0">${escapeHtml(dp.icon || '🚼')}</span>
                           <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-1.5 flex-wrap">
                               <span class="font-bold text-slate-100">Pañal ${escapeHtml(dp.type)}</span>
@@ -19800,7 +19844,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-1 shrink-0">
-                            <button type="button" onclick="openBabyControlModal('${escapeHtml(c.date)}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="openBabyControlModal(${jsArg(c.date)}, ${jsArg(c.id)})" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
                             <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400" title="Eliminar control"><i class="fa-solid fa-trash-can"></i></button>
                           </div>
                         </div>
@@ -19875,7 +19919,7 @@
                             <button type="button" data-bt-toggle-medcontrol="${escapeHtml(c.id)}" class="px-2 py-1 rounded text-[10px] font-bold border transition-colors ${attended ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'}">
                               ${attended ? 'Asistió' : 'Marcar'}
                             </button>
-                            <button type="button" onclick="openBabyControlModal('${escapeHtml(c.date)}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="openBabyControlModal(${jsArg(c.date)}, ${jsArg(c.id)})" class="p-1.5 text-slate-400 hover:text-indigo-300" title="Editar control"><i class="fa-solid fa-pen"></i></button>
                             <button type="button" data-bt-del-medcontrol="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400" title="Eliminar control"><i class="fa-solid fa-trash-can"></i></button>
                           </div>
                         </div>
@@ -20022,7 +20066,7 @@
                           <span>${escapeHtml(m.name)}</span>
                         </h4>
                         <div class="flex items-center gap-1">
-                          <button type="button" onclick="openBabyMedModal('${escapeHtml(m.startDate)}', '${escapeHtml(m.id)}')" class="p-1.5 text-slate-400 hover:text-blue-300 rounded" title="Editar tratamiento"><i class="fa-solid fa-pen"></i></button>
+                          <button type="button" onclick="openBabyMedModal(${jsArg(m.startDate)}, ${jsArg(m.id)})" class="p-1.5 text-slate-400 hover:text-blue-300 rounded" title="Editar tratamiento"><i class="fa-solid fa-pen"></i></button>
                           <button type="button" data-bt-del-babymed="${escapeHtml(m.id)}" class="p-1.5 text-slate-400 hover:text-red-400 rounded" title="Eliminar tratamiento"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                       </div>
@@ -20481,7 +20525,7 @@
                           <p class="text-[11px] text-slate-300 mt-0.5">Quedan aprox. <strong>${activeCanRemainingGrams} g</strong> disponibles en este tarro</p>
                         </div>
                       </div>
-                      <button type="button" onclick="openBabyFormulaCanModal('${activeCanMetrics.openIso}', '${escapeHtml(activeCan.id)}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                      <button type="button" onclick="openBabyFormulaCanModal('${activeCanMetrics.openIso}', ${jsArg(activeCan.id)})" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1">
                         <i class="fa-solid fa-pen"></i> Editar
                       </button>
                     </div>
@@ -20588,7 +20632,7 @@
                                 </p>
                               </div>
                               <div class="flex items-center gap-1 shrink-0">
-                                <button type="button" onclick="openBabyFormulaCanModal('${m.openIso}', '${escapeHtml(c.id)}')" class="p-1.5 text-slate-400 hover:text-sky-300"><i class="fa-solid fa-pen"></i></button>
+                                <button type="button" onclick="openBabyFormulaCanModal('${m.openIso}', ${jsArg(c.id)})" class="p-1.5 text-slate-400 hover:text-sky-300"><i class="fa-solid fa-pen"></i></button>
                                 <button type="button" data-bt-del-can="${escapeHtml(c.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
                               </div>
                             </div>
@@ -20687,7 +20731,7 @@
                           </div>
                         </div>
                         <div class="flex flex-col items-center gap-1 shrink-0">
-                          <button type="button" onclick="openBabyMilkPickupModal('${mp._date}', '${escapeHtml(mp.id)}')" class="p-1.5 text-slate-400 hover:text-amber-300 rounded" title="Editar retiro">
+                          <button type="button" onclick="openBabyMilkPickupModal('${mp._date}', ${jsArg(mp.id)})" class="p-1.5 text-slate-400 hover:text-amber-300 rounded" title="Editar retiro">
                             <i class="fa-solid fa-pen"></i>
                           </button>
                           <button type="button" data-bt-del-milkpickup="${escapeHtml(mp.id)}" class="p-1.5 text-slate-500 hover:text-red-400 rounded" title="Eliminar retiro">
@@ -20815,7 +20859,7 @@
                             </div>
                           </div>
                           <div class="flex items-center gap-1 shrink-0">
-                            <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', '${escapeHtml(p.id)}')" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="openBabyDiaperPurchaseModal('${p._date}', ${jsArg(p.id)})" class="p-1.5 text-slate-400 hover:text-teal-300"><i class="fa-solid fa-pen"></i></button>
                             <button type="button" data-bt-del-diaperpurchase="${escapeHtml(p.id)}" class="p-1.5 text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
                           </div>
                         </div>
@@ -21991,7 +22035,7 @@
         }
         const room = sanitizeRoomCode(btCloudConfig.roomCode);
         if (!base || !room) return '';
-        return `${base}/baby_rooms/${encodeURIComponent(room)}.json`;
+        return ''; // Migrado a omnitask_hub con Firebase Auth
       }
 
       function generateBtInviteToken(dbUrl, roomCode) {
@@ -23059,7 +23103,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.60';
+      const OMNITASK_APP_VERSION = '1.1.63';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -23174,7 +23218,7 @@
         if (!shiftsCloudConfig.enabled || !shiftsCloudConfig.roomCode) return '';
         const room = sanitizeShiftsRoom(shiftsCloudConfig.roomCode);
         if (!room || room.length < 12) return '';
-        return `${FIREBASE_BASE}/baby_rooms/shifts_${encodeURIComponent(room)}.json`;
+        return ''; // Migrado a omnitask_hub con Firebase Auth
       }
 
       function updateShiftsCloudUI(state, msg) {
@@ -24052,7 +24096,7 @@
                   </div>
                 </div>
               </div>
-              <button type="button" onclick="renewVehicleItemOneYear('${escapeHtml(doc.vehicleId)}','${doc.field}')" title="Marcar como realizado y renovar +1 año" class="shrink-0 px-2.5 py-2 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-xl text-[10px] font-bold flex items-center gap-1 active:scale-95 transition-all">
+              <button type="button" onclick="renewVehicleItemOneYear(${jsArg(doc.vehicleId)},'${doc.field}')" title="Marcar como realizado y renovar +1 año" class="shrink-0 px-2.5 py-2 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-xl text-[10px] font-bold flex items-center gap-1 active:scale-95 transition-all">
                 <span>☑</span><span>Realizado</span>
               </button>
             </div>`;
@@ -24099,13 +24143,13 @@
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${b.cls}">${escapeHtml(b.text)}</span>
-                <button type="button" onclick="event.stopPropagation(); renewVehicleItemOneYear('${escapeHtml(v.id)}','${r.field}')" title="Marcar realizado y avanzar +1 año" class="px-2 py-1 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold">☑ Realizado</button>
+                <button type="button" onclick="event.stopPropagation(); renewVehicleItemOneYear(${jsArg(v.id)},'${r.field}')" title="Marcar realizado y avanzar +1 año" class="px-2 py-1 bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-lg text-[10px] font-bold">☑ Realizado</button>
               </div>
             </div>`;
           }).join('');
 
           return `<div class="bg-[#1e2733] rounded-2xl border border-slate-700/70 shadow-lg overflow-hidden">
-            <div onclick="toggleVehicleCardExpand('${escapeHtml(v.id)}')" role="button" tabindex="0" aria-expanded="${isOpen ? 'true' : 'false'}" class="p-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-800/40 transition-colors select-none">
+            <div onclick="toggleVehicleCardExpand(${jsArg(v.id)})" role="button" tabindex="0" aria-expanded="${isOpen ? 'true' : 'false'}" class="p-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-800/40 transition-colors select-none">
               <div class="flex items-center gap-2.5 min-w-0">
                 <span class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-xl shrink-0">${escapeHtml(vIcon)}</span>
                 <div class="min-w-0">
@@ -24121,8 +24165,8 @@
                 </div>
               </div>
               <div class="flex items-center gap-1 shrink-0">
-                <button type="button" onclick="event.stopPropagation(); openVehicleModal('${escapeHtml(v.id)}')" aria-label="Editar" class="p-1.5 text-slate-300 hover:text-sky-300 rounded-lg text-xs">✏️</button>
-                <button type="button" onclick="event.stopPropagation(); deleteVehicleItem('${escapeHtml(v.id)}')" aria-label="Eliminar" class="p-1.5 text-slate-300 hover:text-rose-400 rounded-lg text-xs">🗑️</button>
+                <button type="button" onclick="event.stopPropagation(); openVehicleModal(${jsArg(v.id)})" aria-label="Editar" class="p-1.5 text-slate-300 hover:text-sky-300 rounded-lg text-xs">✏️</button>
+                <button type="button" onclick="event.stopPropagation(); deleteVehicleItem(${jsArg(v.id)})" aria-label="Eliminar" class="p-1.5 text-slate-300 hover:text-rose-400 rounded-lg text-xs">🗑️</button>
                 <span class="p-1 text-slate-400 text-xs transition-transform ${isOpen ? 'rotate-180' : ''}">▾</span>
               </div>
             </div>
@@ -24187,7 +24231,7 @@
 
             const entriesHtml = b.entries.length > 0
               ? b.entries.map(e => `
-                  <div onclick="openVehicleHistoryDetailModal('${escapeHtml(e.vehId)}','${escapeHtml(e.histId)}')" role="button" tabindex="0" class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800/80 border border-slate-800 hover:border-sky-500/40 cursor-pointer transition-all">
+                  <div onclick="openVehicleHistoryDetailModal(${jsArg(e.vehId)},${jsArg(e.histId)})" role="button" tabindex="0" class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800/80 border border-slate-800 hover:border-sky-500/40 cursor-pointer transition-all">
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center gap-1.5">
                         <span class="text-[11px] font-bold text-slate-100 truncate">${escapeHtml(e.label)}</span>
@@ -24196,7 +24240,7 @@
                       <span class="block text-[10px] text-slate-400 truncate">${escapeHtml(e.vehTitle)} · <span class="font-mono">${escapeHtml(e.completedDate || e.dueDate)}</span>${e.city ? ` · 📍 ${escapeHtml(e.city)}` : ''}${e.cost ? ` · 💵 $${Number(e.cost).toLocaleString('es-CL')}` : ''}</span>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
-                      <button type="button" onclick="event.stopPropagation(); revertAndDeleteVehicleHistory('${escapeHtml(e.vehId)}','${escapeHtml(e.histId)}')" title="Deshacer, eliminar registro y volver fecha -1 año" class="px-2 py-1 rounded-lg border border-rose-500/40 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 text-[10px] font-bold active:scale-95 transition-all">↩</button>
+                      <button type="button" onclick="event.stopPropagation(); revertAndDeleteVehicleHistory(${jsArg(e.vehId)},${jsArg(e.histId)})" title="Deshacer, eliminar registro y volver fecha -1 año" class="px-2 py-1 rounded-lg border border-rose-500/40 bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 text-[10px] font-bold active:scale-95 transition-all">↩</button>
                       <span class="text-slate-400 text-xs font-bold px-0.5">›</span>
                     </div>
                   </div>
@@ -24204,7 +24248,7 @@
               : `<p class="text-[11px] text-slate-400 italic py-2 text-center">Aún no hay revisiones marcadas para esta marca. Toca <strong>☑ Realizado</strong> en Próximos o Mis Vehículos para registrarlas.</p>`;
 
             return `<div class="bg-[#1e2733] rounded-2xl border border-slate-700/70 shadow-lg overflow-hidden">
-              <div onclick="toggleBrandStatsExpand('${escapeHtml(b.key)}')" role="button" tabindex="0" aria-expanded="${isOpen ? 'true' : 'false'}" class="p-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-800/40 transition-colors select-none">
+              <div onclick="toggleBrandStatsExpand(${jsArg(b.key)})" role="button" tabindex="0" aria-expanded="${isOpen ? 'true' : 'false'}" class="p-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-800/40 transition-colors select-none">
                 <div class="flex items-center gap-2.5 min-w-0">
                   <span class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-lg shrink-0">${escapeHtml(b.icon)}</span>
                   <div class="min-w-0">
@@ -24775,9 +24819,9 @@
               <div class="text-right shrink-0 flex flex-col items-end gap-1.5">
                 <div class="text-xs font-black text-slate-100">${fmtCLP(b.amount)}</div>
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="toggleBillPaid('${escapeHtml(b.id)}')" class="px-2 py-1 rounded-lg text-[10px] font-bold ${b.paid ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-emerald-600 text-white'}">${b.paid ? 'Desmarcar' : 'Pagar ✓'}</button>
-                  <button type="button" onclick="openBillModal('${escapeHtml(b.id)}')" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-sky-300 border border-slate-700" aria-label="Editar cuenta">✏️</button>
-                  <button type="button" onclick="deleteBillItem('${escapeHtml(b.id)}')" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-rose-400 border border-slate-700" aria-label="Eliminar cuenta">🗑</button>
+                  <button type="button" onclick="toggleBillPaid(${jsArg(b.id)})" class="px-2 py-1 rounded-lg text-[10px] font-bold ${b.paid ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-emerald-600 text-white'}">${b.paid ? 'Desmarcar' : 'Pagar ✓'}</button>
+                  <button type="button" onclick="openBillModal(${jsArg(b.id)})" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-sky-300 border border-slate-700" aria-label="Editar cuenta">✏️</button>
+                  <button type="button" onclick="deleteBillItem(${jsArg(b.id)})" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-rose-400 border border-slate-700" aria-label="Eliminar cuenta">🗑</button>
                 </div>
               </div>
             </div>`;
@@ -24938,7 +24982,7 @@
         } else {
           bar.classList.remove('hidden');
           bar.innerHTML = list.map(p => `
-            <button type="button" onclick="selectActivePet('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === activePetId ? 'ot-btn-orange shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
+            <button type="button" onclick="selectActivePet(${jsArg(p.id)})" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === activePetId ? 'ot-btn-orange shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
               <span>${escapeHtml(p.emoji || '🐾')}</span><span>${escapeHtml(p.name)}</span>
             </button>`).join('') + `
             <button type="button" onclick="openPetProfileModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900/80 text-amber-300 border border-amber-500/40 active:scale-95 ml-auto shrink-0">+ Otra mascota</button>`;
@@ -24973,10 +25017,10 @@
               <div class="flex flex-col items-end gap-1.5 shrink-0">
                 ${isSynced ? `<button type="button" onclick="openOmniTaskSyncCenter()" class="ot-sync-pill-btn" title="En vivo en tu sala"><span class="ot-sync-dot-on"></span><span>En vivo</span></button>` : ''}
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="openPetProfileModal('${escapeHtml(pet.id)}')" class="px-2.5 py-1.5 ot-btn-orange text-white rounded-lg text-[10px] font-bold shadow active:scale-95">
+                  <button type="button" onclick="openPetProfileModal(${jsArg(pet.id)})" class="px-2.5 py-1.5 ot-btn-orange text-white rounded-lg text-[10px] font-bold shadow active:scale-95">
                     <i class="fa-solid fa-pen mr-1"></i>Perfil
                   </button>
-                  <button type="button" onclick="deletePetProfile('${escapeHtml(pet.id)}')" class="px-2 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/40 rounded-lg text-[10px] font-bold active:scale-95" aria-label="Eliminar mascota" title="Eliminar mascota">
+                  <button type="button" onclick="deletePetProfile(${jsArg(pet.id)})" class="px-2 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/40 rounded-lg text-[10px] font-bold active:scale-95" aria-label="Eliminar mascota" title="Eliminar mascota">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
@@ -25051,8 +25095,8 @@
                     <div class="text-[10px] text-slate-400 mt-0.5">${escapeHtml(ev.date || '')} · ${fmtCLP(ev.cost)}</div>
                   </div>
                   <div class="flex items-center gap-1 shrink-0">
-                    <button type="button" onclick="togglePetEventDone('${escapeHtml(ev.id)}')" class="px-2 py-1 rounded-lg text-[10px] font-bold ${ev.done ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-teal-600 text-white'}">${ev.done ? 'Reabrir' : 'Listo ✓'}</button>
-                    <button type="button" onclick="deletePetEvent('${escapeHtml(ev.id)}')" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-rose-400 border border-slate-700" aria-label="Eliminar registro">🗑</button>
+                    <button type="button" onclick="togglePetEventDone(${jsArg(ev.id)})" class="px-2 py-1 rounded-lg text-[10px] font-bold ${ev.done ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-teal-600 text-white'}">${ev.done ? 'Reabrir' : 'Listo ✓'}</button>
+                    <button type="button" onclick="deletePetEvent(${jsArg(ev.id)})" class="px-1.5 py-1 rounded-lg text-[10px] bg-slate-800 text-rose-400 border border-slate-700" aria-label="Eliminar registro">🗑</button>
                   </div>
                 </div>`;
             }).join('')}
@@ -25833,10 +25877,154 @@
             updatedAt: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
           };
           window.OmniTaskNative.updateWidgetData(JSON.stringify(payload));
+
+          if (typeof window.OmniTaskNative.updateBabyWidgetData === 'function') {
+            const bt = JSON.parse(localStorage.getItem('baby_tracker_multi_v1') || '{}');
+            const babies = Array.isArray(bt.babies) ? bt.babies : [];
+            const summarizeBaby = (b, idx) => {
+              let bName = (b.profile && b.profile.name && b.profile.name.trim()) ? b.profile.name.trim() : `Bebé ${idx + 1}`;
+              let ageBadge = 'Hoy', waterMl = 0, milkMl = 0, mealsCount = 0, peeCount = 0, poopCount = 0, bothCount = 0, sleepRunning = false, sleepStartTime = 0;
+              if (b.profile && b.profile.birthDate) {
+                const bd = new Date(b.profile.birthDate + 'T00:00:00');
+                const diffD = Math.max(0, Math.floor((now - bd) / 86400000));
+                const mos = Math.floor(diffD / 30.4375);
+                const remD = Math.floor(diffD - mos * 30.4375);
+                ageBadge = mos > 0 ? `${mos}m ${remD}d` : `${diffD}d`;
+              }
+              const fEnt = (b.feeding && Array.isArray(b.feeding.entries)) ? b.feeding.entries : [];
+              fEnt.forEach(e => {
+                if (!e || e.date !== todayIso) return;
+                if (e.type === 'water') waterMl += Number(e.amountMl) || 0;
+                else if (e.type === 'milk') milkMl += Number(e.amountMl) || 0;
+                else if (e.type === 'solid') mealsCount += 1;
+              });
+              const dEnt = (b.diapers && Array.isArray(b.diapers.entries)) ? b.diapers.entries : [];
+              dEnt.forEach(e => {
+                if (!e || e.date !== todayIso) return;
+                if (e.type === 'pee') peeCount += 1;
+                else if (e.type === 'poop') poopCount += 1;
+                else if (e.type === 'both') bothCount += 1;
+              });
+              if (b.sleepTimer && b.sleepTimer.running && b.sleepTimer.startTime) {
+                sleepRunning = true;
+                sleepStartTime = Number(b.sleepTimer.startTime) || 0;
+              }
+              return { id: b.id, babyName: bName, ageBadge, waterMl, milkMl, mealsCount, peeCount, poopCount, bothCount, sleepRunning, sleepStartTime };
+            };
+            const babySummaries = babies.map((b, i) => summarizeBaby(b, i));
+            const activeSummary = babySummaries.find(x => x.id === bt.activeBabyId) || babySummaries[0] || { id: 'baby_1', babyName: 'Mi Bebé', ageBadge: 'Hoy', waterMl: 0, milkMl: 0, mealsCount: 0, peeCount: 0, poopCount: 0, bothCount: 0, sleepRunning: false, sleepStartTime: 0 };
+            const isPro = (typeof hasPaidOrTrialProAccess === 'function') ? !!hasPaidOrTrialProAccess() : true;
+            window.OmniTaskNative.updateBabyWidgetData(JSON.stringify(Object.assign({}, activeSummary, {
+              activeBabyId: bt.activeBabyId || activeSummary.id,
+              todayIso,
+              isPro,
+              babies: babySummaries
+            })));
+          }
+        } catch (_) {}
+      };
+
+      window.consumeBabyWidgetPendingActions = function (rawJson) {
+        try {
+          const actions = typeof rawJson === 'string' ? JSON.parse(rawJson || '[]') : (Array.isArray(rawJson) ? rawJson : []);
+          if (!Array.isArray(actions) || actions.length === 0) return;
+          const store = JSON.parse(localStorage.getItem('baby_tracker_multi_v1') || '{}');
+          if (!Array.isArray(store.babies) || store.babies.length === 0) return;
+          const nowTs = Date.now();
+          let changed = false;
+          actions.forEach(act => {
+            if (!act || !act.id || !act.kind) return;
+            const baby = (act.babyId ? store.babies.find(b => b && b.id === act.babyId) : null)
+              || store.babies.find(b => b && b.id === store.activeBabyId)
+              || store.babies[0];
+            if (!baby) return;
+            if (!baby.feeding) baby.feeding = { entries: [], milkPickups: [], formulaCans: [], milkStockAdjustment: 0 };
+            if (!Array.isArray(baby.feeding.entries)) baby.feeding.entries = [];
+            if (!baby.diapers) baby.diapers = { entries: [], purchases: [], stockAdjustment: 0 };
+            if (!Array.isArray(baby.diapers.entries)) baby.diapers.entries = [];
+            if (!baby.sleep) baby.sleep = { entries: [] };
+            if (!Array.isArray(baby.sleep.entries)) baby.sleep.entries = [];
+            if (act.kind === 'feeding') {
+              if (!baby.feeding.entries.some(e => e && e.id === act.id)) {
+                baby.feeding.entries.unshift({
+                  id: act.id,
+                  date: act.date,
+                  time: act.time || '12:00',
+                  type: act.subType || 'milk',
+                  amountMl: Number(act.amountMl) || 0,
+                  foodText: act.foodText || '',
+                  notes: act.notes || 'Desde widget',
+                  updatedAt: Number(act.updatedAt) || nowTs
+                });
+                changed = true;
+              }
+            } else if (act.kind === 'diaper') {
+              if (!baby.diapers.entries.some(e => e && e.id === act.id)) {
+                baby.diapers.entries.unshift({
+                  id: act.id,
+                  date: act.date,
+                  time: act.time || '12:00',
+                  type: act.subType || 'pee',
+                  notes: 'Desde widget',
+                  updatedAt: Number(act.updatedAt) || nowTs
+                });
+                changed = true;
+              }
+            } else if (act.kind === 'sleep_start') {
+              baby.sleepTimer = { running: true, startTime: Number(act.startTime) || nowTs, type: 'Siesta' };
+              changed = true;
+            } else if (act.kind === 'sleep_stop') {
+              baby.sleepTimer = { running: false, startTime: null, type: 'Siesta' };
+              if (!baby.sleep.entries.some(e => e && e.id === act.id)) {
+                baby.sleep.entries.unshift({
+                  id: act.id,
+                  date: act.date,
+                  type: 'Siesta',
+                  startTime: act.startHHMM || '12:00',
+                  endTime: act.endHHMM || '12:30',
+                  durationMin: Math.max(1, Number(act.durationMin) || 1),
+                  notes: 'Desde widget',
+                  updatedAt: Number(act.updatedAt) || nowTs
+                });
+              }
+              changed = true;
+            }
+          });
+          if (changed) {
+            store.babies.forEach(b => { if (b) b.updatedAt = b.updatedAt || nowTs; });
+            const lastAct = actions[actions.length - 1];
+            if (lastAct && lastAct.babyId) {
+              const tb = store.babies.find(b => b && b.id === lastAct.babyId);
+              if (tb) tb.updatedAt = nowTs;
+            }
+            store.lastUpdatedAt = nowTs;
+            localStorage.setItem('baby_tracker_multi_v1', JSON.stringify(store));
+            if (typeof window.setBabyTrackerState === 'function') window.setBabyTrackerState(store);
+            if (typeof window.renderBabyTrackerView === 'function') window.renderBabyTrackerView();
+          }
+          if (window.OmniTaskNative && typeof window.OmniTaskNative.clearBabyWidgetPendingActions === 'function') {
+            window.OmniTaskNative.clearBabyWidgetPendingActions();
+          }
+          if (typeof window.syncOmniTaskWidgetData === 'function') setTimeout(window.syncOmniTaskWidgetData, 80);
         } catch (_) {}
       };
 
       window.handleOmniTaskWidgetAction = function (action) {
+        if (action === 'open_baby_paywall') {
+          window._otPendingWidgetAction = null;
+          setTimeout(() => {
+            if (typeof switchView === 'function') switchView('baby');
+            if (typeof openPremiumPaywall === 'function') openPremiumPaywall('baby');
+          }, 250);
+          return;
+        }
+        if (action === 'open_baby') {
+          window._otPendingWidgetAction = null;
+          setTimeout(() => {
+            if (typeof switchView === 'function') switchView('baby');
+          }, 200);
+          return;
+        }
         if (action === 'quick_note') {
           const nowTs = Date.now();
           if (nowTs - lastWidgetActionTs < 1500) return;
@@ -25967,7 +26155,7 @@
           } else {
             bar.classList.remove('hidden');
             bar.innerHTML = s.patients.map(p => `
-              <button type="button" onclick="selectHealthPatient('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-blue-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
+              <button type="button" onclick="selectHealthPatient(${jsArg(p.id)})" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-blue-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
                 <span>${escapeHtml(p.emoji || '🧑')}</span><span>${escapeHtml(p.name || 'Paciente')}</span>
               </button>
             `).join('') + `
@@ -27103,6 +27291,9 @@
       }
 
       // ---- UNIFIED BIDIRECTIONAL MERGE (updatedAt + deletedIds) ----
+      function isValidSyncId(id) {
+        return typeof id === 'string' && /^[A-Za-z0-9_.:-]{1,80}$/.test(id);
+      }
       function mergeByIdWithTimestamp(localArr, remoteArr, deletedMap) {
         const del = deletedMap || {};
         const map = new Map();
@@ -27310,16 +27501,26 @@
               }
               if (remote.medLogs && typeof remote.medLogs === 'object' && typeof medLogs === 'object' && medLogs) {
                 const patMedIds = new Set((Array.isArray(medications) ? medications : []).filter(m => m && patIdsPullSet.has(m.patientId || 'pat_1')).map(m => m.id));
+                const lTsMap = JSON.parse(localStorage.getItem('cal_medlog_ts_v1') || '{}');
+                const rTsMap = (remote.medLogTs && typeof remote.medLogTs === 'object') ? remote.medLogTs : {};
                 const prevLogs = JSON.stringify(medLogs);
                 Object.keys(remote.medLogs).forEach(lk => {
                   const parts = String(lk).split('_');
                   const mId = parts.length >= 3 ? parts.slice(1, -1).join('_') : '';
                   if (!mId || patMedIds.size === 0 || patMedIds.has(mId)) {
-                    if (remote.medLogs[lk]) medLogs[lk] = true;
+                    const rTs = Number(rTsMap[lk] || 0);
+                    const lTs = Number(lTsMap[lk] || 0);
+                    if (rTs > lTs || (lTs === 0 && remote.medLogs[lk])) {
+                      medLogs[lk] = !!remote.medLogs[lk];
+                      if (rTs > lTs) lTsMap[lk] = rTs;
+                    }
                   }
                 });
                 if (JSON.stringify(medLogs) !== prevLogs) {
-                  try { localStorage.setItem('mimedicina_meds_logs_v2', JSON.stringify(medLogs)); } catch (_) {}
+                  try {
+                    localStorage.setItem('mimedicina_logs_v2', JSON.stringify(medLogs));
+                    localStorage.setItem('cal_medlog_ts_v1', JSON.stringify(lTsMap));
+                  } catch (_) {}
                   healthChanged = true;
                 }
               }
@@ -27330,11 +27531,11 @@
               const map = new Map();
               const del = delObj || {};
               (Array.isArray(lArr) ? lArr : []).forEach(it => {
-                if (!it || !it.id || del[it.id]) return;
+                if (!it || !isValidSyncId(it.id) || del[it.id]) return;
                 map.set(it.id, it);
               });
               (Array.isArray(rArr) ? rArr : []).forEach(it => {
-                if (!it || !it.id || del[it.id]) return;
+                if (!it || !isValidSyncId(it.id) || del[it.id]) return;
                 const ex = map.get(it.id);
                 if (!ex) { map.set(it.id, it); return; }
                 const lTs = Number(ex.updatedAt || 0);
@@ -27486,15 +27687,22 @@
             corePayload.healthControls = (Array.isArray(healthControls) ? healthControls : []).filter(c => c && patIds.has(c.patientId || 'pat_1'));
             const sharedMedIdSet = new Set(sharedMeds.map(m => m.id));
             const outLogs = {};
+            const outLogTs = {};
+            const lTsPush = JSON.parse(localStorage.getItem('cal_medlog_ts_v1') || '{}');
             if (typeof medLogs === 'object' && medLogs) {
               Object.keys(medLogs).forEach(lk => {
-                if (!medLogs[lk]) return;
                 const parts = String(lk).split('_');
                 const mId = parts.length >= 3 ? parts.slice(1, -1).join('_') : '';
-                if (sharedMedIdSet.has(mId)) outLogs[lk] = true;
+                if (sharedMedIdSet.has(mId)) {
+                  if (medLogs[lk] || lTsPush[lk]) {
+                    outLogs[lk] = !!medLogs[lk];
+                    if (lTsPush[lk]) outLogTs[lk] = Number(lTsPush[lk]);
+                  }
+                }
               });
             }
             corePayload.medLogs = outLogs;
+            corePayload.medLogTs = outLogTs;
           }
 
           const bIds = new Set(Object.keys(room.sharedModules.babies || {}).filter(k => room.sharedModules.babies[k]));
@@ -27717,7 +27925,7 @@
           } else {
             bar.classList.remove('hidden');
             bar.innerHTML = s.profiles.map(p => `
-              <button type="button" onclick="selectShiftProfile('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-purple-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
+              <button type="button" onclick="selectShiftProfile(${jsArg(p.id)})" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-purple-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
                 <span>${escapeHtml(p.emoji || '🕒')}</span><span>${escapeHtml(p.name || 'Turnos')}</span>
               </button>`).join('') + `
               <button type="button" onclick="openShiftProfileModal(false)" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900/80 text-purple-300 border border-purple-500/40 active:scale-95 ml-auto shrink-0">+ Otra persona</button>`;
@@ -27897,7 +28105,7 @@
           } else {
             bar.classList.remove('hidden');
             bar.innerHTML = s.profiles.map(p => `
-              <button type="button" onclick="selectBillProfile('${escapeHtml(p.id)}')" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-emerald-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
+              <button type="button" onclick="selectBillProfile(${jsArg(p.id)})" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${p.id === active.id ? 'bg-emerald-600 text-white shadow' : 'bg-[#1e2733] text-slate-300 border border-slate-700/60'}">
                 <span>${escapeHtml(p.emoji || '💸')}</span><span>${escapeHtml(p.name || 'Finanzas')}</span>
               </button>`).join('') + `
               <button type="button" onclick="openBillProfileModal(false)" class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900/80 text-emerald-300 border border-emerald-500/40 active:scale-95 ml-auto shrink-0">+ Otro perfil</button>`;
