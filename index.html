@@ -1148,7 +1148,7 @@
               <div class="col-span-3 text-center">Ocurrencias</div>
               <div class="col-span-4 text-right" id="summary-header-time">Tiempo Total</div>
             </div>
-            <div id="summary-stats-breakdown" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+            <div id="summary-stats-breakdown" class="space-y-2 min-h-[240px] max-h-[54vh] overflow-y-auto pr-1"></div>
             <div id="summary-global-footer" class="pt-2.5 border-t border-slate-700/50 flex justify-between text-xs font-bold text-slate-200">
               <span id="summary-global-time-wrapper">Tiempo Total: <span id="summary-global-time" class="text-amber-400 font-extrabold">0h 0m</span></span>
               <span id="summary-global-count-label">Global: <span id="summary-global-count" class="text-teal-400 font-extrabold">0 Notas</span></span>
@@ -1288,22 +1288,22 @@
           </div>
 
           <div class="grid grid-cols-4 gap-1.5 text-center">
-            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+            <button type="button" onclick="switchMedRegistration('control');switchMedSubTab('stats');" class="bg-slate-900/90 hover:bg-slate-800 p-2 rounded-lg border border-slate-800 active:scale-95 transition-all">
               <strong id="health-stat-controls" class="block text-xs font-extrabold text-indigo-300 truncate">0</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Controles</span>
-            </div>
-            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+            </button>
+            <button type="button" onclick="switchMedRegistration('meds');switchMedicationSubTab('treatments');" class="bg-slate-900/90 hover:bg-slate-800 p-2 rounded-lg border border-slate-800 active:scale-95 transition-all">
               <strong id="health-stat-meds" class="block text-xs font-extrabold text-sky-300 truncate">0</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Tratam.</span>
-            </div>
-            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+            </button>
+            <button type="button" onclick="switchMedRegistration('meds');switchMedicationSubTab('today');" class="bg-slate-900/90 hover:bg-slate-800 p-2 rounded-lg border border-slate-800 active:scale-95 transition-all">
               <strong id="health-stat-doses" class="block text-xs font-extrabold text-emerald-400 truncate">0</strong>
               <span class="text-[10px] text-slate-400 font-semibold">Tomas hoy</span>
-            </div>
-            <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+            </button>
+            <button type="button" onclick="openPatientProfileModal(true)" class="bg-slate-900/90 hover:bg-slate-800 p-2 rounded-lg border border-slate-800 active:scale-95 transition-all">
               <strong id="health-stat-blood" class="block text-xs font-extrabold text-rose-300 truncate">—</strong>
               <span class="text-[10px] text-slate-400 font-semibold">🩸 Sangre</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -1346,15 +1346,7 @@
             </div>
             <div id="upcomingHealthControlsList" class="space-y-2"></div>
           </div>
-          <div class="bg-[#1e2733] p-3.5 rounded-2xl border border-slate-700/60 space-y-2.5">
-            <div class="flex items-center justify-between gap-2">
-              <div class="min-w-0">
-                <h3 class="text-xs font-black text-slate-300 uppercase tracking-wider">📋 Historial de controles</h3>
-                <p class="text-[10px] text-slate-400">Controles realizados o pasados de este perfil</p>
-              </div>
-            </div>
-            <div id="pastHealthControlsList" class="space-y-2"></div>
-          </div>
+
         </div><div id="medicationViewToday" class="space-y-3 hidden">
           <section class="rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-4 shadow-lg">
             <div class="flex items-start justify-between gap-2">
@@ -3706,7 +3698,7 @@
             <i class="fa-solid fa-triangle-exclamation"></i> Borrar Todos los Datos
           </button>
           <button type="button" id="settings-version-tap-btn" onclick="handleVersionSecretTap()" class="w-full py-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-300 text-center select-none">
-            OmniTask v1.1.63 · Toca 5 veces para modo prueba
+            OmniTask v1.1.67 · Toca 5 veces para modo prueba
           </button>
         </div>
 
@@ -8340,6 +8332,7 @@
     }
 
     function renderUpcomingHealthControls() {
+      if (typeof window.renderHealthPatientsBar === 'function') window.renderHealthPatientsBar();
       const container = document.getElementById('upcomingHealthControlsList');
       if (!container) return;
       const today = new Date();
@@ -9146,6 +9139,7 @@
     }
 
     function renderTodayMedView() {
+      if (typeof window.renderHealthPatientsBar === 'function') window.renderHealthPatientsBar();
       const today = new Date();
       const dateKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
       const title = document.getElementById('todayMedicationTitle');
@@ -9327,7 +9321,7 @@
       breakdown.innerHTML = Array.from(groups.entries())
         .sort((a, b) => b[1].controls.length - a[1].controls.length || a[1].name.localeCompare(b[1].name, 'es'))
         .map(([key, group]) => {
-          const expanded = true;
+          const expanded = expandedControlStatsPeople.has(key);
           const isSelected = selectedControlStatsPerson === key;
           const count = group.controls.length;
           const itemsHTML = [...group.controls]
@@ -13137,6 +13131,8 @@
 
     function setBirthdayFilterTab(tab) {
       birthdayFilterTab = tab;
+      const totBadge = document.getElementById('birthdays-total-badge');
+      if (totBadge) totBadge.classList.toggle('hidden', tab === 'upcoming');
       const onCls = 'py-2 px-1.5 rounded-xl font-extrabold text-[11px] flex items-center justify-center gap-1 transition-all shadow bg-amber-500 text-slate-950 active:scale-95';
       const offCls = 'py-2 px-1.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-1 transition-all bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700 active:scale-95';
       ['upcoming', 'all', 'anniversaries'].forEach(k => {
@@ -13524,6 +13520,8 @@
     }
 
     function renderBirthdaysView() {
+      const _totB = document.getElementById('birthdays-total-badge');
+      if (_totB) _totB.classList.toggle('hidden', birthdayFilterTab === 'upcoming');
       const container = document.getElementById('birthdays-list-container');
       if (!container) return;
       container.innerHTML = '';
@@ -17980,11 +17978,19 @@
           return item.date;
         }
         if (typeof item.id === 'string' && item.id.includes('_')) {
-          const ts = parseInt(item.id.split('_')[1], 10);
-          if (Number.isFinite(ts) && ts > 1600000000000 && ts < 2500000000000) {
-            const d = new Date(ts);
-            return formatDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+          const parts = item.id.split('_');
+          for (let i = 0; i < parts.length; i++) {
+            const ts = parseInt(parts[i], 10);
+            if (Number.isFinite(ts) && ts > 1600000000000 && ts < 2500000000000) {
+              const d = new Date(ts);
+              return formatDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+            }
           }
+        }
+        const fallbackTs = Number(item.createdAt || item.updatedAt || 0);
+        if (Number.isFinite(fallbackTs) && fallbackTs > 1600000000000 && fallbackTs < 2500000000000) {
+          const d = new Date(fallbackTs);
+          return formatDateKey(d.getFullYear(), d.getMonth(), d.getDate());
         }
         return getTodayDateKey();
       }
@@ -18595,7 +18601,8 @@
         const btState = getCurrentBaby();
         const dev = getBtDevStats(btState);
         const todayStr = getTodayDateKey();
-        const activeDayKey = btSelectedDateKey || todayStr;
+        btSelectedDateKey = todayStr;
+        const activeDayKey = todayStr;
 
         const feedEntries = Array.isArray(btState.feeding && btState.feeding.entries) ? btState.feeding.entries : [];
         const diaperEntries = Array.isArray(btState.diapers && btState.diapers.entries) ? btState.diapers.entries : [];
@@ -22794,23 +22801,7 @@
       window.setBabyTrackerState = function(newState) {
         if (newState && typeof newState === 'object') {
           btStore = normalizeStore(newState);
-          const activeB = btStore.babies && btStore.babies[0];
-          if (activeB) {
-            const todayK = getTodayDateKey();
-            const hasToday = ['feeding', 'diapers', 'sleep'].some(cat =>
-              activeB[cat] && Array.isArray(activeB[cat].entries) && activeB[cat].entries.some(e => e && e.date === todayK)
-            );
-            if (!hasToday) {
-              const allCareDates = [
-                ...((activeB.feeding && activeB.feeding.entries) || []).map(e => e && e.date),
-                ...((activeB.diapers && activeB.diapers.entries) || []).map(e => e && e.date),
-                ...((activeB.sleep && activeB.sleep.entries) || []).map(e => e && e.date)
-              ].filter(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
-              if (allCareDates.length > 0) {
-                btSelectedDateKey = allCareDates[allCareDates.length - 1];
-              }
-            }
-          }
+          btSelectedDateKey = getTodayDateKey();
           saveBtState();
           renderBtMainContent();
         }
@@ -23103,7 +23094,7 @@
   <script>
     // Verificador automático de nuevas actualizaciones en Play Store (vía version.json en GitHub Pages)
     (function () {
-      const OMNITASK_APP_VERSION = '1.1.63';
+      const OMNITASK_APP_VERSION = '1.1.67';
       const VERSION_CHECK_URL = 'https://vorax2009.github.io/mi-calendario/version.json';
       const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=cl.vorax2009.micalendario';
       const PLAY_STORE_MARKET_URL = 'market://details?id=cl.vorax2009.micalendario';
@@ -26193,7 +26184,7 @@
         try {
           const today = new Date();
           const todayKey = typeof formatDateKey === 'function' ? formatDateKey(today.getFullYear(), today.getMonth(), today.getDate()) : '';
-          const pCtrls = (Array.isArray(healthControls) ? healthControls : []).filter(c => c && ((c.patientId || 'pat_1') === active.id) && !c.attended && (!todayKey || c.date >= todayKey)).length;
+          const pCtrls = (Array.isArray(healthControls) ? healthControls : []).filter(c => c && ((c.patientId || 'pat_1') === active.id)).length;
           const pMeds = (Array.isArray(medications) ? medications : []).filter(m => m && ((m.patientId || 'pat_1') === active.id)).length;
           const pDoses = (typeof getDosesForMedDate === 'function' && todayKey)
             ? getDosesForMedDate(todayKey, false).filter(d => ((d.med && d.med.patientId) || 'pat_1') === active.id).length
@@ -28201,21 +28192,32 @@
   </script>
   <script>
     (function () {
+      const scrollActiveInputIntoView = (el) => {
+        if (!el || !el.matches || !el.matches('input, textarea, select')) return;
+        const dlg = el.closest('.ot-v117-modal-bg, [role="dialog"], [id$="Modal"], [id$="-modal"]');
+        if (dlg) {
+          dlg.style.overflowY = 'auto';
+          if (window.visualViewport && dlg.classList.contains('ot-v117-modal-bg')) {
+            const kbH = Math.max(0, window.innerHeight - window.visualViewport.height);
+            dlg.style.paddingBottom = kbH > 60 ? (kbH + 16) + 'px' : '';
+          }
+        }
+        try { el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' }); } catch (_) {}
+      };
       document.addEventListener('focusin', function (e) {
         const t = e.target;
         if (!t || !t.matches('input, textarea, select')) return;
-        const dlg = t.closest('.ot-v117-modal-bg, [role="dialog"], #bill-modal, #pet-profile-modal');
-        if (!dlg) return;
-        setTimeout(() => {
-          try {
-            if (window.visualViewport && dlg.classList.contains('ot-v117-modal-bg')) {
-              const kbH = Math.max(0, window.innerHeight - window.visualViewport.height);
-              dlg.style.paddingBottom = kbH > 60 ? (kbH + 16) + 'px' : '';
-            }
-            t.scrollIntoView({ block: 'center', behavior: 'smooth' });
-          } catch (_) {}
-        }, 220);
+        setTimeout(() => scrollActiveInputIntoView(t), 260);
+        setTimeout(() => scrollActiveInputIntoView(t), 520);
       });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          const act = document.activeElement;
+          if (act && act.matches && act.matches('input, textarea, select')) {
+            setTimeout(() => scrollActiveInputIntoView(act), 60);
+          }
+        });
+      }
       document.addEventListener('focusout', function (e) {
         const dlg = e.target && e.target.closest && e.target.closest('.ot-v117-modal-bg');
         if (dlg) setTimeout(() => {
